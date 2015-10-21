@@ -1,13 +1,7 @@
-import React, {Component, PropTypes} from 'react'
+import React from 'react'
 
 import style from './style.css'
 
-export default class Log extends Component {
-  static propTypes = {
-    children: PropTypes.node
-  }
+const Log = props => <div className={style.log}>{props.children}</div>
 
-  render () {
-    return <div className={style.log}>{this.props.children}</div>
-  }
-}
+export default Log

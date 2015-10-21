@@ -4,18 +4,17 @@ import style from './style.css'
 
 export default class LogItem extends Component {
   static propTypes = {
-    key: PropTypes.number.isRequired,
+    key: PropTypes.number,
     label: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
     type: PropTypes.string
   }
 
   render () {
-    const {key, text, type} = this.props
-    const opacity = key > 0 ? 0.75 : 1
+    const {text} = this.props
     return (
-      <div className={style[type]} style={{opacity}}>
-        <span className={style.text}>{text}</span>
+      <div className={style.logItem}>
+        <span className={style.text}>* {text}</span>
       </div>
     )
   }

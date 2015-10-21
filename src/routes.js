@@ -1,15 +1,13 @@
 import createBrowserHistory from 'history/lib/createBrowserHistory'
-import React, {Component} from 'react'
+import React from 'react'
 import {Router, Route} from 'react-router'
 
-import Place from './place'
+import Place from './containers/place'
 
-export default class Routes extends Component {
-  render () {
-    return (
-      <Router history={createBrowserHistory()}>
-        <Route path='/' component={Place} />
-      </Router>
-    )
-  }
-}
+const Routes = () => (
+  <Router history={createBrowserHistory()}>
+    <Route path='/' component={Place} />
+  </Router>
+)
+
+export default Routes

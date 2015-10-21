@@ -1,13 +1,7 @@
-import React, {Component, PropTypes} from 'react'
+import React from 'react'
 
 import style from './style.css'
 
-export default class Fullscreen extends Component {
-  static propTypes = {
-    children: PropTypes.any
-  }
+const Fullscreen = props => <div className={style.fullscreen}>{props.children}</div>
 
-  render () {
-    return <div className={style.fullscreen}>{this.props.children}</div>
-  }
-}
+export default Fullscreen
