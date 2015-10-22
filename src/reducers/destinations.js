@@ -1,70 +1,8 @@
-import { combineReducers } from 'redux'
+import {handleActions} from 'redux-actions'
 
-import * as actions from './actions'
-import config from './config'
-
-/**
- * Action Log Manipulations
- */
-
-const initialActionLog = [{
-  index: 0,
-  label: 'Main',
-  text: 'Welcome to your location analysis tool! Drag the pin around to see new isochrones!'
-}]
-
-function actionLog (state = initialActionLog, action) {
-  switch (action.type) {
-    case actions.ADD_ACTION_LOG_ITEM:
-      return [action.payload, ...state]
-    default:
-      return state
-  }
-}
-
-/**
- * Map Marker Manipulations
- */
-
-const initialMapMarker = {
-  position: config.center,
-  description: ''
-}
-
-function mapMarker (state = initialMapMarker, action) {
-  switch (action.type) {
-    case actions.UPDATE_MAP_MARKER:
-      return action.payload
-    default:
-      return state
-  }
-}
-
-/**
- * Map Manipulations
- */
-
-const initialMapState = {
-  center: config.center,
-  zoom: config.zoom
-}
-
-function mapState (state = initialMapState, action) {
-  switch (action.type) {
-    case actions.UPDATE_MAP_STATE:
-      return Object.assign({}, state, action.payload)
-    default:
-      return state
-  }
-}
-
-/**
- * Destinations
- */
-
-const initialDestinationState = {
+const initialDestinationsState = {
   selected: 'None',
-  destinations: [
+  sets: [
     {
       'name': 'geoid10',
       'id': 'geoid10'
@@ -540,20 +478,10 @@ const initialDestinationState = {
   ]
 }
 
-function destinationState (state = initialDestinationState, action) {
-  switch (action.type) {
-    case actions.UPDATE_SELECTED_DESTINATION:
-      return Object.assign({}, state, { selected: action.payload })
-    default:
-      return state
+const destinationsReducers = handleActions({
+  UPDATE_SELECTED_DESTINATIONS: (state, action) => {
+    return Object.assign({}, state, { selected: action.payload })
   }
-}
+}, initialDestinationsState)
 
-const placeApp = combineReducers({
-  actionLog,
-  destinationState,
-  mapMarker,
-  mapState
-})
-
-export default placeApp
+export default destinationsReducers

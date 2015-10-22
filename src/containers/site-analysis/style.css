@@ -10,6 +10,15 @@
   height: 100%;
 }
 
+.navbar {
+  color: #98B8EB;
+  margin-bottom: 8px;
+}
+
+.navbar img {
+  height: 2rem;
+}
+
 .geocoderMenu {
   list-style-type: none;
   padding: 0;
@@ -43,8 +52,9 @@
 }
 
 .sideBar {
-  padding: 10px;
+  padding: 8px;
   position: absolute;
+  overflow-y: scroll;
   top: 0;
   bottom: 0;
   right: 0;
