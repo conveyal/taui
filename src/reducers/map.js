@@ -4,6 +4,7 @@ import config from '../config'
 
 const initialMap = {
   center: config.center,
+  mapbox: config.mapbox,
   zoom: config.zoom
 }
 

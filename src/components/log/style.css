@@ -2,13 +2,9 @@
 .log {
   height: 200px;
   width: 100%;
-  padding: 4px 8px;
   font-size: 1rem;
   line-height: 1.5;
   color: #55595c;
   background-color: #fff;
-  background-image: none;
-  border: .0625rem solid #ccc;
-  border-radius: .25rem;
   overflow: scroll;
 }
