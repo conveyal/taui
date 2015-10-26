@@ -1,10 +1,8 @@
-import Leaflet from 'leaflet'
 import React, {Component, PropTypes} from 'react'
 import {Marker, Popup} from 'react-leaflet'
 import {connect} from 'react-redux'
 
-import {updateMapMarker, updateMapState, updateSelectedDestination} from '../../actions'
-import Analyst from '../../analyst.js'
+import {updateMapMarker, updateMap, updateSelectedDestination, updateSelectedTransitMode} from '../../actions'
 import {mapbox} from '../../config'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
@@ -14,20 +12,9 @@ import LogItem from '../../components/log-item'
 import Map from '../../components/map'
 import styles from './style.css'
 
-const analyst = new Analyst(Leaflet, {
-  baseUrl: 'https://analyst.conveyal.com:443',
-  showIso: true
-})
-
-console.log(analyst)
-
 function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
 }
-
-// analyst.obtainClientCredentials('VUYJ6D31V9J1XX838H0LQNMXX', '3amuWUc1Q2Cwv50oRYXVCzjLDFbJSwWlVL7SOe961wM')
-
-const MODES = ['Car', 'Transit', 'Walk', 'Bike', 'Bike to Transit']
 
 class Place extends Component {
   static propTypes = {
@@ -35,11 +22,12 @@ class Place extends Component {
     destinations: PropTypes.object,
     dispatch: PropTypes.any,
     mapMarker: PropTypes.object,
-    map: PropTypes.object
+    map: PropTypes.object,
+    transitMode: PropTypes.object
   }
 
   render () {
-    const {actionLog, destinations, dispatch, map, mapMarker} = this.props
+    const {actionLog, destinations, dispatch, map, mapMarker, transitMode} = this.props
 
     // let isoLayer = null
     let mapContents = ''
@@ -68,6 +56,7 @@ class Place extends Component {
           <Map
             className={styles.map}
             map={map}
+            onChange={state => dispatch(updateMap(state))}
             onClick={e => {
               const {lat, lng} = e.latlng
               log(`Clicked map at ${printLL([lat, lng])}`)
@@ -80,60 +69,64 @@ class Place extends Component {
             {mapContents}
           </Map>
           <div className={styles.sideBar}>
+            <div className={styles.scrollable}>
+              <form>
+                <fieldset className='form-group' style={{position: 'relative'}}>
+                  <Geocoder
+                    accessToken={mapbox.accessToken}
+                    onSelect={place => {
+                      const [lng, lat] = place.center
+
+                      dispatch(updateMap({
+                        center: [lat, lng]
+                      }))
+
+                      dispatch(updateMapMarker({
+                        position: [lat, lng],
+                        text: place.place_name
+                      }))
+
+                      log(`Selected: ${place.place_name}`)
+                    }}
+                    />
+                </fieldset>
+                <fieldset className='form-group'>
+                  <label>Select a key indicator</label>
+                  <select
+                    className='form-control'
+                    onChange={e => {
+                      dispatch(updateSelectedDestination(e.target.value))
+                      log(`Selected new destination set: ${e.target.value}`)
+                    }}
+                    value={destinations.selected.id}>
+                    {destinations.sets.map(destination => <option value={destination.id} key={destination.id}>{destination.name}</option>)}
+                  </select>
+                </fieldset>
+                <fieldset className='form-group'>
+                  <label>Travel mode</label>
+                  <select
+                    className='form-control'
+                    onChange={e => {
+                      dispatch(updateSelectedTransitMode(e.target.value))
+                      log(`Selected new transit mode: ${e.target.value}`)
+                    }}
+                    value={transitMode.selected}>
+                    {transitMode.modes.map(mode => <option value={mode} key={mode}>{mode}</option>)}
+                  </select>
+                </fieldset>
+              </form>
+              <label>Accessibility Results</label>
+              <ul>
+                <li><strong>78,564</strong> — indicators accessible within 60 min</li>
+                <li><strong>85</strong> — transit score</li>
+                <li><strong>55</strong> — bike / walk score</li>
+              </ul>
+            </div>
+
             <div className={styles.navbar}><img src='https://analyst.conveyal.com/images/logo.png' /> Site Accessibility</div>
-            <form>
-              <fieldset className='form-group' style={{position: 'relative'}}>
-                <Geocoder
-                  accessToken={mapbox.accessToken}
-                  focusOnMount={false}
-                  onSelect={place => {
-                    const [lng, lat] = place.center
-
-                    dispatch(updateMapMarker({
-                      position: [lat, lng],
-                      text: place.place_name
-                    }))
-
-                    dispatch(updateMapState({
-                      center: [lat, lng]
-                    }))
-
-                    log(`Selected: ${place.place_name}`)
-                  }}
-                  inputClass='form-control'
-                  resultsClass={styles.geocoderMenu}
-                  resultClass={styles.geocoderItem}
-                  inputPlaceholder='Search for an address'
-                  />
-              </fieldset>
-              <fieldset className='form-group'>
-                <label>Select a key indicator</label>
-                <select
-                  className='form-control'
-                  onChange={e => {
-                    dispatch(updateSelectedDestination(e.target.value))
-                    log(`Selected new destination set: ${e.target.value}`)
-                  }}
-                  value={destinations.selected.id}>
-                  {destinations.sets.map(destination => <option value={destination.id} key={destination.id}>{destination.name}</option>)}
-                </select>
-              </fieldset>
-              <fieldset className='form-group'>
-                <label>Travel mode</label>
-                <select className='form-control'>
-                  {MODES.map(mode => <option value={mode} key={mode}>{mode}</option>)}
-                </select>
-              </fieldset>
-            </form>
-            <label>Accessibility Results</label>
-            <ul>
-              <li><strong>78,564</strong> — indicators accessible within 60 min</li>
-              <li><strong>85</strong> — transit score</li>
-              <li><strong>55</strong> — bike / walk score</li>
-            </ul>
-
-            <label>Action Log</label>
-            <Log>{actionLog.map((logItem, index) => <LogItem {...logItem} key={index} />)}</Log>
+            <div className={styles.dockedActionLog}>
+              <Log>{actionLog.map((logItem, index) => <LogItem {...logItem} key={index} />)}</Log>
+            </div>
           </div>
         </div>
       </Fullscreen>

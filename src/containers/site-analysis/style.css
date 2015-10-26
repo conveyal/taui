@@ -10,59 +10,48 @@
   height: 100%;
 }
 
+.sideBar {
+  position: absolute;
+  overflow: hidden;
+  padding-bottom: 150px;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 375px;
+  border: 0;
+  box-shadow: 2px 0 2px -1px rgba(152,184,235,0.5);
+}
+
 .navbar {
   color: #98B8EB;
   margin-bottom: 8px;
+  height: 44px;
+  width: 100%;
+  padding-left: 8px;
+  line-height: 44px;
+  position: absolute;
+  top: 0;
+  box-shadow: 0 2px 2px -1px rgba(152,184,235,0.5);
+  background-color: #fff;
 }
 
 .navbar img {
   height: 2rem;
 }
 
-.geocoderMenu {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  background-color: #fff;
-  position: absolute;
-  top: 35px;
-  width: 100%;
-  border-left: 0.0625rem solid #ccc;
-  border-right: 0.0625rem solid #ccc;
-  border-bottom: 0.0625rem solid #ccc;
-  border-bottom-left-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
-}
-
-.geocoderItem {
-  padding: .375rem .75rem 0;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #66afe9;
-  border-top: 0.0625rem solid #ccc;
-  width: 100%;
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.geocoderItem:hover {
-  text-decoration: none;
-}
-
-.sideBar {
-  padding: 8px;
-  position: absolute;
+.scrollable {
   overflow-y: scroll;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 375px;
-  border-left: 1px solid rgba(0, 0, 0, .1);
+  height: 100%;
+  padding: 60px 8px 0;
 }
 
-input:focus+.geocoderMenu,
-input:focus+.geocoderMenu .geocoderItem {
-  border-color: #66afe9;
+.dockedActionLog {
+  position: absolute;
+  display: block;
+  bottom: 0;
+  height: 150px;
+  background-color: #fff;
+  box-shadow: 0 -2px 2px -1px rgba(152,184,235,0.5);
+  width: 100%;
+  padding: 8px 8px 0;
 }
