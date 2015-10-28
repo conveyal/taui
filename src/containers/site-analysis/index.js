@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react'
-import {Marker, Popup} from 'react-leaflet'
+import {Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 
 import {updateMapMarker, updateMap, updateSelectedDestination, updateSelectedTransitMode} from '../../actions'
@@ -16,39 +16,19 @@ function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
 }
 
-class Place extends Component {
+class SiteAnalysis extends Component {
   static propTypes = {
     actionLog: PropTypes.arrayOf(PropTypes.object),
     destinations: PropTypes.object,
     dispatch: PropTypes.any,
     mapMarker: PropTypes.object,
     map: PropTypes.object,
+    singlePoint: PropTypes.object,
     transitMode: PropTypes.object
   }
 
   render () {
-    const {actionLog, destinations, dispatch, map, mapMarker, transitMode} = this.props
-
-    // let isoLayer = null
-    let mapContents = ''
-    if (mapMarker && mapMarker.position) {
-      mapContents = (
-        <Marker
-          draggable={true}
-          position={mapMarker.position}
-          onLeafletDragEnd={e => {
-            const {lat, lng} = e.target._latlng
-            log(`Dragged marker to ${printLL([lat, lng])}`)
-
-            dispatch(updateMapMarker({
-              position: [lat, lng],
-              text: ''
-            }))
-          }}>
-          {mapMarker.text && <Popup><span>{mapMarker.text}</span></Popup>}
-        </Marker>
-      )
-    }
+    const {actionLog, destinations, dispatch, map, mapMarker, singlePoint, transitMode} = this.props
 
     return (
       <Fullscreen>
@@ -66,7 +46,32 @@ class Place extends Component {
                 text: ''
               }))
             }}>
-            {mapContents}
+            {(() => {
+              if (mapMarker && mapMarker.position) {
+                return (
+                  <Marker
+                    draggable={true}
+                    position={mapMarker.position}
+                    onLeafletDragEnd={e => {
+                      const {lat, lng} = e.target._latlng
+                      log(`Dragged marker to ${printLL([lat, lng])}`)
+
+                      dispatch(updateMapMarker({
+                        position: [lat, lng],
+                        text: ''
+                      }))
+                    }}>
+                    {mapMarker.text && <Popup><span>{mapMarker.text}</span></Popup>}
+                  </Marker>
+                )
+              }
+            })()}
+            {(() => {
+              if (singlePoint.key && !singlePoint.isFetching) {
+                const url = `https://analyst.conveyal.com/tile/single/${singlePoint.key}/{z}/{x}/{y}.png?showIso=true&showPoints=false&timeLimit=3600&which=AVERAGE`
+                return <TileLayer url={url} />
+              }
+            })()}
           </Map>
           <div className={styles.sideBar}>
             <div className={styles.scrollable}>
@@ -134,4 +139,4 @@ class Place extends Component {
   }
 }
 
-export default connect(s => s)(Place)
+export default connect(s => s)(SiteAnalysis)
