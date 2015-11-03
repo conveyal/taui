@@ -14,7 +14,7 @@ export default class Map extends Component {
 
   render () {
     const {className, children, map, onChange, onClick} = this.props
-    const url = `http://api.tiles.mapbox.com/v4/${map.mapbox.map}/{z}/{x}/{y}.png?access_token=${map.mapbox.accessToken}`
+    const url = `http://api.tiles.mapbox.com/v4/${map.mapbox.mapId}/{z}/{x}/{y}.png?access_token=${map.mapbox.accessToken}`
 
     return (
       <BaseMap

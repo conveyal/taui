@@ -1,9 +1,6 @@
-import dbg from 'debug'
 import {handleActions} from 'redux-actions'
 
 import config from '../config'
-
-const debug = dbg('taui:reducers:map')
 
 const initialMap = {
   center: config.center,
@@ -13,8 +10,12 @@ const initialMap = {
 
 const mapReducers = handleActions({
   UPDATE_MAP: (state, action) => {
-    debug(`UPDATE_MAP: ${JSON.stringify(action.payload)}`)
     return Object.assign({}, state, action.payload)
+  },
+  UPDATE_MAP_MARKER: (state, {payload}) => {
+    return Object.assign({}, state, {
+      center: payload.position
+    })
   }
 }, initialMap)
 

@@ -3,7 +3,7 @@ import {handleActions} from 'redux-actions'
 const initialSinglePointState = {
   data: {},
   isfetching: false,
-  key: '7b57c4eb4f21485c9cda0de9ea4031c0',
+  key: '7e408e63f7ca4fc2bfde9983527200c7',
   properties: {}
 }
 

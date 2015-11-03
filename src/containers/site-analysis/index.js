@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 
-import {updateMapMarker, updateMap, updateSelectedDestination, updateSelectedTransitMode} from '../../actions'
+import {fetchSinglePoint, updateMapMarker, updateMap, updateSelectedDestination, updateSelectedTransitMode} from '../../actions'
 import {mapbox} from '../../config'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
@@ -14,6 +14,11 @@ import styles from './style.css'
 
 function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
+}
+
+function updateMarkerAndSinglePoint (dispatch, query) {
+  dispatch(updateMapMarker(query))
+  fetchSinglePoint(query)(dispatch)
 }
 
 class SiteAnalysis extends Component {
@@ -41,10 +46,10 @@ class SiteAnalysis extends Component {
               const {lat, lng} = e.latlng
               log(`Clicked map at ${printLL([lat, lng])}`)
 
-              dispatch(updateMapMarker({
+              updateMarkerAndSinglePoint(dispatch, {
                 position: [lat, lng],
                 text: ''
-              }))
+              })
             }}>
             {(() => {
               if (mapMarker && mapMarker.position) {
@@ -54,12 +59,13 @@ class SiteAnalysis extends Component {
                     position={mapMarker.position}
                     onLeafletDragEnd={e => {
                       const {lat, lng} = e.target._latlng
-                      log(`Dragged marker to ${printLL([lat, lng])}`)
+                      const position = [lat, lng]
+                      log(`Dragged marker to ${printLL(position)}`)
 
-                      dispatch(updateMapMarker({
-                        position: [lat, lng],
+                      updateMarkerAndSinglePoint(dispatch, {
+                        position,
                         text: ''
-                      }))
+                      })
                     }}>
                     {mapMarker.text && <Popup><span>{mapMarker.text}</span></Popup>}
                   </Marker>
@@ -81,15 +87,12 @@ class SiteAnalysis extends Component {
                     accessToken={mapbox.accessToken}
                     onSelect={place => {
                       const [lng, lat] = place.center
+                      const position = [lat, lng]
 
-                      dispatch(updateMap({
-                        center: [lat, lng]
-                      }))
-
-                      dispatch(updateMapMarker({
-                        position: [lat, lng],
+                      updateMarkerAndSinglePoint(dispatch, {
+                        position,
                         text: place.place_name
-                      }))
+                      })
 
                       log(`Selected: ${place.place_name}`)
                     }}

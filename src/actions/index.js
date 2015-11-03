@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import {stringify} from 'qs'
 import {createAction} from 'redux-actions'
 
 export const ADD_ACTION_LOG_ITEM = 'ADD_ACTION_LOG_ITEM'
@@ -26,10 +27,16 @@ export function fetchSinglePoint (query) {
   return function (dispatch) {
     dispatch(requestSinglePoint(query))
 
-    return fetch(`/api/singlePointRequest&lat=${query.position[0]}&lng=${query.position[1]}`)
+    const qs = stringify({
+      lat: query.position[0],
+      lng: query.position[1],
+      destinationPointsetId: query.destinationPointsetId,
+      graphId: query.graphId
+    })
+
+    return fetch(`/api/singlePointRequest?${qs}`)
       .then(response => response.json())
-      .then(json => {
-        dispatch(receiveSinglePoint(json))
-      })
+      .then(json => dispatch(receiveSinglePoint(json)))
+      .catch(e => console.error(e))
   }
 }
