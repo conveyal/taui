@@ -2,15 +2,16 @@ import React, {Component, PropTypes} from 'react'
 import {Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 
-import {fetchSinglePoint, updateMapMarker, updateMap, updateSelectedDestination, updateSelectedTransitMode} from '../../actions'
+import {fetchSinglePoint, updateMapMarker, updateMap} from '../../actions'
 import {mapbox} from '../../config'
+import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
 import log from '../../log'
 import Log from '../../components/log'
-import LogItem from '../../components/log-item'
 import Map from '../../components/map'
 import styles from './style.css'
+import TransitModeSelect from '../../components/transit-mode-select'
 
 function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
@@ -23,17 +24,14 @@ function updateMarkerAndSinglePoint (dispatch, query) {
 
 class SiteAnalysis extends Component {
   static propTypes = {
-    actionLog: PropTypes.arrayOf(PropTypes.object),
-    destinations: PropTypes.object,
     dispatch: PropTypes.any,
     mapMarker: PropTypes.object,
     map: PropTypes.object,
-    singlePoint: PropTypes.object,
-    transitMode: PropTypes.object
+    singlePoint: PropTypes.object
   }
 
   render () {
-    const {actionLog, destinations, dispatch, map, mapMarker, singlePoint, transitMode} = this.props
+    const {dispatch, map, mapMarker, singlePoint} = this.props
 
     return (
       <Fullscreen>
@@ -100,27 +98,11 @@ class SiteAnalysis extends Component {
                 </fieldset>
                 <fieldset className='form-group'>
                   <label>Select a key indicator</label>
-                  <select
-                    className='form-control'
-                    onChange={e => {
-                      dispatch(updateSelectedDestination(e.target.value))
-                      log(`Selected new destination set: ${e.target.value}`)
-                    }}
-                    value={destinations.selected.id}>
-                    {destinations.sets.map(destination => <option value={destination.id} key={destination.id}>{destination.name}</option>)}
-                  </select>
+                  <DestinationsSelect className='form-control' />
                 </fieldset>
                 <fieldset className='form-group'>
                   <label>Travel mode</label>
-                  <select
-                    className='form-control'
-                    onChange={e => {
-                      dispatch(updateSelectedTransitMode(e.target.value))
-                      log(`Selected new transit mode: ${e.target.value}`)
-                    }}
-                    value={transitMode.selected}>
-                    {transitMode.modes.map(mode => <option value={mode} key={mode}>{mode}</option>)}
-                  </select>
+                  <TransitModeSelect className='form-control' />
                 </fieldset>
               </form>
               <label>Accessibility Results</label>
@@ -132,9 +114,7 @@ class SiteAnalysis extends Component {
             </div>
 
             <div className={styles.navbar}><img src='https://analyst.conveyal.com/images/logo.png' /> Site Accessibility</div>
-            <div className={styles.dockedActionLog}>
-              <Log>{actionLog.map((logItem, index) => <LogItem {...logItem} key={index} />)}</Log>
-            </div>
+            <div className={styles.dockedActionLog}><Log /></div>
           </div>
         </div>
       </Fullscreen>
