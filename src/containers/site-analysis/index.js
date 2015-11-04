@@ -105,12 +105,6 @@ class SiteAnalysis extends Component {
                   <TransitModeSelect className='form-control' />
                 </fieldset>
               </form>
-              <label>Accessibility Results</label>
-              <ul>
-                <li><strong>78,564</strong> — indicators accessible within 60 min</li>
-                <li><strong>85</strong> — transit score</li>
-                <li><strong>55</strong> — bike / walk score</li>
-              </ul>
             </div>
 
             <div className={styles.navbar}><img src='https://analyst.conveyal.com/images/logo.png' /> Site Accessibility</div>
