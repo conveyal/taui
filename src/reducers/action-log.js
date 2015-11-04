@@ -9,6 +9,7 @@ const initialActionLog = [{
   text: 'Welcome to our transit analysis tool! Find how your site stacks up compared to others in the region. Search for your address or drag the pin on the map.'
 }]
 
+// TODO: setting createdAt and normalizing the payload should be done in the action creator
 const actionLogReducers = handleActions({
   ADD_ACTION_LOG_ITEM: (state, action) => {
     const payload = typeof action.payload === 'string'

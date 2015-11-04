@@ -14,8 +14,14 @@ export const updateMap = createAction(UPDATE_MAP)
 export const UPDATE_SELECTED_DESTINATION = 'UPDATE_SELECTED_DESTINATION'
 export const updateSelectedDestination = createAction(UPDATE_SELECTED_DESTINATION)
 
+export const UPDATE_SELECTED_PROJECT = 'UPDATE_SELECTED_PROJECT'
+export const updateSelectedProject = createAction(UPDATE_SELECTED_PROJECT)
+
 export const UPDATE_SELECTED_TRANSIT_MODE = 'UPDATE_SELECTED_TRANSIT_MODE'
 export const updateSelectedTransitMode = createAction(UPDATE_SELECTED_TRANSIT_MODE)
+
+export const UPDATE_SELECTED_TRANSIT_SCENARIO = 'UPDATE_SELECTED_TRANSIT_SCENARIO'
+export const updateSelectedTransitScenario = createAction(UPDATE_SELECTED_TRANSIT_SCENARIO)
 
 export const REQUEST_SINGLE_POINT = 'REQUEST_SINGLE_POINT'
 export const requestSinglePoint = createAction(REQUEST_SINGLE_POINT)

@@ -1,8 +1,9 @@
 import {handleActions} from 'redux-actions'
+import toCamelCase from 'to-camel-case'
 
 const initialTransitMode = {
-  selected: 'Transit',
-  modes: ['Car', 'Transit', 'Walk', 'Bike', 'Bike to Transit']
+  selected: { name: 'Transit', id: 'transit' },
+  modes: ['Car', 'Transit', 'Walk', 'Bike', 'Bike to Transit'].map(m => { return { name: m, id: toCamelCase(m) } })
 }
 
 const transitModeReducers = handleActions({

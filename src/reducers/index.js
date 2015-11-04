@@ -5,17 +5,21 @@ import actionLog from './action-log'
 import destinations from './destinations'
 import map from './map'
 import mapMarker from './map-marker'
+import project from './project'
 import singlePoint from './single-point'
 import transitMode from './transit-mode'
+import transitScenario from './transit-scenario'
 
 const placeApp = combineReducers({
   actionLog,
   destinations,
   map,
   mapMarker,
+  project,
   router,
   singlePoint,
-  transitMode
+  transitMode,
+  transitScenario
 })
 
 export default placeApp

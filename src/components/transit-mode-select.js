@@ -22,8 +22,8 @@ class TransitModeSelect extends Component {
           dispatch(updateSelectedTransitMode(e.target.value))
           log(`Selected new transit mode: ${e.target.value}`)
         }}
-        value={selected}>
-        {modes.map(mode => <option value={mode} key={mode}>{mode}</option>)}
+        value={selected.id}>
+        {modes.map(mode => <option value={mode.id} key={mode.id}>{mode.name}</option>)}
       </select>
     )
   }
