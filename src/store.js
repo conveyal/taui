@@ -1,17 +1,15 @@
-import {applyMiddleware, createStore} from 'redux'
+import {applyMiddleware, compose, createStore} from 'redux'
+import {devTools, persistState} from 'redux-devtools'
 import thunk from 'redux-thunk'
 
 import reducers from './reducers'
 
-const logger = store => next => action => {
-  console.groupCollapsed(action.type)
-  console.info('dispatching', action)
-  const result = next(action)
-  console.log('next state', store.getState())
-  console.groupEnd(action.type)
-  return result
-}
+const finalCreateStore = compose(
+  applyMiddleware(thunk),
+  devTools(),
+  persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
+)(createStore)
 
-const store = applyMiddleware(logger, thunk)(createStore)(reducers)
+const store = finalCreateStore(reducers)
 
 export default store

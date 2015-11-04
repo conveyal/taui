@@ -1,4 +1,5 @@
-import { combineReducers } from 'redux'
+import {combineReducers} from 'redux'
+import {routerStateReducer as router} from 'redux-router'
 
 import actionLog from './action-log'
 import destinations from './destinations'
@@ -12,6 +13,7 @@ const placeApp = combineReducers({
   destinations,
   map,
   mapMarker,
+  router,
   singlePoint,
   transitMode
 })
