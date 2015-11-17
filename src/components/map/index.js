@@ -8,8 +8,8 @@ export default class Map extends Component {
     className: PropTypes.string,
     children: PropTypes.any,
     map: PropTypes.object,
-    onChange: PropTypes.function,
-    onClick: PropTypes.function
+    onChange: PropTypes.func,
+    onClick: PropTypes.func
   }
 
   render () {

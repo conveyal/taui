@@ -7,7 +7,7 @@ import log from '../log'
 class TransitModeSelect extends Component {
   static propTypes = {
     className: PropTypes.string,
-    dispatch: PropTypes.function,
+    dispatch: PropTypes.func,
     modes: PropTypes.arrayOf(PropTypes.object).isRequired,
     selected: PropTypes.object
   }

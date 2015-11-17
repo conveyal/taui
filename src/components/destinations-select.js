@@ -7,7 +7,7 @@ import log from '../log'
 class DestinationsSelect extends Component {
   static propTypes = {
     className: PropTypes.string,
-    dispatch: PropTypes.function,
+    dispatch: PropTypes.func,
     selected: PropTypes.object,
     sets: PropTypes.arrayOf(PropTypes.object).isRequired
   }

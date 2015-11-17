@@ -1,8 +1,12 @@
 import {handleActions} from 'redux-actions'
 
 const initialDestinationsState = {
-  selected: 'None',
+  selected: { name: 'None', id: 'none' },
   sets: [
+    {
+      name: 'None',
+      id: 'none'
+    },
     {
       name: 'geoid10',
       id: 'geoid10'
