@@ -3,7 +3,16 @@ import {stringify} from 'qs'
 import {createAction} from 'redux-actions'
 
 export const ADD_ACTION_LOG_ITEM = 'ADD_ACTION_LOG_ITEM'
-export const addActionLogItem = createAction(ADD_ACTION_LOG_ITEM)
+export const addActionLogItem = createAction(ADD_ACTION_LOG_ITEM, (item) => {
+  const payload = typeof item === 'string'
+    ? { text: item }
+    : item
+
+  return Object.assign({
+    createdAt: new Date(),
+    level: 'info'
+  }, payload)
+})
 
 export const UPDATE_MAP_MARKER = 'UPDATE_MAP_MARKER'
 export const updateMapMarker = createAction(UPDATE_MAP_MARKER)
