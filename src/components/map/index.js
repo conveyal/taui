@@ -14,15 +14,15 @@ export default class Map extends Component {
 
   render () {
     const {className, children, map, onChange, onClick} = this.props
-    const url = `http://api.tiles.mapbox.com/v4/${map.mapbox.mapId}/{z}/{x}/{y}.png?access_token=${map.mapbox.accessToken}`
+    const {center, mapbox, zoom} = map
+    const url = `http://api.tiles.mapbox.com/v4/${mapbox.mapId}/{z}/{x}/{y}.png?access_token=${mapbox.accessToken}`
 
     return (
       <BaseMap
-        center={map.center}
+        center={center}
         className={className}
-        zoom={map.zoom}
+        zoom={zoom}
         onLeafletClick={onClick}
-        // onLeafletMoveEnd={e => onChange({ center: e.target.options.center })}
         onLeafletZoomEnd={e => onChange({ zoom: e.target._zoom })}>
         <TileLayer
           url={url}

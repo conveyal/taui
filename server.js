@@ -49,6 +49,10 @@ app.get('/api/singlePointRequest', function (req, res) {
   }
 })
 
+app.get('/test/data/:filename', function (req, res) {
+  res.sendFile(path.join(__dirname, 'test/data/', req.params.filename))
+})
+
 app.get('*', function (req, res) {
   res.sendFile(path.join(__dirname, 'index.html'))
 })
