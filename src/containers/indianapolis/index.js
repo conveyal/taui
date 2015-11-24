@@ -3,7 +3,7 @@ import {Marker, Popup} from 'react-leaflet'
 import {connect} from 'react-redux'
 
 import {updateMapMarker, updateMap} from '../../actions'
-import {getOrigin} from '../../browsochrones'
+import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, setAccessibility, setSurface} from '../../actions/browsochrones'
 import {mapbox} from '../../config'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
@@ -13,23 +13,85 @@ import Log from '../../components/log'
 import Map from '../../components/map'
 import styles from './style.css'
 
+const baseUrl = 'http://localhost:4567'
+const localUrl = 'http://localhost:3000/test/data'
+
 function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
 }
 
 class Indianapolis extends Component {
   static propTypes = {
+    browsochrones: PropTypes.object,
     dispatch: PropTypes.any,
     mapMarker: PropTypes.object,
     map: PropTypes.object
   }
 
+  constructor (props) {
+    super(props)
+    this.initializeBrowsochrones()
+  }
+
+  initializeBrowsochrones () {
+    const {browsochrones, dispatch} = this.props
+    const bc = browsochrones.instance
+
+    if (!bc.grid) {
+      fetchGrid(`${localUrl}/Jobs_total.grid`)(dispatch)
+    }
+
+    if (!bc.query) {
+      fetchQuery(`${localUrl}/query.json`)(dispatch)
+    }
+
+    if (!bc.stopTrees) {
+      fetchStopTrees(`${localUrl}/stop_trees.dat`)(dispatch)
+    }
+
+    if (!bc.originData && bc.originCoordinates) {
+      fetchOrigin(baseUrl, bc.originCoordinates)(dispatch)
+    }
+  }
+
   updateBrowsochrones (event) {
     log(`Retrieving isochrones for origin.`)
-    getOrigin(event)
-      .then(bc => {
-        const afc = bc.getAccessibilityForCutoff()
-        log(`Origin has access to ${afc.toLocaleString()} jobs within 60 minutes.`)
+
+    const {browsochrones, dispatch} = this.props
+    const bc = browsochrones.instance
+    const map = getMapFromEvent(event)
+
+    // get the pixel coordinates
+    const origin = bc.pixelToOriginCoordinates(map.project(event.latlng || event.target._latlng), map.getZoom())
+
+    if (!bc.coordinatesInQueryBounds(origin)) {
+      if (this.isoLayer) {
+        map.removeLayer(this.isoLayer)
+        this.isoLayer = null
+      }
+      return
+    }
+
+    fetchOrigin(baseUrl, origin)(dispatch)
+      .then(r => {
+        dispatch(setSurface(bc.generateSurface()))
+        dispatch(setAccessibility(bc.getAccessibilityForCutoff()))
+
+        if (this.isoLayer) map.removeLayer(this.isoLayer)
+
+        this.isoLayer = window.L.tileLayer.canvas()
+        this.isoLayer.drawTile = bc.drawTile.bind(bc)
+        this.isoLayer.addTo(map)
+      })
+      .catch(err => {
+        if (this.isoLayer) {
+          map.removeLayer(this.isoLayer)
+          this.isoLayer = null
+        }
+
+        console.error(err)
+        console.error(err.stack)
+        throw err
       })
   }
 
@@ -122,6 +184,18 @@ class Indianapolis extends Component {
         </div>
       </Fullscreen>
     )
+  }
+}
+
+function getMapFromEvent (event) {
+  let {_layers, _map} = event.target
+
+  if (_map) return _map
+
+  for (let key in _layers) {
+    if (_layers.hasOwnProperty(key) && _layers[key]._map) {
+      return _layers[key]._map
+    }
   }
 }
 

@@ -2,6 +2,7 @@ import {combineReducers} from 'redux'
 import {routerStateReducer as router} from 'redux-router'
 
 import actionLog from './action-log'
+import browsochrones from './browsochrones'
 import destinations from './destinations'
 import map from './map'
 import mapMarker from './map-marker'
@@ -12,6 +13,7 @@ import transitScenario from './transit-scenario'
 
 const placeApp = combineReducers({
   actionLog,
+  browsochrones,
   destinations,
   map,
   mapMarker,
