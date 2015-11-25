@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 
 import {updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, setAccessibility, setSurface} from '../../actions/browsochrones'
-import {mapbox} from '../../config'
+import config from '../../config'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
@@ -12,9 +12,6 @@ import log from '../../log'
 import Log from '../../components/log'
 import Map from '../../components/map'
 import styles from './style.css'
-
-const baseUrl = 'http://localhost:4567'
-const localUrl = 'http://localhost:3000/test/data'
 
 function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
@@ -38,19 +35,19 @@ class Indianapolis extends Component {
     const bc = browsochrones.instance
 
     if (!bc.grid) {
-      fetchGrid(`${localUrl}/Jobs_total.grid`)(dispatch)
+      fetchGrid(`${config.browsochrones.localUrl}/Jobs_total.grid`)(dispatch)
     }
 
     if (!bc.query) {
-      fetchQuery(`${localUrl}/query.json`)(dispatch)
+      fetchQuery(`${config.browsochrones.localUrl}/query.json`)(dispatch)
     }
 
     if (!bc.stopTrees) {
-      fetchStopTrees(`${localUrl}/stop_trees.dat`)(dispatch)
+      fetchStopTrees(`${config.browsochrones.localUrl}/stop_trees.dat`)(dispatch)
     }
 
     if (!bc.originData && bc.originCoordinates) {
-      fetchOrigin(baseUrl, bc.originCoordinates)(dispatch)
+      fetchOrigin(config.browsochrones.baseUrl, bc.originCoordinates)(dispatch)
     }
   }
 
@@ -72,7 +69,7 @@ class Indianapolis extends Component {
       return
     }
 
-    fetchOrigin(baseUrl, origin)(dispatch)
+    fetchOrigin(config.browsochrones.baseUrl, origin)(dispatch)
       .then(r => {
         dispatch(setSurface(bc.generateSurface()))
         dispatch(setAccessibility(bc.getAccessibilityForCutoff()))
@@ -157,7 +154,7 @@ class Indianapolis extends Component {
               <form>
                 <fieldset className='form-group' style={{position: 'relative'}}>
                   <Geocoder
-                    accessToken={mapbox.accessToken}
+                    accessToken={config.map.mapbox.accessToken}
                     onSelect={place => {
                       const [lng, lat] = place.center
                       const position = [lat, lng]

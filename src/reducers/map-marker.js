@@ -4,7 +4,7 @@ import config from '../config'
 
 const initialMapMarker = {
   isDragging: false,
-  position: config.center,
+  position: config.map.center,
   description: ''
 }
 
