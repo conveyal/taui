@@ -70,3 +70,19 @@ export function fetchStopTrees (url) {
       .then(stopTrees => dispatch(receiveStopTrees(stopTrees)))
   }
 }
+
+export const REQUEST_TRANSITIVE_NETWORK = 'REQUEST_TRANSITIVE_NETWORK'
+export const requestTransitiveNetwork = createAction(REQUEST_TRANSITIVE_NETWORK)
+
+export const RECEIVE_TRANSITIVE_NETWORK = 'RECEIVE_TRANSITIVE_NETWORK'
+export const receiveTransitiveNetwork = createAction(RECEIVE_TRANSITIVE_NETWORK)
+
+export function fetchTransitiveNetwork (url) {
+  return function (dispatch) {
+    dispatch(requestTransitiveNetwork(url))
+
+    return fetch(url)
+      .then(res => res.json())
+      .then(network => dispatch(receiveTransitiveNetwork(network)))
+  }
+}

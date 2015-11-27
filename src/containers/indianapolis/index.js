@@ -1,9 +1,11 @@
 import React, {Component, PropTypes} from 'react'
 import {Marker, Popup} from 'react-leaflet'
 import {connect} from 'react-redux'
+import Transitive from 'transitive-js'
+import TransitiveLayer from 'leaflet-transitivelayer'
 
 import {updateMapMarker, updateMap} from '../../actions'
-import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, setAccessibility, setSurface} from '../../actions/browsochrones'
+import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibility, setSurface} from '../../actions/browsochrones'
 import config from '../../config'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
@@ -33,21 +35,26 @@ class Indianapolis extends Component {
   initializeBrowsochrones () {
     const {browsochrones, dispatch} = this.props
     const bc = browsochrones.instance
+    const grid = 'Jobs_total'
 
     if (!bc.grid) {
-      fetchGrid(`${config.browsochrones.localUrl}/Jobs_total.grid`)(dispatch)
+      fetchGrid(`${config.browsochrones.gridsUrl}/${grid}.grid`)(dispatch)
     }
 
     if (!bc.query) {
-      fetchQuery(`${config.browsochrones.localUrl}/query.json`)(dispatch)
+      fetchQuery(config.browsochrones.queryUrl)(dispatch)
     }
 
     if (!bc.stopTrees) {
-      fetchStopTrees(`${config.browsochrones.localUrl}/stop_trees.dat`)(dispatch)
+      fetchStopTrees(config.browsochrones.stopTreesUrl)(dispatch)
     }
 
     if (!bc.originData && bc.originCoordinates) {
-      fetchOrigin(config.browsochrones.baseUrl, bc.originCoordinates)(dispatch)
+      fetchOrigin(config.browsochrones.originsUrl, bc.originCoordinates)(dispatch)
+    }
+
+    if (!bc.transitiveNetwork) {
+      fetchTransitiveNetwork(config.browsochrones.transitiveNetworkUrl)(dispatch)
     }
   }
 
@@ -69,16 +76,16 @@ class Indianapolis extends Component {
       return
     }
 
-    fetchOrigin(config.browsochrones.baseUrl, origin)(dispatch)
+    fetchOrigin(config.browsochrones.originsUrl, origin)(dispatch)
       .then(r => {
         dispatch(setSurface(bc.generateSurface()))
         dispatch(setAccessibility(bc.getAccessibilityForCutoff()))
 
-        if (this.isoLayer) map.removeLayer(this.isoLayer)
+        /* if (this.isoLayer) map.removeLayer(this.isoLayer)
 
         this.isoLayer = window.L.tileLayer.canvas()
         this.isoLayer.drawTile = bc.drawTile.bind(bc)
-        this.isoLayer.addTo(map)
+        this.isoLayer.addTo(map)*/
       })
       .catch(err => {
         if (this.isoLayer) {
@@ -90,6 +97,33 @@ class Indianapolis extends Component {
         console.error(err.stack)
         throw err
       })
+  }
+
+  updateTransitive (event) {
+    const {browsochrones} = this.props
+    const bc = browsochrones.instance
+
+    // If an origin has been retrieved
+    if (bc.isLoaded()) {
+      const map = getMapFromEvent(event)
+      const origin = bc.pixelToOriginCoordinates(map.project(event.latlng), map.getZoom())
+
+      const data = bc.generateTransitiveData(origin)
+      const transitive = new Transitive({ data })
+
+      console.log(`Transitive found ${data.journeys.length} unique paths`)
+
+      if (data.journeys.length > 0) {
+        if (this.transitiveLayer) {
+          map.removeLayer(this.transitiveLayer)
+        }
+
+        this.transitiveLayer = new TransitiveLayer(transitive)
+        map.addLayer(this.transitiveLayer)
+        // see leaflet.transitivelayer issue #2
+        this.transitiveLayer._refresh()
+      }
+    }
   }
 
   render () {
@@ -110,6 +144,9 @@ class Indianapolis extends Component {
                 position: [lat, lng],
                 text: ''
               }))
+            }}
+            onLeafletMouseMove={e => {
+              this.updateTransitive(e)
             }}>
             {(() => {
               if (mapMarker && mapMarker.position) {

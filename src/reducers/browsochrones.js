@@ -10,7 +10,7 @@ const initialBrowsochrones = {
   query: null,
   stopTrees: null,
   surface: null,
-  transitiveData: null
+  transitiveNetwork: null
 }
 
 const browsochronesReducers = handleActions({
@@ -23,7 +23,7 @@ const browsochronesReducers = handleActions({
   },
   RECEIVE_ORIGIN: (state, action) => {
     const {x, y} = state.originCoordinates
-    state.instance.setOrigin(action.payload, x, y)
+    state.instance.setOrigin(action.payload, {x, y})
     return Object.assign(state, { originData: action.payload })
   },
   RECEIVE_QUERY: (state, action) => {
@@ -33,6 +33,10 @@ const browsochronesReducers = handleActions({
   RECEIVE_STOP_TREES: (state, action) => {
     state.instance.setStopTrees(action.payload)
     return Object.assign(state, { stopTrees: action.payload })
+  },
+  RECEIVE_TRANSITIVE_NETWORK: (state, action) => {
+    state.instance.setTransitiveNetwork(action.payload)
+    return Object.assign(state, { transitiveNetwork: action.payload })
   },
   SET_ACCESSIBILITY: (state, action) => {
     return Object.assign(state, { accessibility: action.payload })

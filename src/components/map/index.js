@@ -11,16 +11,16 @@ export default class Map extends Component {
   }
 
   render () {
-    const {className, children, map, onChange, onClick} = this.props
+    const {children, map, onChange, onClick} = this.props
     const {attribution, center, zoom} = map
 
     return (
       <BaseMap
         center={center}
-        className={className}
         zoom={zoom}
         onLeafletClick={onClick}
-        onLeafletZoomEnd={e => onChange({ zoom: e.target._zoom })}>
+        onLeafletZoomEnd={e => onChange({ zoom: e.target._zoom })}
+        {...this.props}>
         <TileLayer
           url={map.url}
           attribution={attribution}
