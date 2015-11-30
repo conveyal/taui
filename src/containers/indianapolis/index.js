@@ -7,7 +7,6 @@ import TransitiveLayer from 'leaflet-transitivelayer'
 import {updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibility, setSurface} from '../../actions/browsochrones'
 import config from '../../config'
-import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
 import log from '../../log'
@@ -81,11 +80,11 @@ class Indianapolis extends Component {
         dispatch(setSurface(bc.generateSurface()))
         dispatch(setAccessibility(bc.getAccessibilityForCutoff()))
 
-        /* if (this.isoLayer) map.removeLayer(this.isoLayer)
+        if (this.isoLayer) map.removeLayer(this.isoLayer)
 
         this.isoLayer = window.L.tileLayer.canvas()
         this.isoLayer.drawTile = bc.drawTile.bind(bc)
-        this.isoLayer.addTo(map)*/
+        this.isoLayer.addTo(map)
       })
       .catch(err => {
         if (this.isoLayer) {
@@ -127,7 +126,8 @@ class Indianapolis extends Component {
   }
 
   render () {
-    const {dispatch, map, mapMarker} = this.props
+    const {browsochrones, dispatch, map, mapMarker} = this.props
+    const {accessibility} = browsochrones
 
     return (
       <Fullscreen>
@@ -205,11 +205,8 @@ class Indianapolis extends Component {
                     }}
                     />
                 </fieldset>
-                <fieldset className='form-group'>
-                  <label>Select a key indicator</label>
-                  <DestinationsSelect className='form-control' />
-                </fieldset>
               </form>
+              <p>Access to {accessibility} jobs within 60 minutes.</p>
             </div>
 
             <div className={styles.navbar}>Indianapolis</div>
