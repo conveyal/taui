@@ -1,3 +1,4 @@
+import debounce from 'debounce'
 import React, {Component, PropTypes} from 'react'
 import {Marker, Popup} from 'react-leaflet'
 import {connect} from 'react-redux'
@@ -13,6 +14,7 @@ import log from '../../log'
 import Log from '../../components/log'
 import Map from '../../components/map'
 import styles from './style.css'
+import transitiveStyle from './transitive-style'
 
 function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
@@ -29,6 +31,8 @@ class Indianapolis extends Component {
   constructor (props) {
     super(props)
     this.initializeBrowsochrones()
+
+    this.updateTransitive = debounce(this.updateTransitive, 100, true)
   }
 
   initializeBrowsochrones () {
@@ -108,20 +112,25 @@ class Indianapolis extends Component {
       const origin = bc.pixelToOriginCoordinates(map.project(event.latlng), map.getZoom())
 
       const data = bc.generateTransitiveData(origin)
-      const transitive = new Transitive({ data })
-
-      console.log(`Transitive found ${data.journeys.length} unique paths`)
 
       if (data.journeys.length > 0) {
-        if (this.transitiveLayer) {
-          map.removeLayer(this.transitiveLayer)
+        if (!this.transitive) {
+          this.transitive = new Transitive({
+            data,
+            gridCellSize: 200,
+            useDynamicRendering: true,
+            styles: transitiveStyle
+          })
+          this.transitiveLayer = new TransitiveLayer(this.transitive)
+          map.addLayer(this.transitiveLayer)
+          this.transitiveLayer._refresh()
+        } else {
+          this.transitive.updateData(data)
+          this.transitiveLayer._refresh()
         }
-
-        this.transitiveLayer = new TransitiveLayer(transitive)
-        map.addLayer(this.transitiveLayer)
-        // see leaflet.transitivelayer issue #2
-        this.transitiveLayer._refresh()
       }
+
+      console.log(`Transitive found ${data.journeys.length} unique paths`)
     }
   }
 
