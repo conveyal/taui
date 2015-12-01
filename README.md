@@ -1,2 +1,10 @@
+# Transport Analyst User Interface (TAUI)
 
-# place
+## Build
+After cloning the repository, run:
+ - `npm install`
+ - `npm start` 
+
+## Configuration
+
+??
