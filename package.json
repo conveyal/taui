@@ -39,7 +39,7 @@
     "analyst.js": "^0.1.2",
     "autoprefixer": "^6.0.3",
     "babel-runtime": "^5.8.25",
-    "browsochrones": "0.0.5",
+    "browsochrones": "^0.0.6",
     "concat-stream": "^1.5.1",
     "css-loader": "^0.20.2",
     "debounce": "^1.0.0",
