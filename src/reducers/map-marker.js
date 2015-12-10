@@ -1,14 +1,17 @@
 import {handleActions} from 'redux-actions'
 
 const initialMapMarker = {
-  isDragging: false,
-  position: [],
-  description: ''
+  originMarker: {
+    isDragging: false,
+    position: [],
+    text: ''
+  },
+  destinationMarker: null
 }
 
 const mapMarkerReducers = handleActions({
   UPDATE_MAP_MARKER: (state, action) => {
-    return Object.assign({}, action.payload)
+    return Object.assign(state, action.payload)
   }
 }, initialMapMarker)
 

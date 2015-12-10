@@ -5,7 +5,7 @@ import actionLog from './action-log'
 import browsochrones from './browsochrones'
 import destinations from './destinations'
 import map from './map'
-import mapMarker from './map-marker'
+import mapMarkers from './map-marker'
 import project from './project'
 import singlePoint from './single-point'
 import transitMode from './transit-mode'
@@ -16,7 +16,7 @@ const placeApp = combineReducers({
   browsochrones,
   destinations,
   map,
-  mapMarker,
+  mapMarkers,
   project,
   router,
   singlePoint,
