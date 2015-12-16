@@ -7,7 +7,6 @@ import TransitiveLayer from 'leaflet-transitivelayer'
 
 import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibility, setSurface} from '../../actions/browsochrones'
-import config from '../../config'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
 import Log from '../../components/log'
@@ -44,23 +43,23 @@ class Indianapolis extends Component {
     const grid = 'Jobs_total'
 
     if (!bc.grid) {
-      fetchGrid(`${config.browsochrones.gridsUrl}/${grid}.grid`)(dispatch)
+      fetchGrid(`${browsochrones.gridsUrl}/${grid}.grid`)(dispatch)
     }
 
     if (!bc.query) {
-      fetchQuery(config.browsochrones.queryUrl)(dispatch)
+      fetchQuery(browsochrones.queryUrl)(dispatch)
     }
 
     if (!bc.stopTrees) {
-      fetchStopTrees(config.browsochrones.stopTreesUrl)(dispatch)
+      fetchStopTrees(browsochrones.stopTreesUrl)(dispatch)
     }
 
     if (!bc.originData && bc.originCoordinates) {
-      fetchOrigin(config.browsochrones.originsUrl, bc.originCoordinates)(dispatch)
+      fetchOrigin(browsochrones.originsUrl, bc.originCoordinates)(dispatch)
     }
 
     if (!bc.transitiveNetwork) {
-      fetchTransitiveNetwork(config.browsochrones.transitiveNetworkUrl)(dispatch)
+      fetchTransitiveNetwork(browsochrones.transitiveNetworkUrl)(dispatch)
     }
   }
 
@@ -82,7 +81,7 @@ class Indianapolis extends Component {
       return
     }
 
-    fetchOrigin(config.browsochrones.originsUrl, origin)(dispatch)
+    fetchOrigin(browsochrones.originsUrl, origin)(dispatch)
       .then(r => {
         dispatch(setSurface(bc.generateSurface()))
         dispatch(setAccessibility(bc.getAccessibilityForCutoff()))
@@ -203,7 +202,7 @@ class Indianapolis extends Component {
               <form>
                 <fieldset className='form-group' style={{position: 'relative'}}>
                   <Geocoder
-                    accessToken={config.map.mapbox.accessToken}
+                    accessToken={map.mapbox.accessToken}
                     inputPlaceholder='Search for a start address'
                     onSelect={place => {
                       const [lng, lat] = place.center

@@ -3,7 +3,6 @@ import {Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 
 import {addActionLogItem, fetchSinglePoint, updateMapMarker, updateMap} from '../../actions'
-import {mapbox} from '../../config'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
@@ -85,7 +84,7 @@ class SiteAnalysis extends Component {
               <form>
                 <fieldset className='form-group' style={{position: 'relative'}}>
                   <Geocoder
-                    accessToken={mapbox.accessToken}
+                    accessToken={map.mapbox.accessToken}
                     onSelect={place => {
                       const [lng, lat] = place.center
                       const position = [lat, lng]

@@ -1,10 +1,8 @@
 import {handleActions} from 'redux-actions'
 
-import config from '../config'
-
 const initialMapMarker = {
   isDragging: false,
-  position: config.map.center,
+  position: [],
   description: ''
 }
 

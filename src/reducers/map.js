@@ -1,6 +1,8 @@
 import {handleActions} from 'redux-actions'
 
-import config from '../config'
+const initialMap = {
+  zoom: 13
+}
 
 const mapReducers = handleActions({
   UPDATE_MAP: (state, action) => {
@@ -11,6 +13,6 @@ const mapReducers = handleActions({
       center: payload.position
     })
   }
-}, config.map)
+}, initialMap)
 
 export default mapReducers
