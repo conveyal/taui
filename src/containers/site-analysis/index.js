@@ -2,12 +2,11 @@ import React, {Component, PropTypes} from 'react'
 import {Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 
-import {fetchSinglePoint, updateMapMarker, updateMap} from '../../actions'
+import {addActionLogItem, fetchSinglePoint, updateMapMarker, updateMap} from '../../actions'
 import {mapbox} from '../../config'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
-import log from '../../log'
 import Log from '../../components/log'
 import Map from '../../components/map'
 import styles from './style.css'
@@ -30,6 +29,10 @@ class SiteAnalysis extends Component {
     singlePoint: PropTypes.object
   }
 
+  log (l) {
+    this.props.dispatch(addActionLogItem(l))
+  }
+
   render () {
     const {dispatch, map, mapMarker, singlePoint} = this.props
 
@@ -42,7 +45,7 @@ class SiteAnalysis extends Component {
             onChange={state => dispatch(updateMap(state))}
             onClick={e => {
               const {lat, lng} = e.latlng
-              log(`Clicked map at ${printLL([lat, lng])}`)
+              this.log(`Clicked map at ${printLL([lat, lng])}`)
 
               updateMarkerAndSinglePoint(dispatch, {
                 position: [lat, lng],
@@ -58,7 +61,7 @@ class SiteAnalysis extends Component {
                     onLeafletDragEnd={e => {
                       const {lat, lng} = e.target._latlng
                       const position = [lat, lng]
-                      log(`Dragged marker to ${printLL(position)}`)
+                      this.log(`Dragged marker to ${printLL(position)}`)
 
                       updateMarkerAndSinglePoint(dispatch, {
                         position,
@@ -92,7 +95,7 @@ class SiteAnalysis extends Component {
                         text: place.place_name
                       })
 
-                      log(`Selected: ${place.place_name}`)
+                      this.log(`Selected: ${place.place_name}`)
                     }}
                     />
                 </fieldset>

@@ -1,8 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 
-import {updateSelectedProject} from '../actions'
-import log from '../log'
+import {addActionLogItem, updateSelectedProject} from '../actions'
 
 class ProjectSelect extends Component {
   static propTypes = {
@@ -20,7 +19,7 @@ class ProjectSelect extends Component {
         className={className}
         onChange={e => {
           dispatch(updateSelectedProject(e.target.value))
-          log(`Selected new project: ${e.target.value}`)
+          dispatch(addActionLogItem(`Selected new project: ${e.target.value}`))
         }}
         value={selected.id}>
         {projects.map(project => <option value={project.id} key={project.id}>{project.name}</option>)}

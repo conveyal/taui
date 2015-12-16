@@ -5,12 +5,11 @@ import {connect} from 'react-redux'
 import Transitive from 'transitive-js'
 import TransitiveLayer from 'leaflet-transitivelayer'
 
-import {updateMapMarker, updateMap} from '../../actions'
+import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibility, setSurface} from '../../actions/browsochrones'
 import config from '../../config'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
-import log from '../../log'
 import Log from '../../components/log'
 import Map from '../../components/map'
 import styles from './style.css'
@@ -33,6 +32,10 @@ class Indianapolis extends Component {
     this.initializeBrowsochrones()
 
     this.updateTransitive = debounce(this.updateTransitive, 200, true)
+  }
+
+  log (l) {
+    this.props.dispatch(addActionLogItem(l))
   }
 
   initializeBrowsochrones () {
@@ -62,7 +65,7 @@ class Indianapolis extends Component {
   }
 
   updateBrowsochrones (event) {
-    log(`Retrieving isochrones for origin.`)
+    this.log(`Retrieving isochrones for origin.`)
 
     const {browsochrones, dispatch} = this.props
     const bc = browsochrones.instance
@@ -147,7 +150,7 @@ class Indianapolis extends Component {
             onChange={state => dispatch(updateMap(state))}
             onClick={e => {
               const {lat, lng} = e.latlng
-              log(`Clicked map at ${printLL([lat, lng])}`)
+              this.log(`Clicked map at ${printLL([lat, lng])}`)
 
               dispatch(updateMapMarker({
                 position: [lat, lng],
@@ -176,7 +179,7 @@ class Indianapolis extends Component {
                     onLeafletDragEnd={e => {
                       const {lat, lng} = e.target._latlng
                       const position = [lat, lng]
-                      log(`Dragged marker to ${printLL(position)}`)
+                      this.log(`Dragged marker to ${printLL(position)}`)
 
                       dispatch(updateMapMarker({
                         isDragging: false,
@@ -211,7 +214,7 @@ class Indianapolis extends Component {
                         text: place.place_name
                       }))
 
-                      log(`Selected: ${place.place_name}`)
+                      this.log(`Selected: ${place.place_name}`)
                     }}
                     />
                 </fieldset>

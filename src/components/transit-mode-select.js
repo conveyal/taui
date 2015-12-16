@@ -1,8 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 
-import {updateSelectedTransitMode} from '../actions'
-import log from '../log'
+import {addActionLogItem, updateSelectedTransitMode} from '../actions'
 
 class TransitModeSelect extends Component {
   static propTypes = {
@@ -20,7 +19,7 @@ class TransitModeSelect extends Component {
         className={className}
         onChange={e => {
           dispatch(updateSelectedTransitMode(e.target.value))
-          log(`Selected new transit mode: ${e.target.value}`)
+          dispatch(addActionLogItem(`Selected new transit mode: ${e.target.value}`))
         }}
         value={selected.id}>
         {modes.map(mode => <option value={mode.id} key={mode.id}>{mode.name}</option>)}
