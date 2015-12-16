@@ -32,7 +32,7 @@ class Indianapolis extends Component {
     super(props)
     this.initializeBrowsochrones()
 
-    this.updateTransitive = debounce(this.updateTransitive, 100, true)
+    this.updateTransitive = debounce(this.updateTransitive, 200, true)
   }
 
   initializeBrowsochrones () {
@@ -201,6 +201,7 @@ class Indianapolis extends Component {
                 <fieldset className='form-group' style={{position: 'relative'}}>
                   <Geocoder
                     accessToken={config.map.mapbox.accessToken}
+                    inputPlaceholder='Search for a start address'
                     onSelect={place => {
                       const [lng, lat] = place.center
                       const position = [lat, lng]
@@ -215,7 +216,8 @@ class Indianapolis extends Component {
                     />
                 </fieldset>
               </form>
-              <p>Access to {accessibility} jobs within 60 minutes.</p>
+              <h5>Access</h5>
+              <p>{accessibility.toLocaleString()} jobs within 60 minutes.</p>
             </div>
 
             <div className={styles.navbar}>Indianapolis</div>
