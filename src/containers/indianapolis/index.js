@@ -64,14 +64,14 @@ class Indianapolis extends Component {
   }
 
   updateBrowsochrones (event) {
-    this.log(`Retrieving isochrones for origin.`)
-
     const {browsochrones, dispatch} = this.props
     const bc = browsochrones.instance
     const map = getMapFromEvent(event)
 
     // get the pixel coordinates
     const origin = bc.pixelToOriginCoordinates(map.project(event.latlng || event.target._latlng), map.getZoom())
+
+    this.log(`Retrieving isochrones for origin [${origin.x},  ${origin.y}]`)
 
     if (!bc.coordinatesInQueryBounds(origin)) {
       if (this.isoLayer) {
@@ -139,6 +139,10 @@ class Indianapolis extends Component {
   render () {
     const {browsochrones, dispatch, map, mapMarker} = this.props
     const {accessibility} = browsochrones
+
+    if (browsochrones.instance.isReady()) {
+      console.log('browsochrones is ready!')
+    }
 
     return (
       <Fullscreen>
@@ -219,10 +223,10 @@ class Indianapolis extends Component {
                 </fieldset>
               </form>
               <h5>Access</h5>
-              <p>{accessibility.toLocaleString()} jobs within 60 minutes.</p>
+              <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
             </div>
 
-            <div className={styles.navbar}>Indianapolis</div>
+            <div className={styles.navbar}>Champagne</div>
             <div className={styles.dockedActionLog}><Log /></div>
           </div>
         </div>
