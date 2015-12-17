@@ -141,10 +141,6 @@ class Indianapolis extends Component {
     const {browsochrones, dispatch, map, mapMarker} = this.props
     const {accessibility} = browsochrones
 
-    if (browsochrones.instance.isReady()) {
-      this.log('Browsochrones is ready!')
-    }
-
     return (
       <Fullscreen>
         <Map
