@@ -1,5 +1,6 @@
 import debounce from 'debounce'
 import React, {Component, PropTypes} from 'react'
+import Dock from 'react-dock'
 import {Marker, Popup} from 'react-leaflet'
 import {connect} from 'react-redux'
 import Transitive from 'transitive-js'
@@ -132,7 +133,7 @@ class Indianapolis extends Component {
         }
       }
 
-      console.log(`Transitive found ${data.journeys.length} unique paths`)
+      this.log(`Transitive found ${data.journeys.length} unique paths`)
     }
   }
 
@@ -141,95 +142,97 @@ class Indianapolis extends Component {
     const {accessibility} = browsochrones
 
     if (browsochrones.instance.isReady()) {
-      console.log('browsochrones is ready!')
+      this.log('Browsochrones is ready!')
     }
 
     return (
       <Fullscreen>
-        <div className={styles.main}>
-          <Map
-            className={styles.map}
-            map={map}
-            onChange={state => dispatch(updateMap(state))}
-            onClick={e => {
-              const {lat, lng} = e.latlng
-              this.log(`Clicked map at ${printLL([lat, lng])}`)
+        <Map
+          className={styles.map}
+          map={map}
+          onChange={state => dispatch(updateMap(state))}
+          onClick={e => {
+            const {lat, lng} = e.latlng
+            this.log(`Clicked map at ${printLL([lat, lng])}`)
 
-              dispatch(updateMapMarker({
-                position: [lat, lng],
-                text: ''
-              }))
-            }}
-            onLeafletMouseMove={e => {
-              this.updateTransitive(e)
-            }}>
-            {(() => {
-              if (mapMarker && mapMarker.position) {
-                return (
-                  <Marker
-                    draggable={true}
-                    position={mapMarker.position}
-                    onLeafletDragStart={e => {
-                      const {lat, lng} = e.target._latlng
-                      const position = [lat, lng]
+            dispatch(updateMapMarker({
+              position: [lat, lng],
+              text: ''
+            }))
+          }}
+          onLeafletMouseMove={e => {
+            this.updateTransitive(e)
+          }}>
+          {(() => {
+            if (mapMarker && mapMarker.position) {
+              return (
+                <Marker
+                  draggable={true}
+                  position={mapMarker.position}
+                  onLeafletDragStart={e => {
+                    const {lat, lng} = e.target._latlng
+                    const position = [lat, lng]
 
-                      dispatch(updateMapMarker({
-                        isDragging: true,
-                        position,
-                        text: ''
-                      }))
-                    }}
-                    onLeafletDragEnd={e => {
-                      const {lat, lng} = e.target._latlng
-                      const position = [lat, lng]
-                      this.log(`Dragged marker to ${printLL(position)}`)
+                    dispatch(updateMapMarker({
+                      isDragging: true,
+                      position,
+                      text: ''
+                    }))
+                  }}
+                  onLeafletDragEnd={e => {
+                    const {lat, lng} = e.target._latlng
+                    const position = [lat, lng]
+                    this.log(`Dragged marker to ${printLL(position)}`)
 
-                      dispatch(updateMapMarker({
-                        isDragging: false,
-                        position,
-                        text: ''
-                      }))
-                    }}
-                    onMove={e => {
-                      if (!mapMarker.isDragging) {
-                        this.updateBrowsochrones(e)
-                      }
-                    }}>
-                    {mapMarker.text && <Popup><span>{mapMarker.text}</span></Popup>}
-                  </Marker>
-                )
-              }
-            })()}
-          </Map>
-          <div className={styles.sideBar}>
-            <div className={styles.scrollable}>
-              <form>
-                <fieldset className='form-group' style={{position: 'relative'}}>
-                  <Geocoder
-                    accessToken={map.mapbox.accessToken}
-                    inputPlaceholder='Search for a start address'
-                    onSelect={place => {
-                      const [lng, lat] = place.center
-                      const position = [lat, lng]
+                    dispatch(updateMapMarker({
+                      isDragging: false,
+                      position,
+                      text: ''
+                    }))
+                  }}
+                  onMove={e => {
+                    if (!mapMarker.isDragging) {
+                      this.updateBrowsochrones(e)
+                    }
+                  }}>
+                  {mapMarker.text && <Popup><span>{mapMarker.text}</span></Popup>}
+                </Marker>
+              )
+            }
+          })()}
+        </Map>
+        <Dock
+          dimMode='none'
+          fluid={true}
+          isVisible={true}
+          position='right'
+          >
+          <div className={styles.navbar}>Champagne</div>
+          <div className={styles.dockContent}>
+            <form>
+              <fieldset className='form-group'>
+                <Geocoder
+                  accessToken={map.mapbox.accessToken}
+                  inputPlaceholder='Search for a start address'
+                  onSelect={place => {
+                    const [lng, lat] = place.center
+                    const position = [lat, lng]
 
-                      dispatch(updateMapMarker({
-                        position,
-                        text: place.place_name
-                      }))
+                    dispatch(updateMapMarker({
+                      position,
+                      text: place.place_name
+                    }))
 
-                      this.log(`Selected: ${place.place_name}`)
-                    }}
-                    />
-                </fieldset>
-              </form>
-              <h5>Access</h5>
-              <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
-            </div>
-
-            <div className={styles.navbar}>Champagne</div>
-            <div className={styles.dockedActionLog}><Log /></div>
+                    this.log(`Selected: ${place.place_name}`)
+                  }}
+                  />
+              </fieldset>
+            </form>
+            <h5>Access</h5>
+            <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
           </div>
-        </div>
+          <div className={styles.dockedActionLog}><Log /></div>
+        </Dock>
       </Fullscreen>
     )
   }
