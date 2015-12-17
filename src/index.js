@@ -1,4 +1,4 @@
-import 'babel-core/polyfill'
+import 'babel-polyfill'
 import deepAssign from 'deep-assign'
 import React from 'react'
 import {render} from 'react-dom'
