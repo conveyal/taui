@@ -1,7 +1,6 @@
 import debounce from 'debounce'
 import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
-import {Marker, Popup} from 'react-leaflet'
 import {connect} from 'react-redux'
 import Transitive from 'transitive-js'
 import TransitiveLayer from 'leaflet-transitivelayer'
@@ -9,6 +8,7 @@ import TransitiveLayer from 'leaflet-transitivelayer'
 import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibility, setSurface} from '../../actions/browsochrones'
 import Fullscreen from '../../components/fullscreen'
+import renderMarkers, {mapMarkerConstants} from '../../components/marker-helper'
 import Geocoder from '../../components/geocoder'
 import Log from '../../components/log'
 import Map from '../../components/map'
@@ -17,6 +17,79 @@ import transitiveStyle from './transitive-style'
 
 function printLL (ll) {
   return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
+}
+
+/**
+ * When the origin is moved, Browsochrones are updated. Update Transitive after
+ * that event only if a destination marker is present.
+ *
+ * @private
+ * @param  {Event} e [description]
+ */
+function onAfterOriginBrowsochroneUpdate (e) {
+  const site = this
+  const destinationMarker = site.props.mapMarkers[mapMarkerConstants.DESTINATION]
+  if (destinationMarker && destinationMarker.position) {
+    const destinationEvent = Object.assign(e, {
+      latlng: {
+        lat: destinationMarker.position[0],
+        lng: destinationMarker.position[1]
+      }
+    })
+    site.updateTransitive(destinationEvent);
+  }
+}
+
+/**
+ * Callback to be executed on Origin Marker move. Update Browsochones when
+ * Marker is dropped
+ *
+ * @private
+ * @param  {Event} e
+ */
+function onMoveOrigin (e) {
+  const site = this
+  const originMarker = site.props.mapMarkers[mapMarkerConstants.ORIGIN]
+
+  if (!originMarker.isDragging) {
+    const {lat, lng} = e.target._latlng
+    const position = [lat, lng]
+
+    site.log(`Origin marker dragged to ${printLL(position)}`)
+
+    site.updateBrowsochrones(e)
+      .then(onAfterOriginBrowsochroneUpdate.bind(this, e))
+  }
+}
+
+/**
+ * Callback to be executed on Destination Marker move.
+ *
+ * @private
+ * @param  {Event} e
+ */
+function onMoveDestination (e) {
+  const marker = this.props.mapMarkers[mapMarkerConstants.DESTINATION]
+  this.updateTransitive(e);
+}
+
+/**
+ * When a destination marker is added, use its position to update Transitive
+ *
+ * @private
+ * @param  {Event} e
+ */
+function onAddDestination (e) {
+  const site = this
+  const posOrigin = site.props.mapMarkers[mapMarkerConstants.ORIGIN].position
+  const posDestination = site.props.mapMarkers[mapMarkerConstants.DESTINATION].position
+  const destinationEvent = Object.assign(e, {
+    latlng: {
+      lat: posDestination[0],
+      lng: posDestination[1]
+    }
+  })
+  site.updateTransitive(destinationEvent);
 }
 
 class Indianapolis extends Component {
@@ -32,6 +105,7 @@ class Indianapolis extends Component {
     this.initializeBrowsochrones()
 
     this.updateTransitive = debounce(this.updateTransitive, 200, true)
+    this.updateBrowsochrones = this.updateBrowsochrones.bind(this)
   }
 
   log (l) {
@@ -82,7 +156,7 @@ class Indianapolis extends Component {
       return
     }
 
-    fetchOrigin(browsochrones.originsUrl, origin)(dispatch)
+    return fetchOrigin(browsochrones.originsUrl, origin)(dispatch)
       .then(r => {
         dispatch(setSurface(bc.generateSurface()))
         dispatch(setAccessibility(bc.getAccessibilityForCutoff()))
@@ -138,8 +212,10 @@ class Indianapolis extends Component {
   }
 
   render () {
-    const {browsochrones, dispatch, map, mapMarker} = this.props
+    const {browsochrones, dispatch, map, mapMarkers} = this.props
     const {accessibility} = browsochrones
+    const originMarker = renderMarkers(mapMarkers, mapMarkerConstants.ORIGIN, dispatch, onMoveOrigin.bind(this), () => {})
+    const destinationMarker = renderMarkers(mapMarkers, mapMarkerConstants.DESTINATION, dispatch, onMoveDestination.bind(this), onAddDestination.bind(this))
 
     return (
       <Fullscreen>
@@ -155,47 +231,8 @@ class Indianapolis extends Component {
               position: [lat, lng],
               text: ''
             }))
-          }}
-          onLeafletMouseMove={e => {
-            this.updateTransitive(e)
           }}>
-          {(() => {
-            if (mapMarker && mapMarker.position) {
-              return (
-                <Marker
-                  draggable={true}
-                  position={mapMarker.position}
-                  onLeafletDragStart={e => {
-                    const {lat, lng} = e.target._latlng
-                    const position = [lat, lng]
-
-                    dispatch(updateMapMarker({
-                      isDragging: true,
-                      position,
-                      text: ''
-                    }))
-                  }}
-                  onLeafletDragEnd={e => {
-                    const {lat, lng} = e.target._latlng
-                    const position = [lat, lng]
-                    this.log(`Dragged marker to ${printLL(position)}`)
-
-                    dispatch(updateMapMarker({
-                      isDragging: false,
-                      position,
-                      text: ''
-                    }))
-                  }}
-                  onMove={e => {
-                    if (!mapMarker.isDragging) {
-                      this.updateBrowsochrones(e)
-                    }
-                  }}>
-                  {mapMarker.text && <Popup><span>{mapMarker.text}</span></Popup>}
-                </Marker>
-              )
-            }
-          })()}
+          {[originMarker, destinationMarker]}
         </Map>
         <Dock
           dimMode='none'
@@ -215,8 +252,31 @@ class Indianapolis extends Component {
                     const position = [lat, lng]
 
                     dispatch(updateMapMarker({
-                      position,
-                      text: place.place_name
+                      [mapMarkerConstants.ORIGIN]: {
+                        isDragging: false,
+                        position,
+                        text: place.place_name
+                      }
+                    }))
+
+                    this.log(`Selected: ${place.place_name}`)
+                  }}
+                  />
+              </fieldset>
+              <fieldset className='form-group'>
+                <Geocoder
+                  accessToken={map.mapbox.accessToken}
+                  inputPlaceholder='Search for an end address'
+                  onSelect={place => {
+                    const [lng, lat] = place.center
+                    const position = [lat, lng]
+
+                    dispatch(updateMapMarker({
+                      [mapMarkerConstants.DESTINATION]: {
+                        isDragging: false,
+                        position,
+                        text: place.place_name
+                      }
                     }))
 
                     this.log(`Selected: ${place.place_name}`)
