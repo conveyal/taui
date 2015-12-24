@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React from 'react'
 import {Marker, Popup} from 'react-leaflet'
 import {addActionLogItem, updateMapMarker} from '../actions'
 
@@ -84,7 +84,7 @@ function renderMarker (mapMarkers, type, dispatch, onMove, onAdd) {
   if (marker && marker.position) {
     return (
       <Marker
-        draggable={true}
+        draggable
         key={type}
         position={marker.position}
         onLeafletDragStart={onLeafletDragStart.bind(undefined, type, dispatch)}
@@ -95,7 +95,7 @@ function renderMarker (mapMarkers, type, dispatch, onMove, onAdd) {
       </Marker>
     )
   }
-  return null;
+  return null
 }
 const mapMarkerConstants = TYPES
 export {renderMarker as default, mapMarkerConstants}

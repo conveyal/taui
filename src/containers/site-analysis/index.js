@@ -55,7 +55,7 @@ class SiteAnalysis extends Component {
               if (mapMarker && mapMarker.position) {
                 return (
                   <Marker
-                    draggable={true}
+                    draggable
                     position={mapMarker.position}
                     onLeafletDragEnd={e => {
                       const {lat, lng} = e.target._latlng

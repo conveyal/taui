@@ -36,7 +36,7 @@ function onAfterOriginBrowsochroneUpdate (e) {
         lng: destinationMarker.position[1]
       }
     })
-    site.updateTransitive(destinationEvent);
+    site.updateTransitive(destinationEvent)
   }
 }
 
@@ -66,11 +66,10 @@ function onMoveOrigin (e) {
  * Callback to be executed on Destination Marker move.
  *
  * @private
- * @param  {Event} e
+ * @param {Event} e
  */
 function onMoveDestination (e) {
-  const marker = this.props.mapMarkers[mapMarkerConstants.DESTINATION]
-  this.updateTransitive(e);
+  this.updateTransitive(e)
 }
 
 /**
@@ -81,7 +80,6 @@ function onMoveDestination (e) {
  */
 function onAddDestination (e) {
   const site = this
-  const posOrigin = site.props.mapMarkers[mapMarkerConstants.ORIGIN].position
   const posDestination = site.props.mapMarkers[mapMarkerConstants.DESTINATION].position
   const destinationEvent = Object.assign(e, {
     latlng: {
@@ -89,14 +87,14 @@ function onAddDestination (e) {
       lng: posDestination[1]
     }
   })
-  site.updateTransitive(destinationEvent);
+  site.updateTransitive(destinationEvent)
 }
 
 class Indianapolis extends Component {
   static propTypes = {
     browsochrones: PropTypes.object,
     dispatch: PropTypes.any,
-    mapMarker: PropTypes.object,
+    mapMarkers: PropTypes.object,
     map: PropTypes.object
   }
 
@@ -236,8 +234,8 @@ class Indianapolis extends Component {
         </Map>
         <Dock
           dimMode='none'
-          fluid={true}
-          isVisible={true}
+          fluid
+          isVisible
           position='right'
           >
           <div className={styles.navbar}>Champagne</div>
