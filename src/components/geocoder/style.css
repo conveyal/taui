@@ -3,9 +3,8 @@
   padding: 0;
   margin: 0;
   background-color: #fff;
-  position: absolute;
-  top: 35px;
-  width: 100%;
+  position: relative;
+  top: -3px;
   border-left: 0.0625rem solid #ccc;
   border-right: 0.0625rem solid #ccc;
   border-bottom: 0.0625rem solid #ccc;
