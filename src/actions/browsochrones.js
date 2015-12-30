@@ -1,17 +1,10 @@
 import fetch from 'isomorphic-fetch'
 import {createAction} from 'redux-actions'
 
-export const SET_ACCESSIBILITY = 'SET_ACCESSIBILITY'
-export const setAccessibility = createAction(SET_ACCESSIBILITY)
-
-export const SET_SURFACE = 'SET_SURFACE'
-export const setSurface = createAction(SET_SURFACE)
-
-export const REQUEST_GRID = 'REQUEST_GRID'
-export const requestGrid = createAction(REQUEST_GRID)
-
-export const RECEIVE_GRID = 'RECEIVE_GRID'
-export const receiveGrid = createAction(RECEIVE_GRID)
+export const setAccessibility = createAction('set accessibility')
+export const setSurface = createAction('set surface')
+export const requestGrid = createAction('request grid')
+export const receiveGrid = createAction('receive grid')
 
 export function fetchGrid (url) {
   return function (dispatch) {
@@ -23,11 +16,8 @@ export function fetchGrid (url) {
   }
 }
 
-export const REQUEST_ORIGIN = 'REQUEST_ORIGIN'
-export const requestOrigin = createAction(REQUEST_ORIGIN)
-
-export const RECEIVE_ORIGIN = 'RECEIVE_ORIGIN'
-export const receiveOrigin = createAction(RECEIVE_ORIGIN)
+export const requestOrigin = createAction('request origin')
+export const receiveOrigin = createAction('receive origin')
 
 export function fetchOrigin (url, coordinates) {
   return function (dispatch) {
@@ -39,11 +29,8 @@ export function fetchOrigin (url, coordinates) {
   }
 }
 
-export const REQUEST_QUERY = 'REQUEST_QUERY'
-export const requestQuery = createAction(REQUEST_QUERY)
-
-export const RECEIVE_QUERY = 'RECEIVE_QUERY'
-export const receiveQuery = createAction(RECEIVE_QUERY)
+export const requestQuery = createAction('request query')
+export const receiveQuery = createAction('receive query')
 
 export function fetchQuery (url) {
   return function (dispatch) {
@@ -55,11 +42,8 @@ export function fetchQuery (url) {
   }
 }
 
-export const REQUEST_STOP_TREES = 'REQUEST_STOP_TREES'
-export const requestStopTrees = createAction(REQUEST_STOP_TREES)
-
-export const RECEIVE_STOP_TREES = 'RECEIVE_STOP_TREES'
-export const receiveStopTrees = createAction(RECEIVE_STOP_TREES)
+export const requestStopTrees = createAction('request stop trees')
+export const receiveStopTrees = createAction('receive stop trees')
 
 export function fetchStopTrees (url) {
   return function (dispatch) {
@@ -71,11 +55,8 @@ export function fetchStopTrees (url) {
   }
 }
 
-export const REQUEST_TRANSITIVE_NETWORK = 'REQUEST_TRANSITIVE_NETWORK'
-export const requestTransitiveNetwork = createAction(REQUEST_TRANSITIVE_NETWORK)
-
-export const RECEIVE_TRANSITIVE_NETWORK = 'RECEIVE_TRANSITIVE_NETWORK'
-export const receiveTransitiveNetwork = createAction(RECEIVE_TRANSITIVE_NETWORK)
+export const requestTransitiveNetwork = createAction('request transitive network')
+export const receiveTransitiveNetwork = createAction('receive transitive network')
 
 export function fetchTransitiveNetwork (url) {
   return function (dispatch) {

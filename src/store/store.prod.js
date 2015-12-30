@@ -1,10 +1,11 @@
 import {applyMiddleware, compose, createStore} from 'redux'
-import thunk from 'redux-thunk'
+import effects from 'redux-effects'
+import fetch from 'redux-effects-fetch'
 
 import rootReducer from '../reducers'
 
 const finalCreateStore = compose(
-  applyMiddleware(thunk)
+  applyMiddleware(effects, fetch)
 )(createStore)
 
 export default function configureStore (initialState) {

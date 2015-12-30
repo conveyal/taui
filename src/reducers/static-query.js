@@ -1,13 +1,9 @@
 import {handleActions} from 'redux-actions'
 
-const initialStaticQuery = {
-  query: null
-}
-
-const staticQueryReducers = handleActions({
-  UPDATE_STATIC_QUERY: (state, action) => {
+export default handleActions({
+  'update static query' (state, action) {
     return action.payload
   }
-}, initialStaticQuery)
-
-export default staticQueryReducers
+}, {
+  query: null
+})

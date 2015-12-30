@@ -2,8 +2,7 @@ import fetch from 'isomorphic-fetch'
 import {stringify} from 'qs'
 import {createAction} from 'redux-actions'
 
-export const ADD_ACTION_LOG_ITEM = 'ADD_ACTION_LOG_ITEM'
-export const addActionLogItem = createAction(ADD_ACTION_LOG_ITEM, (item) => {
+export const addActionLogItem = createAction('add action log item', (item) => {
   const payload = typeof item === 'string'
     ? { text: item }
     : item
@@ -14,29 +13,14 @@ export const addActionLogItem = createAction(ADD_ACTION_LOG_ITEM, (item) => {
   }, payload)
 })
 
-export const UPDATE_MAP_MARKER = 'UPDATE_MAP_MARKER'
-export const updateMapMarker = createAction(UPDATE_MAP_MARKER)
-
-export const UPDATE_MAP = 'UPDATE_MAP'
-export const updateMap = createAction(UPDATE_MAP)
-
-export const UPDATE_SELECTED_DESTINATION = 'UPDATE_SELECTED_DESTINATION'
-export const updateSelectedDestination = createAction(UPDATE_SELECTED_DESTINATION)
-
-export const UPDATE_SELECTED_PROJECT = 'UPDATE_SELECTED_PROJECT'
-export const updateSelectedProject = createAction(UPDATE_SELECTED_PROJECT)
-
-export const UPDATE_SELECTED_TRANSIT_MODE = 'UPDATE_SELECTED_TRANSIT_MODE'
-export const updateSelectedTransitMode = createAction(UPDATE_SELECTED_TRANSIT_MODE)
-
-export const UPDATE_SELECTED_TRANSIT_SCENARIO = 'UPDATE_SELECTED_TRANSIT_SCENARIO'
-export const updateSelectedTransitScenario = createAction(UPDATE_SELECTED_TRANSIT_SCENARIO)
-
-export const REQUEST_SINGLE_POINT = 'REQUEST_SINGLE_POINT'
-export const requestSinglePoint = createAction(REQUEST_SINGLE_POINT)
-
-export const RECEIVE_SINGLE_POINT = 'RECEIVE_SINGLE_POINT'
-export const receiveSinglePoint = createAction(RECEIVE_SINGLE_POINT)
+export const updateMapMarker = createAction('update map marker')
+export const updateMap = createAction('update map')
+export const updateSelectedDestination = createAction('update selected destination')
+export const updateSelectedProject = createAction('update selected project')
+export const updateSelectedTransitMode = createAction('update selected transit mode')
+export const updateSelectedTransitScenario = createAction('update selected transit scenario')
+export const requestSinglePoint = createAction('request single point')
+export const receiveSinglePoint = createAction('receive single point')
 
 export function fetchSinglePoint (query) {
   return function (dispatch) {
