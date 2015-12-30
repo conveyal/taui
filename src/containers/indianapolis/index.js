@@ -163,8 +163,11 @@ class Indianapolis extends Component {
 
         if (this.isoLayer) map.removeLayer(this.isoLayer)
 
-        this.isoLayer = window.L.tileLayer.canvas()
-        this.isoLayer.drawTile = bc.drawTile.bind(bc)
+        // make the isoline
+        // TODO don't hardwire time cutoff
+        let isoline = bc.getIsochrone(60)
+
+        this.isoLayer = window.L.geoJson(isoline)
         this.isoLayer.addTo(map)
       })
       .catch(err => {
