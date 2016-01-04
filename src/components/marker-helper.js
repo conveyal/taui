@@ -1,6 +1,5 @@
 import React from 'react'
 import {Marker, Popup} from 'react-leaflet'
-import {addActionLogItem, updateMapMarker} from '../actions'
 
 /**
  * A set of string constants for Marker types.
@@ -12,60 +11,6 @@ import {addActionLogItem, updateMapMarker} from '../actions'
 const TYPES = {
   ORIGIN: 'originMarker',
   DESTINATION: 'destinationMarker'
-}
-
-/**
- * On Marker drag start, update position of Marker
- *
- * @private
- * @param  {String} type
- * @param  {Function} dispatch
- * @param  {Event} e
- */
-function onLeafletDragStart (type, dispatch, e) {
-  const {lat, lng} = e.target._latlng
-  const position = [lat, lng]
-
-  dispatch(updateMapMarker({
-    [type]: {
-      isDragging: true,
-      position,
-      text: ''
-    }
-  }))
-}
-
-/**
- * On Marker drag end, update position of Marker and setting `isDragging` flag to false
- *
- * @private
- * @param  {String} type
- * @param  {Function} dispatch
- * @param  {Event} e
- */
-function onLeafletDragEnd (type, dispatch, e) {
-  const {lat, lng} = e.target._latlng
-  const position = [lat, lng]
-
-  dispatch(addActionLogItem(`Dragged marker to ${printLL(position)}`))
-  dispatch(updateMapMarker({
-    [type]: {
-      isDragging: false,
-      position,
-      text: ''
-    }
-  }))
-}
-
-/**
- * Helper function for displaying coordinates
- *
- * @private
- * @param  {Array} ll
- * @return {String}
- */
-function printLL (ll) {
-  return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
 }
 
 /**
@@ -81,16 +26,14 @@ function printLL (ll) {
  */
 function renderMarker (mapMarkers, type, dispatch, onMove, onAdd) {
   const marker = mapMarkers[type]
-  if (marker && marker.position) {
+  if (marker && marker.latlng) {
     return (
       <Marker
         draggable
         key={type}
-        position={marker.position}
-        onLeafletDragStart={onLeafletDragStart.bind(undefined, type, dispatch)}
-        onLeafletDragEnd={onLeafletDragEnd.bind(undefined, type, dispatch)}
-        onAdd={onAdd}
-        onMove={onMove}>
+        position={marker.latlng}
+        onLeafletDragEnd={onMove}
+        onAdd={onAdd}>
         {marker.text && <Popup><span>{marker.text}</span></Popup>}
       </Marker>
     )

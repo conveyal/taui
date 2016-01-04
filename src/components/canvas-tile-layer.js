@@ -10,14 +10,20 @@ export default class CanvasTileLayer extends BaseTileLayer {
   componentWillMount () {
     super.componentWillMount()
     const {drawTile} = this.props
-    this.leafletElement = tileLayer.canvas()
+    this.leafletElement = tileLayer.canvas({
+      detectRetina: true
+    })
     this.leafletElement.drawTile = drawTile
   }
 
+  componentDidMount () {
+    super.componentDidMount()
+    this.leafletElement.redraw()
+  }
+
   componentDidUpdate (prevProps) {
-    const {drawTile} = this.props
-    if (drawTile && drawTile !== prevProps.drawTile) {
-      this.leafletElement.drawTile = drawTile
-    }
+    super.componentDidUpdate(prevProps)
+    this.leafletElement.drawTile = this.props.drawTile
+    this.leafletElement.redraw()
   }
 }

@@ -10,9 +10,7 @@ export default handleActions({
     }
   },
   'receive single point' (state, action) {
-    return Object.assign({
-      isFetching: false
-    }, action.payload)
+    return Object.assign({}, { isFetching: false }, action.payload)
   }
 }, {
   data: {},

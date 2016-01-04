@@ -6,7 +6,8 @@ import Transitive from 'transitive-js'
 import TransitiveLayer from 'leaflet-transitivelayer'
 
 import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
-import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibility, setSurface} from '../../actions/browsochrones'
+import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, updateOrigin} from '../../actions/browsochrones'
+import CanvasTileLayer from '../../components/canvas-tile-layer'
 import Fullscreen from '../../components/fullscreen'
 import renderMarkers, {mapMarkerConstants} from '../../components/marker-helper'
 import Geocoder from '../../components/geocoder'
@@ -15,29 +16,8 @@ import Map from '../../components/map'
 import styles from './style.css'
 import transitiveStyle from './transitive-style'
 
-function printLL (ll) {
-  return `[ ${ll[0].toFixed(4)}, ${ll[1].toFixed(4)} ]`
-}
-
-/**
- * When the origin is moved, Browsochrones are updated. Update Transitive after
- * that event only if a destination marker is present.
- *
- * @private
- * @param  {Event} e [description]
- */
-function onAfterOriginBrowsochroneUpdate (e) {
-  const site = this
-  const destinationMarker = site.props.mapMarkers[mapMarkerConstants.DESTINATION]
-  if (destinationMarker && destinationMarker.position) {
-    const destinationEvent = Object.assign(e, {
-      latlng: {
-        lat: destinationMarker.position[0],
-        lng: destinationMarker.position[1]
-      }
-    })
-    site.updateTransitive(destinationEvent)
-  }
+function printLatLng (latlng) {
+  return `[ ${latlng.lng.toFixed(4)}, ${latlng.lat.toFixed(4)} ]`
 }
 
 /**
@@ -45,20 +25,32 @@ function onAfterOriginBrowsochroneUpdate (e) {
  * Marker is dropped
  *
  * @private
- * @param  {Event} e
+ * @param  {Event} event
  */
-function onMoveOrigin (e) {
-  const site = this
-  const originMarker = site.props.mapMarkers[mapMarkerConstants.ORIGIN]
+function onMoveOrigin (event) {
+  const {dispatch, browsochrones, mapMarkers} = this.props
+  const latlng = event.target._latlng
+  const map = getMapFromEvent(event)
+  const originMarker = mapMarkers[mapMarkerConstants.ORIGIN]
+
+  dispatch(addActionLogItem(`Dragged origin marker to ${printLatLng(latlng)}`))
+  dispatch(updateMapMarker({
+    originMarker: {
+      latlng,
+      text: ''
+    }
+  }))
 
   if (!originMarker.isDragging) {
-    const {lat, lng} = e.target._latlng
-    const position = [lat, lng]
+    const origin = browsochrones.instance.pixelToOriginCoordinates(map.project(latlng), map.getZoom())
 
-    site.log(`Origin marker dragged to ${printLL(position)}`)
+    this.log(`Origin marker dragged to ${printLatLng(latlng)}`)
 
-    site.updateBrowsochrones(e)
-      .then(onAfterOriginBrowsochroneUpdate.bind(this, e))
+    dispatch(updateOrigin({
+      browsochrones: browsochrones.instance,
+      origin,
+      url: browsochrones.originsUrl
+    }))
   }
 }
 
@@ -80,19 +72,17 @@ function onMoveDestination (e) {
  */
 function onAddDestination (e) {
   const site = this
-  const posDestination = site.props.mapMarkers[mapMarkerConstants.DESTINATION].position
   const destinationEvent = Object.assign(e, {
-    latlng: {
-      lat: posDestination[0],
-      lng: posDestination[1]
-    }
+    latlng: site.props.mapMarkers[mapMarkerConstants.DESTINATION].latlng
   })
   site.updateTransitive(destinationEvent)
 }
 
 class Indianapolis extends Component {
   static propTypes = {
-    browsochrones: PropTypes.object,
+    browsochrones: PropTypes.shape({
+      showIsoLayer: PropTypes.bool
+    }),
     dispatch: PropTypes.any,
     mapMarkers: PropTypes.object,
     map: PropTypes.object
@@ -100,14 +90,16 @@ class Indianapolis extends Component {
 
   constructor (props) {
     super(props)
-    this.initializeBrowsochrones()
-
     this.updateTransitive = debounce(this.updateTransitive, 200, true)
-    this.updateBrowsochrones = this.updateBrowsochrones.bind(this)
+  }
+
+  componentWillMount () {
+    this.initializeBrowsochrones()
   }
 
   log (l) {
-    this.props.dispatch(addActionLogItem(l))
+    const {dispatch} = this.props
+    dispatch(addActionLogItem(l))
   }
 
   initializeBrowsochrones () {
@@ -116,65 +108,24 @@ class Indianapolis extends Component {
     const grid = 'Jobs_total'
 
     if (!bc.grid) {
-      fetchGrid(`${browsochrones.gridsUrl}/${grid}.grid`)(dispatch)
+      dispatch(fetchGrid(`${browsochrones.gridsUrl}/${grid}.grid`))
     }
 
     if (!bc.query) {
-      fetchQuery(browsochrones.queryUrl)(dispatch)
+      dispatch(fetchQuery(browsochrones.queryUrl))
     }
 
     if (!bc.stopTrees) {
-      fetchStopTrees(browsochrones.stopTreesUrl)(dispatch)
+      dispatch(fetchStopTrees(browsochrones.stopTreesUrl))
     }
 
     if (!bc.originData && bc.originCoordinates) {
-      fetchOrigin(browsochrones.originsUrl, bc.originCoordinates)(dispatch)
+      dispatch(fetchOrigin(browsochrones.originsUrl, bc.originCoordinates))
     }
 
     if (!bc.transitiveNetwork) {
-      fetchTransitiveNetwork(browsochrones.transitiveNetworkUrl)(dispatch)
+      dispatch(fetchTransitiveNetwork(browsochrones.transitiveNetworkUrl))
     }
-  }
-
-  updateBrowsochrones (event) {
-    const {browsochrones, dispatch} = this.props
-    const bc = browsochrones.instance
-    const map = getMapFromEvent(event)
-
-    // get the pixel coordinates
-    const origin = bc.pixelToOriginCoordinates(map.project(event.latlng || event.target._latlng), map.getZoom())
-
-    this.log(`Retrieving isochrones for origin [${origin.x},  ${origin.y}]`)
-
-    if (!bc.coordinatesInQueryBounds(origin)) {
-      if (this.isoLayer) {
-        map.removeLayer(this.isoLayer)
-        this.isoLayer = null
-      }
-      return
-    }
-
-    return fetchOrigin(browsochrones.originsUrl, origin)(dispatch)
-      .then(r => {
-        dispatch(setSurface(bc.generateSurface()))
-        dispatch(setAccessibility(bc.getAccessibilityForCutoff()))
-
-        if (this.isoLayer) map.removeLayer(this.isoLayer)
-
-        this.isoLayer = window.L.tileLayer.canvas()
-        this.isoLayer.drawTile = bc.drawTile.bind(bc)
-        this.isoLayer.addTo(map)
-      })
-      .catch(err => {
-        if (this.isoLayer) {
-          map.removeLayer(this.isoLayer)
-          this.isoLayer = null
-        }
-
-        console.error(err)
-        console.error(err.stack)
-        throw err
-      })
   }
 
   updateTransitive (event) {
@@ -209,11 +160,18 @@ class Indianapolis extends Component {
     }
   }
 
+  generateIsoLayer (showIsoLayer, browsochrones) {
+    return showIsoLayer
+      ? <CanvasTileLayer drawTile={browsochrones.drawTile.bind(browsochrones)} />
+      : null
+  }
+
   render () {
     const {browsochrones, dispatch, map, mapMarkers} = this.props
     const {accessibility} = browsochrones
     const originMarker = renderMarkers(mapMarkers, mapMarkerConstants.ORIGIN, dispatch, onMoveOrigin.bind(this), () => {})
     const destinationMarker = renderMarkers(mapMarkers, mapMarkerConstants.DESTINATION, dispatch, onMoveDestination.bind(this), onAddDestination.bind(this))
+    const isoLayer = this.generateIsoLayer(browsochrones.showIsoLayer, browsochrones.instance)
 
     return (
       <Fullscreen>
@@ -222,15 +180,16 @@ class Indianapolis extends Component {
           map={map}
           onChange={state => dispatch(updateMap(state))}
           onClick={e => {
-            const {lat, lng} = e.latlng
-            this.log(`Clicked map at ${printLL([lat, lng])}`)
+            const {latlng} = e
+            this.log(`Clicked map at ${printLatLng(latlng)}`)
 
             dispatch(updateMapMarker({
-              position: [lat, lng],
+              latlng,
               text: ''
             }))
           }}>
           {[originMarker, destinationMarker]}
+          {isoLayer}
         </Map>
         <Dock
           dimMode='none'
@@ -247,12 +206,11 @@ class Indianapolis extends Component {
                   inputPlaceholder='Search for a start address'
                   onSelect={place => {
                     const [lng, lat] = place.center
-                    const position = [lat, lng]
+                    const latlng = {lat, lng}
 
                     dispatch(updateMapMarker({
                       [mapMarkerConstants.ORIGIN]: {
-                        isDragging: false,
-                        position,
+                        latlng,
                         text: place.place_name
                       }
                     }))
@@ -267,12 +225,11 @@ class Indianapolis extends Component {
                   inputPlaceholder='Search for an end address'
                   onSelect={place => {
                     const [lng, lat] = place.center
-                    const position = [lat, lng]
+                    const latlng = {lat, lng}
 
                     dispatch(updateMapMarker({
                       [mapMarkerConstants.DESTINATION]: {
-                        isDragging: false,
-                        position,
+                        latlng,
                         text: place.place_name
                       }
                     }))

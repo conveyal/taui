@@ -10,5 +10,6 @@ export default handleActions({
     })
   }
 }, {
+  map: null,
   zoom: 13
 })
