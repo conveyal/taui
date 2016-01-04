@@ -30,6 +30,9 @@ export default handleActions({
   'show iso layer' (state, action) {
     return Object.assign({}, state, { showIsoLayer: action.payload })
   },
+  'show isoline' (state, action) {
+    return Object.assign({}, state, { showIsoline: action.payload })
+  },
   'set surface' (state, action) {
     return Object.assign({}, state, { surface: action.surface })
   }
@@ -37,10 +40,12 @@ export default handleActions({
   accessibility: 0,
   grid: null,
   instance: new Browsochrones(),
+  isolineTimeCutoff: 60,
   originCoordinates: {},
   originData: null,
   query: null,
   showIsoLayer: false,
+  showIsoline: false,
   stopTrees: null,
   surface: null,
   transitiveNetwork: null

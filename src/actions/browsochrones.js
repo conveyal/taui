@@ -6,9 +6,21 @@ import {addActionLogItem} from './index'
 
 export const setAccessibility = createAction('set accessibility')
 export const showIsoLayer = createAction('show iso layer')
+export const showIsoline = createAction('show isoline')
 export const setSurface = createAction('set surface')
 export const requestGrid = createAction('request grid')
 export const receiveGrid = createAction('receive grid')
+
+export function generateIsochronesIfLoaded (browsochrones) {
+  if (browsochrones.isLoaded()) {
+    return [
+      setSurface(browsochrones.generateSurface()),
+      setAccessibility(browsochrones.getAccessibilityForCutoff()),
+      showIsoLayer(true),
+      showIsoline(true)
+    ]
+  }
+}
 
 export function fetchGrid (url) {
   return [
@@ -32,12 +44,7 @@ export function fetchOrigin ({browsochrones, origin, url}) {
       ({value}) => {
         browsochrones.setOrigin(value, origin)
 
-        return [
-          receiveOrigin(value),
-          setSurface(browsochrones.generateSurface()),
-          setAccessibility(browsochrones.getAccessibilityForCutoff()),
-          showIsoLayer(true)
-        ]
+        return [receiveOrigin(value), generateIsochronesIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )

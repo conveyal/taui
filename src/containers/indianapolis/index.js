@@ -1,12 +1,13 @@
 import debounce from 'debounce'
 import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
+import {GeoJson} from 'react-leaflet'
 import {connect} from 'react-redux'
 import Transitive from 'transitive-js'
 import TransitiveLayer from 'leaflet-transitivelayer'
 
 import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
-import {fetchGrid, fetchOrigin, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, updateOrigin} from '../../actions/browsochrones'
+import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, updateOrigin} from '../../actions/browsochrones'
 import CanvasTileLayer from '../../components/canvas-tile-layer'
 import Fullscreen from '../../components/fullscreen'
 import renderMarkers, {mapMarkerConstants} from '../../components/marker-helper'
@@ -81,7 +82,8 @@ function onAddDestination (e) {
 class Indianapolis extends Component {
   static propTypes = {
     browsochrones: PropTypes.shape({
-      showIsoLayer: PropTypes.bool
+      showIsoLayer: PropTypes.bool,
+      showIsoline: PropTypes.bool
     }),
     dispatch: PropTypes.any,
     mapMarkers: PropTypes.object,
@@ -117,10 +119,6 @@ class Indianapolis extends Component {
 
     if (!bc.stopTrees) {
       dispatch(fetchStopTrees(browsochrones.stopTreesUrl))
-    }
-
-    if (!bc.originData && bc.originCoordinates) {
-      dispatch(fetchOrigin(browsochrones.originsUrl, bc.originCoordinates))
     }
 
     if (!bc.transitiveNetwork) {
@@ -166,12 +164,19 @@ class Indianapolis extends Component {
       : null
   }
 
+  generateIsoline (showIsoline, browsochrones, cutoff) {
+    return showIsoline
+      ? <GeoJson data={browsochrones.getIsochrone(cutoff)} />
+      : null
+  }
+
   render () {
     const {browsochrones, dispatch, map, mapMarkers} = this.props
     const {accessibility} = browsochrones
     const originMarker = renderMarkers(mapMarkers, mapMarkerConstants.ORIGIN, dispatch, onMoveOrigin.bind(this), () => {})
     const destinationMarker = renderMarkers(mapMarkers, mapMarkerConstants.DESTINATION, dispatch, onMoveDestination.bind(this), onAddDestination.bind(this))
     const isoLayer = this.generateIsoLayer(browsochrones.showIsoLayer, browsochrones.instance)
+    const isoline = this.generateIsoline(browsochrones.showIsoline, browsochrones.instance, browsochrones.isolineTimeCutoff)
 
     return (
       <Fullscreen>
@@ -190,6 +195,7 @@ class Indianapolis extends Component {
           }}>
           {[originMarker, destinationMarker]}
           {isoLayer}
+          {isoline}
         </Map>
         <Dock
           dimMode='none'

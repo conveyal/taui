@@ -6,7 +6,7 @@ export default handleActions({
   }
 }, {
   originMarker: {
-    latlng: [],
+    latlng: {},
     text: ''
   },
   destinationMarker: null
