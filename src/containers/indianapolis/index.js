@@ -34,7 +34,7 @@ function onMoveOrigin (event) {
   const map = getMapFromEvent(event)
   const originMarker = mapMarkers[mapMarkerConstants.ORIGIN]
 
-  dispatch(addActionLogItem(`Dragged origin marker to ${printLatLng(latlng)}`))
+  dispatch(addActionLogItem(`Origin marker moved to ${printLatLng(latlng)}`))
   dispatch(updateMapMarker({
     originMarker: {
       latlng,
@@ -44,8 +44,6 @@ function onMoveOrigin (event) {
 
   if (!originMarker.isDragging) {
     const origin = browsochrones.instance.pixelToOriginCoordinates(map.project(latlng), map.getZoom())
-
-    this.log(`Origin marker dragged to ${printLatLng(latlng)}`)
 
     dispatch(updateOrigin({
       browsochrones: browsochrones.instance,
