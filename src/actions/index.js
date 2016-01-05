@@ -18,6 +18,7 @@ export const updateMapMarker = createAction('update map marker')
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
 export const updateSelectedProject = createAction('update selected project')
+export const updateSelectedTimeCutoff = createAction('update selected time cutoff')
 export const updateSelectedTransitMode = createAction('update selected transit mode')
 export const updateSelectedTransitScenario = createAction('update selected transit scenario')
 

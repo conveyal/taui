@@ -14,6 +14,7 @@ import renderMarkers, {mapMarkerConstants} from '../../components/marker-helper'
 import Geocoder from '../../components/geocoder'
 import Log from '../../components/log'
 import Map from '../../components/map'
+import TimeCutoffSelect from '../../components/timecutoff-select'
 import styles from './style.css'
 import transitiveStyle from './transitive-style'
 
@@ -85,7 +86,10 @@ class Indianapolis extends Component {
     }),
     dispatch: PropTypes.any,
     mapMarkers: PropTypes.object,
-    map: PropTypes.object
+    map: PropTypes.object,
+    timeCutoff: PropTypes.shape({
+      selected: PropTypes.number
+    })
   }
 
   constructor (props) {
@@ -169,12 +173,13 @@ class Indianapolis extends Component {
   }
 
   render () {
-    const {browsochrones, dispatch, map, mapMarkers} = this.props
+    const {browsochrones, dispatch, map, mapMarkers, timeCutoff} = this.props
     const {accessibility} = browsochrones
     const originMarker = renderMarkers(mapMarkers, mapMarkerConstants.ORIGIN, dispatch, onMoveOrigin.bind(this), () => {})
     const destinationMarker = renderMarkers(mapMarkers, mapMarkerConstants.DESTINATION, dispatch, onMoveDestination.bind(this), onAddDestination.bind(this))
-    const isoLayer = this.generateIsoLayer(browsochrones.showIsoLayer, browsochrones.instance)
-    const isoline = this.generateIsoline(browsochrones.showIsoline, browsochrones.instance, browsochrones.isolineTimeCutoff)
+
+    const isoLayer = this.generateIsoLayer(browsochrones.showIsoLayer, browsochrones.instance, timeCutoff.selected)
+    const isoline = this.generateIsoline(browsochrones.showIsoline, browsochrones.instance, timeCutoff.selected)
 
     return (
       <Fullscreen>
@@ -182,15 +187,7 @@ class Indianapolis extends Component {
           className={styles.map}
           map={map}
           onChange={state => dispatch(updateMap(state))}
-          onClick={e => {
-            const {latlng} = e
-            this.log(`Clicked map at ${printLatLng(latlng)}`)
-
-            dispatch(updateMapMarker({
-              latlng,
-              text: ''
-            }))
-          }}>
+          >
           {[originMarker, destinationMarker]}
           {isoLayer}
           {isoline}
@@ -242,9 +239,15 @@ class Indianapolis extends Component {
                   }}
                   />
               </fieldset>
+              <fieldset className='form-group'>
+                <label>Time Cutoff</label>
+                <TimeCutoffSelect className='form-control' />
+              </fieldset>
+              <fieldset className='form-group'>
+                <label>Access</label>
+                <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
+              </fieldset>
             </form>
-            <h5>Access</h5>
-            <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
           </div>
           <div className={styles.dockedActionLog}><Log /></div>
         </Dock>
