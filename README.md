@@ -18,7 +18,7 @@ var r5Url = 'http://localhost:4567'
 
 window.taui.config = {
   browsochrones: {
-    gridsUrl: 'http://s3.amazonaws.com/analyst-static/indy-baseline/grids',
+    gridsUrl: 'http://s3.amazonaws.com/analyst-static/indy-baseline-z9/grids',
     originsUrl: r5Url,
     queryUrl: r5Url + '/query.json',
     stopTreesUrl: r5Url + '/stop_trees.dat',
