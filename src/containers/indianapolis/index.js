@@ -168,7 +168,7 @@ class Indianapolis extends Component {
 
   generateIsoline (showIsoline, browsochrones, cutoff) {
     return showIsoline
-      ? <GeoJson data={browsochrones.getIsochrone(cutoff)} />
+      ? <GeoJson key={cutoff} data={browsochrones.getIsochrone(cutoff)} />
       : null
   }
 
