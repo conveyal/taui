@@ -1,7 +1,6 @@
-import debounce from 'debounce'
 import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
-import {GeoJson} from 'react-leaflet'
+import {GeoJson, Map, Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 import Transitive from 'transitive-js'
 import TransitiveLayer from 'leaflet-transitivelayer'
@@ -10,72 +9,14 @@ import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, updateOrigin} from '../../actions/browsochrones'
 import CanvasTileLayer from '../../components/canvas-tile-layer'
 import Fullscreen from '../../components/fullscreen'
-import renderMarkers, {mapMarkerConstants} from '../../components/marker-helper'
 import Geocoder from '../../components/geocoder'
 import Log from '../../components/log'
-import Map from '../../components/map'
 import TimeCutoffSelect from '../../components/timecutoff-select'
 import styles from './style.css'
 import transitiveStyle from './transitive-style'
 
 function printLatLng (latlng) {
   return `[ ${latlng.lng.toFixed(4)}, ${latlng.lat.toFixed(4)} ]`
-}
-
-/**
- * Callback to be executed on Origin Marker move. Update Browsochones when
- * Marker is dropped
- *
- * @private
- * @param  {Event} event
- */
-function onMoveOrigin (event) {
-  const {dispatch, browsochrones, mapMarkers} = this.props
-  const latlng = event.target._latlng
-  const map = getMapFromEvent(event)
-  const originMarker = mapMarkers[mapMarkerConstants.ORIGIN]
-
-  dispatch(addActionLogItem(`Origin marker moved to ${printLatLng(latlng)}`))
-  dispatch(updateMapMarker({
-    originMarker: {
-      latlng,
-      text: ''
-    }
-  }))
-
-  if (!originMarker.isDragging) {
-    const origin = browsochrones.instance.pixelToOriginCoordinates(map.project(latlng), map.getZoom())
-
-    dispatch(updateOrigin({
-      browsochrones: browsochrones.instance,
-      origin,
-      url: browsochrones.originsUrl
-    }))
-  }
-}
-
-/**
- * Callback to be executed on Destination Marker move.
- *
- * @private
- * @param {Event} e
- */
-function onMoveDestination (e) {
-  this.updateTransitive(e)
-}
-
-/**
- * When a destination marker is added, use its position to update Transitive
- *
- * @private
- * @param  {Event} e
- */
-function onAddDestination (e) {
-  const site = this
-  const destinationEvent = Object.assign(e, {
-    latlng: site.props.mapMarkers[mapMarkerConstants.DESTINATION].latlng
-  })
-  site.updateTransitive(destinationEvent)
 }
 
 class Indianapolis extends Component {
@@ -92,13 +33,12 @@ class Indianapolis extends Component {
     })
   }
 
-  constructor (props) {
-    super(props)
-    this.updateTransitive = debounce(this.updateTransitive, 200, true)
-  }
-
   componentWillMount () {
     this.initializeBrowsochrones()
+  }
+
+  componentDidMount () {
+    this.map = this.refs.map.getLeafletElement()
   }
 
   log (l) {
@@ -128,16 +68,64 @@ class Indianapolis extends Component {
     }
   }
 
-  updateTransitive (event) {
+  /**
+   * Callback to be executed on Origin Marker move. Update Browsochones when
+   * Marker is dropped
+   *
+   * @private
+   * @param  {Event} event
+   */
+  onMoveOrigin (latlng) {
+    const {dispatch, browsochrones, mapMarkers} = this.props
+    const originMarker = mapMarkers.origin
+
+    dispatch(addActionLogItem(`Origin marker moved to ${printLatLng(latlng)}`))
+    dispatch(updateMapMarker({
+      originMarker: {
+        latlng,
+        text: ''
+      }
+    }))
+
+    if (!originMarker.isDragging) {
+      const origin = browsochrones.instance.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
+
+      dispatch(updateOrigin({
+        browsochrones: browsochrones.instance,
+        origin,
+        url: browsochrones.originsUrl
+      }))
+    }
+  }
+
+  /**
+   * Callback to be executed on Destination Marker move.
+   *
+   * @private
+   * @param {Event} e
+   */
+  onMoveDestination (latlng) {
+    this.updateTransitive(latlng)
+  }
+
+  /**
+   * When a destination marker is added, use its position to update Transitive
+   *
+   * @private
+   * @param  {Event} e
+   */
+  onAddDestination (latlng) {
+    this.updateTransitive(latlng)
+  }
+
+  updateTransitive (latlng) {
     const {browsochrones} = this.props
     const bc = browsochrones.instance
 
     // If an origin has been retrieved
     if (bc.isLoaded()) {
-      const map = getMapFromEvent(event)
-      const origin = bc.pixelToOriginCoordinates(map.project(event.latlng), map.getZoom())
-
-      const data = bc.generateTransitiveData(origin)
+      const coordinates = bc.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
+      const data = bc.generateTransitiveData(coordinates)
 
       if (data.journeys.length > 0) {
         if (!this.transitive) {
@@ -148,7 +136,7 @@ class Indianapolis extends Component {
             styles: transitiveStyle
           })
           this.transitiveLayer = new TransitiveLayer(this.transitive)
-          map.addLayer(this.transitiveLayer)
+          this.map.addLayer(this.transitiveLayer)
           this.transitiveLayer._refresh()
         } else {
           this.transitive.updateData(data)
@@ -172,26 +160,54 @@ class Indianapolis extends Component {
       : null
   }
 
-  render () {
+  renderMap () {
     const {browsochrones, dispatch, map, mapMarkers, timeCutoff} = this.props
-    const {accessibility} = browsochrones
-    const originMarker = renderMarkers(mapMarkers, mapMarkerConstants.ORIGIN, dispatch, onMoveOrigin.bind(this), () => {})
-    const destinationMarker = renderMarkers(mapMarkers, mapMarkerConstants.DESTINATION, dispatch, onMoveDestination.bind(this), onAddDestination.bind(this))
 
-    const isoLayer = this.generateIsoLayer(browsochrones.showIsoLayer, browsochrones.instance, timeCutoff.selected)
-    const isoline = this.generateIsoline(browsochrones.showIsoline, browsochrones.instance, timeCutoff.selected)
+    return (
+      <Map
+        center={map.centerCoordinates}
+        className={styles.map}
+        onLeafletZoomEnd={event => dispatch(updateMap({ zoom: event.target._zoom }))}
+        ref='map'
+        zoom={map.zoom}
+        >
+        <TileLayer
+          attribution={map.attribution}
+          url={map.url}
+        />
+        <Marker
+          draggable
+          key='originMarker'
+          position={mapMarkers.origin.latlng}
+          onLeafletDragEnd={event => this.onMoveOrigin(event.target._latlng)}
+          >
+          <Popup><span>Origin {mapMarkers.origin.text || ''}</span></Popup>
+        </Marker>
+
+        {mapMarkers.destination &&
+          <Marker
+            draggable
+            key='destinationMarker'
+            position={mapMarkers.destination.latlng}
+            onAdd={event => this.onAddDestination(event.target._latlng)}
+            onLeafletDragEnd={event => this.onMoveDestination(event.target._latlng)}
+            >
+            <Popup><span>Destination {mapMarkers.destination.text || ''}</span></Popup>
+          </Marker>
+        }
+        {this.generateIsoLayer(browsochrones.showIsoLayer, browsochrones.instance, timeCutoff.selected)}
+        {this.generateIsoline(browsochrones.showIsoline, browsochrones.instance, timeCutoff.selected)}
+      </Map>
+    )
+  }
+
+  render () {
+    const {browsochrones, dispatch, map} = this.props
+    const {accessibility} = browsochrones
 
     return (
       <Fullscreen>
-        <Map
-          className={styles.map}
-          map={map}
-          onChange={state => dispatch(updateMap(state))}
-          >
-          {[originMarker, destinationMarker]}
-          {isoLayer}
-          {isoline}
-        </Map>
+        {this.renderMap()}
         <Dock
           dimMode='none'
           fluid
@@ -210,7 +226,7 @@ class Indianapolis extends Component {
                     const latlng = {lat, lng}
 
                     dispatch(updateMapMarker({
-                      [mapMarkerConstants.ORIGIN]: {
+                      origin: {
                         latlng,
                         text: place.place_name
                       }
@@ -229,7 +245,7 @@ class Indianapolis extends Component {
                     const latlng = {lat, lng}
 
                     dispatch(updateMapMarker({
-                      [mapMarkerConstants.DESTINATION]: {
+                      destination: {
                         latlng,
                         text: place.place_name
                       }
@@ -253,18 +269,6 @@ class Indianapolis extends Component {
         </Dock>
       </Fullscreen>
     )
-  }
-}
-
-function getMapFromEvent (event) {
-  let {_layers, _map} = event.target
-
-  if (_map) return _map
-
-  for (let key in _layers) {
-    if (_layers.hasOwnProperty(key) && _layers[key]._map) {
-      return _layers[key]._map
-    }
   }
 }
 

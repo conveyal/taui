@@ -5,9 +5,9 @@ export default handleActions({
     return Object.assign({}, state, action.payload)
   }
 }, {
-  originMarker: {
+  origin: {
     latlng: {},
     text: ''
   },
-  destinationMarker: null
+  destination: null
 })

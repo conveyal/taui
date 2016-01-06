@@ -6,7 +6,7 @@ export default handleActions({
   },
   'update map marker' (state, {payload}) {
     return Object.assign({}, state, {
-      center: payload.position
+      centerCoordinates: payload.position
     })
   }
 }, {
