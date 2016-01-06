@@ -74,7 +74,7 @@ class Indianapolis extends Component {
    * @private
    * @param  {Event} event
    */
-  onMoveOrigin (latlng) {
+  moveOrigin (latlng) {
     const {dispatch, browsochrones, mapMarkers} = this.props
     const originMarker = mapMarkers.origin
 
@@ -103,8 +103,12 @@ class Indianapolis extends Component {
    * @private
    * @param {Event} e
    */
-  onMoveDestination (latlng) {
-    this.updateTransitive(latlng)
+  moveDestination (latlng) {
+    this.props.dispatch(updateMapMarker({
+      destination: {
+        latlng
+      }
+    }))
   }
 
   /**
@@ -113,18 +117,20 @@ class Indianapolis extends Component {
    * @private
    * @param  {Event} e
    */
-  onAddDestination (latlng) {
-    this.updateTransitive(latlng)
+  addDestination (latlng) {
+    this.props.dispatch(updateMapMarker({
+      destination: {
+        latlng
+      }
+    }))
   }
 
   generateTransitiveLayer (browsochrones, latlng) {
     const coordinates = browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
     const data = browsochrones.generateTransitiveData(coordinates)
 
-    this.log(`Transitive found ${data.journeys.length} unique paths`)
-
     return <TransitiveLayer
-      key={coordinates}
+      key={JSON.stringify(latlng)}
       data={data}
       styles={transitiveStyle}
       />
@@ -150,7 +156,7 @@ class Indianapolis extends Component {
           draggable
           key='originMarker'
           position={mapMarkers.origin.latlng}
-          onLeafletDragEnd={event => this.onMoveOrigin(event.target._latlng)}
+          onLeafletDragEnd={event => this.moveOrigin(event.target._latlng)}
           >
           <Popup><span>Origin {mapMarkers.origin.text || ''}</span></Popup>
         </Marker>
@@ -160,8 +166,8 @@ class Indianapolis extends Component {
             draggable
             key='destinationMarker'
             position={mapMarkers.destination.latlng}
-            onAdd={event => this.onAddDestination(event.target._latlng)}
-            onLeafletDragEnd={event => this.onMoveDestination(event.target._latlng)}
+            onAdd={event => this.addDestination(event.target._latlng)}
+            onLeafletDragEnd={event => this.moveDestination(event.target._latlng)}
             >
             <Popup><span>Destination {mapMarkers.destination.text || ''}</span></Popup>
           </Marker>
@@ -205,6 +211,7 @@ class Indianapolis extends Component {
                     }))
 
                     this.log(`Selected: ${place.place_name}`)
+                    this.moveOrigin(latlng)
                   }}
                   />
               </fieldset>

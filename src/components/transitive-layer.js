@@ -1,3 +1,4 @@
+import {Map} from 'leaflet'
 import {PropTypes} from 'react'
 import {MapLayer} from 'react-leaflet'
 import Transitive from 'transitive-js'
@@ -6,6 +7,7 @@ import LeafletTransitiveLayer from 'leaflet-transitivelayer'
 export default class TransitiveMapLayer extends MapLayer {
   static propTypes = {
     data: PropTypes.object.isRequired,
+    map: PropTypes.instanceOf(Map),
     styles: PropTypes.object
   }
 
@@ -17,21 +19,24 @@ export default class TransitiveMapLayer extends MapLayer {
       useDynamicRendering: true,
       styles: this.props.styles
     })
-    this.transitiveLayer = new LeafletTransitiveLayer(this.transitive)
+    this.leafletElement = new LeafletTransitiveLayer(this.transitive)
   }
 
   componentDidMount () {
     super.componentDidMount()
-
-    this.props.map.addLayer(this.transitiveLayer)
-    this.transitiveLayer._refresh()
+    this.leafletElement._refresh()
   }
 
   componentWillReceiveProps (props) {
+    super.componentWillReceiveProps(props)
     this.transitive.updateData(props.data)
   }
 
-  componentDidUpdate () {
-    this.transitiveLayer._refresh()
+  componentDidUpdate (prevProps, prevState) {
+    this.leafletElement._refresh()
+  }
+
+  render () {
+    return null
   }
 }
