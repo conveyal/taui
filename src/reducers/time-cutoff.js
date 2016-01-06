@@ -1,11 +1,11 @@
 import {handleActions} from 'redux-actions'
 
-const timeStep = 5
-const timeMin = 5
+const timeStep = 10
+const timeMin = 10
 const timeMax = 120
 const times = []
 
-for (let i = timeMin; i < timeMax; i += timeStep) times.push({ name: `${i} min`, value: i })
+for (let i = timeMin; i < timeMax; i += timeStep) times.push({ name: `${i} minutes`, value: i })
 
 export default handleActions({
   'update selected time cutoff' (state, action) {
