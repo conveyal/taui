@@ -9,11 +9,8 @@ export default class CanvasTileLayer extends BaseTileLayer {
 
   componentWillMount () {
     super.componentWillMount()
-    const {drawTile} = this.props
-    this.leafletElement = tileLayer.canvas({
-      detectRetina: true
-    })
-    this.leafletElement.drawTile = drawTile
+    this.leafletElement = tileLayer.canvas({ detectRetina: true })
+    this.leafletElement.drawTile = this.props.drawTile
   }
 
   componentDidMount () {
@@ -21,9 +18,12 @@ export default class CanvasTileLayer extends BaseTileLayer {
     this.leafletElement.redraw()
   }
 
-  componentDidUpdate (prevProps) {
-    super.componentDidUpdate(prevProps)
-    this.leafletElement.drawTile = this.props.drawTile
+  componentWillReceiveProps (nextProps) {
+    this.leafletElement.drawTile = nextProps.drawTile
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    super.componentDidUpdate(prevProps, prevState)
     this.leafletElement.redraw()
   }
 }

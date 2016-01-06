@@ -2,8 +2,6 @@ import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
 import {GeoJson, Map, Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
-import Transitive from 'transitive-js'
-import TransitiveLayer from 'leaflet-transitivelayer'
 
 import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, updateOrigin} from '../../actions/browsochrones'
@@ -12,6 +10,7 @@ import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
 import Log from '../../components/log'
 import TimeCutoffSelect from '../../components/timecutoff-select'
+import TransitiveLayer from '../../components/transitive-layer'
 import styles from './style.css'
 import transitiveStyle from './transitive-style'
 
@@ -118,50 +117,22 @@ class Indianapolis extends Component {
     this.updateTransitive(latlng)
   }
 
-  updateTransitive (latlng) {
-    const {browsochrones} = this.props
-    const bc = browsochrones.instance
+  generateTransitiveLayer (browsochrones, latlng) {
+    const coordinates = browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
+    const data = browsochrones.generateTransitiveData(coordinates)
 
-    // If an origin has been retrieved
-    if (bc.isLoaded()) {
-      const coordinates = bc.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
-      const data = bc.generateTransitiveData(coordinates)
+    this.log(`Transitive found ${data.journeys.length} unique paths`)
 
-      if (data.journeys.length > 0) {
-        if (!this.transitive) {
-          this.transitive = new Transitive({
-            data,
-            gridCellSize: 200,
-            useDynamicRendering: true,
-            styles: transitiveStyle
-          })
-          this.transitiveLayer = new TransitiveLayer(this.transitive)
-          this.map.addLayer(this.transitiveLayer)
-          this.transitiveLayer._refresh()
-        } else {
-          this.transitive.updateData(data)
-          this.transitiveLayer._refresh()
-        }
-      }
-
-      this.log(`Transitive found ${data.journeys.length} unique paths`)
-    }
-  }
-
-  generateIsoLayer (showIsoLayer, browsochrones) {
-    return showIsoLayer
-      ? <CanvasTileLayer drawTile={browsochrones.drawTile.bind(browsochrones)} />
-      : null
-  }
-
-  generateIsoline (showIsoline, browsochrones, cutoff) {
-    return showIsoline
-      ? <GeoJson key={cutoff} data={browsochrones.getIsochrone(cutoff)} />
-      : null
+    return <TransitiveLayer
+      key={coordinates}
+      data={data}
+      styles={transitiveStyle}
+      />
   }
 
   renderMap () {
     const {browsochrones, dispatch, map, mapMarkers, timeCutoff} = this.props
+    const bc = browsochrones.instance
 
     return (
       <Map
@@ -195,8 +166,9 @@ class Indianapolis extends Component {
             <Popup><span>Destination {mapMarkers.destination.text || ''}</span></Popup>
           </Marker>
         }
-        {this.generateIsoLayer(browsochrones.showIsoLayer, browsochrones.instance, timeCutoff.selected)}
-        {this.generateIsoline(browsochrones.showIsoline, browsochrones.instance, timeCutoff.selected)}
+        {bc.isLoaded() && browsochrones.showIsoLayer && <CanvasTileLayer drawTile={bc.drawTile.bind(bc)} />}
+        {bc.isLoaded() && browsochrones.showIsoline && <GeoJson key={timeCutoff} data={bc.getIsochrone(timeCutoff.selected)} />}
+        {bc.isLoaded() && mapMarkers.destination && this.generateTransitiveLayer(bc, mapMarkers.destination.latlng)}
       </Map>
     )
   }
