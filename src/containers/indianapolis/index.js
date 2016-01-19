@@ -1,3 +1,4 @@
+import Browsochrones from 'browsochrones'
 import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
 import {GeoJson, Map, Marker, Popup, TileLayer} from 'react-leaflet'
@@ -37,34 +38,23 @@ class Indianapolis extends Component {
   }
 
   componentDidMount () {
+    // Save a reference to the map
     this.map = this.refs.map.getLeafletElement()
-  }
-
-  log (l) {
-    const {dispatch} = this.props
-    dispatch(addActionLogItem(l))
   }
 
   initializeBrowsochrones () {
     const {browsochrones, dispatch} = this.props
-    const bc = browsochrones.instance
+    this.browsochrones = new Browsochrones()
     const grid = 'Jobs_total'
 
-    if (!bc.grid) {
-      dispatch(fetchGrid(`${browsochrones.gridsUrl}/${grid}.grid`))
-    }
+    dispatch(fetchGrid(this.browsochrones, `${browsochrones.gridsUrl}/${grid}.grid`))
+    dispatch(fetchQuery(this.browsochrones, browsochrones.queryUrl))
+    dispatch(fetchStopTrees(this.browsochrones, browsochrones.stopTreesUrl))
+    dispatch(fetchTransitiveNetwork(this.browsochrones, browsochrones.transitiveNetworkUrl))
+  }
 
-    if (!bc.query) {
-      dispatch(fetchQuery(browsochrones.queryUrl))
-    }
-
-    if (!bc.stopTrees) {
-      dispatch(fetchStopTrees(browsochrones.stopTreesUrl))
-    }
-
-    if (!bc.transitiveNetwork) {
-      dispatch(fetchTransitiveNetwork(browsochrones.transitiveNetworkUrl))
-    }
+  shouldComponentUpdate (nextProps, nextState) {
+    return true
   }
 
   /**
@@ -75,10 +65,11 @@ class Indianapolis extends Component {
    * @param  {Event} event
    */
   moveOrigin (latlng) {
-    const {dispatch, browsochrones, mapMarkers} = this.props
-    const originMarker = mapMarkers.origin
+    const {dispatch, browsochrones} = this.props
+    const origin = this.browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
 
     dispatch(addActionLogItem(`Origin marker moved to ${printLatLng(latlng)}`))
+
     dispatch(updateMapMarker({
       originMarker: {
         latlng,
@@ -86,15 +77,11 @@ class Indianapolis extends Component {
       }
     }))
 
-    if (!originMarker.isDragging) {
-      const origin = browsochrones.instance.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
-
-      dispatch(updateOrigin({
-        browsochrones: browsochrones.instance,
-        origin,
-        url: browsochrones.originsUrl
-      }))
-    }
+    dispatch(updateOrigin({
+      browsochrones: this.browsochrones,
+      origin,
+      url: browsochrones.originsUrl
+    }))
   }
 
   /**
@@ -125,20 +112,27 @@ class Indianapolis extends Component {
     }))
   }
 
-  generateTransitiveLayer (browsochrones, latlng) {
-    const coordinates = browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
-    const data = browsochrones.generateTransitiveData(coordinates)
+  generateTransitiveLayer () {
+    const {latlng} = this.props.mapMarkers.destination
+    const coordinates = this.browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
+    const data = this.browsochrones.generateTransitiveData(coordinates)
 
     return <TransitiveLayer
-      key={JSON.stringify(latlng)}
+      key={`transitive-${this.latlngKey()}`}
       data={data}
       styles={transitiveStyle}
       />
   }
 
+  latlngKey () {
+    const {mapMarkers} = this.props
+    const {destination, origin} = mapMarkers
+    if (destination) return `${JSON.stringify(origin.latlng)}-${JSON.stringify(destination.latlng)}`
+    return JSON.stringify(origin.latlng)
+  }
+
   renderMap () {
-    const {browsochrones, dispatch, map, mapMarkers, timeCutoff} = this.props
-    const bc = browsochrones.instance
+    const {dispatch, map, mapMarkers, timeCutoff} = this.props
 
     return (
       <Map
@@ -172,17 +166,83 @@ class Indianapolis extends Component {
             <Popup><span>Destination {mapMarkers.destination.text || ''}</span></Popup>
           </Marker>
         }
-        {bc.isLoaded() && browsochrones.showIsoLayer && <CanvasTileLayer drawTile={bc.drawTile.bind(bc)} />}
-        {bc.isLoaded() && browsochrones.showIsoline && <GeoJson key={timeCutoff} data={bc.getIsochrone(timeCutoff.selected)} />}
-        {bc.isLoaded() && mapMarkers.destination && this.generateTransitiveLayer(bc, mapMarkers.destination.latlng)}
+        {this.browsochrones.isLoaded() &&
+          <CanvasTileLayer
+            key={`isochrone-${this.latlngKey()}`}
+            drawTile={this.browsochrones.drawTile.bind(this.browsochrones)}
+            />
+        }
+        {this.browsochrones.isLoaded() &&
+          <GeoJson
+            key={`isoline-${this.latlngKey()}-${timeCutoff.selected}`}
+            data={this.browsochrones.getIsochrone(timeCutoff.selected)}
+            />
+        }
+        {this.browsochrones.isLoaded() &&
+          mapMarkers.destination &&
+          this.generateTransitiveLayer()}
       </Map>
     )
   }
 
-  render () {
+  renderForm () {
     const {browsochrones, dispatch, map} = this.props
     const {accessibility} = browsochrones
 
+    return (
+      <form>
+        <fieldset className='form-group'>
+          <Geocoder
+            accessToken={map.mapbox.accessToken}
+            inputPlaceholder='Search for a start address'
+            onSelect={place => {
+              const [lng, lat] = place.center
+              const latlng = {lat, lng}
+
+              dispatch(updateMapMarker({
+                origin: {
+                  latlng,
+                  text: place.place_name
+                }
+              }))
+
+              this.log(`Selected: ${place.place_name}`)
+              this.moveOrigin(latlng)
+            }}
+            />
+        </fieldset>
+        <fieldset className='form-group'>
+          <Geocoder
+            accessToken={map.mapbox.accessToken}
+            inputPlaceholder='Search for an end address'
+            onSelect={place => {
+              const [lng, lat] = place.center
+              const latlng = {lat, lng}
+
+              dispatch(updateMapMarker({
+                destination: {
+                  latlng,
+                  text: place.place_name
+                }
+              }))
+
+              this.log(`Selected: ${place.place_name}`)
+            }}
+            />
+        </fieldset>
+        <fieldset className='form-group'>
+          <label>Time Cutoff</label>
+          <TimeCutoffSelect className='form-control' />
+        </fieldset>
+        <fieldset className='form-group'>
+          <label>Access</label>
+          <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
+        </fieldset>
+      </form>
+    )
+  }
+
+  render () {
     return (
       <Fullscreen>
         {this.renderMap()}
@@ -193,61 +253,16 @@ class Indianapolis extends Component {
           position='right'
           >
           <div className={styles.navbar}>Champagne</div>
-          <div className={styles.dockContent}>
-            <form>
-              <fieldset className='form-group'>
-                <Geocoder
-                  accessToken={map.mapbox.accessToken}
-                  inputPlaceholder='Search for a start address'
-                  onSelect={place => {
-                    const [lng, lat] = place.center
-                    const latlng = {lat, lng}
-
-                    dispatch(updateMapMarker({
-                      origin: {
-                        latlng,
-                        text: place.place_name
-                      }
-                    }))
-
-                    this.log(`Selected: ${place.place_name}`)
-                    this.moveOrigin(latlng)
-                  }}
-                  />
-              </fieldset>
-              <fieldset className='form-group'>
-                <Geocoder
-                  accessToken={map.mapbox.accessToken}
-                  inputPlaceholder='Search for an end address'
-                  onSelect={place => {
-                    const [lng, lat] = place.center
-                    const latlng = {lat, lng}
-
-                    dispatch(updateMapMarker({
-                      destination: {
-                        latlng,
-                        text: place.place_name
-                      }
-                    }))
-
-                    this.log(`Selected: ${place.place_name}`)
-                  }}
-                  />
-              </fieldset>
-              <fieldset className='form-group'>
-                <label>Time Cutoff</label>
-                <TimeCutoffSelect className='form-control' />
-              </fieldset>
-              <fieldset className='form-group'>
-                <label>Access</label>
-                <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
-              </fieldset>
-            </form>
-          </div>
+          <div className={styles.dockContent}>{this.renderForm()}</div>
           <div className={styles.dockedActionLog}><Log /></div>
         </Dock>
       </Fullscreen>
     )
+  }
+
+  log (l) {
+    const {dispatch} = this.props
+    dispatch(addActionLogItem(l))
   }
 }
 

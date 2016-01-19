@@ -2,10 +2,13 @@
   "name": "taui",
   "version": "0.0.1",
   "description": "Transport Analyst UI",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "node server.js",
     "test": "standard"
+  },
+  "browserify": {
+    "transform": ["babelify"]
   },
   "repository": {
     "type": "git",
@@ -80,6 +83,7 @@
     "redux-router": "^1.0.0-beta5",
     "redux-thunk": "^1.0.3",
     "to-camel-case": "^0.2.1",
+    "to-capital-case": "^0.1.1",
     "transitive-js": "^0.8.2",
     "xhr": "^2.2.0"
   },

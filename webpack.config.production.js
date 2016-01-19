@@ -20,12 +20,7 @@ module.exports = {
         'NODE_ENV': JSON.stringify('production')
       }
     }),
-    new ExtractTextPlugin('style.css', { allChunks: true }),
-    new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        warnings: false
-      }
-    })
+    new ExtractTextPlugin('style.css', { allChunks: true })
   ],
   module: {
     loaders: [{

@@ -5,29 +5,30 @@ import {fetch} from 'redux-effects-fetch'
 import {addActionLogItem} from './index'
 
 export const setAccessibility = createAction('set accessibility')
-export const showIsoLayer = createAction('show iso layer')
-export const showIsoline = createAction('show isoline')
 export const setSurface = createAction('set surface')
 export const requestGrid = createAction('request grid')
 export const receiveGrid = createAction('receive grid')
 
 export function generateIsochronesIfLoaded (browsochrones) {
   if (browsochrones.isLoaded()) {
+    browsochrones.generateSurface()
     return [
-      setSurface(browsochrones.generateSurface()),
-      setAccessibility(browsochrones.getAccessibilityForCutoff()),
-      showIsoLayer(true),
-      showIsoline(true)
+      setSurface(Date.now()),
+      setAccessibility(browsochrones.getAccessibilityForCutoff())
     ]
   }
 }
 
-export function fetchGrid (url) {
+export function fetchGrid (browsochrones, url) {
   return [
     requestGrid(url),
     bind(
       fetch(url),
-      ({value}) => receiveGrid(value),
+      ({value}) => {
+        browsochrones.setGrid(value)
+
+        return [receiveGrid(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+      },
       ({value}) => addActionLogItem(value)
     )
   ]
@@ -44,7 +45,7 @@ export function fetchOrigin ({browsochrones, origin, url}) {
       ({value}) => {
         browsochrones.setOrigin(value, origin)
 
-        return [receiveOrigin(value), generateIsochronesIfLoaded(browsochrones)]
+        return [receiveOrigin(origin), generateIsochronesIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )
@@ -58,7 +59,6 @@ export function updateOrigin ({browsochrones, origin, url}) {
   actions.push(addActionLogItem(`Retrieving isochrones for origin [${origin.x},  ${origin.y}]`))
 
   if (!browsochrones.coordinatesInQueryBounds(origin)) {
-    actions.push(showIsoLayer(false))
     actions.push(addActionLogItem(`Origin out of bounds`))
   } else {
     actions.push(fetchOrigin({
@@ -74,12 +74,16 @@ export function updateOrigin ({browsochrones, origin, url}) {
 export const requestQuery = createAction('request query')
 export const receiveQuery = createAction('receive query')
 
-export function fetchQuery (url) {
+export function fetchQuery (browsochrones, url) {
   return [
     requestQuery(url),
     bind(
       fetch(url),
-      ({value}) => receiveQuery(value),
+      ({value}) => {
+        browsochrones.setQuery(value)
+
+        return [receiveQuery(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+      },
       ({value}) => addActionLogItem(value)
     )
   ]
@@ -88,12 +92,16 @@ export function fetchQuery (url) {
 export const requestStopTrees = createAction('request stop trees')
 export const receiveStopTrees = createAction('receive stop trees')
 
-export function fetchStopTrees (url) {
+export function fetchStopTrees (browsochrones, url) {
   return [
     requestStopTrees(url),
     bind(
       fetch(url),
-      ({value}) => receiveStopTrees(value),
+      ({value}) => {
+        browsochrones.setStopTrees(value)
+
+        return [receiveStopTrees(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+      },
       ({value}) => addActionLogItem(value)
     )
   ]
@@ -102,12 +110,16 @@ export function fetchStopTrees (url) {
 export const requestTransitiveNetwork = createAction('request transitive network')
 export const receiveTransitiveNetwork = createAction('receive transitive network')
 
-export function fetchTransitiveNetwork (url) {
+export function fetchTransitiveNetwork (browsochrones, url) {
   return [
     requestTransitiveNetwork(url),
     bind(
       fetch(url),
-      ({value}) => receiveTransitiveNetwork(value),
+      ({value}) => {
+        browsochrones.setTransitiveNetwork(value)
+
+        return [receiveTransitiveNetwork(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+      },
       ({value}) => addActionLogItem(value)
     )
   ]
