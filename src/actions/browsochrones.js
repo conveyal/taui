@@ -12,22 +12,17 @@ export const receiveGrid = createAction('receive grid')
 export function generateIsochronesIfLoaded (browsochrones) {
   if (browsochrones.isLoaded()) {
     browsochrones.generateSurface()
-    return [
-      setSurface(Date.now()),
-      setAccessibility(browsochrones.getAccessibilityForCutoff())
-    ]
+    return setSurface(Date.now())
   }
 }
 
-export function fetchGrid (browsochrones, url) {
+export function fetchGrid (browsochrones, url, name) {
   return [
-    requestGrid(url),
+    requestGrid(name),
     bind(
-      fetch(url),
+      fetch(`${url}/${name}.grid`),
       ({value}) => {
-        browsochrones.setGrid(value)
-
-        return [receiveGrid(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+        return [receiveGrid({ name, value }), generateIsochronesIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )

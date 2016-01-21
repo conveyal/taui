@@ -1,13 +1,13 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 
-import {addActionLogItem, updateSelectedDestination} from '../actions'
+import {updateSelectedDestination} from '../actions'
 
 class DestinationsSelect extends Component {
   static propTypes = {
     className: PropTypes.string,
     dispatch: PropTypes.func,
-    selected: PropTypes.object,
+    selected: PropTypes.string,
     sets: PropTypes.arrayOf(PropTypes.object).isRequired
   }
 
@@ -17,12 +17,10 @@ class DestinationsSelect extends Component {
     return (
       <select
         className={className}
-        onChange={e => {
-          dispatch(updateSelectedDestination(e.target.value))
-          dispatch(addActionLogItem(`Selected new destination set: ${e.target.value}`))
-        }}
-        value={selected.id}>
-        {sets.map(destination => <option value={destination.id} key={destination.id}>{destination.name}</option>)}
+        onChange={e => dispatch(updateSelectedDestination(e.target.value))}
+        defaultValue={selected}
+        >
+        {sets.map(destination => <option value={destination.value} key={destination.value}>{destination.label}</option>)}
       </select>
     )
   }

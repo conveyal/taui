@@ -2,7 +2,11 @@ import {handleActions} from 'redux-actions'
 
 export default handleActions({
   'receive grid' (state, action) {
-    return Object.assign({}, state, { grid: action.payload })
+    return Object.assign({}, state, {
+      grids: {
+        [action.payload.name]: action.payload.value
+      }
+    })
   },
   'request origin' (state, action) {
     return Object.assign({}, state, { originCoordinates: action.payload })
@@ -27,7 +31,7 @@ export default handleActions({
   }
 }, {
   accessibility: 0,
-  grid: null,
+  grids: {},
   isolineTimeCutoff: 60,
   originCoordinates: {},
   originData: null,

@@ -7,6 +7,7 @@ import {connect} from 'react-redux'
 import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
 import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, updateOrigin} from '../../actions/browsochrones'
 import CanvasTileLayer from '../../components/canvas-tile-layer'
+import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
 import Log from '../../components/log'
@@ -24,6 +25,9 @@ class Indianapolis extends Component {
     browsochrones: PropTypes.shape({
       showIsoLayer: PropTypes.bool,
       showIsoline: PropTypes.bool
+    }),
+    destinations: PropTypes.shape({
+      selected: PropTypes.string
     }),
     dispatch: PropTypes.any,
     mapMarkers: PropTypes.object,
@@ -45,9 +49,10 @@ class Indianapolis extends Component {
   initializeBrowsochrones () {
     const {browsochrones, dispatch} = this.props
     this.browsochrones = new Browsochrones()
-    const grid = 'Jobs_total'
+    this.browsochrones.grids = {}
 
-    dispatch(fetchGrid(this.browsochrones, `${browsochrones.gridsUrl}/${grid}.grid`))
+    dispatch(fetchGrid(this.browsochrones, browsochrones.gridsUrl, 'Jobs_total'))
+    dispatch(fetchGrid(this.browsochrones, browsochrones.gridsUrl, 'Workers_total'))
     dispatch(fetchQuery(this.browsochrones, browsochrones.queryUrl))
     dispatch(fetchStopTrees(this.browsochrones, browsochrones.stopTreesUrl))
     dispatch(fetchTransitiveNetwork(this.browsochrones, browsochrones.transitiveNetworkUrl))
@@ -235,8 +240,8 @@ class Indianapolis extends Component {
           <TimeCutoffSelect className='form-control' />
         </fieldset>
         <fieldset className='form-group'>
-          <label>Access</label>
-          <p>{accessibility.toLocaleString()} indicators within 60 minutes.</p>
+          <label>Access to <strong>{accessibility.toLocaleString()}</strong></label>
+          <DestinationsSelect className='form-control' />
         </fieldset>
       </form>
     )
