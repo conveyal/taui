@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css'
 import deepAssign from 'deep-assign'
 import React from 'react'
 import {render} from 'react-dom'

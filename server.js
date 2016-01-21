@@ -17,6 +17,10 @@ app.get('/test/data/:filename', function (req, res) {
   res.sendFile(path.join(__dirname, 'test/data/', req.params.filename))
 })
 
+app.get('/dist/style.css', function (req, res) {
+  res.sendFile(path.join(__dirname, 'dist/style.css'))
+})
+
 app.get('*', function (req, res) {
   res.sendFile(path.join(__dirname, 'index.html'))
 })

@@ -7,7 +7,7 @@ export default handleActions({
 }, {
   origin: {
     latlng: {},
-    text: ''
+    label: ''
   },
-  destination: null
+  destination: {}
 })

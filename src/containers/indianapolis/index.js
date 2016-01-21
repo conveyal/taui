@@ -20,6 +20,11 @@ function printLatLng (latlng) {
   return `[ ${latlng.lng.toFixed(4)}, ${latlng.lat.toFixed(4)} ]`
 }
 
+function latlngFromString (str) {
+  const arr = str.split(',').map(parseFloat)
+  return { lat: arr[1], lng: arr[0] }
+}
+
 class Indianapolis extends Component {
   static propTypes = {
     browsochrones: PropTypes.shape({
@@ -30,7 +35,10 @@ class Indianapolis extends Component {
       selected: PropTypes.string
     }),
     dispatch: PropTypes.any,
-    mapMarkers: PropTypes.object,
+    mapMarkers: PropTypes.shape({
+      origin: PropTypes.object,
+      destination: PropTypes.object
+    }),
     map: PropTypes.object,
     timeCutoff: PropTypes.shape({
       selected: PropTypes.number
@@ -69,16 +77,16 @@ class Indianapolis extends Component {
    * @private
    * @param  {Event} event
    */
-  moveOrigin (latlng) {
+  moveOrigin (latlng, label) {
     const {dispatch, browsochrones} = this.props
     const origin = this.browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
 
     dispatch(addActionLogItem(`Origin marker moved to ${printLatLng(latlng)}`))
 
     dispatch(updateMapMarker({
-      originMarker: {
+      origin: {
         latlng,
-        text: ''
+        label
       }
     }))
 
@@ -95,10 +103,11 @@ class Indianapolis extends Component {
    * @private
    * @param {Event} e
    */
-  moveDestination (latlng) {
+  moveDestination (latlng, label) {
     this.props.dispatch(updateMapMarker({
       destination: {
-        latlng
+        latlng,
+        label
       }
     }))
   }
@@ -109,10 +118,11 @@ class Indianapolis extends Component {
    * @private
    * @param  {Event} e
    */
-  addDestination (latlng) {
+  addDestination (latlng, label) {
     this.props.dispatch(updateMapMarker({
       destination: {
-        latlng
+        latlng,
+        label
       }
     }))
   }
@@ -157,10 +167,10 @@ class Indianapolis extends Component {
           position={mapMarkers.origin.latlng}
           onLeafletDragEnd={event => this.moveOrigin(event.target._latlng)}
           >
-          <Popup><span>Origin {mapMarkers.origin.text || ''}</span></Popup>
+          <Popup><span>Origin {mapMarkers.origin.label || ''}</span></Popup>
         </Marker>
 
-        {mapMarkers.destination &&
+        {mapMarkers.destination.latlng &&
           <Marker
             draggable
             key='destinationMarker'
@@ -168,7 +178,7 @@ class Indianapolis extends Component {
             onAdd={event => this.addDestination(event.target._latlng)}
             onLeafletDragEnd={event => this.moveDestination(event.target._latlng)}
             >
-            <Popup><span>Destination {mapMarkers.destination.text || ''}</span></Popup>
+            <Popup><span>Destination {mapMarkers.destination.label || ''}</span></Popup>
           </Marker>
         }
         {this.browsochrones.isLoaded() &&
@@ -184,55 +194,47 @@ class Indianapolis extends Component {
             />
         }
         {this.browsochrones.isLoaded() &&
-          mapMarkers.destination &&
+          mapMarkers.destination.latlng &&
           this.generateTransitiveLayer()}
       </Map>
     )
   }
 
   renderForm () {
-    const {browsochrones, dispatch, map} = this.props
+    const {browsochrones, dispatch, map, mapMarkers} = this.props
     const {accessibility} = browsochrones
 
     return (
       <form>
         <fieldset className='form-group'>
           <Geocoder
-            accessToken={map.mapbox.accessToken}
-            inputPlaceholder='Search for a start address'
-            onSelect={place => {
-              const [lng, lat] = place.center
-              const latlng = {lat, lng}
-
-              dispatch(updateMapMarker({
-                origin: {
-                  latlng,
-                  text: place.place_name
-                }
-              }))
-
-              this.log(`Selected: ${place.place_name}`)
-              this.moveOrigin(latlng)
+            apiKey={map.mapzen.apiKey}
+            name='Start Address'
+            onChange={({ label, value }) => {
+              const latlng = latlngFromString(value)
+              this.log(`Selected: ${label}`)
+              this.moveOrigin(latlng, label)
             }}
+            placeholder='Search for a start address'
+            value={mapMarkers.origin.label}
             />
         </fieldset>
         <fieldset className='form-group'>
           <Geocoder
-            accessToken={map.mapbox.accessToken}
-            inputPlaceholder='Search for an end address'
-            onSelect={place => {
-              const [lng, lat] = place.center
-              const latlng = {lat, lng}
-
+            apiKey={map.mapzen.apiKey}
+            name='End Address'
+            onChange={({ label, value }) => {
+              const latlng = latlngFromString(value)
+              this.log(`Selected: ${label}`)
               dispatch(updateMapMarker({
                 destination: {
                   latlng,
-                  text: place.place_name
+                  label
                 }
               }))
-
-              this.log(`Selected: ${place.place_name}`)
             }}
+            placeholder='Search for an end address'
+            value={mapMarkers.destination.label}
             />
         </fieldset>
         <fieldset className='form-group'>

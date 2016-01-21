@@ -88,8 +88,7 @@
     "redux-thunk": "^1.0.3",
     "to-camel-case": "^0.2.1",
     "to-capital-case": "^0.1.1",
-    "transitive-js": "^0.8.2",
-    "xhr": "^2.2.0"
+    "transitive-js": "^0.8.2"
   },
   "standard": {
     "parser": "babel-eslint"
