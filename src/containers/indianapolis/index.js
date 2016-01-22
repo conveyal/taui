@@ -200,8 +200,39 @@ class Indianapolis extends Component {
     )
   }
 
+  changeStartAddress (input) {
+    if (!input) return
+    const { label, value } = input
+    const latlng = latlngFromString(value)
+    this.log(`Selected: ${label}`)
+    this.moveOrigin(latlng, label)
+  }
+
+  changeEndAddress (input) {
+    const {dispatch} = this.props
+
+    if (!input) {
+      dispatch(updateMapMarker({
+        destination: {
+          latlng: null,
+          label: null
+        }
+      }))
+    } else {
+      const { label, value } = input
+      const latlng = latlngFromString(value)
+      this.log(`Selected: ${label}`)
+      dispatch(updateMapMarker({
+        destination: {
+          latlng,
+          label
+        }
+      }))
+    }
+  }
+
   renderForm () {
-    const {browsochrones, dispatch, map, mapMarkers} = this.props
+    const {browsochrones, map, mapMarkers} = this.props
     const {accessibility} = browsochrones
 
     return (
@@ -209,12 +240,8 @@ class Indianapolis extends Component {
         <fieldset className='form-group'>
           <Geocoder
             apiKey={map.mapzen.apiKey}
-            name='Start Address'
-            onChange={({ label, value }) => {
-              const latlng = latlngFromString(value)
-              this.log(`Selected: ${label}`)
-              this.moveOrigin(latlng, label)
-            }}
+            name='start-address'
+            onChange={input => this.changeStartAddress(input)}
             placeholder='Search for a start address'
             value={mapMarkers.origin.label}
             />
@@ -222,17 +249,8 @@ class Indianapolis extends Component {
         <fieldset className='form-group'>
           <Geocoder
             apiKey={map.mapzen.apiKey}
-            name='End Address'
-            onChange={({ label, value }) => {
-              const latlng = latlngFromString(value)
-              this.log(`Selected: ${label}`)
-              dispatch(updateMapMarker({
-                destination: {
-                  latlng,
-                  label
-                }
-              }))
-            }}
+            name='end-address'
+            onChange={input => this.changeEndAddress(input)}
             placeholder='Search for an end address'
             value={mapMarkers.destination.label}
             />

@@ -11,16 +11,16 @@ function latlngToString (latlng) {
 
 export default class Geocoder extends Component {
   static propTypes = {
-    apiKey: PropTypes.string,
+    apiKey: PropTypes.string.isRequired,
     name: PropTypes.string,
-    onChange: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
     placeholder: PropTypes.string,
     value: PropTypes.string
   }
 
   constructor () {
     super()
-    this.loadOptions = debounce(this.loadOptions, 500, true)
+    this.loadOptions = debounce(this.loadOptions, 400)
   }
 
   loadOptions (input) {
@@ -29,7 +29,7 @@ export default class Geocoder extends Component {
       focusLatlng: {lat: 39.7691, lng: -86.1570},
       text: input
     }).then(features => {
-      return { options: features.map(feature => { return { label: feature.address, value: latlngToString(feature.latlng) } }) }
+      return {options: features.map(feature => { return {label: feature.address, value: latlngToString(feature.latlng)} })}
     })
   }
 
@@ -39,7 +39,7 @@ export default class Geocoder extends Component {
         autoload={false}
         cacheAsyncResults={false}
         filterOptions={false}
-        minimumInput={2}
+        minimumInput={3}
         loadOptions={input => this.loadOptions(input)}
         {...this.props}
         />
