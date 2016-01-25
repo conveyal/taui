@@ -11,7 +11,7 @@ export default class LogItem extends Component {
     key: PropTypes.number,
     level: PropTypes.string,
     text: PropTypes.string.isRequired
-  }
+  };
 
   render () {
     const {createdAt, text} = this.props

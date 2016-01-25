@@ -9,7 +9,7 @@ class TimeCutoffSelect extends Component {
     dispatch: PropTypes.func,
     times: PropTypes.arrayOf(PropTypes.object).isRequired,
     selected: PropTypes.number
-  }
+  };
 
   render () {
     const {dispatch, className, times, selected} = this.props

@@ -9,7 +9,7 @@ class DestinationsSelect extends Component {
     dispatch: PropTypes.func,
     selected: PropTypes.string,
     sets: PropTypes.arrayOf(PropTypes.object).isRequired
-  }
+  };
 
   render () {
     const {dispatch, className, selected, sets} = this.props

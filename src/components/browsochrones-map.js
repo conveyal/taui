@@ -31,7 +31,7 @@ export default class BrowsochronesMap extends Component {
     children: PropTypes.any,
     className: PropTypes.string,
     map: PropTypes.object
-  }
+  };
 
   constructor (props) {
     super(props)

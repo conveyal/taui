@@ -9,7 +9,7 @@ export default class TransitiveMapLayer extends MapLayer {
     data: PropTypes.object.isRequired,
     map: PropTypes.instanceOf(Map),
     styles: PropTypes.object
-  }
+  };
 
   componentWillMount () {
     super.componentWillMount()

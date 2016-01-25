@@ -9,7 +9,7 @@ class TransitModeSelect extends Component {
     dispatch: PropTypes.func,
     modes: PropTypes.arrayOf(PropTypes.object).isRequired,
     selected: PropTypes.object
-  }
+  };
 
   render () {
     const {dispatch, className, modes, selected} = this.props

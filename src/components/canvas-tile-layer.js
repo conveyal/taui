@@ -5,7 +5,7 @@ import {BaseTileLayer} from 'react-leaflet'
 export default class CanvasTileLayer extends BaseTileLayer {
   static propTypes = {
     drawTile: PropTypes.func.isRequired
-  }
+  };
 
   componentWillMount () {
     super.componentWillMount()

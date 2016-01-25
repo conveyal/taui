@@ -7,7 +7,7 @@ import style from './style.css'
 class Log extends Component {
   static propTypes = {
     actionLog: PropTypes.arrayOf(PropTypes.object).isRequired
-  }
+  };
 
   render () {
     const {actionLog} = this.props

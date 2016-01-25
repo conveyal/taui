@@ -10,20 +10,12 @@ import CanvasTileLayer from '../../components/canvas-tile-layer'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
 import Geocoder from '../../components/geocoder'
+import ll from '../../ll'
 import Log from '../../components/log'
 import TimeCutoffSelect from '../../components/timecutoff-select'
 import TransitiveLayer from '../../components/transitive-layer'
 import styles from './style.css'
 import transitiveStyle from './transitive-style'
-
-function printLatLng (latlng) {
-  return `[ ${latlng.lng.toFixed(4)}, ${latlng.lat.toFixed(4)} ]`
-}
-
-function latlngFromString (str) {
-  const arr = str.split(',').map(parseFloat)
-  return { lat: arr[1], lng: arr[0] }
-}
 
 class Indianapolis extends Component {
   static propTypes = {
@@ -43,7 +35,7 @@ class Indianapolis extends Component {
     timeCutoff: PropTypes.shape({
       selected: PropTypes.number
     })
-  }
+  };
 
   componentWillMount () {
     this.initializeBrowsochrones()
@@ -81,7 +73,7 @@ class Indianapolis extends Component {
     const {dispatch, browsochrones} = this.props
     const origin = this.browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
 
-    dispatch(addActionLogItem(`Origin marker moved to ${printLatLng(latlng)}`))
+    dispatch(addActionLogItem(`Origin marker moved to ${ll.print(latlng)}`))
 
     dispatch(updateMapMarker({
       origin: {
@@ -203,7 +195,7 @@ class Indianapolis extends Component {
   changeStartAddress (input) {
     if (!input) return
     const { label, value } = input
-    const latlng = latlngFromString(value)
+    const latlng = ll(value)
     this.log(`Selected: ${label}`)
     this.moveOrigin(latlng, label)
   }
@@ -220,7 +212,7 @@ class Indianapolis extends Component {
       }))
     } else {
       const { label, value } = input
-      const latlng = latlngFromString(value)
+      const latlng = ll(value)
       this.log(`Selected: ${label}`)
       dispatch(updateMapMarker({
         destination: {
@@ -243,7 +235,7 @@ class Indianapolis extends Component {
             name='start-address'
             onChange={input => this.changeStartAddress(input)}
             placeholder='Search for a start address'
-            value={mapMarkers.origin.label}
+            defaultValue={markerToValue(mapMarkers.origin)}
             />
         </fieldset>
         <fieldset className='form-group'>
@@ -252,7 +244,7 @@ class Indianapolis extends Component {
             name='end-address'
             onChange={input => this.changeEndAddress(input)}
             placeholder='Search for an end address'
-            value={mapMarkers.destination.label}
+            defaultValue={markerToValue(mapMarkers.destination)}
             />
         </fieldset>
         <fieldset className='form-group'>
@@ -265,6 +257,12 @@ class Indianapolis extends Component {
         </fieldset>
       </form>
     )
+
+    function markerToValue (m) {
+      return m && m.label && m.latlng
+        ? {label: m.label, value: ll.toString(m.latlng)}
+        : null
+    }
   }
 
   render () {

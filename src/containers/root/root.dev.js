@@ -7,7 +7,7 @@ export default class Root extends Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
     store: PropTypes.object.isRequired
-  }
+  };
 
   render () {
     const { store } = this.props

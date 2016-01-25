@@ -9,7 +9,7 @@ class TransitScenarioSelect extends Component {
     dispatch: PropTypes.function,
     scenarios: PropTypes.arrayOf(PropTypes.object).isRequired,
     selected: PropTypes.object
-  }
+  };
 
   render () {
     const {dispatch, className, scenarios, selected} = this.props

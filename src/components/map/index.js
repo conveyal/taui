@@ -8,7 +8,7 @@ export default class Map extends Component {
     map: PropTypes.object,
     onChange: PropTypes.func,
     onClick: PropTypes.func
-  }
+  };
 
   render () {
     const {children, map, onChange, onClick} = this.props

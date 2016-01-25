@@ -9,7 +9,7 @@ class ProjectSelect extends Component {
     dispatch: PropTypes.function,
     projects: PropTypes.arrayOf(PropTypes.object).isRequired,
     selected: PropTypes.object
-  }
+  };
 
   render () {
     const {className, dispatch, projects, selected} = this.props
