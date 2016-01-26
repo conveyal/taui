@@ -4,8 +4,8 @@ import Dock from 'react-dock'
 import {GeoJson, Map, Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 
-import {addActionLogItem, updateMapMarker, updateMap} from '../../actions'
-import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, updateOrigin} from '../../actions/browsochrones'
+import {addActionLogItem, updateMapMarker, updateMap, updateSelectedDestination} from '../../actions'
+import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibilityForGrid, updateOrigin} from '../../actions/browsochrones'
 import CanvasTileLayer from '../../components/canvas-tile-layer'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
@@ -58,10 +58,6 @@ class Indianapolis extends Component {
     dispatch(fetchTransitiveNetwork(this.browsochrones, browsochrones.transitiveNetworkUrl))
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    return true
-  }
-
   /**
    * Callback to be executed on Origin Marker move. Update Browsochones when
    * Marker is dropped
@@ -70,7 +66,7 @@ class Indianapolis extends Component {
    * @param  {Event} event
    */
   moveOrigin (latlng, label) {
-    const {dispatch, browsochrones} = this.props
+    const {dispatch, browsochrones, destinations} = this.props
     const origin = this.browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
 
     dispatch(addActionLogItem(`Origin marker moved to ${ll.print(latlng)}`))
@@ -84,6 +80,7 @@ class Indianapolis extends Component {
 
     dispatch(updateOrigin({
       browsochrones: this.browsochrones,
+      grid: browsochrones.grids[destinations.selected],
       origin,
       url: browsochrones.originsUrl
     }))
@@ -224,8 +221,8 @@ class Indianapolis extends Component {
   }
 
   renderForm () {
-    const {browsochrones, map, mapMarkers} = this.props
-    const {accessibility} = browsochrones
+    const {browsochrones, dispatch, map, mapMarkers} = this.props
+    const {accessibility, grids} = browsochrones
 
     return (
       <form>
@@ -248,12 +245,18 @@ class Indianapolis extends Component {
             />
         </fieldset>
         <fieldset className='form-group'>
-          <label>Time Cutoff</label>
-          <TimeCutoffSelect className='form-control' />
+          <label>Access to <strong>{accessibility.toLocaleString()}</strong></label>
+          <DestinationsSelect
+            className='form-control'
+            onChange={event => {
+              dispatch(updateSelectedDestination(event.target.value))
+              dispatch(setAccessibilityForGrid({browsochrones: this.browsochrones, grid: grids[event.target.value]}))
+            }}
+            />
         </fieldset>
         <fieldset className='form-group'>
-          <label>Access to <strong>{accessibility.toLocaleString()}</strong></label>
-          <DestinationsSelect className='form-control' />
+          <label>Isoline Time Cutoff</label>
+          <TimeCutoffSelect className='form-control' />
         </fieldset>
       </form>
     )

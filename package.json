@@ -83,6 +83,7 @@
     "redux-actions": "^0.9.0",
     "redux-effects": "^0.4.0",
     "redux-effects-fetch": "^0.4.2",
+    "redux-effects-timeout": "^0.1.7",
     "redux-multi": "^0.1.10",
     "redux-promise": "^0.5.0",
     "redux-router": "^1.0.0-beta5",

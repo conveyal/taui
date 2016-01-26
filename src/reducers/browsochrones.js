@@ -2,11 +2,8 @@ import {handleActions} from 'redux-actions'
 
 export default handleActions({
   'receive grid' (state, action) {
-    return Object.assign({}, state, {
-      grids: {
-        [action.payload.name]: action.payload.value
-      }
-    })
+    state.grids[action.payload.name] = action.payload.value
+    return Object.assign({}, state)
   },
   'request origin' (state, action) {
     return Object.assign({}, state, { originCoordinates: action.payload })
@@ -24,6 +21,9 @@ export default handleActions({
     return Object.assign({}, state, { transitiveNetwork: action.payload })
   },
   'set accessibility' (state, action) {
+    return Object.assign({}, state, { accessibility: action.payload })
+  },
+  'set accessibility for grid' (state, action) {
     return Object.assign({}, state, { accessibility: action.payload })
   },
   'set surface' (state, action) {

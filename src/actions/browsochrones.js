@@ -1,3 +1,4 @@
+import Browsochrones from 'browsochrones'
 import {createAction} from 'redux-actions'
 import {bind} from 'redux-effects'
 import {fetch} from 'redux-effects-fetch'
@@ -9,12 +10,20 @@ export const setSurface = createAction('set surface')
 export const requestGrid = createAction('request grid')
 export const receiveGrid = createAction('receive grid')
 
-export function generateIsochronesIfLoaded (browsochrones) {
+export function generateIsochronesIfLoaded (browsochrones, grid) {
   if (browsochrones.isLoaded()) {
     browsochrones.generateSurface()
-    return setSurface(Date.now())
+    return [
+      setSurface(Date.now()),
+      setAccessibilityForGrid({ browsochrones, grid })
+    ]
   }
 }
+
+export const setAccessibilityForGrid = createAction('set accessibility for grid', ({ browsochrones, grid }) => {
+  if (!grid || !browsochrones.surface) return 0
+  return browsochrones.getAccessibilityForGrid(grid)
+})
 
 export function fetchGrid (browsochrones, url, name) {
   return [
@@ -22,7 +31,7 @@ export function fetchGrid (browsochrones, url, name) {
     bind(
       fetch(`${url}/${name}.grid`),
       ({value}) => {
-        return [receiveGrid({ name, value }), generateIsochronesIfLoaded(browsochrones)]
+        return [receiveGrid({ name, value: new Browsochrones.Grid(value) }), generateIsochronesIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )
@@ -32,7 +41,7 @@ export function fetchGrid (browsochrones, url, name) {
 export const requestOrigin = createAction('request origin')
 export const receiveOrigin = createAction('receive origin')
 
-export function fetchOrigin ({browsochrones, origin, url}) {
+export function fetchOrigin ({browsochrones, grid, origin, url}) {
   return [
     requestOrigin(origin),
     bind(
@@ -40,14 +49,14 @@ export function fetchOrigin ({browsochrones, origin, url}) {
       ({value}) => {
         browsochrones.setOrigin(value, origin)
 
-        return [receiveOrigin(origin), generateIsochronesIfLoaded(browsochrones)]
+        return [receiveOrigin(origin), generateIsochronesIfLoaded(browsochrones, grid)]
       },
       ({value}) => addActionLogItem(value)
     )
   ]
 }
 
-export function updateOrigin ({browsochrones, origin, url}) {
+export function updateOrigin ({browsochrones, grid, origin, url}) {
   // get the pixel coordinates
   const actions = []
 
@@ -58,6 +67,7 @@ export function updateOrigin ({browsochrones, origin, url}) {
   } else {
     actions.push(fetchOrigin({
       browsochrones,
+      grid,
       origin,
       url
     }))
