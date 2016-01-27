@@ -22,22 +22,19 @@ module.exports.toPoint = function toPoint (input) {
 }
 
 function normalize (unknown) {
-  var latlng = {}
-  if (unknown) {
-    var lat = unknown.lat
-    var lng = unknown.lng || unknown.lon
-    if (Array.isArray(unknown)) {
-      lng = unknown[0]
-      lat = unknown[1]
-    } else if (typeof unknown === 'string') {
-      const arr = unknown.split(',')
-      lng = arr[0]
-      lat = arr[1]
-    } else if (unknown.x && unknown.y) {
-      lng = unknown.y
-      lat = unknown.x
-    }
-    latlng = {lng: parseFloat(lng), lat: parseFloat(lat)}
+  if (!unknown) throw new Error('Point must be defined.')
+  var lat = unknown.lat
+  var lng = unknown.lng || unknown.lon
+  if (Array.isArray(unknown)) {
+    lng = unknown[0]
+    lat = unknown[1]
+  } else if (typeof unknown === 'string') {
+    const arr = unknown.split(',')
+    lng = arr[0]
+    lat = arr[1]
+  } else if (unknown.x && unknown.y) {
+    lng = unknown.x
+    lat = unknown.y
   }
-  return latlng
+  return {lng: parseFloat(lng), lat: parseFloat(lat)}
 }
