@@ -215,7 +215,7 @@ class Indianapolis extends Component {
   }
 
   renderForm () {
-    const {browsochrones, dispatch, geocoder, mapMarkers} = this.props
+    const {browsochrones, dispatch, geocoder} = this.props
     const {accessibility, grids} = browsochrones
 
     return (
@@ -226,7 +226,6 @@ class Indianapolis extends Component {
             name='start-address'
             onChange={input => this.changeStartAddress(input)}
             placeholder='Search for a start address'
-            defaultValue={markerToValue(mapMarkers.origin)}
             />
         </fieldset>
         <fieldset className='form-group'>
@@ -235,7 +234,6 @@ class Indianapolis extends Component {
             name='end-address'
             onChange={input => this.changeEndAddress(input)}
             placeholder='Search for an end address'
-            defaultValue={markerToValue(mapMarkers.destination)}
             />
         </fieldset>
         <fieldset className='form-group'>
@@ -254,12 +252,6 @@ class Indianapolis extends Component {
         </fieldset>
       </form>
     )
-
-    function markerToValue (m) {
-      return m && m.label && m.latlng
-        ? {label: m.label, value: lonlng.toString(m.latlng)}
-        : null
-    }
   }
 
   render () {
