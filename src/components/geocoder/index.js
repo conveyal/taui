@@ -1,9 +1,9 @@
+import lonlng from 'lonlng'
 import React, {Component, PropTypes} from 'react'
 import Select from 'react-select'
 import 'react-select/dist/react-select.min.css'
 import throttle from 'throttleit'
 
-import ll from '../../ll'
 import {autocomplete} from './search'
 
 export default class Geocoder extends Component {
@@ -36,7 +36,7 @@ export default class Geocoder extends Component {
       focusLatlng: {lat: 39.7691, lng: -86.1570},
       text: input
     }).then(features => {
-      return {options: features.map(feature => { return {label: feature.address, value: ll.toString(feature.latlng)} })}
+      return {options: features.map(feature => { return {label: feature.address, value: lonlng.toString(feature.latlng)} })}
     })
   }
 
