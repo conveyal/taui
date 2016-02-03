@@ -297,6 +297,10 @@ class Indianapolis extends Component {
 
     const journeys = extractRelevantTransitiveInfo(destinationData.transitiveData)
 
+    if (destinationData.travelTime === 255 || journeys.length === 0) {
+      return <div className={styles.RouteCard}><div className={styles.RouteCardContent}>No travel options found</div></div>
+    }
+
     return (
       <div className={styles.RouteCard}>
         <div className={styles.RouteCardTitle}>Current Options — {destinationData.travelTime} minute trip</div>
