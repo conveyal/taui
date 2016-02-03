@@ -5,13 +5,13 @@ import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
 import {GeoJson, Map, Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
+import Geocoder from 'react-select-geocoder'
 
 import {addActionLogItem, updateMapMarker, updateMap, updateSelectedDestination} from '../../actions'
 import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibilityForGrid, updateOrigin} from '../../actions/browsochrones'
 import CanvasTileLayer from '../../components/canvas-tile-layer'
 import DestinationsSelect from '../../components/destinations-select'
 import Fullscreen from '../../components/fullscreen'
-import Geocoder from '../../components/geocoder'
 import Log from '../../components/log'
 import TimeCutoffSelect from '../../components/timecutoff-select'
 import TransitiveLayer from '../../components/transitive-layer'
@@ -28,6 +28,7 @@ class Indianapolis extends Component {
       selected: PropTypes.string
     }),
     dispatch: PropTypes.any,
+    geocoder: PropTypes.object,
     mapMarkers: PropTypes.shape({
       origin: PropTypes.object,
       destination: PropTypes.object
@@ -184,10 +185,10 @@ class Indianapolis extends Component {
 
   changeStartAddress (input) {
     if (!input) return
-    const { label, value } = input
-    const latlng = lonlng(value)
-    this.log(`Selected: ${label}`)
-    this.moveOrigin(latlng, label)
+    const { geometry, properties } = input
+    const latlng = lonlng(geometry.coordinates)
+    this.log(`Selected: ${properties.label}`)
+    this.moveOrigin(latlng, properties.label)
   }
 
   changeEndAddress (input) {
@@ -201,27 +202,27 @@ class Indianapolis extends Component {
         }
       }))
     } else {
-      const { label, value } = input
-      const latlng = lonlng(value)
-      this.log(`Selected: ${label}`)
+      const { geometry, properties } = input
+      const latlng = lonlng(geometry.coordinates)
+      this.log(`Selected: ${properties.label}`)
       dispatch(updateMapMarker({
         destination: {
           latlng,
-          label
+          label: properties.label
         }
       }))
     }
   }
 
   renderForm () {
-    const {browsochrones, dispatch, map, mapMarkers} = this.props
+    const {browsochrones, dispatch, geocoder, mapMarkers} = this.props
     const {accessibility, grids} = browsochrones
 
     return (
       <form>
         <fieldset className='form-group'>
           <Geocoder
-            apiKey={map.mapzen.apiKey}
+            {...geocoder}
             name='start-address'
             onChange={input => this.changeStartAddress(input)}
             placeholder='Search for a start address'
@@ -230,7 +231,7 @@ class Indianapolis extends Component {
         </fieldset>
         <fieldset className='form-group'>
           <Geocoder
-            apiKey={map.mapzen.apiKey}
+            {...geocoder}
             name='end-address'
             onChange={input => this.changeEndAddress(input)}
             placeholder='Search for an end address'

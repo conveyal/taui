@@ -4,6 +4,7 @@ import {routerStateReducer as router} from 'redux-router'
 import actionLog from './action-log'
 import browsochrones from './browsochrones'
 import destinations from './destinations'
+import geocoder from './geocoder'
 import map from './map'
 import mapMarkers from './map-marker'
 import project from './project'
@@ -16,6 +17,7 @@ const placeApp = combineReducers({
   actionLog,
   browsochrones,
   destinations,
+  geocoder,
   map,
   mapMarkers,
   project,
