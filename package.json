@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/conveyal/taui/issues"
   },
-  "homepage": "https://github.com/taui/place",
+  "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
     "autoprefixer": "^6.2.3",
     "babel-core": "^6.3.26",
