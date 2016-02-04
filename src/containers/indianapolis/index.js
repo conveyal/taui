@@ -6,7 +6,7 @@ import {GeoJson, Map, Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
 import Geocoder from 'react-select-geocoder'
 
-import {addActionLogItem, updateMapMarker, updateMap, updateSelectedDestination} from '../../actions'
+import {updateMapMarker, updateMap, updateSelectedDestination} from '../../actions'
 import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibilityForGrid, updateOrigin} from '../../actions/browsochrones'
 import CanvasTileLayer from '../../components/canvas-tile-layer'
 import DestinationsSelect from '../../components/destinations-select'
@@ -20,6 +20,7 @@ import transitiveStyle from './transitive-style'
 
 class Indianapolis extends Component {
   static propTypes = {
+    actionLog: PropTypes.arrayOf(PropTypes.object),
     browsochrones: PropTypes.shape({
       showIsoLayer: PropTypes.bool,
       showIsoline: PropTypes.bool
@@ -71,8 +72,7 @@ class Indianapolis extends Component {
     const {dispatch, browsochrones, destinations} = this.props
     const origin = this.browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
 
-    dispatch(addActionLogItem(`Origin marker moved to [${lonlng.print(latlng)}]`))
-
+    console.log('updating map marker')
     dispatch(updateMapMarker({
       origin: {
         latlng,
@@ -80,6 +80,7 @@ class Indianapolis extends Component {
       }
     }))
 
+    console.log('updating origin')
     dispatch(updateOrigin({
       browsochrones: this.browsochrones,
       grid: browsochrones.grids[destinations.selected],
@@ -187,7 +188,6 @@ class Indianapolis extends Component {
     if (!input) return
     const { geometry, properties } = input
     const latlng = lonlng(geometry.coordinates)
-    this.log(`Selected: ${properties.label}`)
     this.moveOrigin(latlng, properties.label)
   }
 
@@ -204,7 +204,6 @@ class Indianapolis extends Component {
     } else {
       const { geometry, properties } = input
       const latlng = lonlng(geometry.coordinates)
-      this.log(`Selected: ${properties.label}`)
       dispatch(updateMapMarker({
         destination: {
           latlng,
@@ -254,8 +253,14 @@ class Indianapolis extends Component {
     )
   }
 
+  count = 0;
+  lastRender = new Date();
+
   render () {
     const destinationData = this.generateDestinationData()
+    const now = new Date()
+    console.log(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
+    this.lastRender = now
 
     return (
       <Fullscreen>
@@ -273,7 +278,11 @@ class Indianapolis extends Component {
             {this.renderForm()}
             {this.renderPaths(destinationData)}
           </div>
-          <div className={styles.dockedActionLog}><Log /></div>
+          <div className={styles.dockedActionLog}>
+            <Log
+              items={this.props.actionLog}
+              />
+          </div>
         </Dock>
       </Fullscreen>
     )
@@ -300,11 +309,6 @@ class Indianapolis extends Component {
       transitiveData={destinationData.transitiveData}
       travelTime={destinationData.travelTime}
       />
-  }
-
-  log (l) {
-    const {dispatch} = this.props
-    dispatch(addActionLogItem(l))
   }
 }
 
