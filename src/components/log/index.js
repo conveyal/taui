@@ -1,18 +1,14 @@
 import React, {Component, PropTypes} from 'react'
-import {connect} from 'react-redux'
 
 import LogItem from '../log-item'
 import style from './style.css'
 
-class Log extends Component {
+export default class Log extends Component {
   static propTypes = {
-    actionLog: PropTypes.arrayOf(PropTypes.object).isRequired
+    items: PropTypes.arrayOf(PropTypes.object).isRequired
   };
 
   render () {
-    const {actionLog} = this.props
-    return <div className={style.log}>{actionLog.map((logItem, index) => <LogItem {...logItem} key={index} />)}</div>
+    return <div className={style.log}>{this.props.items.map((item, index) => <LogItem {...item} key={index} />)}</div>
   }
 }
-
-export default connect(s => s)(Log)
