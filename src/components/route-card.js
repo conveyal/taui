@@ -1,7 +1,7 @@
 import Color from 'color'
 import React from 'react'
 
-const RouteCard = ({className, styles, transitiveData, travelTime}) => {
+const RouteCard = ({styles, transitiveData, travelTime}) => {
   const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
