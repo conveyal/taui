@@ -10,12 +10,12 @@ export const setSurface = createAction('set surface')
 export const requestGrid = createAction('request grid')
 export const receiveGrid = createAction('receive grid')
 
-export function generateIsochronesIfLoaded (browsochrones, grid) {
+export function generateSurfaceIfLoaded (browsochrones, grid) {
   if (browsochrones.isLoaded()) {
     browsochrones.generateSurface()
     return [
       setSurface(Date.now()),
-      setAccessibilityForGrid({ browsochrones, grid })
+      setAccessibilityForGrid({browsochrones, grid})
     ]
   }
 }
@@ -31,7 +31,10 @@ export function fetchGrid (browsochrones, url, name) {
     bind(
       fetch(`${url}/${name}.grid`),
       ({value}) => {
-        return [receiveGrid({ name, value: new Browsochrones.Grid(value) }), generateIsochronesIfLoaded(browsochrones)]
+        const grid = new Browsochrones.Grid(value)
+        browsochrones.grids = browsochrones.grids || {}
+        browsochrones.grids[name] = grid
+        return [receiveGrid({name, grid}), generateSurfaceIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )
@@ -49,7 +52,7 @@ export function fetchOrigin ({browsochrones, grid, origin, url}) {
       ({value}) => {
         browsochrones.setOrigin(value, origin)
 
-        return [receiveOrigin(origin), generateIsochronesIfLoaded(browsochrones, grid)]
+        return [receiveOrigin(origin), generateSurfaceIfLoaded(browsochrones, grid)]
       },
       ({value}) => addActionLogItem(value)
     )
@@ -87,7 +90,7 @@ export function fetchQuery (browsochrones, url) {
       ({value}) => {
         browsochrones.setQuery(value)
 
-        return [receiveQuery(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+        return [receiveQuery(Date.now()), generateSurfaceIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )
@@ -105,7 +108,7 @@ export function fetchStopTrees (browsochrones, url) {
       ({value}) => {
         browsochrones.setStopTrees(value)
 
-        return [receiveStopTrees(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+        return [receiveStopTrees(Date.now()), generateSurfaceIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )
@@ -123,7 +126,7 @@ export function fetchTransitiveNetwork (browsochrones, url) {
       ({value}) => {
         browsochrones.setTransitiveNetwork(value)
 
-        return [receiveTransitiveNetwork(Date.now()), generateIsochronesIfLoaded(browsochrones)]
+        return [receiveTransitiveNetwork(Date.now()), generateSurfaceIfLoaded(browsochrones)]
       },
       ({value}) => addActionLogItem(value)
     )
