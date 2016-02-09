@@ -1,26 +1,22 @@
-import React, {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
+import PureComponent from 'react-pure-render/component'
 import {connect} from 'react-redux'
 
-import {addActionLogItem, updateSelectedTimeCutoff} from '../actions'
-
-class TimeCutoffSelect extends Component {
+class TimeCutoffSelect extends PureComponent {
   static propTypes = {
     className: PropTypes.string,
-    dispatch: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
     times: PropTypes.arrayOf(PropTypes.object).isRequired,
     selected: PropTypes.number
   };
 
   render () {
-    const {dispatch, className, times, selected} = this.props
+    const {className, onChange, times, selected} = this.props
 
     return (
       <select
         className={className}
-        onChange={e => {
-          dispatch(updateSelectedTimeCutoff(parseInt(e.target.value, 10)))
-          dispatch(addActionLogItem(`Selected new time cutoff: ${e.target.value}`))
-        }}
+        onChange={onChange}
         value={selected}>
         {times.map(mode => <option value={mode.value} key={mode.value}>{mode.name}</option>)}
       </select>
@@ -28,4 +24,8 @@ class TimeCutoffSelect extends Component {
   }
 }
 
-export default connect(s => s.timeCutoff)(TimeCutoffSelect)
+function mapStateToProps (state, currentProps) {
+  return state.timeCutoff
+}
+
+export default connect(mapStateToProps)(TimeCutoffSelect)

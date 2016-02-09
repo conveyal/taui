@@ -1,28 +1,34 @@
-import React, {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
+import PureComponent from 'react-pure-render/component'
 import {connect} from 'react-redux'
 
-class DestinationsSelect extends Component {
+import {updateSelectedDestination} from '../actions'
+
+class DestinationsSelect extends PureComponent {
   static propTypes = {
-    className: PropTypes.string,
-    dispatch: PropTypes.func,
-    onChange: PropTypes.func.isRequired,
-    selected: PropTypes.string,
-    sets: PropTypes.arrayOf(PropTypes.object).isRequired
+    options: PropTypes.arrayOf(PropTypes.object).isRequired
   };
 
   render () {
-    const {className, onChange, selected, sets} = this.props
-
     return (
-      <select
-        className={className}
-        onChange={onChange}
-        defaultValue={selected}
-        >
-        {sets.map(destination => <option value={destination.value} key={destination.value}>{destination.label}</option>)}
+      <select {...this.props}>
+        {this.props.options.map(destination => <option value={destination.value} key={destination.value}>{destination.label}</option>)}
       </select>
     )
   }
 }
 
-export default connect(s => s.destinations)(DestinationsSelect)
+function mapStateToProps (state) {
+  return {
+    defaultValue: state.destinations.selected,
+    options: state.destinations.sets
+  }
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    onChange: event => dispatch(updateSelectedDestination(event.target.value))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DestinationsSelect)

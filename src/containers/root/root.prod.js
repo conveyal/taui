@@ -8,7 +8,7 @@ export default class Root extends Component {
   };
 
   render () {
-    const { children, store } = this.props
+    const {children, store} = this.props
     return <Provider store={store}>{children}</Provider>
   }
 }

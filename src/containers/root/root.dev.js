@@ -10,9 +10,11 @@ export default class Root extends Component {
   };
 
   render () {
-    const { store } = this.props
+    const {store} = this.props
     return (
-      <Provider store={store}>
+      <Provider
+        store={store}
+        >
         <div>
           {this.props.children}
           <DevTools />

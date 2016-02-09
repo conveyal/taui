@@ -4,12 +4,22 @@ export default handleActions({
   'update map' (state, action) {
     return Object.assign({}, state, action.payload)
   },
-  'update map marker' (state, {payload}) {
+  'set isochrone' (state, action) {
     return Object.assign({}, state, {
-      centerCoordinates: payload.position
+      geojson: [action.payload]
     })
+  },
+  'set transitive network' (state, action) {
+    return Object.assign({}, state, {
+      transitive: action.payload
+    })
+  },
+  'clear destination' (state, action) {
+    return Object.assign({}, state, {transitive: null})
   }
 }, {
+  geojson: [],
   map: null,
+  transitive: null,
   zoom: 11
 })

@@ -1,8 +1,21 @@
 import {handleActions} from 'redux-actions'
 
 export default handleActions({
-  'update map marker' (state, action) {
-    return Object.assign({}, state, action.payload)
+  'hide map marker' (state, {payload}) {
+    return Object.assign({}, state, {
+      [payload.id]: null
+    })
+  },
+  'show map marker' (state, {payload}) {
+    return Object.assign({}, state, {
+      [payload.id]: payload
+    })
+  },
+  'set origin' (state) {
+    return Object.assign({}, state, {destination: null})
+  },
+  'clear destination' (state) {
+    return Object.assign({}, state, {destination: null})
   }
 }, {
   origin: {

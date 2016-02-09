@@ -1,270 +1,118 @@
-import Browsochrones from 'browsochrones'
 import lonlng from 'lonlng'
 import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
-import {GeoJson, Map, Marker, Popup, TileLayer} from 'react-leaflet'
 import {connect} from 'react-redux'
-import Geocoder from 'react-select-geocoder'
 
-import {updateMapMarker, updateMap, updateSelectedDestination} from '../../actions'
-import {fetchGrid, fetchQuery, fetchStopTrees, fetchTransitiveNetwork, setAccessibilityForGrid, updateOrigin} from '../../actions/browsochrones'
-import CanvasTileLayer from '../../components/canvas-tile-layer'
-import DestinationsSelect from '../../components/destinations-select'
+import {clearDestination, updateDestination, updateOrigin, updateSelectedTimeCutoff} from '../../actions'
+import Form from './form'
 import Fullscreen from '../../components/fullscreen'
 import Log from '../../components/log'
-import TimeCutoffSelect from '../../components/timecutoff-select'
-import TransitiveLayer from '../../components/transitive-layer'
+import Map from './map'
 import RouteCard from '../../components/route-card'
 import styles from './style.css'
-import transitiveStyle from './transitive-style'
 
 class Indianapolis extends Component {
   static propTypes = {
     actionLog: PropTypes.arrayOf(PropTypes.object),
-    browsochrones: PropTypes.shape({
-      showIsoLayer: PropTypes.bool,
-      showIsoline: PropTypes.bool
-    }),
-    destinations: PropTypes.shape({
-      selected: PropTypes.string
-    }),
-    dispatch: PropTypes.any,
+    browsochrones: PropTypes.object.isRequired,
+    clearDestination: PropTypes.func.isRequired,
     geocoder: PropTypes.object,
-    mapMarkers: PropTypes.shape({
-      origin: PropTypes.object,
-      destination: PropTypes.object
-    }),
+    mapMarkers: PropTypes.object,
     map: PropTypes.object,
+    moveDestination: PropTypes.func.isRequired,
+    moveOrigin: PropTypes.func.isRequired,
+    onTimeCutoffChange: PropTypes.func.isRequired,
     timeCutoff: PropTypes.shape({
       selected: PropTypes.number
-    })
+    }),
+    zoom: PropTypes.number
   };
 
-  componentWillMount () {
-    this.initializeBrowsochrones()
-  }
-
-  componentDidMount () {
-    // Save a reference to the map
-    this.map = this.refs.map.getLeafletElement()
-  }
-
-  initializeBrowsochrones () {
-    const {browsochrones, dispatch} = this.props
-    this.browsochrones = new Browsochrones()
-    this.browsochrones.grids = {}
-
-    dispatch(fetchGrid(this.browsochrones, browsochrones.gridsUrl, 'Jobs_total'))
-    dispatch(fetchGrid(this.browsochrones, browsochrones.gridsUrl, 'Workers_total'))
-    dispatch(fetchQuery(this.browsochrones, browsochrones.queryUrl))
-    dispatch(fetchStopTrees(this.browsochrones, browsochrones.stopTreesUrl))
-    dispatch(fetchTransitiveNetwork(this.browsochrones, browsochrones.transitiveNetworkUrl))
-  }
-
-  /**
-   * Callback to be executed on Origin Marker move. Update Browsochones when
-   * Marker is dropped
-   *
-   * @private
-   * @param  {Event} event
-   */
-  moveOrigin (latlng, label) {
-    const {dispatch, browsochrones, destinations} = this.props
-    const origin = this.browsochrones.pixelToOriginCoordinates(this.map.project(latlng), this.map.getZoom())
-
-    console.log('updating map marker')
-    dispatch(updateMapMarker({
-      origin: {
-        latlng,
-        label
-      }
-    }))
-
-    console.log('updating origin')
-    dispatch(updateOrigin({
-      browsochrones: this.browsochrones,
-      grid: browsochrones.grids[destinations.selected],
-      origin,
-      url: browsochrones.originsUrl
-    }))
-  }
-
-  /**
-   * Callback to be executed on Destination Marker move.
-   *
-   * @private
-   * @param {Event} e
-   */
-  moveDestination (latlng, label) {
-    this.props.dispatch(updateMapMarker({
-      destination: {
-        latlng,
-        label
-      }
-    }))
-  }
-
-  /**
-   * When a destination marker is added, use its position to update Transitive
-   *
-   * @private
-   * @param  {Event} e
-   */
-  addDestination (latlng, label) {
-    this.props.dispatch(updateMapMarker({
-      destination: {
-        latlng,
-        label
-      }
-    }))
-  }
-
-  latlngKey () {
-    const {mapMarkers} = this.props
-    const {destination, origin} = mapMarkers
-    if (destination) return `${JSON.stringify(origin.latlng)}-${JSON.stringify(destination.latlng)}`
-    return JSON.stringify(origin.latlng)
-  }
-
-  renderMap ({ transitiveData }) {
-    const {dispatch, map, mapMarkers, timeCutoff} = this.props
-
-    return (
-      <Map
-        center={map.centerCoordinates}
-        className={styles.map}
-        onLeafletZoomEnd={event => dispatch(updateMap({ zoom: event.target._zoom }))}
-        ref='map'
-        zoom={map.zoom}
-        >
-        <TileLayer
-          attribution={map.attribution}
-          url={map.url}
-        />
-        <Marker
-          draggable
-          key='originMarker'
-          position={mapMarkers.origin.latlng}
-          onLeafletDragEnd={event => this.moveOrigin(event.target._latlng)}
-          >
-          <Popup><span>Origin {mapMarkers.origin.label || ''}</span></Popup>
-        </Marker>
-
-        {mapMarkers.destination.latlng &&
-          <Marker
-            draggable
-            key='destinationMarker'
-            position={mapMarkers.destination.latlng}
-            onAdd={event => this.addDestination(event.target._latlng)}
-            onLeafletDragEnd={event => this.moveDestination(event.target._latlng)}
-            >
-            <Popup><span>Destination {mapMarkers.destination.label || ''}</span></Popup>
-          </Marker>
-        }
-        {this.browsochrones.isLoaded() &&
-          <CanvasTileLayer
-            key={`isochrone-${this.latlngKey()}`}
-            drawTile={this.browsochrones.drawTile.bind(this.browsochrones)}
-            />
-        }
-        {this.browsochrones.isLoaded() &&
-          <GeoJson
-            key={`isoline-${this.latlngKey()}-${timeCutoff.selected}`}
-            data={this.browsochrones.getIsochrone(timeCutoff.selected)}
-            />
-        }
-        {transitiveData &&
-          <TransitiveLayer
-            key={`transitive-${this.latlngKey()}`}
-            data={transitiveData}
-            styles={transitiveStyle}
-            />
-        }
-      </Map>
-    )
+  moveOrigin ({latlng, label}) {
+    this.props.moveOrigin({
+      label,
+      latlng: lonlng(latlng),
+      timeCutoff: this.props.timeCutoff.selected,
+      zoom: this.props.map.zoom
+    })
   }
 
   changeStartAddress (input) {
     if (!input) return
-    const { geometry, properties } = input
-    const latlng = lonlng(geometry.coordinates)
-    this.moveOrigin(latlng, properties.label)
+    const {geometry, properties} = input
+
+    this.moveOrigin({
+      label: properties.label,
+      latlng: geometry.coordinates
+    })
+  }
+
+  moveDestination ({latlng, label}) {
+    this.props.moveDestination({
+      label,
+      latlng: lonlng(latlng),
+      zoom: this.props.map.zoom
+    })
   }
 
   changeEndAddress (input) {
-    const {dispatch} = this.props
-
     if (!input) {
-      dispatch(updateMapMarker({
-        destination: {
-          latlng: null,
-          label: null
-        }
-      }))
+      this.props.clearDestination()
     } else {
-      const { geometry, properties } = input
-      const latlng = lonlng(geometry.coordinates)
-      dispatch(updateMapMarker({
-        destination: {
-          latlng,
-          label: properties.label
-        }
-      }))
+      const {geometry, properties} = input
+
+      this.moveDestination({
+        label: properties.label,
+        latlng: geometry.coordinates
+      })
     }
   }
 
-  renderForm () {
-    const {browsochrones, dispatch, geocoder} = this.props
-    const {accessibility, grids} = browsochrones
+  onTimeCutoffChange (timeCutoff) {
+    this.props.onTimeCutoffChange({latlng: this.props.mapMarkers.origin.latlng, timeCutoff})
+  }
 
-    return (
-      <form>
-        <fieldset className='form-group'>
-          <Geocoder
-            {...geocoder}
-            name='start-address'
-            onChange={input => this.changeStartAddress(input)}
-            placeholder='Search for a start address'
-            />
-        </fieldset>
-        <fieldset className='form-group'>
-          <Geocoder
-            {...geocoder}
-            name='end-address'
-            onChange={input => this.changeEndAddress(input)}
-            placeholder='Search for an end address'
-            />
-        </fieldset>
-        <fieldset className='form-group'>
-          <label>Access to <strong>{accessibility.toLocaleString()}</strong></label>
-          <DestinationsSelect
-            className='form-control'
-            onChange={event => {
-              dispatch(updateSelectedDestination(event.target.value))
-              dispatch(setAccessibilityForGrid({browsochrones: this.browsochrones, grid: grids[event.target.value]}))
-            }}
-            />
-        </fieldset>
-        <fieldset className='form-group'>
-          <label>Isoline Time Cutoff</label>
-          <TimeCutoffSelect className='form-control' />
-        </fieldset>
-      </form>
-    )
+  renderMap () {
+    const {map, mapMarkers} = this.props
+
+    const markers = []
+    if (mapMarkers.origin && mapMarkers.origin.latlng) {
+      markers.push({
+        position: mapMarkers.origin.latlng,
+        label: mapMarkers.origin.label || '',
+        onLeafletDragEnd: event => this.moveOrigin({latlng: event.target._latlng})
+      })
+    }
+
+    if (mapMarkers.destination && mapMarkers.destination.latlng) {
+      markers.push({
+        position: mapMarkers.destination.latlng,
+        label: mapMarkers.destination.label || '',
+        onAdd: event => this.moveDestination({latlng: event.target._latlng}),
+        onLeafletDragEnd: event => this.moveDestination({latlng: event.target._latlng})
+      })
+    }
+
+    return <Map
+      {...map}
+      markers={markers}
+      />
   }
 
   count = 0;
   lastRender = new Date();
 
   render () {
-    const destinationData = this.generateDestinationData()
+    const {browsochrones, geocoder, map} = this.props
+    const {accessibility} = browsochrones
+
     const now = new Date()
     console.log(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
     this.lastRender = now
 
     return (
       <Fullscreen>
-        {this.renderMap({ transitiveData: destinationData.transitiveData })}
+        {this.renderMap({})}
         <Dock
           dimMode='none'
           fluid
@@ -275,8 +123,20 @@ class Indianapolis extends Component {
           }}
           >
           <div className={styles.dockContent}>
-            {this.renderForm()}
-            {this.renderPaths(destinationData)}
+            <Form
+              accessibility={accessibility}
+              geocoder={geocoder}
+              onTimeCutoffChange={event => this.onTimeCutoffChange(parseInt(event.target.value, 10))}
+              onChangeEnd={input => this.changeEndAddress(input)}
+              onChangeStart={input => this.changeStartAddress(input)}
+              />
+            {map.transitive &&
+              <RouteCard
+                styles={styles}
+                transitiveData={map.transitive}
+                travelTime={0}
+                />
+            }
           </div>
           <div className={styles.dockedActionLog}>
             <Log
@@ -287,29 +147,42 @@ class Indianapolis extends Component {
       </Fullscreen>
     )
   }
+}
 
-  generateDestinationData () {
-    const {mapMarkers} = this.props
-    if (this.browsochrones.isLoaded() && mapMarkers.origin.latlng && mapMarkers.destination.latlng) {
-      const point = this.browsochrones.pixelToOriginCoordinates(this.map.project(mapMarkers.destination.latlng), this.map.getZoom())
-      const transitiveData = this.browsochrones.generateTransitiveData(point)
-      const travelTime = this.browsochrones.surface.surface[point.y * this.browsochrones.query.width + point.x]
+function mapStateToProps (state, currentProps) {
+  return state
+}
 
-      return { transitiveData, travelTime }
-    } else {
-      return false
+function mapDispatchToProps (dispatch, currentProps) {
+  return {
+    clearDestination: () => dispatch(clearDestination()),
+    moveOrigin ({label, latlng, projectedPoint, timeCutoff, zoom}) {
+      dispatch(updateOrigin({
+        browsochrones: currentProps.browsochrones,
+        label,
+        latlng,
+        projectedPoint,
+        timeCutoff,
+        zoom
+      }))
+    },
+    moveDestination ({label, latlng, projectedPoint, zoom}) {
+      dispatch(updateDestination({
+        browsochrones: currentProps.browsochrones,
+        latlng,
+        label,
+        projectedPoint,
+        zoom
+      }))
+    },
+    onTimeCutoffChange ({latlng, timeCutoff}) {
+      dispatch(updateSelectedTimeCutoff({
+        browsochrones: currentProps.browsochrones,
+        latlng,
+        timeCutoff
+      }))
     }
-  }
-
-  renderPaths (destinationData) {
-    if (!destinationData) return null
-
-    return <RouteCard
-      styles={styles}
-      transitiveData={destinationData.transitiveData}
-      travelTime={destinationData.travelTime}
-      />
   }
 }
 
-export default connect(s => s)(Indianapolis)
+export default connect(mapStateToProps, mapDispatchToProps)(Indianapolis)

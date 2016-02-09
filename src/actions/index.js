@@ -1,3 +1,5 @@
+import Leaflet from 'leaflet'
+import lonlng from 'lonlng'
 import {stringify} from 'qs'
 import {createAction} from 'redux-actions'
 import {bind} from 'redux-effects'
@@ -14,13 +16,116 @@ export const addActionLogItem = createAction('add action log item', (item) => {
   }, payload)
 })
 
-export const updateMapMarker = createAction('update map marker')
+export const clearDestination = createAction('clear destination')
+
+export const setBrowsochrones = createAction('set browsochrones')
+export const setDestination = createAction('set destination')
+export const setOrigin = createAction('set origin')
+export const setSelectedTimeCutoff = createAction('set selected time cutoff')
+export const setTransitiveNetwork = createAction('set transitive network')
+export const showMapMarker = createAction('show map marker')
+export const hideMapMarker = createAction('hide map marker')
+
+export const setIsochrone = createAction('set isochrone')
+
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
 export const updateSelectedProject = createAction('update selected project')
-export const updateSelectedTimeCutoff = createAction('update selected time cutoff')
+
 export const updateSelectedTransitMode = createAction('update selected transit mode')
 export const updateSelectedTransitScenario = createAction('update selected transit scenario')
+
+/**
+ * What happens on origin update:
+ *  - Map marker should get set to the new origin immmediately (if it wasn't a drag/drop)
+ *  - If there's no label, the latlng point should be reverse geocoded and saved
+ *  - If Browsochones is loaded, new origin data is retreived
+ *    - A new surface is generated
+ *      - A new jsonline generated
+ *      - Accessibility is calculated for grids
+ */
+export function updateOrigin ({browsochrones, latlng, label, timeCutoff, zoom}) {
+  const actions = [clearDestination()]
+  const point = browsochrones.pixelToOriginCoordinates(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+
+  if (label) {
+    actions.push(showMapMarker({
+      id: 'origin',
+      label,
+      latlng
+    }))
+  } else {
+    // TODO: Reverse geocode and update the text box
+  }
+
+  if (browsochrones.coordinatesInQueryBounds(point)) {
+    actions.push(bind(
+      fetch(`${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`),
+      ({value}) => {
+        const origin = browsochrones.setOrigin(value, point)
+        browsochrones.generateSurface()
+
+        return [
+          setOrigin({point, latlng, label, origin}),
+          generateIsochrone({browsochrones, latlng, timeCutoff})
+        ]
+      },
+      ({err}) => console.error(err)
+    ))
+  } else {
+    console.log('coordinates out of bounds') // TODO: Handle
+  }
+
+  return actions
+}
+
+export function generateIsochrone ({browsochrones, latlng, timeCutoff}) {
+  const isochrone = browsochrones.getIsochrone(timeCutoff)
+  isochrone.key = `${lonlng.toString(latlng)}-${timeCutoff}`
+
+  return setIsochrone(isochrone)
+}
+
+export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
+  const actions = [
+    setSelectedTimeCutoff(timeCutoff)
+  ]
+
+  if (browsochrones.surface) {
+    actions.push(generateIsochrone({browsochrones, latlng, timeCutoff}))
+  }
+
+  return actions
+}
+
+/**
+ * What happens on destination update:
+ *  - Map marker is set to the new destination immmediately (if it wasn't a drag/drop)
+ *  - If there's no label, the latlng point should be reverse geocoded and saved
+ *  - If Browsochones is loaded, transitive data is generated
+ *  - If Browsochones has a surface generated, travel time is calculated
+ */
+export function updateDestination ({browsochrones, latlng, label, zoom}) {
+  const actions = []
+  if (label) {
+    actions.push(showMapMarker({
+      id: 'destination',
+      label,
+      latlng
+    }))
+  } else {
+    // TODO: reverse geocode and update the text box
+  }
+
+  if (browsochrones.surface) {
+    const point = browsochrones.pixelToOriginCoordinates(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+    const transitiveData = browsochrones.generateTransitiveData(point)
+    transitiveData.key = `${lonlng.toString(latlng)}`
+    actions.push(setTransitiveNetwork(transitiveData))
+  }
+
+  return actions
+}
 
 export const requestSinglePoint = createAction('request single point')
 export const receiveSinglePoint = createAction('receive single point')

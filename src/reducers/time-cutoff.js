@@ -8,7 +8,7 @@ const times = []
 for (let i = timeMin; i < timeMax; i += timeStep) times.push({ name: `${i} minutes`, value: i })
 
 export default handleActions({
-  'update selected time cutoff' (state, action) {
+  'set selected time cutoff' (state, action) {
     return Object.assign({}, state, { selected: action.payload })
   }
 }, {
