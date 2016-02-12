@@ -9,6 +9,9 @@ export default handleActions({
       geojson: [action.payload]
     })
   },
+  'set origin' (state) {
+    return Object.assign({}, state, {transitive: null})
+  },
   'set transitive network' (state, action) {
     return Object.assign({}, state, {
       transitive: action.payload

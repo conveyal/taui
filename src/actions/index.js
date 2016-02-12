@@ -1,3 +1,4 @@
+import {reverse} from 'isomorphic-mapzen-search'
 import Leaflet from 'leaflet'
 import lonlng from 'lonlng'
 import {stringify} from 'qs'
@@ -28,6 +29,8 @@ export const hideMapMarker = createAction('hide map marker')
 
 export const setIsochrone = createAction('set isochrone')
 
+export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options))
+
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
 export const updateSelectedProject = createAction('update selected project')
@@ -44,31 +47,27 @@ export const updateSelectedTransitScenario = createAction('update selected trans
  *      - A new jsonline generated
  *      - Accessibility is calculated for grids
  */
-export function updateOrigin ({browsochrones, latlng, label, timeCutoff, zoom}) {
+export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff, zoom}) {
   const actions = [clearDestination()]
   const point = browsochrones.pixelToOriginCoordinates(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
 
   if (label) {
-    actions.push(showMapMarker({
-      id: 'origin',
-      label,
-      latlng
-    }))
+    actions.push(setOrigin({label, latlng, point}))
   } else {
-    // TODO: Reverse geocode and update the text box
+    actions.push(bind(
+      reverseGeocode({apiKey, latlng, options: {format: true}}),
+      ({payload}) => setOrigin({label: payload[0].address, latlng, point})
+    ))
   }
 
   if (browsochrones.coordinatesInQueryBounds(point)) {
     actions.push(bind(
       fetch(`${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`),
       ({value}) => {
-        const origin = browsochrones.setOrigin(value, point)
+        browsochrones.setOrigin(value, point)
         browsochrones.generateSurface()
 
-        return [
-          setOrigin({point, latlng, label, origin}),
-          generateIsochrone({browsochrones, latlng, timeCutoff})
-        ]
+        return generateIsochrone({browsochrones, latlng, timeCutoff})
       },
       ({err}) => console.error(err)
     ))
@@ -105,20 +104,22 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
  *  - If Browsochones is loaded, transitive data is generated
  *  - If Browsochones has a surface generated, travel time is calculated
  */
-export function updateDestination ({browsochrones, latlng, label, zoom}) {
+export function updateDestination ({apiKey, browsochrones, latlng, label, zoom}) {
   const actions = []
+  const point = browsochrones.pixelToOriginCoordinates(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+
   if (label) {
-    actions.push(showMapMarker({
-      id: 'destination',
-      label,
-      latlng
-    }))
+    actions.push(setDestination({label, latlng, point}))
   } else {
-    // TODO: reverse geocode and update the text box
+    actions.push(
+      bind(
+        reverseGeocode({apiKey, latlng, options: {format: true}}),
+        ({payload}) => setDestination({label: payload[0].address, latlng, point})
+      )
+    )
   }
 
   if (browsochrones.surface) {
-    const point = browsochrones.pixelToOriginCoordinates(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
     const transitiveData = browsochrones.generateTransitiveData(point)
     transitiveData.key = `${lonlng.toString(latlng)}`
     actions.push(setTransitiveNetwork(transitiveData))

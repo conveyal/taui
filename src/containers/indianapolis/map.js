@@ -12,13 +12,14 @@ export default class Map extends PureComponent {
     centerCoordinates: PropTypes.arrayOf(PropTypes.number),
     geojson: PropTypes.arrayOf(PropTypes.object).isRequired,
     markers: PropTypes.arrayOf(PropTypes.object).isRequired,
+    onZoom: PropTypes.func,
     transitive: PropTypes.object,
     url: PropTypes.string.isRequired,
     zoom: PropTypes.number
   };
 
   render () {
-    const {attribution, centerCoordinates, geojson, markers, transitive, url, zoom} = this.props
+    const {attribution, centerCoordinates, geojson, markers, onZoom, transitive, url, zoom} = this.props
 
     return (
       <LeafletMap
@@ -26,9 +27,7 @@ export default class Map extends PureComponent {
         className={styles.map}
         ref='map'
         zoom={zoom}
-        onLeafletZoom={e => {
-          console.log(e)
-        }}
+        onLeafletZoom={onZoom}
         >
         <TileLayer
           attribution={attribution}

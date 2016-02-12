@@ -13,6 +13,7 @@ const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoff
           name='start-address'
           onChange={onChangeStart}
           placeholder='Search for a start address'
+          value={geocoder.origin}
           />
       </fieldset>
       <fieldset className='form-group'>
@@ -21,6 +22,7 @@ const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoff
           name='end-address'
           onChange={onChangeEnd}
           placeholder='Search for an end address'
+          value={geocoder.destination}
           />
       </fieldset>
       <fieldset className='form-group'>

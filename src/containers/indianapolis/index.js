@@ -30,6 +30,8 @@ class Indianapolis extends Component {
 
   moveOrigin ({latlng, label}) {
     this.props.moveOrigin({
+      apiKey: this.props.geocoder.apiKey,
+      browsochrones: this.props.browsochrones,
       label,
       latlng: lonlng(latlng),
       timeCutoff: this.props.timeCutoff.selected,
@@ -49,6 +51,8 @@ class Indianapolis extends Component {
 
   moveDestination ({latlng, label}) {
     this.props.moveDestination({
+      apiKey: this.props.geocoder.apiKey,
+      browsochrones: this.props.browsochrones,
       label,
       latlng: lonlng(latlng),
       zoom: this.props.map.zoom
@@ -69,7 +73,11 @@ class Indianapolis extends Component {
   }
 
   onTimeCutoffChange (timeCutoff) {
-    this.props.onTimeCutoffChange({latlng: this.props.mapMarkers.origin.latlng, timeCutoff})
+    this.props.onTimeCutoffChange({
+      browsochrones: this.props.browsochrones,
+      latlng: this.props.mapMarkers.origin.latlng,
+      timeCutoff
+    })
   }
 
   renderMap () {
@@ -103,8 +111,7 @@ class Indianapolis extends Component {
   lastRender = new Date();
 
   render () {
-    const {browsochrones, geocoder, map} = this.props
-    const {accessibility} = browsochrones
+    const {geocoder, map} = this.props
 
     const now = new Date()
     console.log(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
@@ -124,7 +131,7 @@ class Indianapolis extends Component {
           >
           <div className={styles.dockContent}>
             <Form
-              accessibility={accessibility}
+              accessibility={0}
               geocoder={geocoder}
               onTimeCutoffChange={event => this.onTimeCutoffChange(parseInt(event.target.value, 10))}
               onChangeEnd={input => this.changeEndAddress(input)}
@@ -149,38 +156,21 @@ class Indianapolis extends Component {
   }
 }
 
-function mapStateToProps (state, currentProps) {
+function mapStateToProps (state, ownProps) {
   return state
 }
 
-function mapDispatchToProps (dispatch, currentProps) {
+function mapDispatchToProps (dispatch, ownProps) {
   return {
     clearDestination: () => dispatch(clearDestination()),
-    moveOrigin ({label, latlng, projectedPoint, timeCutoff, zoom}) {
-      dispatch(updateOrigin({
-        browsochrones: currentProps.browsochrones,
-        label,
-        latlng,
-        projectedPoint,
-        timeCutoff,
-        zoom
-      }))
+    moveOrigin (options) {
+      dispatch(updateOrigin(options))
     },
-    moveDestination ({label, latlng, projectedPoint, zoom}) {
-      dispatch(updateDestination({
-        browsochrones: currentProps.browsochrones,
-        latlng,
-        label,
-        projectedPoint,
-        zoom
-      }))
+    moveDestination (options) {
+      dispatch(updateDestination(options))
     },
-    onTimeCutoffChange ({latlng, timeCutoff}) {
-      dispatch(updateSelectedTimeCutoff({
-        browsochrones: currentProps.browsochrones,
-        latlng,
-        timeCutoff
-      }))
+    onTimeCutoffChange (options) {
+      dispatch(updateSelectedTimeCutoff(options))
     }
   }
 }

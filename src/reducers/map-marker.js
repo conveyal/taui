@@ -11,8 +11,16 @@ export default handleActions({
       [payload.id]: payload
     })
   },
-  'set origin' (state) {
-    return Object.assign({}, state, {destination: null})
+  'set origin' (state, {payload}) {
+    return Object.assign({}, state, {
+      destination: null,
+      origin: payload
+    })
+  },
+  'set destination' (state, {payload}) {
+    return Object.assign({}, state, {
+      destination: payload
+    })
   },
   'clear destination' (state) {
     return Object.assign({}, state, {destination: null})

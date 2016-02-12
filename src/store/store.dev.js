@@ -4,19 +4,19 @@ import {batchedSubscribe} from 'redux-batched-subscribe'
 import {persistState} from 'redux-devtools'
 import effects from 'redux-effects'
 import fetch from 'redux-effects-fetch'
-import timeout from 'redux-effects-timeout'
 import createLogger from 'redux-logger'
 import multi from 'redux-multi'
+import promises from 'redux-promise'
 
 import DevTools from '../components/dev-tools'
 import rootReducer from '../reducers'
 
 const finalCreateStore = compose(
-  applyMiddleware(timeout(), multi, effects, fetch),
-  batchedSubscribe(batchedUpdates),
+  applyMiddleware(multi, effects, fetch, promises),
   persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)),
   applyMiddleware(createLogger()),
-  DevTools.instrument()
+  DevTools.instrument(),
+  batchedSubscribe(batchedUpdates)
 )(createStore)
 
 export default function configureStore (initialState) {

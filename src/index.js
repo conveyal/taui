@@ -10,9 +10,10 @@ import Site from './containers/indianapolis'
 import configureStore from './store'
 
 const {config} = window.taui
-config.browsochrones = initializeBrowsochrones(store, config.browsochrones)
 const fakeStore = configureStore()
 const store = configureStore(deepAssign(fakeStore.getState(), config))
+
+config.browsochrones = initializeBrowsochrones(store, config.browsochrones)
 
 render(
   <Root store={store}><Site browsochrones={config.browsochrones} /></Root>,

@@ -1,6 +1,8 @@
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
 
+import {addActionLogItem, setBrowsochrones} from './actions'
+
 export function initialize (store, config) {
   const bs = new Browsochrones()
   bs.originsUrl = config.originsUrl
@@ -23,10 +25,9 @@ export function initialize (store, config) {
       .then(res => res.json())
       .then(tn => bs.setTransitiveNetwork(tn))
   ]).then(() => {
-    console.log('bs loaded')
+    store.dispatch(setBrowsochrones(bs))
+    store.dispatch(addActionLogItem('Application is ready!'))
   }).catch(err => {
     console.error(err)
   })
-
-  return bs
 }
