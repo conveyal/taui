@@ -8,6 +8,7 @@ import {fetch} from 'redux-effects-fetch'
 
 const IDENTITY = i => i
 const META = metadata => data => metadata
+const RAF = META({raf: true})
 
 export const addActionLogItem = createAction('add action log item', (item) => {
   const payload = typeof item === 'string'
@@ -23,16 +24,16 @@ export const addActionLogItem = createAction('add action log item', (item) => {
 export const clearDestination = createAction('clear destination')
 
 export const setBrowsochrones = createAction('set browsochrones')
-export const setDestination = createAction('set destination')
-export const setOrigin = createAction('set origin')
+export const setDestination = createAction('set destination', IDENTITY, RAF)
+export const setOrigin = createAction('set origin', IDENTITY, RAF)
 export const setSelectedTimeCutoff = createAction('set selected time cutoff')
-export const setTransitiveNetwork = createAction('set transitive network', IDENTITY, META({raf: true}))
-export const showMapMarker = createAction('show map marker')
+export const setTransitiveNetwork = createAction('set transitive network', IDENTITY, RAF)
+export const showMapMarker = createAction('show map marker', IDENTITY, RAF)
 export const hideMapMarker = createAction('hide map marker')
 
-export const setIsochrone = createAction('set isochrone')
+export const setIsochrone = createAction('set isochrone', IDENTITY, RAF)
 
-export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options))
+export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options), RAF)
 
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
