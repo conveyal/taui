@@ -99,7 +99,6 @@ class Indianapolis extends Component {
       markers.push({
         position: mapMarkers.destination.latlng,
         label: mapMarkers.destination.label || '',
-        onAdd: event => this.moveDestination({latlng: event.target._latlng}),
         onLeafletDragEnd: event => this.moveDestination({latlng: event.target._latlng})
       })
     }
@@ -144,7 +143,7 @@ class Indianapolis extends Component {
               <RouteCard
                 styles={styles}
                 transitiveData={map.transitive}
-                travelTime={0}
+                travelTime={map.travelTime}
                 />
             }
           </div>

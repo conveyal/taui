@@ -6,6 +6,9 @@ import {createAction} from 'redux-actions'
 import {bind} from 'redux-effects'
 import {fetch} from 'redux-effects-fetch'
 
+const IDENTITY = i => i
+const META = metadata => data => metadata
+
 export const addActionLogItem = createAction('add action log item', (item) => {
   const payload = typeof item === 'string'
     ? { text: item }
@@ -23,7 +26,7 @@ export const setBrowsochrones = createAction('set browsochrones')
 export const setDestination = createAction('set destination')
 export const setOrigin = createAction('set origin')
 export const setSelectedTimeCutoff = createAction('set selected time cutoff')
-export const setTransitiveNetwork = createAction('set transitive network')
+export const setTransitiveNetwork = createAction('set transitive network', IDENTITY, META({raf: true}))
 export const showMapMarker = createAction('show map marker')
 export const hideMapMarker = createAction('hide map marker')
 
@@ -67,7 +70,10 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
         browsochrones.setOrigin(value, point)
         browsochrones.generateSurface()
 
-        return generateIsochrone({browsochrones, latlng, timeCutoff})
+        return [
+          generateIsochrone({browsochrones, latlng, timeCutoff})
+          // calculateAccessibility(browsochrones)
+        ]
       },
       ({err}) => console.error(err)
     ))

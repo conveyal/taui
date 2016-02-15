@@ -9,10 +9,11 @@ import multi from 'redux-multi'
 import promises from 'redux-promise'
 
 import DevTools from '../components/dev-tools'
+import rafScheduler from '../utils/raf-scheduler'
 import rootReducer from '../reducers'
 
 const finalCreateStore = compose(
-  applyMiddleware(multi, effects, fetch, promises),
+  applyMiddleware(multi, effects, fetch, promises, rafScheduler),
   persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)),
   applyMiddleware(createLogger()),
   DevTools.instrument(),
