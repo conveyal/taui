@@ -1,3 +1,4 @@
+import dbg from 'debug'
 import lonlng from 'lonlng'
 import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
@@ -10,6 +11,8 @@ import Log from '../../components/log'
 import Map from './map'
 import RouteCard from '../../components/route-card'
 import styles from './style.css'
+
+const debug = dbg('taui:indianapolis')
 
 class Indianapolis extends Component {
   static propTypes = {
@@ -114,7 +117,7 @@ class Indianapolis extends Component {
     const {geocoder, map} = this.props
 
     const now = new Date()
-    console.log(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
+    debug(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
     this.lastRender = now
 
     return (

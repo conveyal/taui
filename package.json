@@ -57,7 +57,6 @@
     "webpack-hot-middleware": "^2.6.0"
   },
   "dependencies": {
-    "analyst.js": "^0.1.2",
     "browsochrones": "*",
     "color": "^0.11.1",
     "concat-stream": "^1.5.1",

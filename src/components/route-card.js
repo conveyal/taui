@@ -38,35 +38,57 @@ const RouteCard = ({styles, transitiveData, travelTime}) => {
   )
 }
 
-function extractRelevantTransitiveInfo (transitive) {
-  return transitive.journeys.map(j => {
-    return j.segments.filter(s => !!s.pattern_id).map(s => {
-      const seg = {
-        type: s.type.toLowerCase()
+function journeyKey (j) {
+  return j.segments
+    .filter(s => !!s.pattern_id)
+    .map(s => s.pattern_id)
+    .sort()
+    .concat('-')
+}
+
+function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
+  const uniq = []
+
+  return journeys
+    .filter(j => {
+      const key = journeyKey(j)
+      if (uniq.find(key)) {
+        return false
+      }else {
+        uniq.push(key)
+        return true
       }
-      seg.color = '#333'
-
-      if (s.from_stop_index) seg.from = transitive.stops[s.from_stop_index].stop_name
-      if (s.to_stop_index) seg.to = transitive.stops[s.to_stop_index].stop_name
-
-      if (s.from) {
-        if (s.from.stop_id) seg.from = transitive.stops[parseInt(s.from.stop_id, 10)].stop_name
-        else seg.start = true
-      }
-      if (s.to) {
-        if (s.to.stop_id) seg.to = transitive.stops[parseInt(s.to.stop_id, 10)].stop_name
-        else seg.end = true
-      }
-
-      const route = transitive.routes[parseInt(transitive.patterns[parseInt(s.pattern_id, 10)].route_id, 10)]
-      const color = Color(`#${route.route_color}`)
-      seg.name = route.route_long_name
-      seg.backgroundColor = color.rgbaString()
-      seg.color = color.light() ? '#000' : '#fff'
-
-      return seg
     })
-  })
+    .map(j => {
+      return j.segments
+        .filter(s => !!s.pattern_id)
+        .map(s => {
+          const seg = {
+            type: s.type.toLowerCase()
+          }
+          seg.color = '#333'
+
+          if (s.from_stop_index) seg.from = stops[s.from_stop_index].stop_name
+          if (s.to_stop_index) seg.to = stops[s.to_stop_index].stop_name
+
+          if (s.from) {
+            if (s.from.stop_id) seg.from = stops[parseInt(s.from.stop_id, 10)].stop_name
+            else seg.start = true
+          }
+          if (s.to) {
+            if (s.to.stop_id) seg.to = stops[parseInt(s.to.stop_id, 10)].stop_name
+            else seg.end = true
+          }
+
+          const route = routes[parseInt(patterns[parseInt(s.pattern_id, 10)].route_id, 10)]
+          const color = Color(`#${route.route_color}`)
+          seg.name = route.route_long_name
+          seg.backgroundColor = color.rgbaString()
+          seg.color = color.light() ? '#000' : '#fff'
+
+          return seg
+        })
+    })
 }
 
 export default RouteCard
