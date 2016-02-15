@@ -28,6 +28,6 @@ export function initialize (store, config) {
     store.dispatch(setBrowsochrones(bs))
     store.dispatch(addActionLogItem('Application is ready!'))
   }).catch(err => {
-    console.error(err)
+    store.dispatch(addActionLogItem(err.message))
   })
 }

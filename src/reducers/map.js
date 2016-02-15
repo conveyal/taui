@@ -1,3 +1,4 @@
+import lonlng from 'lonlng'
 import {handleActions} from 'redux-actions'
 
 export default handleActions({
@@ -12,10 +13,11 @@ export default handleActions({
   'set origin' (state) {
     return Object.assign({}, state, {transitive: null})
   },
-  'set transitive network' (state, action) {
-    return Object.assign({}, state, {
-      transitive: action.payload
-    })
+  'set transitive network' (state, {payload}) {
+    const {browsochrones, point, latlng} = payload
+    const transitive = browsochrones.generateTransitiveData(point)
+    transitive.key = `${lonlng.toString(latlng)}`
+    return Object.assign({}, state, {transitive})
   },
   'clear destination' (state, action) {
     return Object.assign({}, state, {transitive: null})

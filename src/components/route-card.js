@@ -38,27 +38,9 @@ const RouteCard = ({styles, transitiveData, travelTime}) => {
   )
 }
 
-function journeyKey (j) {
-  return j.segments
-    .filter(s => !!s.pattern_id)
-    .map(s => s.pattern_id)
-    .sort()
-    .concat('-')
-}
-
+// TODO: filter journeys that have same pattern id sequences
 function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
-  const uniq = []
-
   return journeys
-    .filter(j => {
-      const key = journeyKey(j)
-      if (uniq.find(key)) {
-        return false
-      }else {
-        uniq.push(key)
-        return true
-      }
-    })
     .map(j => {
       return j.segments
         .filter(s => !!s.pattern_id)

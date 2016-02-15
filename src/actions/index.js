@@ -120,9 +120,7 @@ export function updateDestination ({apiKey, browsochrones, latlng, label, zoom})
   }
 
   if (browsochrones.surface) {
-    const transitiveData = browsochrones.generateTransitiveData(point)
-    transitiveData.key = `${lonlng.toString(latlng)}`
-    actions.push(setTransitiveNetwork(transitiveData))
+    actions.push(setTransitiveNetwork({browsochrones, point, latlng}))
   }
 
   return actions
