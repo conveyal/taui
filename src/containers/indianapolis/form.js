@@ -5,6 +5,8 @@ import Geocoder from 'react-select-geocoder'
 import TimeCutoffSelect from '../../components/timecutoff-select'
 
 const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
+  const accessibilityKeys = Object.keys(accessibility)
+
   return (
     <form>
       <fieldset className='form-group'>
@@ -32,13 +34,15 @@ const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoff
           onChange={onTimeCutoffChange}
           />
       </fieldset>
-      <fieldset className='form-group'>
-        <label>Access to:
-          {Object.keys(accessibility).map(k => {
-            return <span><br /><strong>{(accessibility[k] | 0).toLocaleString()} {k.toLowerCase()}</strong></span>
-          })}
-        </label>
-      </fieldset>
+      {accessibilityKeys.length > 0 &&
+        <fieldset className='form-group'>
+          <label>Access to:
+            {Object.keys(accessibility).map(k => {
+              return <span><br /><strong>{(accessibility[k] | 0).toLocaleString()} {k.toLowerCase()}</strong></span>
+            })}
+          </label>
+        </fieldset>
+      }
     </form>
   )
 }
