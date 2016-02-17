@@ -21,6 +21,7 @@ export const addActionLogItem = createAction('add action log item', (item) => {
   }, payload)
 })
 
+export const calculateAccessibility = createAction('calculate accessibility')
 export const clearDestination = createAction('clear destination')
 
 export const setBrowsochrones = createAction('set browsochrones')
@@ -60,7 +61,10 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
   } else {
     actions.push(bind(
       reverseGeocode({apiKey, latlng, options: {format: true}}),
-      ({payload}) => setOrigin({label: payload[0].address, latlng, point})
+      ({payload}) => {
+        if (!payload) return
+        return setOrigin({label: payload[0].address, latlng, point})
+      }
     ))
   }
 
@@ -72,8 +76,8 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
         browsochrones.generateSurface()
 
         return [
-          generateIsochrone({browsochrones, latlng, timeCutoff})
-          // calculateAccessibility(browsochrones)
+          generateIsochrone({browsochrones, latlng, timeCutoff}),
+          calculateAccessibility({browsochrones})
         ]
       },
       ({err}) => console.error(err)

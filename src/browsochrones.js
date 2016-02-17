@@ -17,10 +17,10 @@ export function initialize (store, config) {
       .then(st => bs.setStopTrees(st)),
     fetch(`${config.gridsUrl}/Jobs_total.grid`)
       .then(res => res.arrayBuffer())
-      .then(grid => { bs.grids.Jobs_total = grid }),
+      .then(grid => { bs.grids.Jobs = new Browsochrones.Grid(grid) }),
     fetch(`${config.gridsUrl}/Workers_total.grid`)
       .then(res => res.arrayBuffer())
-      .then(grid => { bs.grids.Workers_total = grid }),
+      .then(grid => { bs.grids.Workers = new Browsochrones.Grid(grid) }),
     fetch(config.transitiveNetworkUrl)
       .then(res => res.json())
       .then(tn => bs.setTransitiveNetwork(tn))

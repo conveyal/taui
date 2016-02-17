@@ -1,7 +1,7 @@
 import React from 'react'
 import Geocoder from 'react-select-geocoder'
 
-import DestinationsSelect from '../../components/destinations-select'
+// import DestinationsSelect from '../../components/destinations-select'
 import TimeCutoffSelect from '../../components/timecutoff-select'
 
 const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
@@ -26,17 +26,18 @@ const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoff
           />
       </fieldset>
       <fieldset className='form-group'>
-        <label>Access to <strong>{(accessibility | 0).toLocaleString()}</strong></label>
-        <DestinationsSelect
-          className='form-control'
-          />
-      </fieldset>
-      <fieldset className='form-group'>
         <label>Isoline Time Cutoff</label>
         <TimeCutoffSelect
           className='form-control'
           onChange={onTimeCutoffChange}
           />
+      </fieldset>
+      <fieldset className='form-group'>
+        <label>Access to:
+          {Object.keys(accessibility).map(k => {
+            return <span><br /><strong>{(accessibility[k] | 0).toLocaleString()} {k.toLowerCase()}</strong></span>
+          })}
+        </label>
       </fieldset>
     </form>
   )

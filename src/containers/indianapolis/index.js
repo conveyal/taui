@@ -19,6 +19,7 @@ class Indianapolis extends Component {
     actionLog: PropTypes.arrayOf(PropTypes.object),
     browsochrones: PropTypes.object.isRequired,
     clearDestination: PropTypes.func.isRequired,
+    destinations: PropTypes.func.object,
     geocoder: PropTypes.object,
     mapMarkers: PropTypes.object,
     map: PropTypes.object,
@@ -113,7 +114,7 @@ class Indianapolis extends Component {
   lastRender = new Date();
 
   render () {
-    const {geocoder, map} = this.props
+    const {destinations, geocoder, map} = this.props
 
     const now = new Date()
     debug(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
@@ -133,7 +134,7 @@ class Indianapolis extends Component {
           >
           <div className={styles.dockContent}>
             <Form
-              accessibility={0}
+              accessibility={destinations.accessibility}
               geocoder={geocoder}
               onTimeCutoffChange={event => this.onTimeCutoffChange(parseInt(event.target.value, 10))}
               onChangeEnd={input => this.changeEndAddress(input)}
