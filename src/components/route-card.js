@@ -10,9 +10,9 @@ const RouteCard = ({styles, transitiveData, travelTime}) => {
 
   return (
     <div className={styles.RouteCard}>
-      <div className={styles.RouteCardTitle}>Current Options — {travelTime} minute trip</div>
+      <div className={styles.RouteCardTitle}><strong>{travelTime}</strong> minute trip</div>
       <div className={styles.RouteCardContent}>
-        {journeys.map((segments, jindex) => {
+        {journeys.slice(0, 5).map((segments, jindex) => {
           return (
             <div key={`journey-${jindex}`}>
               <span className={styles.RouteCardSegmentIndex}>{jindex + 1}</span>
