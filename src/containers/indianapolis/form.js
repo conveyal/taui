@@ -1,7 +1,6 @@
 import React from 'react'
 import Geocoder from 'react-select-geocoder'
 
-// import DestinationsSelect from '../../components/destinations-select'
 import TimeCutoffSelect from '../../components/timecutoff-select'
 
 const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {

@@ -34,7 +34,7 @@ export const hideMapMarker = createAction('hide map marker')
 
 export const setIsochrone = createAction('set isochrone', IDENTITY, RAF)
 
-export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options), RAF)
+export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options))
 
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
