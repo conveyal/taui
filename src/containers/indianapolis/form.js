@@ -38,7 +38,7 @@ const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoff
         <fieldset className='form-group'>
           <label>Access to:
             {Object.keys(accessibility).map(k => {
-              return <span><br /><strong>{(accessibility[k] | 0).toLocaleString()} {k.toLowerCase()}</strong></span>
+              return <span key={k}><br /><strong>{(accessibility[k] | 0).toLocaleString()} {k.toLowerCase()}</strong></span>
             })}
           </label>
         </fieldset>
