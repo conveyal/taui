@@ -19,7 +19,7 @@ class Indianapolis extends Component {
     actionLog: PropTypes.arrayOf(PropTypes.object),
     browsochrones: PropTypes.object.isRequired,
     clearDestination: PropTypes.func.isRequired,
-    destinations: PropTypes.func.object,
+    destinations: PropTypes.object,
     geocoder: PropTypes.object,
     mapMarkers: PropTypes.object,
     map: PropTypes.object,

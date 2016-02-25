@@ -13,10 +13,10 @@ const {config} = window.taui
 const fakeStore = configureStore()
 const store = configureStore(deepAssign(fakeStore.getState(), config))
 
-config.browsochrones = initializeBrowsochrones(store, config.browsochrones)
+initializeBrowsochrones(store, config.browsochrones)
 
 render(
-  <Root store={store}><Site browsochrones={config.browsochrones} /></Root>,
+  <Root store={store}><Site /></Root>,
   document.getElementById('root')
 )
 
