@@ -2,9 +2,10 @@ import React, {PropTypes} from 'react'
 import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer} from 'react-leaflet'
 import PureComponent from 'react-pure-render/component'
 
-import styles from './style.css'
 import TransitiveLayer from '../../components/transitive-layer'
 import transitiveStyle from './transitive-style'
+
+import './style.css'
 
 export default class Map extends PureComponent {
   static propTypes = {
@@ -24,7 +25,7 @@ export default class Map extends PureComponent {
     return (
       <LeafletMap
         center={centerCoordinates}
-        className={styles.map}
+        className='Taui-Map'
         ref='map'
         zoom={zoom}
         onLeafletZoom={onZoom}

@@ -1,25 +1,25 @@
 import Color from 'color'
 import React from 'react'
 
-const RouteCard = ({styles, transitiveData, travelTime}) => {
+const RouteCard = ({transitiveData, travelTime}) => {
   const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
-    return <div className={styles.RouteCard}><div className={styles.RouteCardContent}>No travel options found</div></div>
+    return <div className='RouteCard'><div className='RouteCardContent'>No travel options found</div></div>
   }
 
   return (
-    <div className={styles.RouteCard}>
-      <div className={styles.RouteCardTitle}><strong>{travelTime}</strong> minute trip</div>
-      <div className={styles.RouteCardContent}>
+    <div className='RouteCard'>
+      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip</div>
+      <div className='RouteCardContent'>
         {journeys.slice(0, 5).map((segments, jindex) => {
           return (
             <div key={`journey-${jindex}`}>
-              <span className={styles.RouteCardSegmentIndex}>{jindex + 1}</span>
+              <span className='RouteCardSegmentIndex'>{jindex + 1}</span>
               {segments.map((s, sindex) => {
                 return (
                   <span
-                    className={styles.RouteCardSegment}
+                    className='RouteCardSegment'
                     key={`journey-${jindex}-segment-${sindex}`}
                     style={{
                       backgroundColor: (s.backgroundColor || 'inherit'),

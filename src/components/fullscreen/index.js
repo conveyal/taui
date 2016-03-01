@@ -1,7 +1,7 @@
 import React from 'react'
 
-import style from './style.css'
+import './style.css'
 
-const Fullscreen = props => <div className={style.fullscreen}>{props.children}</div>
+const Fullscreen = props => <div className='Fullscreen'>{props.children}</div>
 
 export default Fullscreen

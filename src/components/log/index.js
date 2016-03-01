@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 
 import LogItem from '../log-item'
-import style from './style.css'
+
+import './style.css'
 
 export default class Log extends Component {
   static propTypes = {
@@ -9,6 +10,6 @@ export default class Log extends Component {
   };
 
   render () {
-    return <div className={style.log}>{this.props.items.map((item, index) => <LogItem {...item} key={index} />)}</div>
+    return <div className='Log'>{this.props.items.map((item, index) => <LogItem {...item} key={index} />)}</div>
   }
 }

@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import moment from 'moment'
 
-import style from './style.css'
+import './style.css'
 
 const format = 'MM-DD HH:mm:ss'
 
@@ -16,9 +16,9 @@ export default class LogItem extends Component {
   render () {
     const {createdAt, text} = this.props
     return (
-      <div className={style.logItem}>
-        <small className={style.createdAt}>{moment(createdAt).format(format)}</small>
-        <span className={style.text}>{text}</span>
+      <div className='LogItem'>
+        <small className='LogItem-createdAt'>{moment(createdAt).format(format)}</small>
+        <span className='LogItem-text'>{text}</span>
       </div>
     )
   }

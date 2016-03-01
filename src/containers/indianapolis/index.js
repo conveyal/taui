@@ -10,7 +10,8 @@ import Fullscreen from '../../components/fullscreen'
 import Log from '../../components/log'
 import Map from './map'
 import RouteCard from '../../components/route-card'
-import styles from './style.css'
+
+import './style.css'
 
 const debug = dbg('taui:indianapolis')
 
@@ -132,7 +133,7 @@ class Indianapolis extends Component {
             backgroundColor: '#6492d9'
           }}
           >
-          <div className={styles.dockContent}>
+          <div className='Taui-Dock-content'>
             <Form
               accessibility={destinations.accessibility}
               geocoder={geocoder}
@@ -142,13 +143,12 @@ class Indianapolis extends Component {
               />
             {map.transitive &&
               <RouteCard
-                styles={styles}
                 transitiveData={map.transitive}
                 travelTime={map.travelTime}
                 />
             }
           </div>
-          <div className={styles.dockedActionLog}>
+          <div className='Taui-ActionLog'>
             <Log
               items={this.props.actionLog}
               />
