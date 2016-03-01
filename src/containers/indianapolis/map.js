@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react'
 import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer} from 'react-leaflet'
 import PureComponent from 'react-pure-render/component'
 
-import TransitiveLayer from '../../components/transitive-layer'
+import TransitiveLayer from '../../components/transitive-map-layer'
 import transitiveStyle from './transitive-style'
 
 import './style.css'
