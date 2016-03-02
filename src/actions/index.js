@@ -24,7 +24,8 @@ export const addActionLogItem = createAction('add action log item', (item) => {
 export const calculateAccessibility = createAction('calculate accessibility')
 export const clearDestination = createAction('clear destination')
 
-export const setBrowsochrones = createAction('set browsochrones')
+export const setBrowsochronesBase = createAction('set browsochrones base')
+export const setBrowsochronesComparison = createAction('set browsochrones comparison')
 export const setDestination = createAction('set destination', IDENTITY, RAF)
 export const setOrigin = createAction('set origin', IDENTITY, RAF)
 export const setSelectedTimeCutoff = createAction('set selected time cutoff')
