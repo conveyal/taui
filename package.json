@@ -4,7 +4,8 @@
   "description": "Transport Analyst UI",
   "main": "src/index.js",
   "scripts": {
-    "start": "budo . -- -g browserify-css -p browserify-hmr",
+    "develop": "budo . -- -g browserify-css -p browserify-hmr",
+    "start": "budo . -- -g browserify-css",
     "test": "standard"
   },
   "browserify": {

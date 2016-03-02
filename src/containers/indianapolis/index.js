@@ -36,7 +36,7 @@ class Indianapolis extends Component {
   moveOrigin ({latlng, label}) {
     this.props.moveOrigin({
       apiKey: this.props.geocoder.apiKey,
-      browsochrones: this.props.browsochrones.base,
+      browsochrones: this.props.browsochrones,
       label,
       latlng: lonlng(latlng),
       timeCutoff: this.props.timeCutoff.selected,
@@ -57,7 +57,7 @@ class Indianapolis extends Component {
   moveDestination ({latlng, label}) {
     this.props.moveDestination({
       apiKey: this.props.geocoder.apiKey,
-      browsochrones: this.props.browsochrones.base,
+      browsochrones: this.props.browsochrones,
       label,
       latlng: lonlng(latlng),
       zoom: this.props.map.zoom
@@ -79,7 +79,7 @@ class Indianapolis extends Component {
 
   onTimeCutoffChange (timeCutoff) {
     this.props.onTimeCutoffChange({
-      browsochrones: this.props.browsochrones.base,
+      browsochrones: this.props.browsochrones,
       latlng: this.props.mapMarkers.origin.latlng,
       timeCutoff
     })
@@ -143,6 +143,7 @@ class Indianapolis extends Component {
               />
             {map.transitive &&
               <RouteCard
+                oldTravelTime={map.oldTravelTime}
                 transitiveData={map.transitive}
                 travelTime={map.travelTime}
                 />

@@ -1,3 +1,4 @@
+import ifetch from 'isomorphic-fetch'
 import {reverse} from 'isomorphic-mapzen-search'
 import Leaflet from 'leaflet'
 import lonlng from 'lonlng'
@@ -55,7 +56,7 @@ export const updateSelectedTransitScenario = createAction('update selected trans
  */
 export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff, zoom}) {
   const actions = [clearDestination()]
-  const point = browsochrones.pixelToOriginCoordinates(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
 
   if (label) {
     actions.push(setOrigin({label, latlng, point}))
@@ -69,25 +70,57 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
     ))
   }
 
-  if (browsochrones.coordinatesInQueryBounds(point)) {
+  if (browsochrones.base.pointInQueryBounds(point)) {
     actions.push(bind(
-      fetch(`${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`),
-      ({value}) => {
-        browsochrones.setOrigin(value, point)
-        browsochrones.generateSurface()
-
+      generateSurfaces(browsochrones, point),
+      () => {
         return [
-          generateIsochrone({browsochrones, latlng, timeCutoff}),
+          generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}),
           calculateAccessibility({browsochrones})
         ]
       },
       ({err}) => console.error(err)
     ))
   } else {
-    console.log('coordinates out of bounds') // TODO: Handle
+    console.log('point out of bounds') // TODO: Handle
   }
 
   return actions
+}
+
+const generateSurfaces = createAction('generate surfaces', (browsochrones, point) => {
+  return Promise.all([generateSurface(browsochrones.base, point), generateSurface(browsochrones.comparison, point)])
+})
+
+async function generateSurface (browsochrones, point) {
+  try {
+    const response = await ifetch(`${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`)
+    const value = await response.arrayBuffer()
+
+    await browsochrones.setOrigin(value, point)
+    await browsochrones.generateSurface()
+
+    /** TODO: Calculate Accessibility here
+    const accessibility = {
+      base: {},
+      comparison: {}
+    }
+
+    Object.keys(base.grids).forEach(g => {
+      accessibility.base[g] = base.getAccessibilityForGrid(base.grids[g].slice(0))
+    })
+
+    if (comparison && comparison.isLoaded()) {
+      Object.keys(comparison.grids).forEach(g => {
+        accessibility.comparison[g] = comparison.getAccessibilityForGrid(comparison.grids[g].slice(0))
+      })
+    } */
+
+  } catch (e) {
+    console.error(e)
+  }
+
+  return browsochrones
 }
 
 export function generateIsochrone ({browsochrones, latlng, timeCutoff}) {
@@ -97,13 +130,17 @@ export function generateIsochrone ({browsochrones, latlng, timeCutoff}) {
   return setIsochrone(isochrone)
 }
 
+const generateDestinationData = createAction('generate destination data', (browsochrones, point) => {
+  return Promise.all([browsochrones.base.generateDestinationData(point), browsochrones.comparison.generateDestinationData(point)])
+})
+
 export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
   const actions = [
     setSelectedTimeCutoff(timeCutoff)
   ]
 
-  if (browsochrones.surface) {
-    actions.push(generateIsochrone({browsochrones, latlng, timeCutoff}))
+  if (browsochrones.base.surface) {
+    actions.push(generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}))
   }
 
   return actions
@@ -118,7 +155,7 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
  */
 export function updateDestination ({apiKey, browsochrones, latlng, label, zoom}) {
   const actions = []
-  const point = browsochrones.pixelToOriginCoordinates(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
 
   if (label) {
     actions.push(setDestination({label, latlng, point}))
@@ -131,8 +168,11 @@ export function updateDestination ({apiKey, browsochrones, latlng, label, zoom})
     )
   }
 
-  if (browsochrones.surface) {
-    actions.push(setTransitiveNetwork({browsochrones, point, latlng}))
+  if (browsochrones.base.isLoaded()) {
+    actions.push(bind(
+      generateDestinationData(browsochrones, point),
+      ({payload}) => setTransitiveNetwork({data: payload, latlng})
+    ))
   }
 
   return actions

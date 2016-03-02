@@ -11,7 +11,6 @@ export function initialize (store, config) {
 
       if (bs2) {
         store.dispatch(setBrowsochronesComparison(bs2))
-        console.log('comparison is set')
       }
 
       store.dispatch(addActionLogItem('Application is ready!'))
@@ -46,7 +45,7 @@ function fetchGrids (url, grids) {
     return fetch(`${url}/${name}.grid`)
       .then(res => res.arrayBuffer())
       .then(grid => {
-        gridMap[name] = new Browsochrones.Grid(grid)
+        gridMap[name] = grid
       })
   })).then(() => gridMap)
 }

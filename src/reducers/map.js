@@ -14,12 +14,17 @@ export default handleActions({
     return Object.assign({}, state, {transitive: null})
   },
   'set transitive network' (state, action) {
-    const {browsochrones, point, latlng} = action.payload
-    const transitive = browsochrones.generateTransitiveData(point)
-    transitive.key = `${lonlng.toString(latlng)}`
-    const travelTime = browsochrones.surface.surface[point.y * browsochrones.query.width + point.x]
+    const {data, latlng} = action.payload
+    const base = data[0]
+    const comparison = data[1]
 
-    return Object.assign({}, state, {transitive, travelTime})
+    base.transitive.key = `${lonlng.toString(latlng)}`
+
+    return Object.assign({}, state, {
+      transitive: base.transitive,
+      travelTime: base.travelTime,
+      oldTravelTime: comparison.travelTime
+    })
   },
   'clear destination' (state, action) {
     return Object.assign({}, state, {transitive: null})
@@ -29,5 +34,6 @@ export default handleActions({
   map: null,
   transitive: null,
   travelTime: 0,
+  oldTravelTime: 0,
   zoom: 11
 })
