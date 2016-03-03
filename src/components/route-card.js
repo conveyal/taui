@@ -1,16 +1,21 @@
 import Color from 'color'
 import React from 'react'
 
-const RouteCard = ({transitiveData, travelTime}) => {
+const RouteCard = ({transitiveData, travelTime, oldTravelTime}) => {
   const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
     return <div className='RouteCard'><div className='RouteCardContent'>No travel options found</div></div>
   }
 
+  let percentFaster = parseInt(travelTime / oldTravelTime, 10) * 100
+  if (oldTravelTime === 255) {
+    percentFaster = 100
+  }
+
   return (
     <div className='RouteCard'>
-      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip</div>
+      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip ({percentFaster}% faster)</div>
       <div className='RouteCardContent'>
         {journeys.slice(0, 5).map((segments, jindex) => {
           return (

@@ -22,7 +22,7 @@ export const addActionLogItem = createAction('add action log item', (item) => {
   }, payload)
 })
 
-export const calculateAccessibility = createAction('calculate accessibility')
+export const setAccessibility = createAction('set accessibility')
 export const clearDestination = createAction('clear destination')
 
 export const setBrowsochronesBase = createAction('set browsochrones base')
@@ -73,10 +73,13 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
   if (browsochrones.base.pointInQueryBounds(point)) {
     actions.push(bind(
       generateSurfaces(browsochrones, point),
-      () => {
+      ({payload}) => {
         return [
           generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}),
-          calculateAccessibility({browsochrones})
+          setAccessibility({
+            base: payload[0],
+            comparison: payload[1]
+          })
         ]
       },
       ({err}) => console.error(err)
@@ -100,27 +103,16 @@ async function generateSurface (browsochrones, point) {
     await browsochrones.setOrigin(value, point)
     await browsochrones.generateSurface()
 
-    /** TODO: Calculate Accessibility here
-    const accessibility = {
-      base: {},
-      comparison: {}
-    }
+    const accessibility = {}
 
-    Object.keys(base.grids).forEach(g => {
-      accessibility.base[g] = base.getAccessibilityForGrid(base.grids[g].slice(0))
+    await Object.keys(browsochrones.grids).map(async (g) => {
+      accessibility[g] = await browsochrones.getAccessibilityForGrid(browsochrones.grids[g].slice(0))
     })
 
-    if (comparison && comparison.isLoaded()) {
-      Object.keys(comparison.grids).forEach(g => {
-        accessibility.comparison[g] = comparison.getAccessibilityForGrid(comparison.grids[g].slice(0))
-      })
-    } */
-
+    return accessibility
   } catch (e) {
     console.error(e)
   }
-
-  return browsochrones
 }
 
 export function generateIsochrone ({browsochrones, latlng, timeCutoff}) {

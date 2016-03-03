@@ -1,13 +1,8 @@
 import {handleActions} from 'redux-actions'
 
 export default handleActions({
-  'calculate accessibility' (state, action) {
-    const accessibility = {
-      base: {},
-      comparison: {}
-    }
-
-    return Object.assign({}, state, {accessibility})
+  'set accessibility' (state, action) {
+    return Object.assign({}, state, {accessibility: action.payload})
   },
   'update selected destination' (state, action) {
     return Object.assign({}, state, {selected: action.payload})
