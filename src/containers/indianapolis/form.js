@@ -64,7 +64,7 @@ function showDiff (keys, {base, comparison}) {
     <fieldset className='form-group'>
       <label>Access to (% change):
         {keys.map(k => {
-          const diff = parseInt(base[k] / comparison[k] * 100, 10).toLocaleString()
+          const diff = parseInt(base[k] / comparison[k] * 100 - 100, 10).toLocaleString()
           return <span key={k}><br /><strong>{(base[k] | 0).toLocaleString()} ({diff}%) {toCapitalCase(k)}</strong></span>
         })}
       </label>

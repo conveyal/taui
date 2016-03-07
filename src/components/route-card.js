@@ -8,7 +8,7 @@ const RouteCard = ({transitiveData, travelTime, oldTravelTime}) => {
     return <div className='RouteCard'><div className='RouteCardContent'>No travel options found</div></div>
   }
 
-  let percentFaster = parseInt(travelTime / oldTravelTime, 10) * 100
+  let percentFaster = parseInt(travelTime / oldTravelTime, 10) * 100 - 100
   if (oldTravelTime === 255) {
     percentFaster = 100
   }
