@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "build": "NODE_ENV=production browserify src/index.js -t babelify -g browserify-css | uglifyjs -cm > dist/bundle.js",
-    "develop": "budo . -- -g browserify-css -p browserify-hmr",
-    "start": "budo . -- -g browserify-css",
+    "develop": "budo src/index.js:dist/bundle.js -- -g browserify-css -p browserify-hmr",
+    "start": "budo src/index.js:dist/bundle.js -- -g browserify-css",
     "test": "standard"
   },
   "browserify": {

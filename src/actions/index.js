@@ -59,20 +59,20 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
   const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
 
   if (label) {
-    actions.push(setOrigin({label, latlng, point}))
+    actions.push(setOrigin({label, latlng}))
   } else {
     actions.push(bind(
       reverseGeocode({apiKey, latlng, options: {format: true}}),
       ({payload}) => {
         if (!payload) return
-        return setOrigin({label: payload[0].address, latlng, point})
+        return setOrigin({label: payload[0].address, latlng})
       }
     ))
   }
 
   if (browsochrones.base.pointInQueryBounds(point)) {
     actions.push(bind(
-      generateSurfaces(browsochrones, point),
+      generateSurfaces(browsochrones, latlng, zoom),
       ({payload}) => {
         return [
           generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}),
@@ -91,12 +91,13 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
   return actions
 }
 
-const generateSurfaces = createAction('generate surfaces', (browsochrones, point) => {
-  return Promise.all([generateSurface(browsochrones.base, point), generateSurface(browsochrones.comparison, point)])
+const generateSurfaces = createAction('generate surfaces', (browsochrones, latlng, zoom) => {
+  return Promise.all([generateSurface(browsochrones.base, latlng, zoom), generateSurface(browsochrones.comparison, latlng, zoom)])
 })
 
-async function generateSurface (browsochrones, point) {
+async function generateSurface (browsochrones, latlng, zoom) {
   try {
+    const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
     const response = await ifetch(`${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`)
     const value = await response.arrayBuffer()
 
@@ -122,8 +123,11 @@ export function generateIsochrone ({browsochrones, latlng, timeCutoff}) {
   return setIsochrone(isochrone)
 }
 
-const generateDestinationData = createAction('generate destination data', (browsochrones, point) => {
-  return Promise.all([browsochrones.base.generateDestinationData(point), browsochrones.comparison.generateDestinationData(point)])
+const generateDestinationData = createAction('generate destination data', (browsochrones, latlng, zoom) => {
+  return Promise.all([
+    browsochrones.base.generateDestinationData(browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)),
+    browsochrones.comparison.generateDestinationData(browsochrones.comparison.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom))
+  ])
 })
 
 export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
@@ -147,22 +151,21 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
  */
 export function updateDestination ({apiKey, browsochrones, latlng, label, zoom}) {
   const actions = []
-  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
 
   if (label) {
-    actions.push(setDestination({label, latlng, point}))
+    actions.push(setDestination({label, latlng}))
   } else {
     actions.push(
       bind(
         reverseGeocode({apiKey, latlng, options: {format: true}}),
-        ({payload}) => setDestination({label: payload[0].address, latlng, point})
+        ({payload}) => setDestination({label: payload[0].address, latlng})
       )
     )
   }
 
   if (browsochrones.base.isLoaded()) {
     actions.push(bind(
-      generateDestinationData(browsochrones, point),
+      generateDestinationData(browsochrones, latlng, zoom),
       ({payload}) => setTransitiveNetwork({data: payload, latlng})
     ))
   }
