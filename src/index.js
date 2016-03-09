@@ -13,7 +13,7 @@ import configureStore from './store'
 const fakeStore = configureStore()
 const store = configureStore(deepAssign(fakeStore.getState(), config))
 
-initializeBrowsochrones(store, config.browsochrones)
+initializeBrowsochrones(store, config)
 
 render(
   <Root store={store}><Site /></Root>,
