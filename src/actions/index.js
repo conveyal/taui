@@ -56,7 +56,6 @@ export const updateSelectedTransitScenario = createAction('update selected trans
  */
 export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff, zoom}) {
   const actions = [clearDestination()]
-  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
 
   if (label) {
     actions.push(setOrigin({label, latlng}))
@@ -70,6 +69,9 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
     ))
   }
 
+  if (!browsochrones.base) return actions
+
+  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   if (browsochrones.base.pointInQueryBounds(point)) {
     actions.push(bind(
       generateSurfaces(browsochrones, latlng, zoom),
@@ -135,7 +137,7 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
     setSelectedTimeCutoff(timeCutoff)
   ]
 
-  if (browsochrones.base.isLoaded()) {
+  if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}))
   }
 
@@ -163,7 +165,7 @@ export function updateDestination ({apiKey, browsochrones, latlng, label, zoom})
     )
   }
 
-  if (browsochrones.base.isLoaded()) {
+  if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(bind(
       generateDestinationData(browsochrones, latlng, zoom),
       ({payload}) => setTransitiveNetwork({data: payload, latlng})
