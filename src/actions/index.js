@@ -116,8 +116,8 @@ async function generateSurface (browsochrones, latlng, zoom) {
   }
 }
 
-export function generateIsochrone ({browsochrones, latlng, timeCutoff}) {
-  const isochrone = browsochrones.getIsochrone(timeCutoff)
+export async function generateIsochrone ({browsochrones, latlng, timeCutoff}) {
+  const isochrone = await browsochrones.getIsochrone(timeCutoff)
   isochrone.key = `${lonlng.toString(latlng)}-${timeCutoff}`
 
   return setIsochrone(isochrone)
@@ -135,7 +135,7 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
     setSelectedTimeCutoff(timeCutoff)
   ]
 
-  if (browsochrones.base.surface) {
+  if (browsochrones.base.isLoaded()) {
     actions.push(generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}))
   }
 

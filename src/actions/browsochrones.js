@@ -66,7 +66,7 @@ export function updateOrigin ({browsochrones, grid, origin, url}) {
   actions.push(addActionLogItem(`Retrieving isochrones for origin [${origin.x},  ${origin.y}]`))
 
   if (!browsochrones.coordinatesInQueryBounds(origin)) {
-    actions.push(addActionLogItem(`Origin out of bounds`))
+    actions.push(addActionLogItem('Origin out of bounds'))
   } else {
     actions.push(fetchOrigin({
       browsochrones,
