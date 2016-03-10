@@ -42,11 +42,11 @@
 .RouteCard {
   background-color: #fff;
   border-radius: 4px;
+  margin-bottom: 12px;
 }
 
 .RouteCard-alt > .RouteCardTitle {
   background-color: orange;
-  margin-top: 8px;
 }
 
 .RouteCardTitle {

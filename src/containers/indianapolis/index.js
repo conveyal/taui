@@ -148,18 +148,24 @@ class Indianapolis extends Component {
               onChangeStart={input => this.changeStartAddress(input)}
               />
             {map.base && map.base.transitive &&
-              <RouteCard
-                transitiveData={map.base.transitive}
-                travelTime={map.base.travelTime}
-                oldTravelTime={map.comparison.travelTime}
-                />
+              <div>
+                <label>New Route</label>
+                <RouteCard
+                  transitiveData={map.base.transitive}
+                  travelTime={map.base.travelTime}
+                  oldTravelTime={map.comparison.travelTime}
+                  />
+              </div>
             }
             {map.comparison && map.comparison.transitive &&
-              <RouteCard
-                transitiveData={map.comparison.transitive}
-                travelTime={map.comparison.travelTime}
-                alt={true}
-                />
+              <div>
+                <label>Old Route</label>
+                <RouteCard
+                  transitiveData={map.comparison.transitive}
+                  travelTime={map.comparison.travelTime}
+                  alt={true}
+                  />
+              </div>
             }
           </div>
           <div className='Taui-ActionLog'>

@@ -62,7 +62,7 @@ function showAccess (keys, base) {
 function showDiff (keys, {base, comparison}) {
   return (
     <fieldset className='form-group'>
-      <label>Access to (% change):
+      <label>Access to:
         {keys.map(k => {
           let diff = parseInt((base[k] - comparison[k]) / base[k] * 100, 10)
 
