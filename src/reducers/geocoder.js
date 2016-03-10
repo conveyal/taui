@@ -16,6 +16,9 @@ export default handleActions({
         value: `${payload.latlng.lng},${payload.latlng.lat}`
       }
     })
+  },
+  'clear destination' (state) {
+    return Object.assign({}, state, { destination: null })
   }
 }, {
   origin: null,
