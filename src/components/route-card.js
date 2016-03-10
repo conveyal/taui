@@ -8,14 +8,15 @@ const RouteCard = ({transitiveData, travelTime, oldTravelTime}) => {
     return <div className='RouteCard'><div className='RouteCardContent'>No travel options found</div></div>
   }
 
-  let percentFaster = parseInt(travelTime / oldTravelTime, 10) * 100 - 100
-  if (oldTravelTime === 255) {
-    percentFaster = 100
-  }
+  let difference = oldTravelTime - travelTime
+  if (oldTravelTime === 255) difference = 'new trip!'
+  else if (difference > 0) difference = difference + 'minutes faster'
+  else if (difference === 0) difference = 'no change'
+  else difference = difference + 'minutes slower'
 
   return (
     <div className='RouteCard'>
-      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip ({percentFaster}% faster)</div>
+      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip ({difference})</div>
       <div className='RouteCardContent'>
         {journeys.slice(0, 5).map((segments, jindex) => {
           return (

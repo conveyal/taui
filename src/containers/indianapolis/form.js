@@ -64,7 +64,7 @@ function showDiff (keys, {base, comparison}) {
     <fieldset className='form-group'>
       <label>Access to (% change):
         {keys.map(k => {
-          let diff = parseInt(base[k] / comparison[k] * 100 - 100, 10)
+          let diff = parseInt(base[k] - comparison[k] / base[k] * 100, 10)
 
           if (diff > 0) diff = diff.toLocaleString() + '% increase'
           else if (diff === 0) diff = 'no change'
