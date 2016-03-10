@@ -1,24 +1,33 @@
 import Color from 'color'
 import React from 'react'
 
-const RouteCard = ({transitiveData, travelTime, oldTravelTime}) => {
+const RouteCard = ({alt, transitiveData, travelTime, oldTravelTime}) => {
   const journeys = extractRelevantTransitiveInfo(transitiveData)
+  let className = 'RouteCard'
+
+  if (alt) {
+    className += ' RouteCard-alt'
+  }
 
   if (travelTime === 255 || journeys.length === 0) {
     return <div className='RouteCard'><div className='RouteCardContent'>No travel options found</div></div>
   }
 
-  let difference = oldTravelTime - travelTime
-  if (oldTravelTime === 255) difference = 'New trip!'
-  else if (difference > 0) difference = difference + ' minute(s) faster!'
-  else if (difference === 0) difference = 'No change.'
-  else difference = difference + ' minute(s) slower.'
+  let difference = ''
+  if (oldTravelTime) {
+    difference = oldTravelTime - travelTime
+    if (oldTravelTime === 255) difference = 'New trip!'
+    else if (difference > 0) difference = difference + ' minute(s) faster!'
+    else if (difference === 0) difference = 'No change.'
+    else difference = difference + ' minute(s) slower.'
+    difference = ` — ${difference}`
+  }
 
   return (
-    <div className='RouteCard'>
-      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip — {difference}</div>
+    <div className={className}>
+      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip {difference}</div>
       <div className='RouteCardContent'>
-        {journeys.map((segments, jindex) => {
+        {journeys.slice(0, 5).map((segments, jindex) => {
           return (
             <div key={`journey-${jindex}`}>
               <span className='RouteCardSegmentIndex'>{jindex + 1}</span>

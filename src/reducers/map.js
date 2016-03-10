@@ -21,12 +21,13 @@ export default handleActions({
     const base = data[0]
     const comparison = data[1]
 
-    base.transitive.key = `${lonlng.toString(latlng)}`
+    base.transitive.key = `base-${lonlng.toString(latlng)}`
+    comparison.transitive.key = `comparison-${lonlng.toString(latlng)}`
 
     return Object.assign({}, state, {
-      transitive: base.transitive,
-      travelTime: base.travelTime,
-      oldTravelTime: comparison.travelTime
+      base,
+      comparison,
+      transitive: base.transitive
     })
   },
   'clear destination' (state, action) {
@@ -36,7 +37,7 @@ export default handleActions({
   geojson: [],
   map: null,
   transitive: null,
-  travelTime: 0,
-  oldTravelTime: 0,
+  base: null,
+  comparison: null,
   zoom: 11
 })

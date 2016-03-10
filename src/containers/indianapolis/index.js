@@ -147,11 +147,18 @@ class Indianapolis extends Component {
               onChangeEnd={input => this.changeEndAddress(input)}
               onChangeStart={input => this.changeStartAddress(input)}
               />
-            {map.transitive &&
+            {map.base && map.base.transitive &&
               <RouteCard
-                oldTravelTime={map.oldTravelTime}
-                transitiveData={map.transitive}
-                travelTime={map.travelTime}
+                transitiveData={map.base.transitive}
+                travelTime={map.base.travelTime}
+                oldTravelTime={map.comparison.travelTime}
+                />
+            }
+            {map.comparison && map.comparison.transitive &&
+              <RouteCard
+                transitiveData={map.comparison.transitive}
+                travelTime={map.comparison.travelTime}
+                alt={true}
                 />
             }
           </div>
