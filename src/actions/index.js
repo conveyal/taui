@@ -34,6 +34,7 @@ export const setTransitiveNetwork = createAction('set transitive network', IDENT
 export const showMapMarker = createAction('show map marker', IDENTITY, RAF)
 export const hideMapMarker = createAction('hide map marker')
 
+export const clearIsochrone = createAction('clear isochrone', IDENTITY, RAF)
 export const setIsochrone = createAction('set isochrone', IDENTITY, RAF)
 
 export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options))
@@ -54,8 +55,8 @@ export const updateSelectedTransitScenario = createAction('update selected trans
  *      - A new jsonline generated
  *      - Accessibility is calculated for grids
  */
-export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff, zoom}) {
-  const actions = [clearDestination()]
+export function updateOrigin ({apiKey, browsochrones, destinationLatlng, latlng, label, timeCutoff, zoom}) {
+  const actions = [clearIsochrone()]
 
   if (label) {
     actions.push(setOrigin({label, latlng}))
@@ -76,13 +77,22 @@ export function updateOrigin ({apiKey, browsochrones, latlng, label, timeCutoff,
     actions.push(bind(
       generateSurfaces(browsochrones, latlng, zoom),
       ({payload}) => {
-        return [
+        const actions = [
           generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}),
           setAccessibility({
             base: payload[0],
             comparison: payload[1]
           })
         ]
+
+        if (destinationLatlng) {
+          actions.push(bind(
+            generateDestinationData(browsochrones, destinationLatlng, zoom),
+            ({payload}) => setTransitiveNetwork({data: payload, latlng: destinationLatlng})
+          ))
+        }
+
+        return actions
       },
       ({err}) => console.error(err)
     ))

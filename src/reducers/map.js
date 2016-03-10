@@ -5,6 +5,9 @@ export default handleActions({
   'update map' (state, action) {
     return Object.assign({}, state, action.payload)
   },
+  'clear isochrone' (state, action) {
+    return Object.assign({}, state, { geojson: [] })
+  },
   'set isochrone' (state, action) {
     return Object.assign({}, state, {
       geojson: [action.payload]

@@ -34,9 +34,15 @@ class Indianapolis extends Component {
   };
 
   moveOrigin ({latlng, label}) {
+    const {mapMarkers} = this.props
+    const destinationLatlng = mapMarkers.destination && mapMarkers.destination.latlng
+      ? mapMarkers.destination.latlng
+      : null
+
     this.props.moveOrigin({
       apiKey: this.props.geocoder.apiKey,
       browsochrones: this.props.browsochrones,
+      destinationLatlng,
       label,
       latlng: lonlng(latlng),
       timeCutoff: this.props.timeCutoff.selected,

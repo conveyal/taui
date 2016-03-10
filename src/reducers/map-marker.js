@@ -12,10 +12,7 @@ export default handleActions({
     })
   },
   'set origin' (state, {payload}) {
-    return Object.assign({}, state, {
-      destination: null,
-      origin: payload
-    })
+    return Object.assign({}, state, { origin: payload })
   },
   'set destination' (state, {payload}) {
     return Object.assign({}, state, {
