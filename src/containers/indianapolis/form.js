@@ -68,7 +68,7 @@ function showDiff (keys, {base, comparison}) {
 
           if (diff > 0) diff = diff.toLocaleString() + '% increase'
           else if (diff === 0) diff = 'no change'
-          else diff = diff.toLocaleString() + '% decrease'
+          else diff = (diff * -1).toLocaleString() + '% decrease'
 
           return <span key={k}><br /><strong>{(base[k] | 0).toLocaleString()} ({diff}) {toCapitalCase(k)}</strong></span>
         })}

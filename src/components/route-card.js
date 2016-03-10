@@ -10,15 +10,15 @@ const RouteCard = ({transitiveData, travelTime, oldTravelTime}) => {
 
   let difference = oldTravelTime - travelTime
   if (oldTravelTime === 255) difference = 'New trip!'
-  else if (difference > 0) difference = difference + ' minutes faster!'
+  else if (difference > 0) difference = difference + ' minute(s) faster!'
   else if (difference === 0) difference = 'No change.'
-  else difference = difference + ' minutes slower.'
+  else difference = difference + ' minute(s) slower.'
 
   return (
     <div className='RouteCard'>
       <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip — {difference}</div>
       <div className='RouteCardContent'>
-        {journeys.slice(0, 5).map((segments, jindex) => {
+        {journeys.map((segments, jindex) => {
           return (
             <div key={`journey-${jindex}`}>
               <span className='RouteCardSegmentIndex'>{jindex + 1}</span>
