@@ -125,7 +125,7 @@ function showDiff (keys, base, comparison) {
         else diff = (diff * -1).toLocaleString() + '% decrease'
 
         return <div key={k}>
-          <span className='RouteCardSegment'>{(base[k] | 0).toLocaleString()} ({diff}) {toCapitalCase(k)}</span>
+          <span className='RouteCardSegment'>{(base[k] | 0).toLocaleString()} {toCapitalCase(k)} ({diff})</span>
         </div>
       })}
     </div>
