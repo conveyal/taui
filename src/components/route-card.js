@@ -61,7 +61,7 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
         .filter(s => !!s.pattern_id)
         .map(s => {
           const seg = {}
-          const route = routes[parseInt(patterns[parseInt(s.pattern_id, 10)].route_id, 10)]
+          const route = routes.find(r => r.route_id === patterns.find(p => p.pattern_id === s.pattern_id).route_id)
           const color = Color(`#${route.route_color}`)
           seg.name = route.route_long_name
           seg.backgroundColor = color.rgbaString()
