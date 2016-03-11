@@ -1,13 +1,35 @@
 import Color from 'color'
 import React from 'react'
+import toCapitalCase from 'to-capital-case'
 
-const RouteCard = ({alt, transitiveData, travelTime, oldTravelTime}) => {
-  const journeys = extractRelevantTransitiveInfo(transitiveData)
+const RouteCard = ({alt, accessibility, oldAccessibility, children, transitiveData, travelTime, oldTravelTime}) => {
   let className = 'RouteCard'
 
   if (alt) {
     className += ' RouteCard-alt'
   }
+
+  const accessibilityKeys = Object.keys(accessibility)
+  const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
+
+  let access = null
+  if (comparisonAccessibilityKeys.length > 0) {
+    access = showDiff(accessibilityKeys, accessibility, oldAccessibility)
+  } else if (accessibilityKeys.length > 0) {
+    access = showAccess(accessibilityKeys, accessibility)
+  }
+
+  return (
+    <div className={className}>
+      <div className='RouteCardTitle'>{children}</div>
+      <div className='RouteCardContent'>{access}</div>
+      {travelTime && transitiveData && renderJourneys({ oldTravelTime, travelTime, transitiveData })}
+    </div>
+  )
+}
+
+function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
+  const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
     return <div className='RouteCard'><div className='RouteCardContent'>No travel options found</div></div>
@@ -24,13 +46,13 @@ const RouteCard = ({alt, transitiveData, travelTime, oldTravelTime}) => {
   }
 
   return (
-    <div className={className}>
+    <div>
       <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip {difference}</div>
       <div className='RouteCardContent'>
         {journeys.map((segments, jindex) => {
           return (
             <div key={`journey-${jindex}`}>
-              <span className='RouteCardSegmentIndex'>{jindex + 1}</span>
+              <span className='RouteCardIndex'>{jindex + 1}</span>
               {segments.map((s, sindex) => {
                 return (
                   <span
@@ -63,7 +85,7 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
           const seg = {}
           const route = routes.find(r => r.route_id === patterns.find(p => p.pattern_id === s.pattern_id).route_id)
           const color = Color(`#${route.route_color}`)
-          seg.name = route.route_long_name
+          seg.name = route.route_short_name
           seg.backgroundColor = color.rgbaString()
           seg.color = color.light() ? '#000' : '#fff'
           seg.type = typeToIcon[route.route_type]
@@ -78,6 +100,36 @@ const typeToIcon = {
   1: 'subway',
   2: 'train',
   3: 'bus'
+}
+
+function showAccess (keys, base) {
+  return (
+    <div className='RouteCardAccess'>
+      {keys.map((k, i) => {
+        return <div key={k}>
+          <span className='RouteCardSegment'>{(base[k] | 0).toLocaleString()} {toCapitalCase(k)}</span>
+        </div>
+      })}
+    </div>
+  )
+}
+
+function showDiff (keys, base, comparison) {
+  return (
+    <div className='RouteCardAccess'>
+      {keys.map((k, i) => {
+        let diff = parseInt((base[k] - comparison[k]) / base[k] * 100, 10)
+
+        if (diff > 0) diff = diff.toLocaleString() + '% increase'
+        else if (diff === 0) diff = 'no change'
+        else diff = (diff * -1).toLocaleString() + '% decrease'
+
+        return <div key={k}>
+          <span className='RouteCardSegment'>{(base[k] | 0).toLocaleString()} ({diff}) {toCapitalCase(k)}</span>
+        </div>
+      })}
+    </div>
+  )
 }
 
 export default RouteCard

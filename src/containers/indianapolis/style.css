@@ -45,16 +45,20 @@
   margin-bottom: 12px;
 }
 
-.RouteCard-alt > .RouteCardTitle {
-  background-color: orange;
+.RouteCard-alt .RouteCardTitle {
+  background-color: #4269a4;
 }
 
 .RouteCardTitle {
   font-size: 1rem;
   line-height: 1.5;
-  background-color: #4269a4;
+  background-color: orange;
   color: #fff;
   padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.RouteCard > .RouteCardTitle {
   border-radius: 4px 4px 0 0;
 }
 
@@ -72,10 +76,9 @@
   text-transform: uppercase;
   font-size: 0.75em;
   font-weight: bold;
-  opacity: 0.75;
 }
 
-.RouteCardSegmentIndex {
+.RouteCardIndex {
   margin-left: 4px;
   margin-right: 8px;
   font-weight: bold;

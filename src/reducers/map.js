@@ -37,7 +37,7 @@ export default handleActions({
   geojson: [],
   map: null,
   transitive: null,
-  base: null,
-  comparison: null,
+  base: {},
+  comparison: {},
   zoom: 11
 })
