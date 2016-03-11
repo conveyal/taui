@@ -36,7 +36,7 @@ const Form = ({accessibility, geocoder, onChangeEnd, onChangeStart, onTimeCutoff
           />
       </fieldset>
       <fieldset className='form-group'>
-        <label>Isoline Time Cutoff</label>
+        <label>Highlight area accessible within</label>
         <TimeCutoffSelect
           className='form-control'
           onChange={onTimeCutoffChange}

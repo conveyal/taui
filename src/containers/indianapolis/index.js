@@ -159,7 +159,7 @@ class Indianapolis extends Component {
             }
             {map.comparison && map.comparison.transitive &&
               <div>
-                <label>Old Route</label>
+                <label>Current Route</label>
                 <RouteCard
                   transitiveData={map.comparison.transitive}
                   travelTime={map.comparison.travelTime}
