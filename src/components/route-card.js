@@ -27,7 +27,7 @@ const RouteCard = ({alt, transitiveData, travelTime, oldTravelTime}) => {
     <div className={className}>
       <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip {difference}</div>
       <div className='RouteCardContent'>
-        {journeys.slice(0, 5).map((segments, jindex) => {
+        {journeys.map((segments, jindex) => {
           return (
             <div key={`journey-${jindex}`}>
               <span className='RouteCardSegmentIndex'>{jindex + 1}</span>
