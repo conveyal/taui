@@ -82,13 +82,20 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
 function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
   return journeys
     .map(j => {
+      console.log(j.segments)
       return j.segments
-        .filter(s => !!s.pattern_id)
+        .filter(s => !!s.pattern_id || !!s.patterns)
         .map(s => {
+          const pid = s.pattern_id || s.patterns[0].pattern_id
           const seg = {}
-          const route = routes.find(r => r.route_id === patterns.find(p => p.pattern_id === s.pattern_id).route_id)
+          const route = findRouteForPattern({id: pid, patterns, routes})
           const color = Color(`#${route.route_color}`)
           seg.name = route.route_short_name
+
+          if (s.patterns && s.patterns.length > 0) {
+            seg.name = s.patterns.map(p => findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name).join(' / ')
+          }
+
           seg.backgroundColor = color.rgbaString()
           seg.color = color.light() ? '#000' : '#fff'
           seg.type = typeToIcon[route.route_type]
@@ -96,6 +103,10 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
           return seg
         })
     })
+}
+
+function findRouteForPattern ({id, patterns, routes}) {
+  return routes.find(r => r.route_id === patterns.find(p => p.pattern_id === id).route_id)
 }
 
 const typeToIcon = {
