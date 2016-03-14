@@ -11,6 +11,7 @@ export function initialize (store, config) {
       store.dispatch(updateOrigin({
         apiKey: config.geocoder.apiKey,
         browsochrones: {
+          active: 'base',
           base: bs1,
           comparison: bs2
         },

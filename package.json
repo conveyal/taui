@@ -55,7 +55,7 @@
     "uglifyify": "^3.0.1"
   },
   "dependencies": {
-    "browsochrones": "*",
+    "browsochrones": "0.2.2",
     "color": "^0.11.1",
     "concat-stream": "^1.5.1",
     "debounce": "^1.0.0",

@@ -4,7 +4,7 @@ import React, {Component, PropTypes} from 'react'
 import Dock from 'react-dock'
 import {connect} from 'react-redux'
 
-import {clearDestination, updateDestination, updateOrigin, updateSelectedTimeCutoff} from '../../actions'
+import {clearDestination, setBaseActive, setComparisonActive, updateDestination, updateOrigin, updateSelectedTimeCutoff} from '../../actions'
 import Form from './form'
 import Fullscreen from '../../components/fullscreen'
 import Log from '../../components/log'
@@ -27,6 +27,8 @@ class Indianapolis extends Component {
     moveDestination: PropTypes.func.isRequired,
     moveOrigin: PropTypes.func.isRequired,
     onTimeCutoffChange: PropTypes.func.isRequired,
+    setBaseActive: PropTypes.func,
+    setComparisonActive: PropTypes.func,
     timeCutoff: PropTypes.shape({
       selected: PropTypes.number
     }),
@@ -121,7 +123,7 @@ class Indianapolis extends Component {
   lastRender = new Date();
 
   render () {
-    const {destinations, geocoder, map} = this.props
+    const {browsochrones, destinations, geocoder, map, setBaseActive, setComparisonActive} = this.props
 
     const now = new Date()
     debug(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
@@ -150,20 +152,23 @@ class Indianapolis extends Component {
             {destinations.accessibility.base &&
               <RouteCard
                 accessibility={destinations.accessibility.base}
+                active={browsochrones.active === 'base'}
                 oldAccessibility={destinations.accessibility.comparison}
-                transitiveData={map.base.transitive}
-                travelTime={map.base.travelTime}
-                oldTravelTime={map.comparison.travelTime}
+                oldTravelTime={map.comparisonTravelTime}
+                onClick={setBaseActive}
+                transitiveData={map.baseTransitive}
+                travelTime={map.baseTravelTime}
                 >
                 New System Access
               </RouteCard>
             }
             {destinations.accessibility.comparison &&
               <RouteCard
+                active={browsochrones.active === 'comparison'}
                 accessibility={destinations.accessibility.comparison}
-                transitiveData={map.comparison.transitive}
-                travelTime={map.comparison.travelTime}
-                alt={true}
+                onClick={setComparisonActive}
+                transitiveData={map.comparisonTransitive}
+                travelTime={map.comparisonTravelTime}
                 >
                 Current System Access
               </RouteCard>
@@ -195,6 +200,12 @@ function mapDispatchToProps (dispatch, ownProps) {
     },
     onTimeCutoffChange (options) {
       dispatch(updateSelectedTimeCutoff(options))
+    },
+    setBaseActive () {
+      dispatch(setBaseActive())
+    },
+    setComparisonActive () {
+      dispatch(setComparisonActive())
     }
   }
 }

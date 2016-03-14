@@ -8,6 +8,13 @@ export default handleActions({
   'clear isochrone' (state, action) {
     return Object.assign({}, state, { geojson: [] })
   },
+  'set isochrones' (state, {payload}) {
+    return Object.assign({}, state, {
+      geojson: [payload[payload.active]],
+      baseIsochrone: payload.base,
+      comparisonIsochrone: payload.comparison
+    })
+  },
   'set isochrone' (state, action) {
     return Object.assign({}, state, {
       geojson: [action.payload]
@@ -16,18 +23,36 @@ export default handleActions({
   'set origin' (state) {
     return Object.assign({}, state, {transitive: null})
   },
-  'set transitive network' (state, action) {
-    const {data, latlng} = action.payload
+  'set transitive network' (state, {payload}) {
+    const {active, data, latlng} = payload
     const base = data[0]
     const comparison = data[1]
 
     base.transitive.key = `base-${lonlng.toString(latlng)}`
     comparison.transitive.key = `comparison-${lonlng.toString(latlng)}`
 
+    const transitive = active === 'base'
+      ? base.transitive
+      : comparison.transitive
+
     return Object.assign({}, state, {
-      base,
-      comparison,
-      transitive: base.transitive
+      baseTransitive: base.transitive,
+      baseTravelTime: base.travelTime,
+      comparisonTransitive: comparison.transitive,
+      comparisonTravelTime: comparison.travelTime,
+      transitive
+    })
+  },
+  'set base active' (state, action) {
+    return Object.assign({}, state, {
+      geojson: [state.baseIsochrone],
+      transitive: state.baseTransitive
+    })
+  },
+  'set comparison active' (state, action) {
+    return Object.assign({}, state, {
+      geojson: [state.comparisonIsochrone],
+      transitive: state.comparisonTransitive
     })
   },
   'clear destination' (state, action) {
@@ -37,7 +62,11 @@ export default handleActions({
   geojson: [],
   map: null,
   transitive: null,
-  base: {},
-  comparison: {},
+  baseIsochrone: null,
+  baseTransitive: {},
+  baseTravelTime: null,
+  comparisonIsochrone: null,
+  comparisonTransitive: {},
+  comparisonTravelTime: null,
   zoom: 11
 })

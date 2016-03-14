@@ -2,11 +2,11 @@ import Color from 'color'
 import React from 'react'
 import toCapitalCase from 'to-capital-case'
 
-const RouteCard = ({alt, accessibility, oldAccessibility, children, transitiveData, travelTime, oldTravelTime}) => {
+const RouteCard = ({active, accessibility, oldAccessibility, children, transitiveData, travelTime, oldTravelTime, onClick}) => {
   let className = 'RouteCard'
 
-  if (alt) {
-    className += ' RouteCard-alt'
+  if (active) {
+    className += ' RouteCard-active'
   }
 
   const accessibilityKeys = Object.keys(accessibility)
@@ -20,7 +20,10 @@ const RouteCard = ({alt, accessibility, oldAccessibility, children, transitiveDa
   }
 
   return (
-    <div className={className}>
+    <div
+      className={className}
+      onClick={onClick}
+      >
       <div className='RouteCardTitle'>{children}</div>
       <div className='RouteCardContent'>{access}</div>
       {travelTime && transitiveData && renderJourneys({ oldTravelTime, travelTime, transitiveData })}

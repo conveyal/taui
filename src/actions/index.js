@@ -36,6 +36,10 @@ export const hideMapMarker = createAction('hide map marker')
 
 export const clearIsochrone = createAction('clear isochrone', IDENTITY, RAF)
 export const setIsochrone = createAction('set isochrone', IDENTITY, RAF)
+export const setIsochrones = createAction('set isochrones', IDENTITY, RAF)
+
+export const setBaseActive = createAction('set base active', IDENTITY, RAF)
+export const setComparisonActive = createAction('set comparison active', IDENTITY, RAF)
 
 export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options))
 
@@ -78,7 +82,7 @@ export function updateOrigin ({apiKey, browsochrones, destinationLatlng, latlng,
       generateSurfaces(browsochrones, latlng, zoom),
       ({payload}) => {
         const actions = [
-          generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}),
+          generateIsochrones({browsochrones, latlng, timeCutoff}),
           setAccessibility({
             base: payload[0],
             comparison: payload[1]
@@ -128,11 +132,18 @@ async function generateSurface (browsochrones, latlng, zoom) {
   }
 }
 
-export async function generateIsochrone ({browsochrones, latlng, timeCutoff}) {
-  const isochrone = await browsochrones.getIsochrone(timeCutoff)
-  isochrone.key = `${lonlng.toString(latlng)}-${timeCutoff}`
+export function generateIsochrones ({browsochrones, latlng, timeCutoff}) {
+  return Promise.all([
+    generateIsochrone({browsochrones, latlng, timeCutoff, which: 'base'}),
+    generateIsochrone({browsochrones, latlng, timeCutoff, which: 'comparison'})
+  ]).then((isochrones) => setIsochrones({active: browsochrones.active, base: isochrones[0], comparison: isochrones[1]}))
+}
 
-  return setIsochrone(isochrone)
+export async function generateIsochrone ({browsochrones, latlng, timeCutoff, which}) {
+  const isochrone = await browsochrones[which].getIsochrone(timeCutoff)
+  isochrone.key = `${which}-${lonlng.toString(latlng)}-${timeCutoff}`
+
+  return isochrone
 }
 
 const generateDestinationData = createAction('generate destination data', (browsochrones, latlng, zoom) => {
@@ -148,7 +159,7 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
   ]
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
-    actions.push(generateIsochrone({browsochrones: browsochrones.base, latlng, timeCutoff}))
+    actions.push(generateIsochrones({browsochrones, latlng, timeCutoff}))
   }
 
   return actions

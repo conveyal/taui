@@ -43,16 +43,26 @@
   background-color: #fff;
   border-radius: 4px;
   margin-bottom: 12px;
+  cursor: pointer;
 }
 
-.RouteCard-alt .RouteCardTitle {
-  background-color: #4269a4;
+.RouteCard:hover {
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.RouteCard:active,
+.RouteCard:active > .RouteCardTitle {
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.3) inset;
+}
+
+.RouteCard-active .RouteCardTitle {
+  background-color: orange;
 }
 
 .RouteCardTitle {
   font-size: 0.9rem;
   line-height: 1.5;
-  background-color: orange;
+  background-color: #4269a4;
   color: #fff;
   padding: 8px 12px;
   text-transform: uppercase;
