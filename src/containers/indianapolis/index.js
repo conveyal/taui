@@ -155,7 +155,7 @@ class Indianapolis extends Component {
                 travelTime={map.base.travelTime}
                 oldTravelTime={map.comparison.travelTime}
                 >
-                New System
+                New System Access
               </RouteCard>
             }
             {destinations.accessibility.comparison &&
@@ -165,7 +165,7 @@ class Indianapolis extends Component {
                 travelTime={map.comparison.travelTime}
                 alt={true}
                 >
-                Current System
+                Current System Access
               </RouteCard>
             }
           </div>
