@@ -39,9 +39,9 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
   if (oldTravelTime) {
     difference = oldTravelTime - travelTime
     if (oldTravelTime === 255) difference = 'New trip!'
-    else if (difference > 0) difference = difference + ' minute(s) faster!'
+    else if (difference > 0) difference = `${difference} minute(s) faster!`
     else if (difference === 0) difference = 'No change.'
-    else difference = difference + ' minute(s) slower.'
+    else difference = `${difference * -1} minute(s) slower.`
     difference = ` — ${difference}`
   }
 
