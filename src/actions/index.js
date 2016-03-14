@@ -92,7 +92,7 @@ export function updateOrigin ({apiKey, browsochrones, destinationLatlng, latlng,
         if (destinationLatlng) {
           actions.push(bind(
             generateDestinationData(browsochrones, destinationLatlng, zoom),
-            ({payload}) => setTransitiveNetwork({data: payload, latlng: destinationLatlng})
+            ({payload}) => setTransitiveNetwork({active: browsochrones.active, data: payload, latlng: destinationLatlng})
           ))
         }
 
@@ -189,7 +189,7 @@ export function updateDestination ({apiKey, browsochrones, latlng, label, zoom})
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(bind(
       generateDestinationData(browsochrones, latlng, zoom),
-      ({payload}) => setTransitiveNetwork({data: payload, latlng})
+      ({payload}) => setTransitiveNetwork({active: browsochrones.active, data: payload, latlng})
     ))
   }
 
