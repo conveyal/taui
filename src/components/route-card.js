@@ -82,7 +82,6 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
 function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
   return journeys
     .map(j => {
-      console.log(j.segments)
       return j.segments
         .filter(s => !!s.pattern_id || !!s.patterns)
         .map(s => {
