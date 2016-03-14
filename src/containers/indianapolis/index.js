@@ -159,7 +159,7 @@ class Indianapolis extends Component {
                 transitiveData={map.baseTransitive}
                 travelTime={map.baseTravelTime}
                 >
-                New System Access
+                Proposed System Access
               </RouteCard>
             }
             {destinations.accessibility.comparison &&
