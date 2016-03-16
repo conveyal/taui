@@ -39,7 +39,7 @@
   padding: 8px;
 }
 
-.Select.is-focused.has-value > .Select-control > .Select-value > .Select-value-label {
+.Select.is-open.has-value > .Select-control > .Select-value > .Select-value-label {
   color: #aaa;
 }
 
