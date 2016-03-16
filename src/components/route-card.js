@@ -92,7 +92,7 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
           seg.name = route.route_short_name
 
           if (s.patterns && s.patterns.length > 0) {
-            seg.name = s.patterns.map(p => findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name).join(' / ')
+            seg.name = uniq(s.patterns.map(p => findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name)).join(' / ')
           }
 
           seg.backgroundColor = color.rgbaString()
@@ -106,6 +106,10 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
 
 function findRouteForPattern ({id, patterns, routes}) {
   return routes.find(r => r.route_id === patterns.find(p => p.pattern_id === id).route_id)
+}
+
+function uniq (a) {
+  return [...new Set(a)]
 }
 
 const typeToIcon = {
