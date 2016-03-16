@@ -19,7 +19,21 @@ export default class TransitiveMapLayer extends MapLayer {
       data: this.props.data,
       gridCellSize: 200,
       useDynamicRendering: true,
-      styles: this.props.styles
+      styles: this.props.styles,
+      // see https://github.com/conveyal/transitive.js/wiki/Zoom-Factors
+      zoomFactors: [{
+        minScale: 0,
+        gridCellSize: 25,
+        internalVertexFactor: 1000000,
+        angleConstraint: 45,
+        mergeVertexThreshold: 200
+      }, {
+        minScale: 0.5,
+        gridCellSize: 0,
+        internalVertexFactor: 0,
+        angleConstraint: 5,
+        mergeVertexThreshold: 0
+      }]
     })
     this.leafletElement = new LeafletTransitiveLayer(this.transitive)
   }
