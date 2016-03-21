@@ -4,4 +4,6 @@ npm-debug.log
 dist
 config.dev.js
 config.prod.js
+
 configurations/*
+!configurations/default
