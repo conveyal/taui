@@ -9,7 +9,6 @@ export function initialize (store, config) {
     .then(([bs1, bs2]) => {
       store.dispatch(setBrowsochronesBase(bs1))
       store.dispatch(updateOrigin({
-        apiKey: config.geocoder.apiKey,
         browsochrones: {
           active: 'base',
           base: bs1,

@@ -10,7 +10,8 @@ const dir = path.resolve(process.cwd(), args[0] || 'configurations/default')
 
 const defaultEnvify = {
   _: 'purge',
-  NODE_ENV: process.env.NODE_ENV || 'development'
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  CONFIG_DIR: dir
 }
 
 budo.cli(['src/index.js:dist/bundle.js'], {

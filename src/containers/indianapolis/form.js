@@ -8,6 +8,7 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
     <form>
       <fieldset className='form-group'>
         <Geocoder
+          apiKey={process.env.MAPZEN_SEARCH_KEY}
           {...geocoder}
           name='start-address'
           onChange={onChangeStart}
@@ -17,6 +18,7 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
       </fieldset>
       <fieldset className='form-group'>
         <Geocoder
+          apiKey={process.env.MAPZEN_SEARCH_KEY}
           {...geocoder}
           name='end-address'
           onChange={onChangeEnd}
