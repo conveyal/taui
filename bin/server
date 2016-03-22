@@ -4,6 +4,8 @@ const babelify = require('babelify')
 const budo = require('budo')
 const envify = require('envify/custom')
 const path = require('path')
+const YAML = require('yamljs')
+const yamlify = require('./yamlify')
 
 const args = process.argv.slice(2)
 const dir = path.resolve(process.cwd(), args[0] || 'configurations/default')
@@ -11,7 +13,7 @@ const dir = path.resolve(process.cwd(), args[0] || 'configurations/default')
 const defaultEnvify = {
   _: 'purge',
   NODE_ENV: process.env.NODE_ENV || 'development',
-  CONFIG_DIR: dir
+  INITIAL_STORE: YAML.load(`${dir}/store.yml`)
 }
 
 budo.cli(['src/index.js:dist/bundle.js'], {
@@ -35,7 +37,8 @@ budo.cli(['src/index.js:dist/bundle.js'], {
         plugins: ['transform-runtime'],
         presets: ['es2015', 'react', 'stage-0']
       }),
-      envify(Object.assign(defaultEnvify, require(`${dir}/env.json`)))
+      envify(Object.assign(defaultEnvify, YAML.load(`${dir}/env.yml`))),
+      yamlify
     ]
   }
 })

@@ -1,0 +1,30 @@
+browsochrones:
+  active: base
+  gridsUrl: https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-z9/intgrids
+  grids:
+    - Jobs_total
+    - Workers_total
+  origins:
+    - https://dz69bcpxxuhn6.cloudfront.net/indyconnect
+    - https://dz69bcpxxuhn6.cloudfront.net/indy-demo
+geocoder:
+  focusLatlng:
+    lat: 39.7691
+    lng: -86.1570
+  boundary:
+    country: USA
+    rect:
+      maxLatlng:
+        lat: 40.271143686084194
+        lng: -85.462646484375
+      minLatlng:
+        lat: 39.35978526869001
+        lng: -86.8524169921875
+map:
+  centerCoordinates: [39.7691, -86.1570]
+  zoom: 11
+mapMarkers:
+  origin:
+    latlng:
+      lat: 39.7691
+      lng: -86.1570

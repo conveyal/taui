@@ -53,7 +53,8 @@
     "redux-devtools-dock-monitor": "^1.0.1",
     "redux-devtools-log-monitor": "^1.0.1",
     "redux-logger": "^2.3.1",
-    "uglifyify": "^3.0.1"
+    "uglifyify": "^3.0.1",
+    "yamljs": "^0.2.6"
   },
   "dependencies": {
     "browsochrones": "0.2.4",

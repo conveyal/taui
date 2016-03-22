@@ -5,15 +5,16 @@ import React from 'react'
 import {render} from 'react-dom'
 
 import {initialize as initializeBrowsochrones} from './browsochrones'
-import config from './config'
 import Root from './containers/root'
 import Site from './containers/indianapolis'
 import configureStore from './store'
 
-const fakeStore = configureStore()
-const store = configureStore(deepAssign(fakeStore.getState(), config))
+const initialStore = process.env.INITIAL_STORE
 
-initializeBrowsochrones(store, config)
+const fakeStore = configureStore()
+const store = configureStore(deepAssign(fakeStore.getState(), initialStore))
+
+initializeBrowsochrones(store, initialStore)
 
 render(
   <Root store={store}><Site /></Root>,
