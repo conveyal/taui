@@ -41,7 +41,7 @@ export const setIsochrones = createAction('set isochrones', IDENTITY, RAF)
 export const setBaseActive = createAction('set base active', IDENTITY, RAF)
 export const setComparisonActive = createAction('set comparison active', IDENTITY, RAF)
 
-export const reverseGeocode = createAction('reverse geocode', ({apiKey, latlng, options}) => reverse(apiKey, latlng, options))
+export const reverseGeocode = createAction('reverse geocode', ({latlng, options}) => reverse(process.env.MAPZEN_SEARCH_KEY, latlng, options))
 
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
@@ -59,14 +59,14 @@ export const updateSelectedTransitScenario = createAction('update selected trans
  *      - A new jsonline generated
  *      - Accessibility is calculated for grids
  */
-export function updateOrigin ({apiKey, browsochrones, destinationLatlng, latlng, label, timeCutoff, zoom}) {
+export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, timeCutoff, zoom}) {
   const actions = [clearIsochrone()]
 
   if (label) {
     actions.push(setOrigin({label, latlng}))
   } else {
     actions.push(bind(
-      reverseGeocode({apiKey, latlng, options: {format: true}}),
+      reverseGeocode({latlng, options: {format: true}}),
       ({payload}) => {
         if (!payload) return
         return setOrigin({label: payload[0].address, latlng})
@@ -172,7 +172,7 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
  *  - If Browsochones is loaded, transitive data is generated
  *  - If Browsochones has a surface generated, travel time is calculated
  */
-export function updateDestination ({apiKey, browsochrones, latlng, label, zoom}) {
+export function updateDestination ({browsochrones, latlng, label, zoom}) {
   const actions = []
 
   if (label) {
@@ -180,7 +180,7 @@ export function updateDestination ({apiKey, browsochrones, latlng, label, zoom})
   } else {
     actions.push(
       bind(
-        reverseGeocode({apiKey, latlng, options: {format: true}}),
+        reverseGeocode({latlng, options: {format: true}}),
         ({payload}) => setDestination({label: payload[0].address, latlng})
       )
     )

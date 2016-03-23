@@ -9,18 +9,16 @@ import './style.css'
 
 export default class Map extends PureComponent {
   static propTypes = {
-    attribution: PropTypes.string,
     centerCoordinates: PropTypes.arrayOf(PropTypes.number),
     geojson: PropTypes.arrayOf(PropTypes.object).isRequired,
     markers: PropTypes.arrayOf(PropTypes.object).isRequired,
     onZoom: PropTypes.func,
     transitive: PropTypes.object,
-    url: PropTypes.string.isRequired,
     zoom: PropTypes.number
   };
 
   render () {
-    const {attribution, centerCoordinates, geojson, markers, onZoom, transitive, url, zoom} = this.props
+    const {centerCoordinates, geojson, markers, onZoom, transitive, zoom} = this.props
 
     return (
       <LeafletMap
@@ -31,8 +29,8 @@ export default class Map extends PureComponent {
         onLeafletZoom={onZoom}
         >
         <TileLayer
-          attribution={attribution}
-          url={url}
+          attribution={'&copy <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
+          url={`https://api.tiles.mapbox.com/v4/${process.env.MAPBOX_MAP_ID}/{z}/{x}/{y}.png?access_token=${process.env.MAPBOX_ACCESS_TOKEN}`}
         />
         {markers.map((m, index) => {
           return (

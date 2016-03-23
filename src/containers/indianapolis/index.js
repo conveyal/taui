@@ -42,7 +42,6 @@ class Indianapolis extends Component {
       : null
 
     this.props.moveOrigin({
-      apiKey: this.props.geocoder.apiKey,
       browsochrones: this.props.browsochrones,
       destinationLatlng,
       label,
@@ -64,7 +63,6 @@ class Indianapolis extends Component {
 
   moveDestination ({latlng, label}) {
     this.props.moveDestination({
-      apiKey: this.props.geocoder.apiKey,
       browsochrones: this.props.browsochrones,
       label,
       latlng: lonlng(latlng),
