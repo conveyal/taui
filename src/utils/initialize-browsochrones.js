@@ -1,11 +1,15 @@
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
 
-import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, updateOrigin} from './actions'
+import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, updateOrigin} from '../actions'
 
-export function initialize (store, config) {
-  fetchGrids(config.browsochrones.gridsUrl, config.browsochrones.grids)
-    .then(grids => Promise.all(config.browsochrones.origins.map(origin => load(origin, grids))))
+export default function initialize (store) {
+  const state = store.getState()
+  const {grids, gridsUrl, origins} = state.browsochrones
+  const {latlng} = state.mapMarkers.origin
+  const {zoom} = state.map
+  fetchGrids(gridsUrl, grids)
+    .then(grids => Promise.all(origins.map(origin => load(origin, grids))))
     .then(([bs1, bs2]) => {
       store.dispatch(setBrowsochronesBase(bs1))
       store.dispatch(updateOrigin({
@@ -14,9 +18,9 @@ export function initialize (store, config) {
           base: bs1,
           comparison: bs2
         },
-        latlng: config.mapMarkers.origin.latlng,
+        latlng,
         timeCutoff: 60,
-        zoom: config.map.zoom
+        zoom
       }))
 
       if (bs2) {

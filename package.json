@@ -4,8 +4,8 @@
   "description": "Transport Analyst UI",
   "main": "src/index.js",
   "scripts": {
-    "build": "NODE_ENV=production bin/build.js src/index.js > dist/bundle.js",
-    "start": "bin/server.js src/index.js:dist/bundle.js",
+    "build": "NODE_ENV=production bin/build.js src/applications/indianapolis.js > dist/bundle.js",
+    "start": "bin/server.js src/applications/indianapolis.js:dist/bundle.js",
     "test": "standard"
   },
   "repository": {
@@ -52,6 +52,7 @@
     "yamljs": "^0.2.6"
   },
   "dependencies": {
+    "auth0-lock": "^9.0.1",
     "browsochrones": "0.2.4",
     "color": "^0.11.1",
     "concat-stream": "^1.5.1",
