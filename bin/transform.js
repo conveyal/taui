@@ -25,8 +25,10 @@ const defaultDirectory = path.resolve(process.cwd(), 'configurations/default')
 const directory = path.resolve(process.cwd(), argv.config ? argv.config : 'configurations/default')
 const defaultEnvify = {
   _: 'purge',
+  MESSAGES: loadYml('messages'),
   NODE_ENV: process.env.NODE_ENV || 'development',
-  INITIAL_STORE: loadYml('store')
+  SETTINGS: loadYml('settings'),
+  STORE: loadYml('store')
 }
 
 module.exports = [

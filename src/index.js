@@ -9,7 +9,7 @@ import Root from './containers/root'
 import Site from './containers/indianapolis'
 import configureStore from './store'
 
-const initialStore = process.env.INITIAL_STORE
+const initialStore = process.env.STORE
 
 const fakeStore = configureStore()
 const store = configureStore(deepAssign(fakeStore.getState(), initialStore))
