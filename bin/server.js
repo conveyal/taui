@@ -12,7 +12,8 @@ if (argv.proxy) {
   middleware.push(proxy(proxyOptions))
 }
 
-budo.cli(argv._, {
+budo.cli([`${argv._[0]}:assets/index.js`], {
   browserify: {debug: true, transform},
+  cors: true,
   middleware
 })

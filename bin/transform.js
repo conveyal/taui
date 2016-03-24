@@ -6,6 +6,8 @@ const path = require('path')
 const YAML = require('yamljs')
 
 const babelifyConfig = {
+  presets: ['es2015', 'react', 'stage-0'],
+  plugins: ['transform-runtime'],
   env: {
     development: {
       plugins: [['react-transform', {
@@ -17,9 +19,7 @@ const babelifyConfig = {
         }]
       }]]
     }
-  },
-  plugins: ['transform-runtime'],
-  presets: ['es2015', 'react', 'stage-0']
+  }
 }
 const defaultDirectory = path.resolve(process.cwd(), 'configurations/default')
 const directory = path.resolve(process.cwd(), argv.config ? argv.config : 'configurations/default')
