@@ -22,7 +22,7 @@ export default function (Container) {
         settings={settings}
         />
     </Root>,
-    document.getElementById('root')
+    document.getElementById('mount')
   )
 
   return {messages, settings, store}
