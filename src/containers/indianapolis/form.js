@@ -2,6 +2,7 @@ import React from 'react'
 import Geocoder from 'react-select-geocoder'
 
 import TimeCutoffSelect from '../../components/timecutoff-select'
+import featureToLabel from '../../utils/feature-to-label'
 
 const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
   return (
@@ -10,6 +11,7 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
         <Geocoder
           apiKey={process.env.MAPZEN_SEARCH_KEY}
           {...geocoder}
+          featureToLabel={featureToLabel}
           name='start-address'
           onChange={onChangeStart}
           placeholder='Search for a start address'
@@ -20,6 +22,7 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
         <Geocoder
           apiKey={process.env.MAPZEN_SEARCH_KEY}
           {...geocoder}
+          featureToLabel={featureToLabel}
           name='end-address'
           onChange={onChangeEnd}
           placeholder='Search for an end address'

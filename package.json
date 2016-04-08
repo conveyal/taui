@@ -81,7 +81,7 @@
     "react-redux": "^4.0.6",
     "react-router": "^1.0.3",
     "react-select": "^1.0.0-beta8",
-    "react-select-geocoder": "^0.0.4",
+    "react-select-geocoder": "^0.0.6",
     "redux": "^3.0.5",
     "redux-actions": "^0.9.0",
     "redux-batched-subscribe": "^0.1.4",

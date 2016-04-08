@@ -7,6 +7,8 @@ import {createAction} from 'redux-actions'
 import {bind} from 'redux-effects'
 import {fetch} from 'redux-effects-fetch'
 
+import featureToLabel from '../utils/feature-to-label'
+
 const IDENTITY = i => i
 const META = metadata => data => metadata
 const RAF = META({raf: true})
@@ -66,10 +68,10 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
     actions.push(setOrigin({label, latlng}))
   } else {
     actions.push(bind(
-      reverseGeocode({latlng, options: {format: true}}),
+      reverseGeocode({latlng}),
       ({payload}) => {
-        if (!payload) return
-        return setOrigin({label: payload[0].address, latlng})
+        if (!payload || payload.length < 1) return
+        return setOrigin({label: featureToLabel(payload.features[0]), latlng: lonlng(payload.features[0].geometry.coordinates)})
       }
     ))
   }
@@ -180,8 +182,8 @@ export function updateDestination ({browsochrones, latlng, label, zoom}) {
   } else {
     actions.push(
       bind(
-        reverseGeocode({latlng, options: {format: true}}),
-        ({payload}) => setDestination({label: payload[0].address, latlng})
+        reverseGeocode({latlng}),
+        ({payload}) => setDestination({label: featureToLabel(payload.features[0]), latlng: lonlng(payload.features[0].geometry.coordinates)})
       )
     )
   }

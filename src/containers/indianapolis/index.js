@@ -5,6 +5,7 @@ import Dock from 'react-dock'
 import {connect} from 'react-redux'
 
 import {clearDestination, setBaseActive, setComparisonActive, updateDestination, updateOrigin, updateSelectedTimeCutoff} from '../../actions'
+import featureToLabel from '../../utils/feature-to-label'
 import Form from './form'
 import Fullscreen from '../../components/fullscreen'
 import Log from '../../components/log'
@@ -51,12 +52,12 @@ class Indianapolis extends Component {
     })
   }
 
-  changeStartAddress (input) {
-    if (!input) return
-    const {geometry, properties} = input
+  changeStartAddress (feature) {
+    if (!feature) return
+    const {geometry} = feature
 
     this.moveOrigin({
-      label: properties.label,
+      label: featureToLabel(feature),
       latlng: geometry.coordinates
     })
   }
@@ -70,14 +71,14 @@ class Indianapolis extends Component {
     })
   }
 
-  changeEndAddress (input) {
-    if (!input) {
+  changeEndAddress (feature) {
+    if (!feature) {
       this.props.clearDestination()
     } else {
-      const {geometry, properties} = input
+      const {geometry} = feature
 
       this.moveDestination({
-        label: properties.label,
+        label: featureToLabel(feature),
         latlng: geometry.coordinates
       })
     }
