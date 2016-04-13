@@ -4,8 +4,8 @@
   "description": "Transport Analyst UI",
   "main": "src/index.js",
   "scripts": {
-    "build": "NODE_ENV=production bin/build.js src/applications/indianapolis.js > assets/index.js",
-    "start": "bin/server.js src/applications/indianapolis.js:assets/index.js",
+    "build": "NODE_ENV=production mastarm build src/applications/indianapolis.js > assets/index.js",
+    "start": "mastarm serve src/applications/indianapolis.js",
     "test": "standard"
   },
   "repository": {
