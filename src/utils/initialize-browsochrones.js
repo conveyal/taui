@@ -3,63 +3,78 @@ import fetch from 'isomorphic-fetch'
 
 import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, updateOrigin} from '../actions'
 
-export default function initialize (store) {
+export default async function initialize (store) {
   const state = store.getState()
   const {grids, gridsUrl, origins} = state.browsochrones
   const {latlng} = state.mapMarkers.origin
   const {zoom} = state.map
-  fetchGrids(gridsUrl, grids)
-    .then(grids => Promise.all(origins.map(origin => load(origin, grids))))
-    .then(([bs1, bs2]) => {
-      store.dispatch(setBrowsochronesBase(bs1))
-      store.dispatch(updateOrigin({
-        browsochrones: {
-          active: 'base',
-          base: bs1,
-          comparison: bs2
-        },
-        latlng,
-        timeCutoff: 60,
-        zoom
-      }))
+  try {
+    const fetchedGrids = await fetchGrids(gridsUrl, grids)
+    const bs1 = await load(origins[0], fetchedGrids)
+    const bs2 = await load(origins[1], fetchedGrids)
 
-      if (bs2) {
-        store.dispatch(setBrowsochronesComparison(bs2))
-      }
+    store.dispatch(setBrowsochronesBase(bs1))
+    store.dispatch(updateOrigin({
+      browsochrones: {
+        active: 'base',
+        base: bs1,
+        comparison: bs2
+      },
+      latlng,
+      timeCutoff: 60,
+      zoom
+    }))
 
-      store.dispatch(addActionLogItem('Application is ready!'))
-    }).catch(err => {
-      store.dispatch(addActionLogItem(err.message))
-    })
+    if (bs2) {
+      store.dispatch(setBrowsochronesComparison(bs2))
+    }
+
+    store.dispatch(addActionLogItem('Application is ready!'))
+  } catch (err) {
+    store.dispatch(addActionLogItem(err.message))
+  }
 }
 
-function load (url, grids) {
+async function load (url, grids) {
   const bs = new Browsochrones()
   bs.originsUrl = url
-  bs.grids = grids
+  bs.grids = grids.map((g) => g.name)
 
-  return Promise.all([
-    fetch(`${url}/query.json`)
-      .then(res => res.json())
-      .then(query => bs.setQuery(query)),
-    fetch(`${url}/stop_trees.dat`)
-      .then(res => res.arrayBuffer())
-      .then(st => bs.setStopTrees(st)),
-    fetch(`${url}/transitive.json`)
-      .then(res => res.json())
-      .then(tn => bs.setTransitiveNetwork(tn))
-  ]).then(() => {
-    return bs
-  })
+  await Promise.all([
+    setQuery(bs, url),
+    setStopTrees(bs, url),
+    setTransitiveNetwork(bs, url)
+  ])
+
+  await Promise.all(grids.map((grid) => bs.putGrid(grid.name, grid)))
+  return bs
 }
 
-function fetchGrids (url, grids) {
-  const gridMap = {}
-  return Promise.all(grids.map(name => {
-    return fetch(`${url}/${name}.grid`)
-      .then(res => res.arrayBuffer())
-      .then(grid => {
-        gridMap[name] = grid
-      })
-  })).then(() => gridMap)
+async function setQuery (bs, url) {
+  const response = await fetch(`${url}/query.json`)
+  const query = await response.json()
+  await bs.setQuery(query)
+}
+
+async function setStopTrees (bs, url) {
+  const response = await fetch(`${url}/stop_trees.dat`)
+  const stopTrees = await response.arrayBuffer()
+  await bs.setStopTrees(stopTrees)
+}
+
+async function setTransitiveNetwork (bs, url) {
+  const response = await fetch(`${url}/transitive.json`)
+  const transitive = await response.json()
+  await bs.setTransitiveNetwork(transitive)
+}
+
+async function fetchGrids (url, grids) {
+  return await Promise.all(grids.map((name) => fetchGrid(url, name)))
+}
+
+async function fetchGrid (url, name) {
+  const response = await fetch(`${url}/${name}.grid`)
+  const grid = await response.arrayBuffer()
+  grid.name = name
+  return grid
 }

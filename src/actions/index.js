@@ -81,7 +81,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
   const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   if (browsochrones.base.pointInQueryBounds(point)) {
     actions.push(bind(
-      generateSurfaces(browsochrones, latlng, zoom),
+      generateSurfaces({browsochrones, latlng, timeCutoff, zoom}),
       ({payload}) => {
         const actions = [
           generateIsochrones({browsochrones, latlng, timeCutoff}),
@@ -109,11 +109,14 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
   return actions
 }
 
-const generateSurfaces = createAction('generate surfaces', (browsochrones, latlng, zoom) => {
-  return Promise.all([generateSurface(browsochrones.base, latlng, zoom), generateSurface(browsochrones.comparison, latlng, zoom)])
+const generateSurfaces = createAction('generate surfaces', ({browsochrones, latlng, timeCutoff, zoom}) => {
+  return Promise.all([
+    generateSurface({browsochrones: browsochrones.base, latlng, timeCutoff, zoom}),
+    generateSurface({browsochrones: browsochrones.comparison, latlng, timeCutoff, zoom})
+  ])
 })
 
-async function generateSurface (browsochrones, latlng, zoom) {
+async function generateSurface ({browsochrones, latlng, timeCutoff, zoom}) {
   try {
     const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
     const response = await ifetch(`${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`)
@@ -124,8 +127,8 @@ async function generateSurface (browsochrones, latlng, zoom) {
 
     const accessibility = {}
 
-    await Object.keys(browsochrones.grids).map(async (g) => {
-      accessibility[g] = await browsochrones.getAccessibilityForGrid(browsochrones.grids[g].slice(0))
+    await browsochrones.grids.map(async (g) => {
+      accessibility[g] = await browsochrones.getAccessibilityForGrid(g, timeCutoff)
     })
 
     return accessibility
@@ -155,6 +158,21 @@ const generateDestinationData = createAction('generate destination data', (brows
   ])
 })
 
+const generateAccessiblity = createAction('generate accessibility', async ({browsochrones, timeCutoff}) => {
+  const accessibility = {
+    base: {},
+    comparison: {}
+  }
+  await browsochrones.base.grids.forEach(async (grid) => {
+    accessibility.base[grid] = await browsochrones.base.getAccessibilityForGrid(grid, timeCutoff)
+  })
+  await browsochrones.comparison.grids.forEach(async (grid) => {
+    accessibility.comparison[grid] = await browsochrones.comparison.getAccessibilityForGrid(grid, timeCutoff)
+  })
+
+  return accessibility
+})
+
 export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
   const actions = [
     setSelectedTimeCutoff(timeCutoff)
@@ -162,6 +180,10 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateIsochrones({browsochrones, latlng, timeCutoff}))
+    actions.push(bind(
+      generateAccessiblity({browsochrones, timeCutoff}),
+      ({payload}) => setAccessibility(payload)
+    ))
   }
 
   return actions

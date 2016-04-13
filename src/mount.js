@@ -8,9 +8,9 @@ import Root from './containers/root'
 import configureStore from './store'
 
 export default function (Container) {
-  const settings = process.env.SETTINGS
-  const initialStore = process.env.STORE
-  const messages = process.env.MESSAGES
+  const settings = parse(process.env.SETTINGS)
+  const initialStore = parse(process.env.STORE)
+  const messages = parse(process.env.MESSAGES)
 
   const fakeStore = configureStore()
   const store = configureStore(deepAssign(fakeStore.getState(), initialStore))
@@ -26,4 +26,12 @@ export default function (Container) {
   )
 
   return {messages, settings, store}
+}
+
+function parse (p) {
+  try {
+    return JSON.parse(p) || {}
+  } catch (e) {
+    return {}
+  }
 }
