@@ -9,9 +9,10 @@ import {fetch} from 'redux-effects-fetch'
 
 import featureToLabel from '../utils/feature-to-label'
 
-const IDENTITY = i => i
-const META = metadata => data => metadata
+const IDENTITY = (i) => i
+const META = (metadata) => (data) => metadata
 const RAF = META({raf: true})
+const reverseGeocode = ({latlng, options}) => reverse(process.env.MAPZEN_SEARCH_KEY, latlng, options)
 
 export const addActionLogItem = createAction('add action log item', (item) => {
   const payload = typeof item === 'string'
@@ -43,8 +44,6 @@ export const setIsochrones = createAction('set isochrones', IDENTITY, RAF)
 export const setBaseActive = createAction('set base active', IDENTITY, RAF)
 export const setComparisonActive = createAction('set comparison active', IDENTITY, RAF)
 
-export const reverseGeocode = createAction('reverse geocode', ({latlng, options}) => reverse(process.env.MAPZEN_SEARCH_KEY, latlng, options))
-
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
 export const updateSelectedProject = createAction('update selected project')
@@ -67,13 +66,13 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
   if (label) {
     actions.push(setOrigin({label, latlng}))
   } else {
-    actions.push(bind(
-      reverseGeocode({latlng}),
-      ({payload}) => {
-        if (!payload || payload.length < 1) return
-        return setOrigin({label: featureToLabel(payload.features[0]), latlng: lonlng(payload.features[0].geometry.coordinates)})
-      }
-    ))
+    actions.push(
+      reverseGeocode({latlng})
+        .then(({features}) => {
+          if (!features || features.length < 1) return
+          return setOrigin({label: featureToLabel(features[0]), latlng: lonlng(features[0].geometry.coordinates)})
+        })
+    )
   }
 
   if (!browsochrones.base) return actions
@@ -92,10 +91,10 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
         ]
 
         if (destinationLatlng) {
-          actions.push(bind(
-            generateDestinationData(browsochrones, destinationLatlng, zoom),
-            ({payload}) => setTransitiveNetwork({active: browsochrones.active, data: payload, latlng: destinationLatlng})
-          ))
+          actions.push(
+            generateDestinationData(browsochrones, destinationLatlng, zoom)
+              .then((data) => setTransitiveNetwork({active: browsochrones.active, data, latlng: destinationLatlng}))
+          )
         }
 
         return actions
@@ -137,28 +136,29 @@ async function generateSurface ({browsochrones, latlng, timeCutoff, zoom}) {
   }
 }
 
-export function generateIsochrones ({browsochrones, latlng, timeCutoff}) {
-  return Promise.all([
+async function generateIsochrones ({browsochrones, latlng, timeCutoff}) {
+  const isochrones = await Promise.all([
     generateIsochrone({browsochrones, latlng, timeCutoff, which: 'base'}),
     generateIsochrone({browsochrones, latlng, timeCutoff, which: 'comparison'})
-  ]).then((isochrones) => setIsochrones({active: browsochrones.active, base: isochrones[0], comparison: isochrones[1]}))
+  ])
+  return setIsochrones({active: browsochrones.active, base: isochrones[0], comparison: isochrones[1]})
 }
 
-export async function generateIsochrone ({browsochrones, latlng, timeCutoff, which}) {
+async function generateIsochrone ({browsochrones, latlng, timeCutoff, which}) {
   const isochrone = await browsochrones[which].getIsochrone(timeCutoff)
   isochrone.key = `${which}-${lonlng.toString(latlng)}-${timeCutoff}`
 
   return isochrone
 }
 
-const generateDestinationData = createAction('generate destination data', (browsochrones, latlng, zoom) => {
-  return Promise.all([
-    browsochrones.base.generateDestinationData(browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)),
-    browsochrones.comparison.generateDestinationData(browsochrones.comparison.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom))
-  ])
-})
+async function generateDestinationData ({browsochrones, latlng, zoom}) {
+  return [
+    await browsochrones.base.generateDestinationData(browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)),
+    await browsochrones.comparison.generateDestinationData(browsochrones.comparison.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom))
+  ]
+}
 
-const generateAccessiblity = createAction('generate accessibility', async ({browsochrones, timeCutoff}) => {
+async function generateAccessiblity ({browsochrones, timeCutoff}) {
   const accessibility = {
     base: {},
     comparison: {}
@@ -170,8 +170,8 @@ const generateAccessiblity = createAction('generate accessibility', async ({brow
     accessibility.comparison[grid] = await browsochrones.comparison.getAccessibilityForGrid(grid, timeCutoff)
   })
 
-  return accessibility
-})
+  return setAccessibility(accessibility)
+}
 
 export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
   const actions = [
@@ -180,10 +180,7 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateIsochrones({browsochrones, latlng, timeCutoff}))
-    actions.push(bind(
-      generateAccessiblity({browsochrones, timeCutoff}),
-      ({payload}) => setAccessibility(payload)
-    ))
+    actions.push(generateAccessiblity({browsochrones, timeCutoff}))
   }
 
   return actions
@@ -203,18 +200,16 @@ export function updateDestination ({browsochrones, latlng, label, zoom}) {
     actions.push(setDestination({label, latlng}))
   } else {
     actions.push(
-      bind(
-        reverseGeocode({latlng}),
-        ({payload}) => setDestination({label: featureToLabel(payload.features[0]), latlng: lonlng(payload.features[0].geometry.coordinates)})
-      )
+      reverseGeocode({latlng})
+        .then(({features}) => setDestination({label: featureToLabel(features[0]), latlng: lonlng(features[0].geometry.coordinates)}))
     )
   }
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
-    actions.push(bind(
-      generateDestinationData(browsochrones, latlng, zoom),
-      ({payload}) => setTransitiveNetwork({active: browsochrones.active, data: payload, latlng})
-    ))
+    actions.push(
+      generateDestinationData({browsochrones, latlng, zoom})
+        .then((data) => setTransitiveNetwork({active: browsochrones.active, data, latlng}))
+    )
   }
 
   return actions

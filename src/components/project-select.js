@@ -17,15 +17,15 @@ class ProjectSelect extends Component {
     return (
       <select
         className={className}
-        onChange={e => {
+        onChange={(e) => {
           dispatch(updateSelectedProject(e.target.value))
           dispatch(addActionLogItem(`Selected new project: ${e.target.value}`))
         }}
         value={selected.id}>
-        {projects.map(project => <option value={project.id} key={project.id}>{project.name}</option>)}
+        {projects.map((project) => <option value={project.id} key={project.id}>{project.name}</option>)}
       </select>
     )
   }
 }
 
-export default connect(s => s.project)(ProjectSelect)
+export default connect((s) => s.project)(ProjectSelect)

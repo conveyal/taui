@@ -7,5 +7,5 @@ export default handleActions({
   }
 }, {
   selected: { name: 'Transit', id: 'transit' },
-  modes: ['Car', 'Transit', 'Walk', 'Bike', 'Bike to Transit'].map(m => { return { name: m, id: toCamelCase(m) } })
+  modes: ['Car', 'Transit', 'Walk', 'Bike', 'Bike to Transit'].map((m) => { return { name: m, id: toCamelCase(m) } })
 })

@@ -35,7 +35,7 @@ export default function rafScheduler (store) {
       maybeRaf()
 
       return function cancel () {
-        queuedActions = queuedActions.filter(a => a !== action)
+        queuedActions = queuedActions.filter((a) => a !== action)
       }
     }
   }

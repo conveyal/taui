@@ -12,7 +12,7 @@ class DestinationsSelect extends PureComponent {
   render () {
     return (
       <select {...this.props}>
-        {this.props.options.map(destination => <option value={destination.value} key={destination.value}>{destination.label}</option>)}
+        {this.props.options.map((destination) => <option value={destination.value} key={destination.value}>{destination.label}</option>)}
       </select>
     )
   }
@@ -27,7 +27,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    onChange: event => dispatch(updateSelectedDestination(event.target.value))
+    onChange: (event) => dispatch(updateSelectedDestination(event.target.value))
   }
 }
 

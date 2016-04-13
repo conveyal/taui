@@ -17,15 +17,15 @@ class TransitModeSelect extends Component {
     return (
       <select
         className={className}
-        onChange={e => {
+        onChange={(e) => {
           dispatch(updateSelectedTransitMode(e.target.value))
           dispatch(addActionLogItem(`Selected new transit mode: ${e.target.value}`))
         }}
         value={selected.id}>
-        {modes.map(mode => <option value={mode.id} key={mode.id}>{mode.name}</option>)}
+        {modes.map((mode) => <option value={mode.id} key={mode.id}>{mode.name}</option>)}
       </select>
     )
   }
 }
 
-export default connect(s => s.transitMode)(TransitModeSelect)
+export default connect((s) => s.transitMode)(TransitModeSelect)

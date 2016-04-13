@@ -100,7 +100,7 @@ class Indianapolis extends Component {
       markers.push({
         position: mapMarkers.origin.latlng,
         label: mapMarkers.origin.label || '',
-        onLeafletDragEnd: event => this.moveOrigin({latlng: event.target._latlng})
+        onLeafletDragEnd: (event) => this.moveOrigin({latlng: event.target._latlng})
       })
     }
 
@@ -108,7 +108,7 @@ class Indianapolis extends Component {
       markers.push({
         position: mapMarkers.destination.latlng,
         label: mapMarkers.destination.label || '',
-        onLeafletDragEnd: event => this.moveDestination({latlng: event.target._latlng})
+        onLeafletDragEnd: (event) => this.moveDestination({latlng: event.target._latlng})
       })
     }
 
@@ -118,8 +118,8 @@ class Indianapolis extends Component {
       />
   }
 
-  count = 0;
-  lastRender = new Date();
+  count = 0
+  lastRender = new Date()
 
   render () {
     const {browsochrones, destinations, geocoder, map, setBaseActive, setComparisonActive} = this.props
@@ -144,9 +144,9 @@ class Indianapolis extends Component {
             <Form
               accessibility={destinations.accessibility}
               geocoder={geocoder}
-              onTimeCutoffChange={event => this.onTimeCutoffChange(parseInt(event.target.value, 10))}
-              onChangeEnd={input => this.changeEndAddress(input)}
-              onChangeStart={input => this.changeStartAddress(input)}
+              onTimeCutoffChange={(event) => this.onTimeCutoffChange(parseInt(event.target.value, 10))}
+              onChangeEnd={(input) => this.changeEndAddress(input)}
+              onChangeStart={(input) => this.changeStartAddress(input)}
               />
             {destinations.accessibility.base &&
               <RouteCard

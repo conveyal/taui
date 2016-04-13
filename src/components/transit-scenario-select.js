@@ -17,15 +17,15 @@ class TransitScenarioSelect extends Component {
     return (
       <select
         className={className}
-        onChange={e => {
+        onChange={(e) => {
           dispatch(updateSelectedTransitScenario(e.target.value))
           dispatch(addActionLogItem(`Selected new transit mode: ${e.target.value}`))
         }}
         value={selected}>
-        {scenarios.map(scenario => <option value={scenario.id} key={scenario.id}>{scenario.name}</option>)}
+        {scenarios.map((scenario) => <option value={scenario.id} key={scenario.id}>{scenario.name}</option>)}
       </select>
     )
   }
 }
 
-export default connect(s => s.transitScenario)(TransitScenarioSelect)
+export default connect((s) => s.transitScenario)(TransitScenarioSelect)

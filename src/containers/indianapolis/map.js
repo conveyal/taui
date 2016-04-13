@@ -43,7 +43,7 @@ export default class Map extends PureComponent {
             </Marker>
           )
         })}
-        {geojson.map(g => {
+        {geojson.map((g) => {
           return <GeoJson
             key={`${g.key}`}
             data={g}

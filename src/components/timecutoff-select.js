@@ -18,7 +18,7 @@ class TimeCutoffSelect extends PureComponent {
         className={className}
         onChange={onChange}
         value={selected}>
-        {times.map(mode => <option value={mode.value} key={mode.value}>{mode.name}</option>)}
+        {times.map((mode) => <option value={mode.value} key={mode.value}>{mode.name}</option>)}
       </select>
     )
   }

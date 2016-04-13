@@ -81,10 +81,10 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
 // TODO: filter journeys that have same pattern id sequences
 function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
   return journeys
-    .map(j => {
+    .map((j) => {
       return j.segments
-        .filter(s => !!s.pattern_id || !!s.patterns)
-        .map(s => {
+        .filter((s) => !!s.pattern_id || !!s.patterns)
+        .map((s) => {
           const pid = s.pattern_id || s.patterns[0].pattern_id
           const seg = {}
           const route = findRouteForPattern({id: pid, patterns, routes})
@@ -92,7 +92,7 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
           seg.name = route.route_short_name
 
           if (s.patterns && s.patterns.length > 0) {
-            seg.name = uniq(s.patterns.map(p => findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name)).join(' / ')
+            seg.name = uniq(s.patterns.map((p) => findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name)).join(' / ')
           }
 
           seg.backgroundColor = color.rgbaString()
@@ -105,7 +105,7 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
 }
 
 function findRouteForPattern ({id, patterns, routes}) {
-  return routes.find(r => r.route_id === patterns.find(p => p.pattern_id === id).route_id)
+  return routes.find((r) => r.route_id === patterns.find((p) => p.pattern_id === id).route_id)
 }
 
 function uniq (a) {
