@@ -12,7 +12,7 @@ geocoder:
     lat: 39.7691
     lng: -86.1570
   boundary:
-    country: USA
+    country: us
     rect:
       maxLatlng:
         lat: 40.271143686084194
