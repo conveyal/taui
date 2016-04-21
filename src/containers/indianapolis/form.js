@@ -3,7 +3,7 @@ import Geocoder from 'react-select-geocoder'
 
 import TimeCutoffSelect from '../../components/timecutoff-select'
 import featureToLabel from '../../utils/feature-to-label'
-import mapboxGeocoder from '../../utils/mapbox-geocoder'
+import {search} from '../../utils/mapbox-geocoder'
 
 const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
   return (
@@ -17,7 +17,7 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
           name='start-address'
           onChange={onChangeStart}
           placeholder='Search for a start address'
-          search={mapboxGeocoder}
+          search={search}
           value={geocoder.origin}
           />
       </fieldset>
@@ -30,7 +30,7 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
           name='end-address'
           onChange={onChangeEnd}
           placeholder='Search for an end address'
-          search={mapboxGeocoder}
+          search={search}
           value={geocoder.destination}
           />
       </fieldset>

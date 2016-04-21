@@ -26,7 +26,7 @@ export default class Map extends PureComponent {
         className='Taui-Map'
         ref='map'
         zoom={zoom}
-        onLeafletZoom={onZoom}
+        onZoom={onZoom}
         >
         <TileLayer
           attribution={'&copy <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}

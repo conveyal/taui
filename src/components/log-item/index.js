@@ -8,7 +8,6 @@ const format = 'MM-DD HH:mm:ss'
 export default class LogItem extends Component {
   static propTypes = {
     createdAt: PropTypes.object,
-    key: PropTypes.number,
     level: PropTypes.string,
     text: PropTypes.string.isRequired
   };

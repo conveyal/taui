@@ -100,7 +100,7 @@ class Indianapolis extends Component {
       markers.push({
         position: mapMarkers.origin.latlng,
         label: mapMarkers.origin.label || '',
-        onLeafletDragEnd: (event) => this.moveOrigin({latlng: event.target._latlng})
+        onDragEnd: (event) => this.moveOrigin({latlng: event.target._latlng})
       })
     }
 
@@ -108,7 +108,7 @@ class Indianapolis extends Component {
       markers.push({
         position: mapMarkers.destination.latlng,
         label: mapMarkers.destination.label || '',
-        onLeafletDragEnd: (event) => this.moveDestination({latlng: event.target._latlng})
+        onDragEnd: (event) => this.moveDestination({latlng: event.target._latlng})
       })
     }
 

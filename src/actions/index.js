@@ -1,5 +1,4 @@
 import ifetch from 'isomorphic-fetch'
-import {reverse} from 'isomorphic-mapzen-search'
 import Leaflet from 'leaflet'
 import lonlng from 'lonlng'
 import {stringify} from 'qs'
@@ -8,11 +7,12 @@ import {bind} from 'redux-effects'
 import {fetch} from 'redux-effects-fetch'
 
 import featureToLabel from '../utils/feature-to-label'
+import {reverse} from '../utils/mapbox-geocoder'
 
 const IDENTITY = (i) => i
 const META = (metadata) => (data) => metadata
 const RAF = META({raf: true})
-const reverseGeocode = ({latlng, options}) => reverse(process.env.MAPZEN_SEARCH_KEY, latlng, options)
+const reverseGeocode = ({latlng}) => reverse(process.env.MAPBOX_ACCESS_TOKEN, latlng)
 
 export const addActionLogItem = createAction('add action log item', (item) => {
   const payload = typeof item === 'string'

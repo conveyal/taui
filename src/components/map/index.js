@@ -18,8 +18,8 @@ export default class Map extends Component {
       <BaseMap
         center={center}
         zoom={zoom}
-        onLeafletClick={onClick}
-        onLeafletZoomEnd={(e) => onChange({ zoom: e.target._zoom })}
+        onClick={onClick}
+        onZoomEnd={(e) => onChange({ zoom: e.target._zoom })}
         {...this.props}>
         <TileLayer
           url={map.url}
