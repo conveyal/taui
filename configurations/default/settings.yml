@@ -1,0 +1,3 @@
+s3bucket: taui
+entry: src/applications/indianapolis.js
+cloudfrontDistributionID: E3O3DWVEGFZH0X
