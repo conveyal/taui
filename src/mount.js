@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.css'
-import 'react-select/dist/react-select.css'
 import deepAssign from 'deep-assign'
 import React from 'react'
 import {render} from 'react-dom'
