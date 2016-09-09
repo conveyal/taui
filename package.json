@@ -36,7 +36,7 @@
     "auth0-lock": "^10.2.2",
     "browsochrones": "0.2.6",
     "color": "^0.11.1",
-    "concat-stream": "^1.5.1",
+    "concat-stream": "^1.5.2",
     "debounce": "^1.0.0",
     "debug": "^2.2.0",
     "declarative-fetch": "^0.1.13",
