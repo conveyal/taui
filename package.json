@@ -42,7 +42,7 @@
     "declarative-fetch": "^0.1.13",
     "deep-assign": "^2.0.0",
     "font-awesome": "^4.6.3",
-    "history": "^3.0.0",
+    "history": "^3.2.1",
     "isomorphic-fetch": "^2.2.1",
     "isomorphic-mapzen-search": "0.0.4",
     "leaflet": "^0.7.7",
