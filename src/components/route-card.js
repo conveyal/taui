@@ -66,7 +66,7 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
                       color: (s.color || 'inherit')
                     }}
                     >
-                    <i className={`fa fa-${s.type}`}></i> {s.name}
+                    <i className={`fa fa-${s.type}`} /> {s.name}
                   </span>
                 )
               })}

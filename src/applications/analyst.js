@@ -14,11 +14,11 @@ class App extends Component {
   }
 
   onClick = (e) => {
-    lock.show((err, profile, id_token) => {
+    lock.show((err, profile, idToken) => {
       if (err) {
         console.error(err)
       } else {
-        console.log(profile, id_token)
+        console.log(profile, idToken)
       }
     })
   }

@@ -4,7 +4,7 @@ mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
 
 const geocoder = mapbox.geocoder('mapbox.places')
 
-export function search (api_key, text, {boundary, focusLatlng, format} = {}) {
+export function search (apiKey, text, {boundary, focusLatlng, format} = {}) {
   if (!text) return Promise.resolve([])
 
   return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ export function search (api_key, text, {boundary, focusLatlng, format} = {}) {
   })
 }
 
-export function reverse (api_key, latlng) {
+export function reverse (apiKey, latlng) {
   return new Promise((resolve, reject) => {
     geocoder.reverseQuery(latlng, (err, results) => {
       if (err) return reject(err)
