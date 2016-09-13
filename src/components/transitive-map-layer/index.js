@@ -4,8 +4,6 @@ import {MapLayer} from 'react-leaflet'
 import Transitive from 'transitive-js'
 import LeafletTransitiveLayer from 'leaflet-transitivelayer'
 
-import './style.css'
-
 export default class TransitiveMapLayer extends MapLayer {
   static propTypes = {
     data: PropTypes.object.isRequired,

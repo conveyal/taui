@@ -5,6 +5,7 @@
 @import url(src/components/fullscreen/style.css);
 @import url(src/components/log/style.css);
 @import url(src/components/log-item/style.css);
+@import url(src/components/transitive-map-layer/style.css);
 
 .Taui-Map {
   position: relative;
