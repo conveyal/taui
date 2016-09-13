@@ -10,6 +10,7 @@ import Form from './form'
 import Fullscreen from '../../components/fullscreen'
 import Log from '../../components/log'
 import Map from './map'
+import messages from '../../utils/messages'
 import RouteCard from '../../components/route-card'
 
 import './style.css'
@@ -158,7 +159,7 @@ class Indianapolis extends Component {
                 transitiveData={map.baseTransitive}
                 travelTime={map.baseTravelTime}
                 >
-                Proposed System Access
+                {messages.Systems.Base.Title}
               </RouteCard>
             }
             {destinations.accessibility.comparison &&
@@ -169,7 +170,7 @@ class Indianapolis extends Component {
                 transitiveData={map.comparisonTransitive}
                 travelTime={map.comparisonTravelTime}
                 >
-                Current System Access
+                {messages.Systems.Comparison.Title}
               </RouteCard>
             }
           </div>
