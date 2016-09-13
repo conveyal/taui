@@ -1,8 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import moment from 'moment'
 
-import './style.css'
-
 const format = 'MM-DD HH:mm:ss'
 
 export default class LogItem extends Component {

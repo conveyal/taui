@@ -2,8 +2,6 @@ import React, {Component, PropTypes} from 'react'
 
 import LogItem from '../log-item'
 
-import './style.css'
-
 export default class Log extends Component {
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.object).isRequired

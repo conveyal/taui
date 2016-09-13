@@ -2,6 +2,9 @@
 @import url(node_modules/bootstrap/dist/css/bootstrap.css);
 @import url(node_modules/font-awesome/css/font-awesome.css);
 @import url(node_modules/react-select/dist/react-select.css);
+@import url(src/components/fullscreen/style.css);
+@import url(src/components/log/style.css);
+@import url(src/components/log-item/style.css);
 
 .Taui-Map {
   position: relative;
