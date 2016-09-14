@@ -3,3 +3,4 @@ npm-debug.log
 assets
 configurations/*
 !configurations/default
+!configurations/messages

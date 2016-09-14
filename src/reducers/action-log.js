@@ -1,4 +1,5 @@
 import {handleActions} from 'redux-actions'
+import messages from '../utils/messages'
 
 export default handleActions({
   'add action log item' (state, action) {
@@ -7,5 +8,5 @@ export default handleActions({
 }, [{
   createdAt: new Date(),
   index: 0,
-  text: 'Welcome to our transit analysis tool! Find how your site stacks up compared to others in the region. Search for your address or drag the pin on the map.'
+  text: messages.Strings.Welcome
 }])

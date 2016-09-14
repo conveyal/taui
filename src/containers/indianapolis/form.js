@@ -4,6 +4,7 @@ import Geocoder from 'react-select-geocoder'
 import TimeCutoffSelect from '../../components/timecutoff-select'
 import featureToLabel from '../../utils/feature-to-label'
 import {search} from '../../utils/mapbox-geocoder'
+import messages from '../../utils/messages'
 
 const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
   return (
@@ -16,7 +17,7 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
           featureToValue={(f) => f.id}
           name='start-address'
           onChange={onChangeStart}
-          placeholder='Search for a start address'
+          placeholder={messages.Strings.SearchForStartAddress}
           search={search}
           value={geocoder.origin}
           />
@@ -29,13 +30,13 @@ const Form = ({geocoder, onChangeEnd, onChangeStart, onTimeCutoffChange}) => {
           featureToValue={(f) => f.id}
           name='end-address'
           onChange={onChangeEnd}
-          placeholder='Search for an end address'
+          placeholder={messages.Strings.SearchForEndAddress}
           search={search}
           value={geocoder.destination}
           />
       </fieldset>
       <fieldset className='form-group'>
-        <label>Highlight area accessible within</label>
+        <label>{messages.Strings.HighlightAreaAccessibleWithin}</label>
         <TimeCutoffSelect
           className='form-control'
           onChange={onTimeCutoffChange}

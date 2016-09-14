@@ -1,5 +1,6 @@
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
+import messages from './messages'
 
 import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, updateOrigin} from '../actions'
 
@@ -29,7 +30,7 @@ export default async function initialize (store) {
       store.dispatch(setBrowsochronesComparison(bs2))
     }
 
-    store.dispatch(addActionLogItem('Application is ready!'))
+    store.dispatch(addActionLogItem(messages.Strings.ApplicationReady))
   } catch (err) {
     store.dispatch(addActionLogItem(err.message))
   }

@@ -3,3 +3,11 @@ Systems:
     Title: Proposed System Access
   Comparison:
     Title: Current System Access
+Strings:
+  SearchForStartAddress: Search for a start address
+  SearchForEndAddress: Search for an end address
+  HighlightAreaAccessibleWithin: Highlight area accessible within
+  ApplicationReady: Application is ready!
+  Welcome: Welcome to our transit analysis tool! Find how your site stacks up compared to others in the region. Search for your address or drag the pin on the map.
+  Minutes: minutes
+  
