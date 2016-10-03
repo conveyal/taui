@@ -45,7 +45,7 @@
     "history": "^4.2.0",
     "isomorphic-fetch": "^2.2.1",
     "isomorphic-mapzen-search": "0.0.4",
-    "leaflet": "^0.7.7",
+    "leaflet": "^1.0.0",
     "leaflet-transitivelayer": "^0.2.0",
     "lonlng": "0.1.0",
     "mapbox.js": "^2.4.0",
