@@ -47,6 +47,9 @@ export default class Map extends PureComponent {
           return <GeoJson
             key={`${g.key}`}
             data={g}
+            style={{
+              stroke: false
+            }}
             />
         })}
         {transitive &&
