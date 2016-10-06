@@ -1,5 +1,4 @@
 import {combineReducers} from 'redux'
-import {routerStateReducer as router} from 'redux-router'
 
 import actionLog from './action-log'
 import browsochrones from './browsochrones'
@@ -21,7 +20,6 @@ const placeApp = combineReducers({
   map,
   mapMarkers,
   project,
-  router,
   singlePoint,
   timeCutoff,
   transitMode,
