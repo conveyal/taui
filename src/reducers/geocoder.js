@@ -17,8 +17,17 @@ export default handleActions({
       }
     })
   },
-  'clear destination' (state) {
-    return Object.assign({}, state, { destination: null })
+  'clear start' (state) {
+    return {
+      ...state,
+      origin: null
+    }
+  },
+  'clear end' (state) {
+    return {
+      ...state,
+      destination: null
+    }
   }
 }, {
   origin: null,

@@ -12,10 +12,15 @@ import DevTools from '../components/dev-tools'
 import rafScheduler from '../utils/raf-scheduler'
 import rootReducer from '../reducers'
 
+const logger = createLogger({
+  collapsed: true,
+  duration: true
+})
+
 const finalCreateStore = compose(
   applyMiddleware(multi, effects, fetch, promises, rafScheduler),
   persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)),
-  applyMiddleware(createLogger()),
+  applyMiddleware(logger),
   DevTools.instrument(),
   batchedSubscribe(batchedUpdates)
 )(createStore)

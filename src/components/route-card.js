@@ -1,85 +1,125 @@
 import Color from 'color'
 import React from 'react'
 import toCapitalCase from 'to-capital-case'
+import toSpaceCase from 'to-space-case'
 
-const RouteCard = ({active, accessibility, oldAccessibility, children, transitiveData, travelTime, oldTravelTime, onClick}) => {
-  let className = 'RouteCard'
+import Icon from './icon'
+import messages from '../utils/messages'
 
-  if (active) {
-    className += ' RouteCard-active'
-  }
-
+const RouteCard = ({
+  active,
+  alternate,
+  accessibility,
+  children,
+  oldAccessibility,
+  oldTravelTime,
+  onClick,
+  transitiveData,
+  travelTime
+}) => {
+  const className = 'Card' + (alternate ? ' Card-alternate' : '') + (active ? ' Card-active' : '')
   const accessibilityKeys = Object.keys(accessibility)
   const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
 
-  let access = null
-  if (comparisonAccessibilityKeys.length > 0) {
-    access = showDiff(accessibilityKeys, accessibility, oldAccessibility)
-  } else if (accessibilityKeys.length > 0) {
-    access = showAccess(accessibilityKeys, accessibility)
-  }
+  const access = comparisonAccessibilityKeys.length > 0
+    ? showDiff(accessibilityKeys, accessibility, oldAccessibility)
+    : showAccess(accessibilityKeys, accessibility)
 
   return (
     <div
       className={className}
-      onClick={onClick}
       >
-      <div className='RouteCardTitle'>{children}</div>
-      <div className='RouteCardContent'>{access}</div>
-      {travelTime && transitiveData && renderJourneys({ oldTravelTime, travelTime, transitiveData })}
+      <div className='CardTitle' onClick={onClick}>{children}
+        <span className='pull-right'>
+          {active && <Icon type='map' />}
+          {!active && 'show'}
+        </span>
+      </div>
+      <div className='CardContent'>
+        {access}
+        {travelTime && transitiveData && renderJourneys({ oldTravelTime, travelTime, transitiveData })}
+      </div>
     </div>
   )
+}
+
+function TripDiff ({
+  oldTravelTime,
+  travelTime
+}) {
+  const difference = oldTravelTime - travelTime
+
+  if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /></span>
+  else if (difference > 0) return <span className='increase'>{difference} {messages.Units.Mins} {messages.Faster}</span>
+  else if (difference < 0) return <span className='decrease'>{difference * -1} {messages.Units.Mins} {messages.Slower}</span>
 }
 
 function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
   const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
-    return <div className='RouteCard'><div className='RouteCardContent'>No travel options found</div></div>
+    return <div className='CardJourneys'>
+      <div className='heading'>{messages.Systems.TripsTitle}</div>
+      <div>{messages.Systems.TripsEmpty}</div>
+    </div>
   }
 
-  let difference = ''
-  if (oldTravelTime) {
-    difference = oldTravelTime - travelTime
-    if (oldTravelTime === 255) difference = 'New trip!'
-    else if (difference > 0) difference = `${difference} minute(s) faster!`
-    else if (difference === 0) difference = 'No change.'
-    else difference = `${difference * -1} minute(s) slower.`
-    difference = ` — ${difference}`
-  }
+  const [bestTripSegments, ...alternateTripSegments] = journeys.map((segments, jindex) => {
+    return segments.map((s, sindex) => {
+      return (
+        <span
+          className='CardSegment'
+          key={`journey-${jindex}-segment-${sindex}`}
+          style={{
+            backgroundColor: (s.backgroundColor || 'inherit'),
+            color: (s.color || 'inherit')
+          }}
+          >
+          <i className={`fa fa-${s.type}`} /> {s.name}
+        </span>
+      )
+    })
+  })
+
+  const alternateTrips = alternateTripSegments.map((segments, jindex) => {
+    return (
+      <div className='Trip' key={`journey-${jindex}`}>
+        <span className='CardIndex'>#{jindex + 1}</span>
+        {segments}
+      </div>
+    )
+  })
 
   return (
     <div>
-      <div className='RouteCardTitle'><strong>{travelTime}</strong> minute trip {difference}</div>
-      <div className='RouteCardContent'>
-        {journeys.map((segments, jindex) => {
-          return (
-            <div key={`journey-${jindex}`}>
-              <span className='RouteCardIndex'>{jindex + 1}</span>
-              {segments.map((s, sindex) => {
-                return (
-                  <span
-                    className='RouteCardSegment'
-                    key={`journey-${jindex}-segment-${sindex}`}
-                    style={{
-                      backgroundColor: (s.backgroundColor || 'inherit'),
-                      color: (s.color || 'inherit')
-                    }}
-                    >
-                    <i className={`fa fa-${s.type}`} /> {s.name}
-                  </span>
-                )
-              })}
-            </div>
-          )
-        })}
+      <div className='heading'>{messages.Systems.BestTripTitle}</div>
+      <div className='Metric'>
+        {bestTripSegments}
+        <Icon type='clock-o' /><strong>{travelTime}</strong> {messages.Units.Mins}
+        {oldTravelTime && <span className='pull-right'>
+          <TripDiff
+            oldTravelTime={oldTravelTime}
+            travelTime={travelTime}
+            />
+        </span>}
       </div>
+      {alternateTrips.length > 0 &&
+        <div>
+          <div className='heading'>{messages.Systems.AlternateTripsTitle}</div>
+          <div className='Trips'>{alternateTrips}</div>
+        </div>
+      }
     </div>
   )
 }
 
 // TODO: filter journeys that have same pattern id sequences
-function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
+function extractRelevantTransitiveInfo ({
+  journeys,
+  patterns,
+  routes,
+  stops
+}) {
   return journeys
     .map((j) => {
       return j.segments
@@ -89,10 +129,11 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
           const seg = {}
           const route = findRouteForPattern({id: pid, patterns, routes})
           const color = Color(`#${route.route_color}`)
-          seg.name = route.route_short_name
+          seg.name = toCapitalCase(route.route_short_name)
 
           if (s.patterns && s.patterns.length > 0) {
-            seg.name = uniq(s.patterns.map((p) => findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name)).join(' / ')
+            seg.name = uniq(s.patterns.map((p) =>
+              toCapitalCase(findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name))).join(' / ')
           }
 
           seg.backgroundColor = color.rgbaString()
@@ -119,31 +160,37 @@ const typeToIcon = {
   3: 'bus'
 }
 
+function MetricIcon ({
+  name
+}) {
+  const lc = name.toLowerCase()
+  if (lc.indexOf('job') !== -1) return <Icon type='building' />
+  if (lc.indexOf('worker') !== -1) return <Icon type='child' />
+}
+
 function showAccess (keys, base) {
   return (
-    <div className='RouteCardAccess'>
-      {keys.map((k, i) => {
-        return <div key={k}>
-          <span className='RouteCardSegment'>{(base[k] | 0).toLocaleString()} {toCapitalCase(k)}</span>
-        </div>
-      })}
+    <div className='CardAccess'>
+      <div className='heading'>Access to</div>
+      {keys.map((k, i) => <div className='Metric' key={k}><MetricIcon name={k} /><strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)}</div>)}
     </div>
   )
 }
 
+function AccessDiffPercentage ({
+  diff
+}) {
+  if (diff > 0) return <span className='pull-right increase'>{diff.toLocaleString()}%<Icon type='level-up' /></span>
+  else if (diff < 0) return <span className='pull-right decrease'>{(diff * -1).toLocaleString()}%<Icon className='fa-rotate-180' type='level-up' /></span>
+}
+
 function showDiff (keys, base, comparison) {
   return (
-    <div className='RouteCardAccess'>
+    <div className='CardAccess'>
+      <div className='heading'>Access to</div>
       {keys.map((k, i) => {
-        let diff = parseInt((base[k] - comparison[k]) / base[k] * 100, 10)
-
-        if (diff > 0) diff = diff.toLocaleString() + '% increase'
-        else if (diff === 0) diff = 'no change'
-        else diff = (diff * -1).toLocaleString() + '% decrease'
-
-        return <div key={k}>
-          <span className='RouteCardSegment'>{(base[k] | 0).toLocaleString()} {toCapitalCase(k)} ({diff})</span>
-        </div>
+        const diff = parseInt((base[k] - comparison[k]) / base[k] * 100, 10)
+        return <div className='Metric' key={k}><MetricIcon name={k} /><strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)} <AccessDiffPercentage diff={diff} /></div>
       })}
     </div>
   )

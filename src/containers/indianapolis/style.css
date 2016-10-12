@@ -1,5 +1,6 @@
 
-@import url(node_modules/bootstrap/dist/css/bootstrap.css);
+@import url(node_modules/normalize.css/normalize.css);
+@import url(node_modules/mapbox.js/theme/style.css);
 @import url(node_modules/font-awesome/css/font-awesome.css);
 @import url(node_modules/react-select/dist/react-select.css);
 @import url(src/components/fullscreen/style.css);
@@ -7,109 +8,231 @@
 @import url(src/components/log-item/style.css);
 @import url(src/components/transitive-map-layer/style.css);
 
+body {
+  font-size: 16px;
+  font-family: 'Noto Sans', sans-serif;
+  color: #0b2b40;
+}
+
 .Taui-Map {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-.Taui-Navbar {
-  color: #98B8EB;
-  margin-bottom: 8px;
-  height: 44px;
-  width: 100%;
-  padding-left: 8px;
-  line-height: 44px;
-  position: fixed;
-  top: 0;
-  box-shadow: 0 2px 2px -1px rgba(152,184,235,0.5);
-}
-
-.Taui-Navbar img {
-  height: 2rem;
-}
-
 .Taui-Dock {
-  background-color: #6492d9;
+  background-color: #0b2b40; /* Conveyal blue down to 25% brightness in HSB */
+  position: absolute;
+  width: 414px;
+  top: 0;
+  right: 0;
+  height: 100%;
+  box-shadow: 0 0 25px 0 rgba(0, 0, 0, .15);
 }
 
 .Taui-Dock-content {
-  padding: 8px 8px 158px 8px;
-  color: #fff;
+  position: relative;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 0.5rem 1rem;
+}
+
+.Taui-Dock-content .heading {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 1rem 0 0.5rem;
+  font-weight: 700;
+}
+
+.Taui-Dock-content .title {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.5rem;
+  margin: 0.5rem 0;
+  font-weight: 700;
 }
 
 .Taui-ActionLog {
-  position: fixed;
   display: block;
   bottom: 0;
-  height: 150px;
+  height: 6rem;
   background-color: #fff;
-  box-shadow: 0 -2px 2px -1px rgba(152,184,235,0.5);
-  padding: 8px;
+  padding: 0.5rem 1rem;
 }
 
-.Select.is-open.has-value > .Select-control > .Select-value > .Select-value-label {
-  color: #aaa;
+.Geocoder {
+  margin-bottom: 0.5rem;
 }
 
-.RouteCard {
+.Select-control {
+  border: none;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #0b2b40;
+  height: 3rem;
+}
+
+.Select-input,
+.Select-placeholder,
+.Select--single > .Select-control .Select-value {
+  line-height: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.has-value.Select--single > .Select-control .Select-value {
+  padding-right: 3rem;
+}
+
+.has-value.Select--single > .Select-control .Select-value .Select-value-label,
+.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value .Select-value-label {
+  color: #0b2b40;
+}
+
+.Select-clear {
+  font-size: 1.5rem;
+}
+
+.Select-arrow {
+  border-width: 0.4rem 0.4rem 0.2rem;
+}
+
+.Select-arrow-zone {
+  width: 2rem;
+  padding-right: 1rem;
+}
+
+.Select-option,
+.Select-noresults {
+  padding: 1rem;
+}
+
+.TimeCutoff {
+  display: flex;
+  margin: 0.5rem 0 1rem;
+}
+
+.TimeCutoff .Time {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.TimeCutoff input[type=range] {
+  margin-left: 1rem;
+  flex: auto;
+}
+
+.Card {
   background-color: #fff;
-  border-radius: 4px;
-  margin-bottom: 12px;
-  cursor: pointer;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.RouteCard:hover {
-  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.3);
-}
-
-.RouteCard:active,
-.RouteCard:active > .RouteCardTitle {
-  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.3) inset;
-}
-
-.RouteCard-active .RouteCardTitle {
+.Card-alternate .CardTitle {
   background-color: orange;
 }
 
-.RouteCardTitle {
-  font-size: 0.9rem;
-  line-height: 1.5;
+.CardTitle {
   background-color: #4269a4;
-  color: #fff;
-  padding: 8px 12px;
-  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.RouteCard > .RouteCardTitle {
-  border-radius: 4px 4px 0 0;
+.Card-active > .CardTitle {
+  cursor: inherit;
 }
 
-.RouteCardContent {
-  color: #333;
-  padding: 0 12px 12px;
-  opacity: 0.8;
+.Card .heading {
+  color: #0b2b40;
+  border-bottom: 1px solid rgba(11, 44, 65, 0.25);
+  padding-bottom: 0.25rem;
 }
 
-.RouteCardSegment {
-  padding: 4px 6px;
-  border-radius: 3px;
-  margin-right: 1px;
+.Card > .CardTitle {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.CardContent {
+  color: #0b2b40;
+  padding: 0 1rem 1rem;
+}
+
+.CardSegment {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-right: 0.25rem;
   display: inline-block;
-  margin-top: 8px;
-  text-transform: uppercase;
-  font-size: 0.8em;
-  font-weight: bold;
 }
 
-.RouteCardAccess .RouteCardSegment {
+.CardAccess .CardSegment {
   padding: 0;
 }
 
-.RouteCardIndex {
-  margin-right: 8px;
+.Card .increase {
+  color: green;
+}
+
+.Card .decrease {
+  color: red;
+}
+
+.Card .Trips {
+  margin-top: 0.5rem;
+}
+
+.Card .Trip {
+  margin-top: 0.5rem;
+}
+
+.Card .Metric {
+  height: 1.5rem;
+}
+
+.Card .Metric > .pull-right {
+  margin-top: 0.25rem;
+}
+
+.CardIndex {
+  margin-right: 0.5rem;
   font-weight: bold;
-  font-size: 0.75em;
   display: inline-block;
-  width: 10px;
+  width: 1rem;
+}
+
+.leaflet-popup-content-wrapper,
+.map-legends,
+.map-tooltip {
+  border-radius: 0.5rem;
+  background-color: #0b2b40;
+
+}
+
+.leaflet-popup-close-button + .leaflet-popup-content-wrapper .leaflet-popup-content,
+.leaflet-popup-content {
+  padding: 0.5rem;
+}
+
+.Popup button {
+  display: block;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  color: #0b2b40;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.Popup button:last-of-type {
+  margin-bottom: 0;
+}
+
+.Popup button:hover {
+  background-color: #fff;
+}
+
+.leaflet-popup-tip {
+  border-top-color: #0b2b40;
 }

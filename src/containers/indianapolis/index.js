@@ -1,19 +1,17 @@
 import dbg from 'debug'
 import lonlng from 'lonlng'
 import React, {Component, PropTypes} from 'react'
-import Dock from 'react-dock'
 import {connect} from 'react-redux'
 
-import {clearDestination, setBaseActive, setComparisonActive, updateDestination, updateOrigin, updateSelectedTimeCutoff} from '../../actions'
+import {clearEnd, clearStart, setBaseActive, setComparisonActive, updateDestination, updateOrigin, updateSelectedTimeCutoff} from '../../actions'
 import featureToLabel from '../../utils/feature-to-label'
 import Form from './form'
 import Fullscreen from '../../components/fullscreen'
+import Icon from '../../components/icon'
 import Log from '../../components/log'
 import Map from './map'
 import messages from '../../utils/messages'
 import RouteCard from '../../components/route-card'
-
-import './style.css'
 
 const debug = dbg('taui:indianapolis')
 
@@ -21,7 +19,8 @@ class Indianapolis extends Component {
   static propTypes = {
     actionLog: PropTypes.arrayOf(PropTypes.object),
     browsochrones: PropTypes.object.isRequired,
-    clearDestination: PropTypes.func.isRequired,
+    clearEnd: PropTypes.func.isRequired,
+    clearStart: PropTypes.func.isRequired,
     destinations: PropTypes.object,
     geocoder: PropTypes.object,
     mapMarkers: PropTypes.object,
@@ -35,57 +34,82 @@ class Indianapolis extends Component {
       selected: PropTypes.number
     }),
     zoom: PropTypes.number
-  };
+  }
 
-  moveOrigin ({latlng, label}) {
-    const {mapMarkers} = this.props
+  _clearStartAndEnd = () => {
+    const {clearEnd, clearStart} = this.props
+    clearStart()
+    clearEnd()
+  }
+
+  _setStart = ({
+    label,
+    latlng
+  }) => {
+    const {browsochrones, map, mapMarkers, moveOrigin, timeCutoff} = this.props
     const destinationLatlng = mapMarkers.destination && mapMarkers.destination.latlng
       ? mapMarkers.destination.latlng
       : null
 
-    this.props.moveOrigin({
-      browsochrones: this.props.browsochrones,
+    moveOrigin({
+      browsochrones,
       destinationLatlng,
       label,
       latlng: lonlng(latlng),
-      timeCutoff: this.props.timeCutoff.selected,
-      zoom: this.props.map.zoom
+      timeCutoff: timeCutoff.selected,
+      zoom: map.zoom
     })
   }
 
-  changeStartAddress (feature) {
-    if (!feature) return
-    const {geometry} = feature
-
-    this.moveOrigin({
-      label: featureToLabel(feature),
-      latlng: geometry.coordinates
-    })
+  _setStartWithEvent = (event) => {
+    this._setStart({latlng: event.latlng || event.target._latlng})
   }
 
-  moveDestination ({latlng, label}) {
-    this.props.moveDestination({
-      browsochrones: this.props.browsochrones,
-      label,
-      latlng: lonlng(latlng),
-      zoom: this.props.map.zoom
-    })
-  }
-
-  changeEndAddress (feature) {
+  _setStartWithFeature = (feature) => {
     if (!feature) {
-      this.props.clearDestination()
+      this.props.clearStart()
     } else {
       const {geometry} = feature
 
-      this.moveDestination({
+      this._setStart({
         label: featureToLabel(feature),
         latlng: geometry.coordinates
       })
     }
   }
 
-  onTimeCutoffChange (timeCutoff) {
+  _setEnd = ({
+    label,
+    latlng
+  }) => {
+    const {browsochrones, map, moveDestination} = this.props
+    moveDestination({
+      browsochrones,
+      label,
+      latlng: lonlng(latlng),
+      zoom: map.zoom
+    })
+  }
+
+  _setEndWithEvent = (event) => {
+    this._setEnd({latlng: event.latlng || event.target._latlng})
+  }
+
+  _setEndWithFeature = (feature) => {
+    if (!feature) {
+      this.props.clearEnd()
+    } else {
+      const {geometry} = feature
+
+      this._setEnd({
+        label: featureToLabel(feature),
+        latlng: geometry.coordinates
+      })
+    }
+  }
+
+  _onTimeCutoffChange = (event) => {
+    const timeCutoff = parseInt(event.target.value, 10)
     this.props.onTimeCutoffChange({
       browsochrones: this.props.browsochrones,
       latlng: this.props.mapMarkers.origin.latlng,
@@ -94,14 +118,14 @@ class Indianapolis extends Component {
   }
 
   renderMap () {
-    const {map, mapMarkers} = this.props
+    const {browsochrones, map, mapMarkers} = this.props
 
     const markers = []
     if (mapMarkers.origin && mapMarkers.origin.latlng) {
       markers.push({
         position: mapMarkers.origin.latlng,
         label: mapMarkers.origin.label || '',
-        onDragEnd: (event) => this.moveOrigin({latlng: event.target._latlng})
+        onDragEnd: this._setStartWithEvent
       })
     }
 
@@ -109,13 +133,17 @@ class Indianapolis extends Component {
       markers.push({
         position: mapMarkers.destination.latlng,
         label: mapMarkers.destination.label || '',
-        onDragEnd: (event) => this.moveDestination({latlng: event.target._latlng})
+        onDragEnd: this._setEndWithEvent
       })
     }
 
     return <Map
       {...map}
+      clearStartAndEnd={this._clearStartAndEnd}
+      geojsonColor={browsochrones.active === 'base' ? '#4269a4' : 'darkorange'}
       markers={markers}
+      setEnd={this._setEnd}
+      setStart={this._setStart}
       />
   }
 
@@ -123,31 +151,27 @@ class Indianapolis extends Component {
   lastRender = new Date()
 
   render () {
-    const {browsochrones, destinations, geocoder, map, setBaseActive, setComparisonActive} = this.props
+    const {browsochrones, destinations, geocoder, map, setBaseActive, setComparisonActive, timeCutoff} = this.props
 
     const now = new Date()
     debug(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
     this.lastRender = now
 
     return (
-      <Fullscreen>
-        {this.renderMap({})}
-        <Dock
-          dimMode='none'
-          fluid
-          isVisible
-          position='right'
-          dockStyle={{
-            backgroundColor: '#6492d9'
-          }}
-          >
+      <div>
+        <Fullscreen>
+          {this.renderMap({})}
+        </Fullscreen>
+        <div className='Taui-Dock'>
           <div className='Taui-Dock-content'>
+            <div className='title'><Icon type='map' /> {messages.Title}</div>
             <Form
               accessibility={destinations.accessibility}
               geocoder={geocoder}
-              onTimeCutoffChange={(event) => this.onTimeCutoffChange(parseInt(event.target.value, 10))}
-              onChangeEnd={(input) => this.changeEndAddress(input)}
-              onChangeStart={(input) => this.changeStartAddress(input)}
+              onTimeCutoffChange={this._onTimeCutoffChange}
+              onChangeEnd={this._setEndWithFeature}
+              onChangeStart={this._setStartWithFeature}
+              selectedTimeCutoff={timeCutoff.selected}
               />
             {destinations.accessibility.base &&
               <RouteCard
@@ -159,28 +183,29 @@ class Indianapolis extends Component {
                 transitiveData={map.baseTransitive}
                 travelTime={map.baseTravelTime}
                 >
-                {messages.Systems.Base.Title}
+                {messages.Systems.BaseTitle}
               </RouteCard>
             }
             {destinations.accessibility.comparison &&
               <RouteCard
+                alternate
                 active={browsochrones.active === 'comparison'}
                 accessibility={destinations.accessibility.comparison}
                 onClick={setComparisonActive}
                 transitiveData={map.comparisonTransitive}
                 travelTime={map.comparisonTravelTime}
                 >
-                {messages.Systems.Comparison.Title}
+                {messages.Systems.ComparisonTitle}
               </RouteCard>
             }
+            <div className='Card'>
+              <Log
+                items={this.props.actionLog}
+                />
+            </div>
           </div>
-          <div className='Taui-ActionLog'>
-            <Log
-              items={this.props.actionLog}
-              />
-          </div>
-        </Dock>
-      </Fullscreen>
+        </div>
+      </div>
     )
   }
 }
@@ -191,22 +216,13 @@ function mapStateToProps (state, ownProps) {
 
 function mapDispatchToProps (dispatch, ownProps) {
   return {
-    clearDestination: () => dispatch(clearDestination()),
-    moveOrigin (options) {
-      dispatch(updateOrigin(options))
-    },
-    moveDestination (options) {
-      dispatch(updateDestination(options))
-    },
-    onTimeCutoffChange (options) {
-      dispatch(updateSelectedTimeCutoff(options))
-    },
-    setBaseActive () {
-      dispatch(setBaseActive())
-    },
-    setComparisonActive () {
-      dispatch(setComparisonActive())
-    }
+    clearEnd: () => dispatch(clearEnd()),
+    clearStart: () => dispatch(clearStart()),
+    moveOrigin: (options) => dispatch(updateOrigin(options)),
+    moveDestination: (options) => dispatch(updateDestination(options)),
+    onTimeCutoffChange: (options) => dispatch(updateSelectedTimeCutoff(options)),
+    setBaseActive: () => dispatch(setBaseActive()),
+    setComparisonActive: () => dispatch(setComparisonActive())
   }
 }
 

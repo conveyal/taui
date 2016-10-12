@@ -1,13 +1,31 @@
 Systems:
-  Base:
-    Title: Proposed System Access
-  Comparison:
-    Title: Current System Access
+  BaseTitle: Proposed Transit
+  ComparisonTitle: Current Transit
+  TripsTitle: Example trips
+  TripsEmpty: No trips found!
+  BestTripTitle: Best trip
+  AlternateTripsTitle: Alternates
+Faster: faster
+NewTrip: New Trip
+Geocoding:
+  StartTitle: Find my location
+  StartPlaceholder: Start
+  EndTitle: Traveling to
+  EndPlaceholder: End
+  PromptText: Type to search for an address
+Map:
+  SetLocationPopup:
+    SetStart: Set start
+    SetEnd: Set end
+    ClearMarkers: Clear markers
 Strings:
-  SearchForStartAddress: Search for a start address
-  SearchForEndAddress: Search for an end address
-  HighlightAreaAccessibleWithin: Highlight area accessible within
   ApplicationReady: Application is ready!
-  Welcome: Welcome to our transit analysis tool! Find how your site stacks up compared to others in the region. Search for your address or drag the pin on the map.
+  SearchForStartAddress: Start location
+  SearchForEndAddress: End location
+  HighlightAreaAccessibleWithin: Area accessible within
+  Welcome: Welcome to transit planning analysis! Find how accessible your location is compared to others in the region. Search for your address above or click on the map to get started.
+Slower: slower
+Title: Indianapolis Insights
+Units:
   Minutes: minutes
-  
+  Mins: min

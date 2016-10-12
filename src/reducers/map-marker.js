@@ -19,13 +19,19 @@ export default handleActions({
       destination: payload
     })
   },
-  'clear destination' (state) {
-    return Object.assign({}, state, {destination: null})
+  'clear end' (state) {
+    return {
+      ...state,
+      destination: null
+    }
+  },
+  'clear start' (state) {
+    return {
+      ...state,
+      origin: null
+    }
   }
 }, {
-  origin: {
-    latlng: {},
-    label: ''
-  },
+  origin: {},
   destination: {}
 })

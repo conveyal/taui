@@ -24,7 +24,3 @@ map:
   centerCoordinates: [39.7691, -86.1570]
   zoom: 11
 mapMarkers:
-  origin:
-    latlng:
-      lat: 39.7691
-      lng: -86.1570

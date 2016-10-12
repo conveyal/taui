@@ -26,7 +26,8 @@ export const addActionLogItem = createAction('add action log item', (item) => {
 })
 
 export const setAccessibility = createAction('set accessibility')
-export const clearDestination = createAction('clear destination')
+export const clearEnd = createAction('clear end')
+export const clearStart = createAction('clear start')
 
 export const setBrowsochronesBase = createAction('set browsochrones base')
 export const setBrowsochronesComparison = createAction('set browsochrones comparison')
@@ -137,11 +138,15 @@ async function generateSurface ({browsochrones, latlng, timeCutoff, zoom}) {
 }
 
 async function generateIsochrones ({browsochrones, latlng, timeCutoff}) {
-  const isochrones = await Promise.all([
+  const [base, comparison] = await Promise.all([
     generateIsochrone({browsochrones, latlng, timeCutoff, which: 'base'}),
     generateIsochrone({browsochrones, latlng, timeCutoff, which: 'comparison'})
   ])
-  return setIsochrones({active: browsochrones.active, base: isochrones[0], comparison: isochrones[1]})
+  return setIsochrones({
+    active: browsochrones.active,
+    base,
+    comparison
+  })
 }
 
 async function generateIsochrone ({browsochrones, latlng, timeCutoff, which}) {

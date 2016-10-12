@@ -9,16 +9,18 @@ export default handleActions({
     return Object.assign({}, state, { geojson: [] })
   },
   'set isochrones' (state, {payload}) {
-    return Object.assign({}, state, {
+    return {
+      ...state,
       geojson: [payload[payload.active]],
       baseIsochrone: payload.base,
       comparisonIsochrone: payload.comparison
-    })
+    }
   },
   'set isochrone' (state, action) {
-    return Object.assign({}, state, {
+    return {
+      ...state,
       geojson: [action.payload]
-    })
+    }
   },
   'set origin' (state) {
     return Object.assign({}, state, {transitive: null})
@@ -35,13 +37,14 @@ export default handleActions({
       ? base.transitive
       : comparison.transitive
 
-    return Object.assign({}, state, {
+    return {
+      ...state,
       baseTransitive: base.transitive,
       baseTravelTime: base.travelTime,
       comparisonTransitive: comparison.transitive,
       comparisonTravelTime: comparison.travelTime,
       transitive
-    })
+    }
   },
   'set base active' (state, action) {
     return Object.assign({}, state, {
@@ -55,8 +58,23 @@ export default handleActions({
       transitive: state.comparisonTransitive
     })
   },
-  'clear destination' (state, action) {
-    return Object.assign({}, state, {transitive: null})
+  'clear start' (state, action) {
+    return {
+      ...state,
+      geojson: [],
+      baseIsochrone: null,
+      baseTransitive: null,
+      baseTravelTime: null,
+      comparisonIsochrone: null,
+      comparisonTransitive: null,
+      comparisonTravelTime: null
+    }
+  },
+  'clear end' (state, action) {
+    return {
+      ...state,
+      transitive: null
+    }
   }
 }, {
   geojson: [],
