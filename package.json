@@ -63,7 +63,7 @@
     "throttleit": "^1.0.0",
     "to-camel-case": "^1.0.0",
     "to-capital-case": "^1.0.0",
-    "transitive-js": "^0.8.2"
+    "transitive-js": "^0.8.3"
   },
   "standard": {
     "parser": "babel-eslint"
