@@ -22,7 +22,7 @@
   "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
     "bootstrap": "^4.0.0-alpha.4",
-    "mastarm": "^1.0.0",
+    "mastarm": "^1.1.2",
     "redux-devtools": "^3.2.0",
     "redux-devtools-dock-monitor": "^1.1.1",
     "redux-devtools-log-monitor": "^1.0.11",
