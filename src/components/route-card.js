@@ -1,7 +1,7 @@
 import Color from 'color'
 import React from 'react'
-import toCapitalCase from 'to-capital-case'
-import toSpaceCase from 'to-space-case'
+import toCapitalCase from 'lodash.capitalize'
+import toSpaceCase from 'lodash.lowercase'
 
 import Icon from './icon'
 import messages from '../utils/messages'

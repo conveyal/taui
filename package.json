@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
-    "bootstrap": "^4.0.0-alpha.4",
     "mastarm": "^1.0.0",
     "redux-devtools": "^3.2.0",
     "redux-devtools-dock-monitor": "^1.1.1",
@@ -31,15 +30,16 @@
   "dependencies": {
     "browsochrones": "^0.4.0",
     "color": "^0.11.1",
-    "debounce": "^1.0.0",
     "debug": "^2.2.0",
     "declarative-fetch": "^0.1.13",
-    "deep-assign": "^2.0.0",
     "font-awesome": "^4.6.3",
     "isomorphic-fetch": "^2.2.1",
     "isomorphic-mapzen-search": "0.0.4",
     "leaflet": "^0.7.7",
     "leaflet-transitivelayer": "^0.2.0",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.capitalize": "^4.2.1",
+    "lodash.lowercase": "^4.3.0",
     "lonlng": "0.1.0",
     "mapbox.js": "^2.4.0",
     "moment": "^2.15.1",
@@ -60,9 +60,6 @@
     "redux-multi": "^0.1.12",
     "redux-promise": "^0.5.3",
     "redux-thunk": "^2.0.1",
-    "throttleit": "^1.0.0",
-    "to-camel-case": "^1.0.0",
-    "to-capital-case": "^1.0.0",
     "transitive-js": "^0.8.2"
   },
   "standard": {

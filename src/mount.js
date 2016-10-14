@@ -1,4 +1,3 @@
-import deepAssign from 'deep-assign'
 import React from 'react'
 import {render} from 'react-dom'
 
@@ -11,7 +10,10 @@ export default function (Container) {
   const messages = parse(process.env.MESSAGES)
 
   const fakeStore = configureStore()
-  const store = configureStore(deepAssign(fakeStore.getState(), initialStore))
+  const store = configureStore({
+    ...fakeStore.getState(),
+    ...initialStore
+  })
 
   render(
     <Root store={store}>

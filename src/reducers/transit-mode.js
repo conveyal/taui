@@ -1,5 +1,5 @@
 import {handleActions} from 'redux-actions'
-import toCamelCase from 'to-camel-case'
+import toCamelCase from 'lodash.camelcase'
 
 export default handleActions({
   'update selected transit mode' (state, action) {
