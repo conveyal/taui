@@ -4014,9 +4014,9 @@ marked@^0.3.6:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
 
-mastarm@^1.0.0:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/mastarm/-/mastarm-1.1.2.tgz#2df157f537ff78544d446b3cd0b104f09db8d0bc"
+mastarm@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/mastarm/-/mastarm-1.1.3.tgz#06edfdf1e1d3b8466d5f992a286794f6bc818b39"
   dependencies:
     aws-sdk "^2.4.2"
     babel-core "^6.10.4"
