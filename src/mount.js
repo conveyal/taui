@@ -1,3 +1,4 @@
+import merge from 'lodash.merge'
 import React from 'react'
 import {render} from 'react-dom'
 
@@ -10,10 +11,7 @@ export default function (Container) {
   const messages = parse(process.env.MESSAGES)
 
   const fakeStore = configureStore()
-  const store = configureStore({
-    ...fakeStore.getState(),
-    ...initialStore
-  })
+  const store = configureStore(merge({}, fakeStore.getState(), initialStore))
 
   render(
     <Root store={store}>

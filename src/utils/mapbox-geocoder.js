@@ -3,26 +3,34 @@ import {mapbox} from 'mapbox.js'
 
 mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
 
+const MAPBOX_TYPES = ['address', 'neighborhood', 'place', 'poi']
 const geocoder = mapbox.geocoder('mapbox.places')
 
-export async function search (apiKey, text, {
+export function search (apiKey, text, {
   boundary,
   focusLatlng,
   format
 } = {}) {
-  if (!text) return Promise.resolve([])
+  return geocode({boundary, focusLatlng, text})
+    .then((results) => ({...results, features: results.features.slice(0, 3)}))
+}
 
+export function geocode ({
+  boundary,
+  focusLatlng,
+  text
+}) {
+  if (!text) return Promise.resolve([])
   return new Promise((resolve, reject) => {
     geocoder.query({
       country: boundary.country,
       proximity: lonlng.toCoordinates(focusLatlng),
       query: text,
-      types: ['address', 'neighborhood', 'place', 'poi']
-    }, (err, results) => {
+      types: MAPBOX_TYPES
+    }, (err, response) => {
       if (err) return reject(err)
-      if (!results) return resolve()
-      results.results.features = results.results.features.slice(0, 3) // only return top 3
-      resolve(results.results)
+      if (!response) return resolve([])
+      resolve(response.results)
     })
   })
 }

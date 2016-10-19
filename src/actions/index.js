@@ -93,7 +93,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
         if (destinationLatlng) {
           actions.push(
-            generateDestinationData(browsochrones, destinationLatlng, zoom)
+            generateDestinationData({browsochrones, latlng: destinationLatlng, zoom})
               .then((data) => setTransitiveNetwork({active: browsochrones.active, data, latlng: destinationLatlng}))
           )
         }

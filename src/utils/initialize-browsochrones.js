@@ -1,11 +1,15 @@
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
+import lonlng from 'lonlng'
+import {parse as parseQueryString} from 'qs'
+
+import {geocode} from './mapbox-geocoder'
 import messages from './messages'
 
-import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison} from '../actions'
+import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, setDestination, updateOrigin} from '../actions'
 
 export default async function initialize (store) {
-  const state = store.getState()
+  let state = store.getState()
   const {grids, gridsUrl, origins} = state.browsochrones
   try {
     const fetchGrids = grids.map(async (name) => {
@@ -19,9 +23,40 @@ export default async function initialize (store) {
     const bs1 = await load(origins[0], fetchedGrids)
     store.dispatch(setBrowsochronesBase(bs1))
 
-    if (origins[1]) {
-      const bs2 = await load(origins[1], fetchedGrids)
+    const bs2 = origins[1]
+      ? await load(origins[1], fetchedGrids)
+      : false
+    if (bs2) {
       store.dispatch(setBrowsochronesComparison(bs2))
+    }
+
+    const qs = parseQueryString(window.location.search.split('?')[1])
+    if (qs.start) {
+      try {
+        const {geocoder} = state
+        const [startResults, endResults] = await Promise.all(['start', 'end']
+          .filter((d) => !!qs[d])
+          .map((d) => geocode({
+            boundary: geocoder.boundary,
+            focusLatlng: geocoder.focusLatlng,
+            text: qs[d]
+          })))
+        if (startResults.features.length > 0) {
+          const destination = endResults && endResults.features.length > 0
+            ? { latlng: lonlng(endResults.features[0].geometry.coordinates), label: endResults.features[0].place_name }
+            : {}
+          store.dispatch(updateOrigin({
+            browsochrones: { active: 'base', base: bs1, comparison: bs2 },
+            label: startResults.features[0].place_name,
+            destinationLatlng: destination.latlng,
+            latlng: lonlng(startResults.features[0].geometry.coordinates),
+            zoom: state.map.zoom
+          }))
+          store.dispatch(setDestination(destination))
+        }
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     store.dispatch(addActionLogItem(messages.Strings.ApplicationReady))

@@ -23,4 +23,3 @@ geocoder:
 map:
   centerCoordinates: [39.7691, -86.1570]
   zoom: 11
-mapMarkers:

@@ -40,6 +40,7 @@
     "lodash.camelcase": "^4.3.0",
     "lodash.capitalize": "^4.2.1",
     "lodash.lowercase": "^4.3.0",
+    "lodash.merge": "^4.6.0",
     "lonlng": "0.1.0",
     "mapbox.js": "^2.4.0",
     "moment": "^2.15.1",
@@ -60,7 +61,7 @@
     "redux-multi": "^0.1.12",
     "redux-promise": "^0.5.3",
     "redux-thunk": "^2.0.1",
-    "transitive-js": "^0.8.2"
+    "transitive-js": "0.8.3"
   },
   "standard": {
     "parser": "babel-eslint"
