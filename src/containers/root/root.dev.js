@@ -22,4 +22,10 @@ export default class Root extends Component {
       </Provider>
     )
   }
+
+  componentDidMount () {
+    window.Perf.stop()
+    window.Perf.printExclusive()
+    console.timeEnd('startup')
+  }
 }

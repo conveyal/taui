@@ -39,10 +39,14 @@ export default handleActions({
 
     return {
       ...state,
+      baseInVehicleTravelTime: base.inVehicleTravelTime,
       baseTransitive: base.transitive,
       baseTravelTime: base.travelTime,
+      baseWaitTime: base.waitTime,
+      comparisonInVehicleTravelTime: comparison.inVehicleTravelTime,
       comparisonTransitive: comparison.transitive,
       comparisonTravelTime: comparison.travelTime,
+      comparisonWaitTime: comparison.waitTime,
       transitive
     }
   },

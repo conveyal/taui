@@ -1,3 +1,9 @@
+if (process.env.NODE_ENV === 'development') {
+  const Perf = window.Perf = require('react-addons-perf')
+  Perf.start()
+  console.time('startup')
+}
+
 import merge from 'lodash.merge'
 import React from 'react'
 import {render} from 'react-dom'

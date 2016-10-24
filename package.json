@@ -30,7 +30,7 @@
     "semantic-release": "^4.3.5"
   },
   "dependencies": {
-    "browsochrones": "^0.4.0",
+    "browsochrones": "^0.7.1",
     "color": "^0.11.1",
     "debug": "^2.2.0",
     "declarative-fetch": "^0.1.13",
@@ -49,6 +49,7 @@
     "normalize.css": "^5.0.0",
     "qs": "^6.1.0",
     "react": "^15.3.2",
+    "react-addons-perf": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-leaflet": "^0.12.2",
     "react-pure-render": "^1.0.2",

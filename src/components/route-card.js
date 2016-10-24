@@ -13,9 +13,11 @@ const RouteCard = ({
   children,
   oldAccessibility,
   oldTravelTime,
+  oldWaitTime,
   onClick,
   transitiveData,
-  travelTime
+  travelTime,
+  waitTime
 }) => {
   const className = 'Card' + (alternate ? ' Card-alternate' : '') + (active ? ' Card-active' : '')
   const accessibilityKeys = Object.keys(accessibility)
@@ -37,7 +39,14 @@ const RouteCard = ({
       </div>
       <div className='CardContent'>
         {access}
-        {travelTime && transitiveData && renderJourneys({ oldTravelTime, travelTime, transitiveData })}
+        {travelTime && transitiveData &&
+          renderJourneys({
+            oldTravelTime,
+            oldWaitTime,
+            travelTime,
+            transitiveData,
+            waitTime
+          })}
       </div>
     </div>
   )
@@ -50,11 +59,11 @@ function TripDiff ({
   const difference = oldTravelTime - travelTime
 
   if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /></span>
-  else if (difference > 0) return <span className='increase'>{difference} {messages.Units.Mins} {messages.Faster}</span>
-  else if (difference < 0) return <span className='decrease'>{difference * -1} {messages.Units.Mins} {messages.Slower}</span>
+  else if (difference > 0) return <span className='increase'><strong>{difference}</strong> {messages.Units.Mins} {messages.Faster}</span>
+  else if (difference < 0) return <span className='decrease'><strong>{difference * -1}</strong> {messages.Units.Mins} {messages.Slower}</span>
 }
 
-function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
+function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }) {
   const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
@@ -95,13 +104,14 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime }) {
       <div className='heading'>{messages.Systems.BestTripTitle}</div>
       <div className='Metric'>
         {bestTripSegments}
-        <Icon type='clock-o' /><strong>{travelTime}</strong> {messages.Units.Mins}
+        <strong>{travelTime}</strong> {messages.Units.Mins} / <strong>{waitTime}</strong> {messages.Units.Mins} avg wait
         {oldTravelTime && <span className='pull-right'>
           <TripDiff
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}
             />
         </span>}
+        <br />
       </div>
       {alternateTrips.length > 0 &&
         <div>
@@ -128,7 +138,7 @@ function extractRelevantTransitiveInfo ({
           const pid = s.pattern_id || s.patterns[0].pattern_id
           const seg = {}
           const route = findRouteForPattern({id: pid, patterns, routes})
-          const color = Color(`#${route.route_color}`)
+          const color = route.route_color ? Color(`#${route.route_color}`) : Color(s.color)
           seg.name = toCapitalCase(route.route_short_name)
 
           if (s.patterns && s.patterns.length > 0) {
@@ -180,8 +190,8 @@ function showAccess (keys, base) {
 function AccessDiffPercentage ({
   diff
 }) {
-  if (diff > 0) return <span className='pull-right increase'>{diff.toLocaleString()}%<Icon type='level-up' /></span>
-  else if (diff < 0) return <span className='pull-right decrease'>{(diff * -1).toLocaleString()}%<Icon className='fa-rotate-180' type='level-up' /></span>
+  if (diff > 0) return <span className='pull-right increase'><strong>{diff.toLocaleString()}</strong>%<Icon type='level-up' /></span>
+  else if (diff < 0) return <span className='pull-right decrease'><strong>{(diff * -1).toLocaleString()}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
 }
 
 function showDiff (keys, base, comparison) {

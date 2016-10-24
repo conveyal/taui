@@ -182,6 +182,7 @@ class Indianapolis extends Component {
                 onClick={setBaseActive}
                 transitiveData={map.baseTransitive}
                 travelTime={map.baseTravelTime}
+                waitTime={map.baseWaitTime}
                 >
                 {messages.Systems.BaseTitle}
               </RouteCard>
@@ -194,6 +195,7 @@ class Indianapolis extends Component {
                 onClick={setComparisonActive}
                 transitiveData={map.comparisonTransitive}
                 travelTime={map.comparisonTravelTime}
+                waitTime={map.comparisonWaitTime}
                 >
                 {messages.Systems.ComparisonTitle}
               </RouteCard>
