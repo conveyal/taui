@@ -1,10 +1,7 @@
 import {handleActions} from 'redux-actions'
 
 function setQueryParameters (opts) {
-  if (window.history.pushState) {
-    const newurl = `${window.location.protocol}//${window.location.host}/search?start=${opts.start}&end=${opts.end || ''}`
-    window.history.pushState({path: newurl}, '', newurl)
-  }
+  window.location.hash = `start=${encodeURIComponent(opts.start)}&end=${encodeURIComponent(opts.end || '')}`
 }
 
 export default handleActions({

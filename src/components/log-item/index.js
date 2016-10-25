@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import moment from 'moment'
 
-const format = 'MM-DD HH:mm:ss'
+const format = 'HH:mm:ss'
 
 export default class LogItem extends Component {
   static propTypes = {

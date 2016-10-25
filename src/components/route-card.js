@@ -104,7 +104,7 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
       <div className='heading'>{messages.Systems.BestTripTitle}</div>
       <div className='Metric'>
         {bestTripSegments}
-        <strong>{travelTime}</strong> {messages.Units.Mins} / <strong>{waitTime}</strong> {messages.Units.Mins} avg wait
+        <strong> {travelTime}</strong> {messages.Units.Mins} / <strong>{waitTime}</strong> {messages.Units.Mins} wait
         {oldTravelTime && <span className='pull-right'>
           <TripDiff
             oldTravelTime={oldTravelTime}
@@ -142,8 +142,9 @@ function extractRelevantTransitiveInfo ({
           seg.name = toCapitalCase(route.route_short_name)
 
           if (s.patterns && s.patterns.length > 0) {
-            seg.name = uniq(s.patterns.map((p) =>
-              toCapitalCase(findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name))).join(' / ')
+            const patternNames = s.patterns.map((p) =>
+              toCapitalCase(findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name))
+            seg.name = unique(patternNames).join(' / ')
           }
 
           seg.backgroundColor = color.rgbaString()
@@ -159,8 +160,11 @@ function findRouteForPattern ({id, patterns, routes}) {
   return routes.find((r) => r.route_id === patterns.find((p) => p.pattern_id === id).route_id)
 }
 
-function uniq (a) {
-  return [...new Set(a)]
+function unique (a) {
+  return a.reduce(function (n, e) {
+    if (n.indexOf(e) === -1) n.push(e)
+    return n
+  }, [])
 }
 
 const typeToIcon = {

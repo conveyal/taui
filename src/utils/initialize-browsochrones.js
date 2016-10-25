@@ -59,7 +59,7 @@ async function loadFromQueryString ({
   bs2,
   state
 }) {
-  const qs = parseQueryString(window.location.search.split('?')[1])
+  const qs = parseQueryString(window.location.hash.split('#')[1])
   if (qs.start) {
     const {geocoder} = state
     try {
