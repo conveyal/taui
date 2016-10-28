@@ -1,6 +1,6 @@
 cloudfront: EJKZ46R7IC1BB
 entries:
-  - src/applications/indianapolis.js:assets/index.js
+  - src/index.js:assets/index.js
   - src/containers/indianapolis/style.css:assets/index.css
 flyle: true
 s3bucket: taui

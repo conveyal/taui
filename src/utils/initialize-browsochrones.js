@@ -8,9 +8,13 @@ import messages from './messages'
 
 import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, setDestination, updateOrigin} from '../actions'
 
-export default async function initialize (store) {
-  const state = store.getState()
-  const {grids, gridsUrl, origins} = state.browsochrones
+export default async function initialize ({
+  browsochrones,
+  geocoder,
+  map
+}) {
+  const actions = []
+  const {grids, gridsUrl, origins} = browsochrones
   const fetchGrids = grids.map(async (name) => {
     const res = await fetch(`${gridsUrl}/${name}.grid`)
     const grid = await res.arrayBuffer()
@@ -20,19 +24,21 @@ export default async function initialize (store) {
   const fetchedGrids = await Promise.all(fetchGrids)
 
   const bs1 = await load(origins[0], fetchedGrids)
-  store.dispatch(setBrowsochronesBase(bs1))
+  actions.push(setBrowsochronesBase(bs1))
 
   const bs2 = origins[1]
     ? await load(origins[1], fetchedGrids)
     : false
   if (bs2) {
-    store.dispatch(setBrowsochronesComparison(bs2))
+    actions.push(setBrowsochronesComparison(bs2))
   }
 
-  const actions = await loadFromQueryString({bs1, bs2, state})
-  if (actions && actions.length > 0) store.dispatch(actions)
+  const qs = parseQueryString(window.location.hash.split('#')[1])
+  if (qs.start) {
+    actions.push(...(await loadFromQueryString({bs1, bs2, geocoder, map, qs})))
+  }
 
-  store.dispatch(addActionLogItem(messages.Strings.ApplicationReady))
+  return [...actions, addActionLogItem(messages.Strings.ApplicationReady)]
 }
 
 async function load (url, grids) {
@@ -57,36 +63,35 @@ async function load (url, grids) {
 async function loadFromQueryString ({
   bs1,
   bs2,
-  state
+  geocoder,
+  map,
+  qs
 }) {
-  const qs = parseQueryString(window.location.hash.split('#')[1])
-  if (qs.start) {
-    const {geocoder} = state
-    try {
-      const [startResults, endResults] = await Promise.all(['start', 'end']
-        .filter((d) => !!qs[d])
-        .map((d) => geocode({
-          boundary: geocoder.boundary,
-          focusLatlng: geocoder.focusLatlng,
-          text: qs[d]
-        })))
-      if (startResults.features.length > 0) {
-        const destination = endResults && endResults.features.length > 0
-          ? { latlng: lonlng(endResults.features[0].geometry.coordinates), label: endResults.features[0].place_name }
-          : {}
-        return [
-          updateOrigin({
-            browsochrones: { active: 'base', base: bs1, comparison: bs2 },
-            label: startResults.features[0].place_name,
-            destinationLatlng: destination.latlng,
-            latlng: lonlng(startResults.features[0].geometry.coordinates),
-            zoom: state.map.zoom
-          }),
-          setDestination(destination)
-        ]
-      }
-    } catch (e) {
-      console.error(e)
+  try {
+    const [startResults, endResults] = await Promise.all(['start', 'end']
+      .filter((d) => !!qs[d])
+      .map((d) => geocode({
+        boundary: geocoder.boundary,
+        focusLatlng: geocoder.focusLatlng,
+        text: qs[d]
+      })))
+    if (startResults.features.length > 0) {
+      const destination = endResults && endResults.features.length > 0
+        ? { latlng: lonlng(endResults.features[0].geometry.coordinates), label: endResults.features[0].place_name }
+        : {}
+      return [
+        updateOrigin({
+          browsochrones: { active: 'base', base: bs1, comparison: bs2 },
+          label: startResults.features[0].place_name,
+          destinationLatlng: destination.latlng,
+          latlng: lonlng(startResults.features[0].geometry.coordinates),
+          zoom: map.zoom
+        }),
+        setDestination(destination)
+      ]
     }
+  } catch (e) {
+    console.error(e)
+    return []
   }
 }

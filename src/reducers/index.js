@@ -1,5 +1,3 @@
-import {combineReducers} from 'redux'
-
 import actionLog from './action-log'
 import browsochrones from './browsochrones'
 import destinations from './destinations'
@@ -12,7 +10,7 @@ import timeCutoff from './time-cutoff'
 import transitMode from './transit-mode'
 import transitScenario from './transit-scenario'
 
-const placeApp = combineReducers({
+export default {
   actionLog,
   browsochrones,
   destinations,
@@ -24,6 +22,4 @@ const placeApp = combineReducers({
   timeCutoff,
   transitMode,
   transitScenario
-})
-
-export default placeApp
+}

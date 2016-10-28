@@ -12,6 +12,7 @@ import Log from '../../components/log'
 import Map from './map'
 import messages from '../../utils/messages'
 import RouteCard from '../../components/route-card'
+import initializeBrowsochrones from '../../utils/initialize-browsochrones'
 
 const debug = dbg('taui:indianapolis')
 
@@ -23,6 +24,7 @@ class Indianapolis extends Component {
     clearStart: PropTypes.func.isRequired,
     destinations: PropTypes.object,
     geocoder: PropTypes.object,
+    initializeBrowsochrones: PropTypes.func.isRequired,
     mapMarkers: PropTypes.object,
     map: PropTypes.object,
     moveDestination: PropTypes.func.isRequired,
@@ -34,6 +36,17 @@ class Indianapolis extends Component {
       selected: PropTypes.number
     }),
     zoom: PropTypes.number
+  }
+
+  componentWillMount () {
+    const {browsochrones, geocoder, map} = this.props
+    initializeBrowsochrones({
+      browsochrones,
+      geocoder,
+      map
+    }).then((actions) => {
+      this.props.initializeBrowsochrones(actions)
+    })
   }
 
   _clearStartAndEnd = () => {
@@ -220,6 +233,7 @@ function mapDispatchToProps (dispatch, ownProps) {
   return {
     clearEnd: () => dispatch(clearEnd()),
     clearStart: () => dispatch(clearStart()),
+    initializeBrowsochrones: (actions) => dispatch(actions),
     moveOrigin: (options) => dispatch(updateOrigin(options)),
     moveDestination: (options) => dispatch(updateDestination(options)),
     onTimeCutoffChange: (options) => dispatch(updateSelectedTimeCutoff(options)),
