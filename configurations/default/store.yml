@@ -1,5 +1,7 @@
 browsochrones:
   active: base
+  base: null
+  comparison: null
   gridsUrl: https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-z9/intgrids
   grids:
     - Jobs_total
@@ -22,4 +24,5 @@ geocoder:
         lng: -86.8524169921875
 map:
   centerCoordinates: [39.7691, -86.1570]
+  geojson: []
   zoom: 11

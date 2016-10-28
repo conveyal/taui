@@ -17,8 +17,4 @@ export default handleActions({
     state.comparison = action.payload
     return state
   }
-}, {
-  active: 'base',
-  base: null,
-  comparison: null
-})
+}, {})
