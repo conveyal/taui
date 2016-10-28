@@ -1,17 +1,12 @@
-import ifetch from 'isomorphic-fetch'
 import Leaflet from 'leaflet'
 import lonlng from 'lonlng'
-import {stringify} from 'qs'
 import {createAction} from 'redux-actions'
-import {bind} from 'redux-effects'
-import {fetch} from 'redux-effects-fetch'
+
+import fetch from 'mastarm/react/fetch'
 
 import featureToLabel from '../utils/feature-to-label'
 import {reverse} from '../utils/mapbox-geocoder'
 
-const IDENTITY = (i) => i
-const META = (metadata) => (data) => metadata
-const RAF = META({raf: true})
 const reverseGeocode = ({latlng}) => reverse(process.env.MAPBOX_ACCESS_TOKEN, latlng)
 
 export const addActionLogItem = createAction('add action log item', (item) => {
@@ -26,28 +21,30 @@ export const addActionLogItem = createAction('add action log item', (item) => {
 })
 
 export const setAccessibility = createAction('set accessibility')
+export const setAccessibilityFor = createAction('set accessibility for')
 export const clearEnd = createAction('clear end')
 export const clearStart = createAction('clear start')
 
 export const setBrowsochronesBase = createAction('set browsochrones base')
 export const setBrowsochronesComparison = createAction('set browsochrones comparison')
-export const setDestination = createAction('set destination', IDENTITY, RAF)
-export const setOrigin = createAction('set origin', IDENTITY, RAF)
+export const setDestination = createAction('set destination')
+export const setOrigin = createAction('set origin')
 export const setSelectedTimeCutoff = createAction('set selected time cutoff')
-export const setTransitiveNetwork = createAction('set transitive network', IDENTITY, RAF)
-export const showMapMarker = createAction('show map marker', IDENTITY, RAF)
+export const setTransitiveNetwork = createAction('set transitive network')
+export const setDestinationDataFor = createAction('set destination data for')
+export const showMapMarker = createAction('show map marker')
 export const hideMapMarker = createAction('hide map marker')
 
-export const clearIsochrone = createAction('clear isochrone', IDENTITY, RAF)
-export const setIsochrone = createAction('set isochrone', IDENTITY, RAF)
-export const setIsochrones = createAction('set isochrones', IDENTITY, RAF)
+export const clearIsochrone = createAction('clear isochrone')
+export const setIsochrone = createAction('set isochrone')
+export const setIsochrones = createAction('set isochrones')
+export const setIsochroneFor = createAction('set isochrone for')
 
-export const setBaseActive = createAction('set base active', IDENTITY, RAF)
-export const setComparisonActive = createAction('set comparison active', IDENTITY, RAF)
+export const setBaseActive = createAction('set base active')
+export const setComparisonActive = createAction('set comparison active')
 
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
-export const updateSelectedProject = createAction('update selected project')
 
 export const updateSelectedTransitMode = createAction('update selected transit mode')
 export const updateSelectedTransitScenario = createAction('update selected transit scenario')
@@ -80,28 +77,22 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
   const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   if (browsochrones.base.pointInQueryBounds(point)) {
-    actions.push(bind(
-      generateSurfaces({browsochrones, latlng, timeCutoff, zoom}),
-      ({payload}) => {
-        const actions = [
-          generateIsochrones({browsochrones, latlng, timeCutoff}),
-          setAccessibility({
-            base: payload[0],
-            comparison: payload[1]
-          })
-        ]
-
-        if (destinationLatlng) {
-          actions.push(
-            generateDestinationData({browsochrones, latlng: destinationLatlng, zoom})
-              .then((data) => setTransitiveNetwork({active: browsochrones.active, data, latlng: destinationLatlng}))
-          )
-        }
-
-        return actions
-      },
-      ({err}) => console.error(err)
-    ))
+    actions.push(fetchBrowsochronesFor({
+      browsochrones: browsochrones.base,
+      destinationLatlng,
+      latlng,
+      name: 'base',
+      timeCutoff,
+      zoom
+    }))
+    actions.push(fetchBrowsochronesFor({
+      browsochrones: browsochrones.comparison,
+      destinationLatlng,
+      latlng,
+      name: 'comparison',
+      timeCutoff,
+      zoom
+    }))
   } else {
     console.log('point out of bounds') // TODO: Handle
   }
@@ -109,73 +100,54 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
   return actions
 }
 
-const generateSurfaces = createAction('generate surfaces', ({browsochrones, latlng, timeCutoff, zoom}) => {
-  return Promise.all([
-    generateSurface({browsochrones: browsochrones.base, latlng, timeCutoff, zoom}),
-    generateSurface({browsochrones: browsochrones.comparison, latlng, timeCutoff, zoom})
-  ])
-})
+function fetchBrowsochronesFor ({
+  browsochrones,
+  destinationLatlng,
+  latlng,
+  name,
+  timeCutoff,
+  zoom
+}) {
+  const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+  return fetch({
+    url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
+    next: async (response) => {
+      const actions = []
+      await browsochrones.setOrigin(response.value, point)
+      await browsochrones.generateSurface()
 
-async function generateSurface ({browsochrones, latlng, timeCutoff, zoom}) {
-  try {
-    const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
-    const response = await ifetch(`${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`)
-    const value = await response.arrayBuffer()
+      actions.push(generateAccessiblityFor({browsochrones, name, timeCutoff}))
+      actions.push(generateIsochroneFor({browsochrones, latlng, name, timeCutoff}))
 
-    await browsochrones.setOrigin(value, point)
-    await browsochrones.generateSurface()
+      if (destinationLatlng) {
+        actions.push(generateDestinationDataFor({browsochrones, latlng: destinationLatlng, name, zoom}))
+      }
 
-    const accessibility = {}
+      return actions
+    }
+  })
+}
 
-    await browsochrones.grids.map(async (g) => {
-      accessibility[g] = await browsochrones.getAccessibilityForGrid(g, timeCutoff)
-    })
-
-    return accessibility
-  } catch (e) {
-    console.error(e)
+async function generateAccessiblityFor ({browsochrones, name, timeCutoff}) {
+  const accessibility = {}
+  for (const grid of browsochrones.grids) {
+    accessibility[grid] = await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
   }
+  return setAccessibilityFor({accessibility, name})
 }
 
-async function generateIsochrones ({browsochrones, latlng, timeCutoff}) {
-  const [base, comparison] = await Promise.all([
-    generateIsochrone({browsochrones, latlng, timeCutoff, which: 'base'}),
-    generateIsochrone({browsochrones, latlng, timeCutoff, which: 'comparison'})
-  ])
-  return setIsochrones({
-    active: browsochrones.active,
-    base,
-    comparison
-  })
+async function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
+  const isochrone = await browsochrones.getIsochrone(timeCutoff)
+  isochrone.key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
+
+  return setIsochroneFor({isochrone, name})
 }
 
-async function generateIsochrone ({browsochrones, latlng, timeCutoff, which}) {
-  const isochrone = await browsochrones[which].getIsochrone(timeCutoff)
-  isochrone.key = `${which}-${lonlng.toString(latlng)}-${timeCutoff}`
-
-  return isochrone
-}
-
-async function generateDestinationData ({browsochrones, latlng, zoom}) {
-  return [
-    await browsochrones.base.generateDestinationData(browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)),
-    await browsochrones.comparison.generateDestinationData(browsochrones.comparison.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom))
-  ]
-}
-
-async function generateAccessiblity ({browsochrones, timeCutoff}) {
-  const accessibility = {
-    base: {},
-    comparison: {}
-  }
-  await browsochrones.base.grids.forEach(async (grid) => {
-    accessibility.base[grid] = await browsochrones.base.getAccessibilityForGrid(grid, timeCutoff)
-  })
-  await browsochrones.comparison.grids.forEach(async (grid) => {
-    accessibility.comparison[grid] = await browsochrones.comparison.getAccessibilityForGrid(grid, timeCutoff)
-  })
-
-  return setAccessibility(accessibility)
+async function generateDestinationDataFor ({browsochrones, latlng, name, zoom}) {
+  const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+  const data = await browsochrones.generateDestinationData(destinationPoint, zoom)
+  data.transitive.key = `${name}-${lonlng.toString(latlng)}`
+  return setDestinationDataFor({data, name})
 }
 
 export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
@@ -184,8 +156,10 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
   ]
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
-    actions.push(generateIsochrones({browsochrones, latlng, timeCutoff}))
-    actions.push(generateAccessiblity({browsochrones, timeCutoff}))
+    actions.push(generateIsochroneFor({browsochrones: browsochrones.base, latlng, name: 'base', timeCutoff}))
+    actions.push(generateIsochroneFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', timeCutoff}))
+    actions.push(generateAccessiblityFor({browsochrones: browsochrones.base, name: 'base', timeCutoff}))
+    actions.push(generateAccessiblityFor({browsochrones: browsochrones.comparison, name: 'comparison', timeCutoff}))
   }
 
   return actions
@@ -211,32 +185,9 @@ export function updateDestination ({browsochrones, latlng, label, zoom}) {
   }
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
-    actions.push(
-      generateDestinationData({browsochrones, latlng, zoom})
-        .then((data) => setTransitiveNetwork({active: browsochrones.active, data, latlng}))
-    )
+    actions.push(generateDestinationDataFor({browsochrones: browsochrones.base, latlng, name: 'base', zoom}))
+    actions.push(generateDestinationDataFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', zoom}))
   }
 
   return actions
-}
-
-export const requestSinglePoint = createAction('request single point')
-export const receiveSinglePoint = createAction('receive single point')
-
-export function fetchSinglePoint (query) {
-  const qs = stringify({
-    lat: query.position[0],
-    lng: query.position[1],
-    destinationPointsetId: query.destinationPointsetId,
-    graphId: query.graphId
-  })
-
-  return [
-    requestSinglePoint(query),
-    bind(
-      fetch(`/api/singlePointRequest?${qs}`),
-      ({value}) => receiveSinglePoint(value),
-      ({value}) => addActionLogItem(value)
-    )
-  ]
 }

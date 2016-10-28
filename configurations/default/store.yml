@@ -23,6 +23,9 @@ geocoder:
         lat: 39.35978526869001
         lng: -86.8524169921875
 map:
+  active: base
   centerCoordinates: [39.7691, -86.1570]
   geojson: []
   zoom: 11
+ui:
+  fetches: 0

@@ -35,6 +35,7 @@ class Indianapolis extends Component {
     timeCutoff: PropTypes.shape({
       selected: PropTypes.number
     }),
+    ui: PropTypes.object,
     zoom: PropTypes.number
   }
 
@@ -164,7 +165,7 @@ class Indianapolis extends Component {
   lastRender = new Date()
 
   render () {
-    const {browsochrones, destinations, geocoder, map, setBaseActive, setComparisonActive, timeCutoff} = this.props
+    const {browsochrones, destinations, geocoder, map, setBaseActive, setComparisonActive, timeCutoff, ui} = this.props
 
     const now = new Date()
     debug(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
@@ -177,7 +178,11 @@ class Indianapolis extends Component {
         </Fullscreen>
         <div className='Taui-Dock'>
           <div className='Taui-Dock-content'>
-            <div className='title'><Icon type='map' /> {messages.Title}</div>
+            <div className='title'>
+              {ui.fetches > 0
+                ? <Icon type='spinner' className='fa-spin' />
+                : <Icon type='map' />} {messages.Title}
+            </div>
             <Form
               accessibility={destinations.accessibility}
               geocoder={geocoder}

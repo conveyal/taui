@@ -4,6 +4,16 @@ export default handleActions({
   'set accessibility' (state, action) {
     return Object.assign({}, state, {accessibility: action.payload})
   },
+  'set accessibility for' (state, {payload}) {
+    const {accessibility, name} = payload
+    return {
+      ...state,
+      accessibility: {
+        ...state.accessibility,
+        [`${name}`]: accessibility
+      }
+    }
+  },
   'clear start' (state, action) {
     return {
       ...state,
@@ -14,7 +24,7 @@ export default handleActions({
     }
   },
   'update selected destination' (state, action) {
-    return Object.assign({}, state, {selected: action.payload})
+    return {...state, selected: action.payload}
   }
 }, {
   accessibility: {

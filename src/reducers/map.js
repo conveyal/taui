@@ -6,7 +6,15 @@ export default handleActions({
     return Object.assign({}, state, action.payload)
   },
   'clear isochrone' (state, action) {
-    return Object.assign({}, state, { geojson: [] })
+    return {...state, geojson: []}
+  },
+  'set isochrone for' (state, {payload}) {
+    const {name, isochrone} = payload
+    return {
+      ...state,
+      geojson: state.active === name ? [isochrone] : state.geojson,
+      [`${name}Isochrone`]: isochrone
+    }
   },
   'set isochrones' (state, {payload}) {
     return {
@@ -24,6 +32,17 @@ export default handleActions({
   },
   'set origin' (state) {
     return Object.assign({}, state, {transitive: null})
+  },
+  'set destination data for' (state, {payload}) {
+    const {data, name} = payload
+    return {
+      ...state,
+      [`${name}InVehicleTravelTime`]: data.inVehicleTravelTime,
+      [`${name}Transitive`]: data.transitive,
+      [`${name}TravelTime`]: data.travelTime,
+      [`${name}WaitTime`]: data.waitTime,
+      transitive: state.active === name ? data.transitive : state.transitive
+    }
   },
   'set transitive network' (state, {payload}) {
     const {active, data, latlng} = payload
@@ -52,12 +71,14 @@ export default handleActions({
   },
   'set base active' (state, action) {
     return Object.assign({}, state, {
+      active: 'base',
       geojson: [state.baseIsochrone],
       transitive: state.baseTransitive
     })
   },
   'set comparison active' (state, action) {
     return Object.assign({}, state, {
+      active: 'comparison',
       geojson: [state.comparisonIsochrone],
       transitive: state.comparisonTransitive
     })
@@ -81,6 +102,7 @@ export default handleActions({
     }
   }
 }, {
+  active: 'base',
   geojson: [],
   map: null,
   transitive: null,

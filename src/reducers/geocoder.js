@@ -14,7 +14,7 @@ export default handleActions({
       ...state,
       origin: {
         label: payload.label,
-        value: `${payload.latlng.lng},${payload.latlng.lat}`
+        value: payload.latlng ? `${payload.latlng.lng},${payload.latlng.lat}` : false
       }
     }
   },
@@ -27,7 +27,7 @@ export default handleActions({
       ...state,
       destination: {
         label: payload.label,
-        value: `${payload.latlng.lng},${payload.latlng.lat}`
+        value: payload.latlng ? `${payload.latlng.lng},${payload.latlng.lat}` : false
       }
     }
   },
