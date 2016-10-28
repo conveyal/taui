@@ -30,7 +30,6 @@
     "browsochrones": "^0.8.0",
     "color": "^0.11.1",
     "debug": "^2.2.0",
-    "declarative-fetch": "^0.1.13",
     "font-awesome": "^4.6.3",
     "isomorphic-fetch": "^2.2.1",
     "isomorphic-mapzen-search": "0.0.4",
@@ -55,10 +54,6 @@
     "react-select-geocoder": "^0.2.1",
     "redux": "^3.6.0",
     "redux-actions": "^0.12.0",
-    "redux-batched-subscribe": "^0.1.4",
-    "redux-effects": "^0.4.3",
-    "redux-effects-fetch": "^0.5.5",
-    "redux-effects-timeout": "^0.1.7",
     "transitive-js": "0.8.4"
   },
   "standard": {

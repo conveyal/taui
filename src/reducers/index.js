@@ -4,11 +4,11 @@ import destinations from './destinations'
 import geocoder from './geocoder'
 import map from './map'
 import mapMarkers from './map-marker'
-import project from './project'
 import singlePoint from './single-point'
 import timeCutoff from './time-cutoff'
 import transitMode from './transit-mode'
 import transitScenario from './transit-scenario'
+import ui from './ui'
 
 export default {
   actionLog,
@@ -17,9 +17,9 @@ export default {
   geocoder,
   map,
   mapMarkers,
-  project,
   singlePoint,
   timeCutoff,
   transitMode,
-  transitScenario
+  transitScenario,
+  ui
 }

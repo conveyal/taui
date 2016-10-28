@@ -1,9 +1,9 @@
 import mount from 'mastarm/react/mount'
 
+import Indianapolis from './containers/indianapolis'
 import reducers from './reducers'
-import router from './router'
 
 mount({
-  app: router,
+  app: Indianapolis,
   reducers
 })
