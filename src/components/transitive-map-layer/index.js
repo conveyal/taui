@@ -1,4 +1,5 @@
 import {Map} from 'leaflet'
+import isEqual from 'lodash.isequal'
 import {PropTypes} from 'react'
 import {MapLayer} from 'react-leaflet'
 import Transitive from 'transitive-js'
@@ -9,7 +10,11 @@ export default class TransitiveMapLayer extends MapLayer {
     data: PropTypes.object.isRequired,
     map: PropTypes.instanceOf(Map),
     styles: PropTypes.object
-  };
+  }
+
+  shouldComponentUpdate (newProps, newState) {
+    return !isEqual(newProps, this.props) || !isEqual(newState, this.state)
+  }
 
   componentWillMount () {
     super.componentWillMount()

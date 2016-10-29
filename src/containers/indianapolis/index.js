@@ -219,6 +219,7 @@ class Indianapolis extends Component {
               </RouteCard>
             }
             <div className='Card'>
+              <div className='CardTitle'>Log</div>
               <Log
                 items={this.props.actionLog}
                 />

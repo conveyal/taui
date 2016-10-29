@@ -5,6 +5,7 @@ import {createAction} from 'redux-actions'
 import fetch from 'mastarm/react/fetch'
 
 import featureToLabel from '../utils/feature-to-label'
+import {setKeyTo} from '../utils/hash'
 import {reverse} from '../utils/mapbox-geocoder'
 
 const reverseGeocode = ({latlng}) => reverse(process.env.MAPBOX_ACCESS_TOKEN, latlng)
@@ -14,21 +15,35 @@ export const addActionLogItem = createAction('add action log item', (item) => {
     ? { text: item }
     : item
 
-  return Object.assign({
+  return {
     createdAt: new Date(),
-    level: 'info'
-  }, payload)
+    level: 'info',
+    ...payload
+  }
+})
+
+export const setDestination = createAction('set destination', (destination) => {
+  setKeyTo('end', destination ? destination.label : null)
+  return destination
+})
+
+export const setOrigin = createAction('set origin', (origin) => {
+  setKeyTo('start', origin ? origin.label : null)
+  return origin
+})
+
+export const clearEnd = createAction('clear end', () => {
+  setKeyTo('end', null)
+})
+export const clearStart = createAction('clear start', () => {
+  setKeyTo('start', null)
 })
 
 export const setAccessibility = createAction('set accessibility')
 export const setAccessibilityFor = createAction('set accessibility for')
-export const clearEnd = createAction('clear end')
-export const clearStart = createAction('clear start')
 
 export const setBrowsochronesBase = createAction('set browsochrones base')
 export const setBrowsochronesComparison = createAction('set browsochrones comparison')
-export const setDestination = createAction('set destination')
-export const setOrigin = createAction('set origin')
 export const setSelectedTimeCutoff = createAction('set selected time cutoff')
 export const setTransitiveNetwork = createAction('set transitive network')
 export const setDestinationDataFor = createAction('set destination data for')
@@ -46,9 +61,6 @@ export const setComparisonActive = createAction('set comparison active')
 export const updateMap = createAction('update map')
 export const updateSelectedDestination = createAction('update selected destination')
 
-export const updateSelectedTransitMode = createAction('update selected transit mode')
-export const updateSelectedTransitScenario = createAction('update selected transit scenario')
-
 /**
  * What happens on origin update:
  *  - Map marker should get set to the new origin immmediately (if it wasn't a drag/drop)
@@ -59,16 +71,27 @@ export const updateSelectedTransitScenario = createAction('update selected trans
  *      - Accessibility is calculated for grids
  */
 export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, timeCutoff, zoom}) {
-  const actions = [clearIsochrone()]
+  const actions = [
+    addActionLogItem('Generating origins...'),
+    clearIsochrone()
+  ]
 
   if (label) {
-    actions.push(setOrigin({label, latlng}))
+    actions.push(
+      addActionLogItem(`Set start address to: ${label}`),
+      setOrigin({label, latlng})
+    )
   } else {
     actions.push(
+      addActionLogItem(`Finding start address for ${lonlng(latlng).toString()}`),
       reverseGeocode({latlng})
         .then(({features}) => {
           if (!features || features.length < 1) return
-          return setOrigin({label: featureToLabel(features[0]), latlng: lonlng(features[0].geometry.coordinates)})
+          const label = featureToLabel(features[0])
+          return [
+            addActionLogItem(`Set start address to: ${label}`),
+            setOrigin({label, latlng: lonlng(features[0].geometry.coordinates)})
+          ]
         })
     )
   }
@@ -77,22 +100,24 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
   const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   if (browsochrones.base.pointInQueryBounds(point)) {
-    actions.push(fetchBrowsochronesFor({
-      browsochrones: browsochrones.base,
-      destinationLatlng,
-      latlng,
-      name: 'base',
-      timeCutoff,
-      zoom
-    }))
-    actions.push(fetchBrowsochronesFor({
-      browsochrones: browsochrones.comparison,
-      destinationLatlng,
-      latlng,
-      name: 'comparison',
-      timeCutoff,
-      zoom
-    }))
+    actions.push(
+      fetchBrowsochronesFor({
+        browsochrones: browsochrones.base,
+        destinationLatlng,
+        latlng,
+        name: 'base',
+        timeCutoff,
+        zoom
+      }),
+      fetchBrowsochronesFor({
+        browsochrones: browsochrones.comparison,
+        destinationLatlng,
+        latlng,
+        name: 'comparison',
+        timeCutoff,
+        zoom
+      })
+    )
   } else {
     console.log('point out of bounds') // TODO: Handle
   }
@@ -109,45 +134,65 @@ function fetchBrowsochronesFor ({
   zoom
 }) {
   const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
-  return fetch({
-    url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
-    next: async (response) => {
-      const actions = []
-      await browsochrones.setOrigin(response.value, point)
-      await browsochrones.generateSurface()
+  return [
+    addActionLogItem(`Fetching origin data for ${name} scenario`),
+    fetch({
+      url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
+      next: async (response) => {
+        const actions = []
+        await browsochrones.setOrigin(response.value, point)
+        await browsochrones.generateSurface()
 
-      actions.push(generateAccessiblityFor({browsochrones, name, timeCutoff}))
-      actions.push(generateIsochroneFor({browsochrones, latlng, name, timeCutoff}))
+        actions.push(
+          generateAccessiblityFor({browsochrones, name, timeCutoff}),
+          generateIsochroneFor({browsochrones, latlng, name, timeCutoff})
+        )
 
-      if (destinationLatlng) {
-        actions.push(generateDestinationDataFor({browsochrones, latlng: destinationLatlng, name, zoom}))
+        if (destinationLatlng) {
+          actions.push(generateDestinationDataFor({browsochrones, latlng: destinationLatlng, name, zoom}))
+        }
+
+        return actions
       }
-
-      return actions
-    }
-  })
+    })
+  ]
 }
 
-async function generateAccessiblityFor ({browsochrones, name, timeCutoff}) {
-  const accessibility = {}
-  for (const grid of browsochrones.grids) {
-    accessibility[grid] = await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
-  }
-  return setAccessibilityFor({accessibility, name})
+function generateAccessiblityFor ({browsochrones, name, timeCutoff}) {
+  return [
+    addActionLogItem(`Generating accessibility surface for ${name}`),
+    (async () => {
+      const accessibility = {}
+      for (const grid of browsochrones.grids) {
+        accessibility[grid] = await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
+      }
+      return setAccessibilityFor({accessibility, name})
+    })()
+  ]
 }
 
-async function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
-  const isochrone = await browsochrones.getIsochrone(timeCutoff)
-  isochrone.key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
+function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
+  return [
+    addActionLogItem(`Generating travel time isochrone for ${name}`),
+    (async () => {
+      const isochrone = await browsochrones.getIsochrone(timeCutoff)
+      isochrone.key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
 
-  return setIsochroneFor({isochrone, name})
+      return setIsochroneFor({isochrone, name})
+    })()
+  ]
 }
 
-async function generateDestinationDataFor ({browsochrones, latlng, name, zoom}) {
-  const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
-  const data = await browsochrones.generateDestinationData(destinationPoint, zoom)
-  data.transitive.key = `${name}-${lonlng.toString(latlng)}`
-  return setDestinationDataFor({data, name})
+function generateDestinationDataFor ({browsochrones, latlng, name, zoom}) {
+  return [
+    addActionLogItem(`Generating transit data for ${name}`),
+    (async () => {
+      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+      const data = await browsochrones.generateDestinationData(destinationPoint, zoom)
+      data.transitive.key = `${name}-${lonlng.toString(latlng)}`
+      return setDestinationDataFor({data, name})
+    })()
+  ]
 }
 
 export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
