@@ -1,8 +1,9 @@
 import React, {PropTypes} from 'react'
-import PureComponent from 'react-pure-render/component'
 import {connect} from 'react-redux'
 
-class TimeCutoffSelect extends PureComponent {
+import DeepEqual from './deep-equal'
+
+class TimeCutoffSelect extends DeepEqual {
   static propTypes = {
     className: PropTypes.string,
     onChange: PropTypes.func.isRequired,

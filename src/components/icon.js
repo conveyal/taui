@@ -1,5 +1,7 @@
 import React from 'react'
 
+import {pure} from './deep-equal'
+
 const Icon = ({
   className = '',
   type,
@@ -10,4 +12,4 @@ const Icon = ({
     {...props}
     />
 
-export default Icon
+export default pure(Icon)

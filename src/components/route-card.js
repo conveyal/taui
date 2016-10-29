@@ -3,53 +3,57 @@ import React from 'react'
 import toCapitalCase from 'lodash.capitalize'
 import toSpaceCase from 'lodash.lowercase'
 
+import DeepEqual from './deep-equal'
 import Icon from './icon'
 import messages from '../utils/messages'
 
-const RouteCard = ({
-  active,
-  alternate,
-  accessibility,
-  children,
-  oldAccessibility,
-  oldTravelTime,
-  oldWaitTime,
-  onClick,
-  transitiveData,
-  travelTime,
-  waitTime
-}) => {
-  const className = 'Card' + (alternate ? ' Card-alternate' : '') + (active ? ' Card-active' : '')
-  const accessibilityKeys = Object.keys(accessibility)
-  const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
+export default class RouteCard extends DeepEqual {
+  render () {
+    const {
+      active,
+      alternate,
+      accessibility,
+      children,
+      oldAccessibility,
+      oldTravelTime,
+      oldWaitTime,
+      onClick,
+      transitiveData,
+      travelTime,
+      waitTime
+    } = this.props
+    const className = 'Card' + (alternate ? ' Card-alternate' : '') + (active ? ' Card-active' : '')
+    const accessibilityKeys = Object.keys(accessibility)
+    const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
 
-  const access = comparisonAccessibilityKeys.length > 0
-    ? showDiff(accessibilityKeys, accessibility, oldAccessibility)
-    : showAccess(accessibilityKeys, accessibility)
+    const access = comparisonAccessibilityKeys.length > 0
+      ? showDiff(accessibilityKeys, accessibility, oldAccessibility)
+      : showAccess(accessibilityKeys, accessibility)
 
-  return (
-    <div
-      className={className}
-      >
-      <div className='CardTitle' onClick={onClick}>{children}
-        <span className='pull-right'>
-          {active && <Icon type='map' />}
-          {!active && 'show'}
-        </span>
+    return (
+      <div
+        className={className}
+        >
+        <div className='CardTitle' onClick={onClick}>{children}
+          <span className='pull-right'>
+            {active && <Icon type='map' />}
+            {!active && 'show'}
+          </span>
+        </div>
+        <div className='CardContent'>
+          {access}
+          {travelTime && transitiveData &&
+            renderJourneys({
+              oldTravelTime,
+              oldWaitTime,
+              travelTime,
+              transitiveData,
+              waitTime
+            })}
+        </div>
       </div>
-      <div className='CardContent'>
-        {access}
-        {travelTime && transitiveData &&
-          renderJourneys({
-            oldTravelTime,
-            oldWaitTime,
-            travelTime,
-            transitiveData,
-            waitTime
-          })}
-      </div>
-    </div>
-  )
+    )
+  }
 }
 
 function TripDiff ({
@@ -194,20 +198,24 @@ function showAccess (keys, base) {
 function AccessDiffPercentage ({
   diff
 }) {
-  if (diff > 0) return <span className='pull-right increase'><strong>{diff.toLocaleString()}</strong>%<Icon type='level-up' /></span>
-  else if (diff < 0) return <span className='pull-right decrease'><strong>{(diff * -1).toLocaleString()}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
+  if (diff > 0) return <span className='pull-right increase'><strong>{diff}</strong>%<Icon type='level-up' /></span>
+  else if (diff < 0) return <span className='pull-right decrease'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
+  else return <span />
 }
 
 function showDiff (keys, base, comparison) {
   return (
     <div className='CardAccess'>
       <div className='heading'>Access to</div>
-      {keys.map((k, i) => {
-        const diff = parseInt((base[k] - comparison[k]) / base[k] * 100, 10)
-        return <div className='Metric' key={k}><MetricIcon name={k} /><strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)} <AccessDiffPercentage diff={diff} /></div>
+      {keys.map((key, i) => {
+        const diff = parseInt(((base[key] - comparison[key]) / base[key] * 100).toFixed(1))
+        return (
+          <div className='Metric' key={key}>
+            <MetricIcon name={key} /><strong> {(base[key] | 0).toLocaleString()} </strong> {toSpaceCase(key)}
+            <AccessDiffPercentage diff={diff} />
+          </div>
+        )
       })}
     </div>
   )
 }
-
-export default RouteCard

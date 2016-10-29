@@ -1,9 +1,11 @@
-import React, {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
 import moment from 'moment'
+
+import DeepEqual from '../deep-equal'
 
 const format = 'HH:mm:ss'
 
-export default class LogItem extends Component {
+export default class LogItem extends DeepEqual {
   static propTypes = {
     createdAt: PropTypes.object,
     level: PropTypes.string,

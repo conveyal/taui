@@ -1,6 +1,7 @@
 
 .LogItem {
   margin-bottom: 0.5rem;
+  display: flex;
 }
 
 .LogItem-label {

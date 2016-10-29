@@ -1,14 +1,14 @@
 import {Browser} from 'leaflet'
 import React, {PropTypes} from 'react'
 import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer} from 'react-leaflet'
-import PureComponent from 'react-pure-render/component'
 
+import DeepEqual from '../../components/deep-equal'
 import Icon from '../../components/icon'
 import messages from '../../utils/messages'
 import TransitiveLayer from '../../components/transitive-map-layer'
 import transitiveStyle from './transitive-style'
 
-export default class Map extends PureComponent {
+export default class Map extends DeepEqual {
   static propTypes = {
     centerCoordinates: PropTypes.arrayOf(PropTypes.number),
     clearStartAndEnd: PropTypes.func.isRequired,

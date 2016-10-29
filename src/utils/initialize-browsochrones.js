@@ -1,8 +1,8 @@
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
 import lonlng from 'lonlng'
-import {parse as parseQueryString} from 'qs'
 
+import {getAsObject as getHash} from './hash'
 import {geocode} from './mapbox-geocoder'
 import messages from './messages'
 
@@ -33,7 +33,7 @@ export default async function initialize ({
     actions.push(setBrowsochronesComparison(bs2))
   }
 
-  const qs = parseQueryString(window.location.hash.split('#')[1])
+  const qs = getHash()
   if (qs.start) {
     actions.push(...(await loadFromQueryString({bs1, bs2, geocoder, map, qs})))
   }
