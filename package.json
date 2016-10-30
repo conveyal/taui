@@ -51,7 +51,7 @@
     "react-redux": "^4.4.5",
     "react-select-geocoder": "^0.2.1",
     "redux": "^3.6.0",
-    "redux-actions": "^0.12.0",
+    "redux-actions": "^0.13.0",
     "transitive-js": "0.8.4"
   },
   "standard": {
