@@ -112,7 +112,8 @@ export default class Map extends DeepEqual {
             style={{
               fillColor: geojsonColor,
               pointerEvents: 'none',
-              stroke: false
+              stroke: geojsonColor,
+              weight: 1
             }}
             />
         })}
