@@ -2,7 +2,10 @@ import Leaflet from 'leaflet'
 import lonlng from 'lonlng'
 import {createAction} from 'redux-actions'
 
-import fetch from 'mastarm/react/fetch'
+import fetch, {
+  incrementFetches as incrementWork,
+  decrementFetches as decrementWork
+} from 'mastarm/react/fetch'
 
 import featureToLabel from '../utils/feature-to-label'
 import {setKeyTo} from '../utils/hash'
@@ -135,24 +138,20 @@ function fetchBrowsochronesFor ({
 }) {
   const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   return [
+    incrementWork(), // to include the time taking to set the origin and generate the surface
     addActionLogItem(`Fetching origin data for ${name} scenario`),
     fetch({
       url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
       next: async (response) => {
-        const actions = []
         await browsochrones.setOrigin(response.value, point)
         await browsochrones.generateSurface()
 
-        actions.push(
+        return [
+          decrementWork(),
           generateAccessiblityFor({browsochrones, name, timeCutoff}),
-          generateIsochroneFor({browsochrones, latlng, name, timeCutoff})
-        )
-
-        if (destinationLatlng) {
-          actions.push(generateDestinationDataFor({browsochrones, latlng: destinationLatlng, name, zoom}))
-        }
-
-        return actions
+          generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
+          destinationLatlng && generateDestinationDataFor({browsochrones, latlng: destinationLatlng, name, zoom})
+        ]
       }
     })
   ]
@@ -160,37 +159,49 @@ function fetchBrowsochronesFor ({
 
 function generateAccessiblityFor ({browsochrones, name, timeCutoff}) {
   return [
+    incrementWork(),
     addActionLogItem(`Generating accessibility surface for ${name}`),
     (async () => {
       const accessibility = {}
       for (const grid of browsochrones.grids) {
         accessibility[grid] = await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
       }
-      return setAccessibilityFor({accessibility, name})
+      return [
+        setAccessibilityFor({accessibility, name}),
+        decrementWork()
+      ]
     })()
   ]
 }
 
 function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
   return [
+    incrementWork(),
     addActionLogItem(`Generating travel time isochrone for ${name}`),
     (async () => {
       const isochrone = await browsochrones.getIsochrone(timeCutoff)
       isochrone.key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
 
-      return setIsochroneFor({isochrone, name})
+      return [
+        setIsochroneFor({isochrone, name}),
+        decrementWork()
+      ]
     })()
   ]
 }
 
 function generateDestinationDataFor ({browsochrones, latlng, name, zoom}) {
   return [
+    incrementWork(),
     addActionLogItem(`Generating transit data for ${name}`),
     (async () => {
       const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
       const data = await browsochrones.generateDestinationData(destinationPoint, zoom)
       data.transitive.key = `${name}-${lonlng.toString(latlng)}`
-      return setDestinationDataFor({data, name})
+      return [
+        setDestinationDataFor({data, name}),
+        decrementWork()
+      ]
     })()
   ]
 }
