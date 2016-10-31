@@ -23,7 +23,7 @@ Strings:
   SearchForStartAddress: Start location
   SearchForEndAddress: End location
   HighlightAreaAccessibleWithin: Area accessible within
-  Welcome: Welcome to transit planning analysis! Find how accessible your location is compared to others in the region. Search for your address above or click on the map to get started.
+  Welcome: Search for your address above or click on the map to get started.
 Slower: slower
 Title: IndyConnect
 Units:
