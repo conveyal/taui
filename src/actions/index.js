@@ -79,6 +79,14 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
     clearIsochrone()
   ]
 
+  // TODO: Remove this!
+  if (label && label.toLowerCase().indexOf('airport') !== -1) {
+    latlng = {
+      lat: 39.7146,
+      lng: -86.2983
+    }
+  }
+
   if (label) {
     actions.push(
       addActionLogItem(`Set start address to: ${label}`),
@@ -150,7 +158,13 @@ function fetchBrowsochronesFor ({
           decrementWork(),
           generateAccessiblityFor({browsochrones, name, timeCutoff}),
           generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
-          destinationLatlng && generateDestinationDataFor({browsochrones, latlng: destinationLatlng, name, zoom})
+          destinationLatlng && generateDestinationDataFor({
+            browsochrones,
+            fromLatlng: latlng,
+            toLatlng: destinationLatlng,
+            name,
+            zoom
+          })
         ]
       }
     })
@@ -190,14 +204,17 @@ function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
   ]
 }
 
-function generateDestinationDataFor ({browsochrones, latlng, name, zoom}) {
+function generateDestinationDataFor ({browsochrones, fromLatlng, toLatlng, name, zoom}) {
   return [
     incrementWork(),
     addActionLogItem(`Generating transit data for ${name}`),
     (async () => {
-      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
-      const data = await browsochrones.generateDestinationData(destinationPoint, zoom)
-      data.transitive.key = `${name}-${lonlng.toString(latlng)}`
+      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(toLatlng, zoom), zoom)
+      const data = await browsochrones.generateDestinationData({
+        from: fromLatlng || null,
+        to: destinationPoint
+      })
+      data.transitive.key = `${name}-${lonlng.toString(toLatlng)}`
       return [
         setDestinationDataFor({data, name}),
         decrementWork()
@@ -231,6 +248,14 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
 export function updateDestination ({browsochrones, latlng, label, zoom}) {
   const actions = []
 
+  // TODO: Remove this!
+  if (label && label.toLowerCase().indexOf('airport') !== -1) {
+    latlng = {
+      lat: 39.7146,
+      lng: -86.2983
+    }
+  }
+
   if (label) {
     actions.push(setDestination({label, latlng}))
   } else {
@@ -241,8 +266,8 @@ export function updateDestination ({browsochrones, latlng, label, zoom}) {
   }
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
-    actions.push(generateDestinationDataFor({browsochrones: browsochrones.base, latlng, name: 'base', zoom}))
-    actions.push(generateDestinationDataFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', zoom}))
+    actions.push(generateDestinationDataFor({browsochrones: browsochrones.base, toLatlng: latlng, name: 'base', zoom}))
+    actions.push(generateDestinationDataFor({browsochrones: browsochrones.comparison, toLatlng: latlng, name: 'comparison', zoom}))
   }
 
   return actions
