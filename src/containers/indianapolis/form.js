@@ -32,33 +32,37 @@ export default class Form extends DeepEqual {
             value={geocoder.origin}
             />
         </div>
-        <div className='heading'>{messages.Geocoding.EndTitle}</div>
-        <div className='Geocoder'>
-          <Geocoder
-            apiKey={process.env.MAPZEN_SEARCH_KEY}
-            {...geocoder}
-            featureToLabel={featureToLabel}
-            featureToValue={(f) => f.id}
-            name='end-address'
-            onChange={onChangeEnd}
-            placeholder={messages.Geocoding.EndPlaceholder}
-            search={search}
-            searchPromptText={messages.Geocoding.PromptText}
-            value={geocoder.destination}
-            />
-        </div>
-        <div className='heading'>{messages.Strings.HighlightAreaAccessibleWithin}</div>
-        <div className='TimeCutoff'>
-          <div className='Time'>{selectedTimeCutoff} {messages.Units.Minutes}</div>
-          <input
-            defaultValue={selectedTimeCutoff}
-            onChange={onTimeCutoffChange}
-            type='range'
-            min={10}
-            max={120}
-            step={10}
-            />
-        </div>
+        {geocoder.origin &&
+          <div>
+            <div className='heading'>{messages.Geocoding.EndTitle}</div>
+            <div className='Geocoder'>
+              <Geocoder
+                apiKey={process.env.MAPZEN_SEARCH_KEY}
+                {...geocoder}
+                featureToLabel={featureToLabel}
+                featureToValue={(f) => f.id}
+                name='end-address'
+                onChange={onChangeEnd}
+                placeholder={messages.Geocoding.EndPlaceholder}
+                search={search}
+                searchPromptText={messages.Geocoding.PromptText}
+                value={geocoder.destination}
+                />
+            </div>
+            <div className='heading'>{messages.Strings.HighlightAreaAccessibleWithin}</div>
+            <div className='TimeCutoff'>
+              <div className='Time'>{selectedTimeCutoff} {messages.Units.Minutes}</div>
+              <input
+                defaultValue={selectedTimeCutoff}
+                onChange={onTimeCutoffChange}
+                type='range'
+                min={10}
+                max={120}
+                step={10}
+                />
+            </div>
+          </div>
+        }
       </div>
     )
   }

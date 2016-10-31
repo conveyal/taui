@@ -1,9 +1,17 @@
-import dbg from 'debug'
 import lonlng from 'lonlng'
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 
-import {clearEnd, clearStart, setBaseActive, setComparisonActive, updateDestination, updateOrigin, updateSelectedTimeCutoff} from '../../actions'
+import {
+  clearEnd,
+  clearIsochrone,
+  clearStart,
+  setBaseActive,
+  setComparisonActive,
+  updateDestination,
+  updateOrigin,
+  updateSelectedTimeCutoff
+} from '../../actions'
 import featureToLabel from '../../utils/feature-to-label'
 import Form from './form'
 import Fullscreen from '../../components/fullscreen'
@@ -14,13 +22,12 @@ import messages from '../../utils/messages'
 import RouteCard from '../../components/route-card'
 import initializeBrowsochrones from '../../utils/initialize-browsochrones'
 
-const debug = dbg('taui:indianapolis')
-
 class Indianapolis extends Component {
   static propTypes = {
     actionLog: PropTypes.arrayOf(PropTypes.object),
     browsochrones: PropTypes.object.isRequired,
     clearEnd: PropTypes.func.isRequired,
+    clearIsochrone: PropTypes.func.isRequired,
     clearStart: PropTypes.func.isRequired,
     destinations: PropTypes.object,
     geocoder: PropTypes.object,
@@ -51,8 +58,9 @@ class Indianapolis extends Component {
   }
 
   _clearStartAndEnd = () => {
-    const {clearEnd, clearStart} = this.props
+    const {clearEnd, clearIsochrone, clearStart} = this.props
     clearStart()
+    clearIsochrone()
     clearEnd()
   }
 
@@ -81,7 +89,7 @@ class Indianapolis extends Component {
 
   _setStartWithFeature = (feature) => {
     if (!feature) {
-      this.props.clearStart()
+      this._clearStartAndEnd()
     } else {
       const {geometry} = feature
 
@@ -161,15 +169,18 @@ class Indianapolis extends Component {
       />
   }
 
-  count = 0
-  lastRender = new Date()
-
   render () {
-    const {browsochrones, destinations, geocoder, map, setBaseActive, setComparisonActive, timeCutoff, ui} = this.props
-
-    const now = new Date()
-    debug(`render ${this.count++} last was ${now - this.lastRender}ms ago`)
-    this.lastRender = now
+    const {
+      actionLog,
+      browsochrones,
+      destinations,
+      geocoder,
+      map,
+      setBaseActive,
+      setComparisonActive,
+      timeCutoff,
+      ui
+    } = this.props
 
     return (
       <div>
@@ -218,12 +229,14 @@ class Indianapolis extends Component {
                 {messages.Systems.ComparisonTitle}
               </RouteCard>
             }
-            <div className='Card'>
-              <div className='CardTitle'>Log</div>
-              <Log
-                items={this.props.actionLog}
-                />
-            </div>
+            {actionLog && actionLog.length > 0 &&
+              <div className='Card'>
+                <div className='CardTitle'>Log</div>
+                <Log
+                  items={this.props.actionLog}
+                  />
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -238,6 +251,7 @@ function mapStateToProps (state, ownProps) {
 function mapDispatchToProps (dispatch, ownProps) {
   return {
     clearEnd: () => dispatch(clearEnd()),
+    clearIsochrone: () => dispatch(clearIsochrone()),
     clearStart: () => dispatch(clearStart()),
     initializeBrowsochrones: (actions) => dispatch(actions),
     moveOrigin: (options) => dispatch(updateOrigin(options)),
