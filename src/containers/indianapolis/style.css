@@ -24,9 +24,9 @@ body {
 .Taui-Dock {
   background-color: #0b2b40; /* Conveyal blue down to 25% brightness in HSB */
   position: absolute;
-  width: 414px;
+  max-width: 414px;
   top: 0;
-  right: 0;
+  left: 0;
   height: 100%;
   box-shadow: 0 0 25px 0 rgba(0, 0, 0, .15);
 }
@@ -54,7 +54,7 @@ body {
 .Taui-ActionLog {
   display: block;
   bottom: 0;
-  height: 6rem;
+  height: 5rem;
   background-color: #fff;
   padding: 0.5rem 1rem;
 }
