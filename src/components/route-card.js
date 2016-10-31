@@ -2,6 +2,7 @@ import Color from 'color'
 import React from 'react'
 import toCapitalCase from 'lodash.capitalize'
 import toSpaceCase from 'lodash.lowercase'
+import unique from 'lodash.uniq'
 
 import DeepEqual from './deep-equal'
 import Icon from './icon'
@@ -164,13 +165,6 @@ function findRouteForPattern ({id, patterns, routes}) {
   return routes.find((r) => r.route_id === patterns.find((p) => p.pattern_id === id).route_id)
 }
 
-function unique (a) {
-  return a.reduce(function (n, e) {
-    if (n.indexOf(e) === -1) n.push(e)
-    return n
-  }, [])
-}
-
 const typeToIcon = {
   0: 'subway',
   1: 'subway',
@@ -196,11 +190,17 @@ function showAccess (keys, base) {
 }
 
 function AccessDiffPercentage ({
-  diff
+  newAccess,
+  originalAccess
 }) {
-  if (diff > 0) return <span className='pull-right increase'><strong>{diff}</strong>%<Icon type='level-up' /></span>
-  else if (diff < 0) return <span className='pull-right decrease'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
-  else return <span />
+  const actualDiff = newAccess - originalAccess
+  const nume = actualDiff > 0
+    ? newAccess - originalAccess
+    : originalAccess - newAccess
+  const diff = parseInt((nume / originalAccess * 100).toFixed(1))
+  if (diff === 0) return <span />
+  else if (actualDiff > 0) return <span className='pull-right increase'><strong>{diff}</strong>%<Icon type='level-up' /></span>
+  else return <span className='pull-right decrease'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
 }
 
 function showDiff (keys, base, comparison) {
@@ -208,11 +208,10 @@ function showDiff (keys, base, comparison) {
     <div className='CardAccess'>
       <div className='heading'>Access to</div>
       {keys.map((key, i) => {
-        const diff = parseInt(((base[key] - comparison[key]) / base[key] * 100).toFixed(1))
         return (
           <div className='Metric' key={key}>
             <MetricIcon name={key} /><strong> {(base[key] | 0).toLocaleString()} </strong> {toSpaceCase(key)}
-            <AccessDiffPercentage diff={diff} />
+            <AccessDiffPercentage newAccess={base[key]} originalAccess={comparison[key]} />
           </div>
         )
       })}
