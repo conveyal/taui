@@ -114,10 +114,10 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
       <div className='BestTrip'>
         <div>{bestTripSegments} <strong> {travelTime}</strong> {messages.Units.Mins}</div>
         <div>{oldTravelTime &&
-            <TripDiff
-              oldTravelTime={oldTravelTime}
-              travelTime={travelTime}
-              />}<br />
+          <TripDiff
+            oldTravelTime={oldTravelTime}
+            travelTime={travelTime}
+            />}<br />
           includes <strong>{waitTime}</strong> {messages.Units.Mins} waiting <br />
         </div>
       </div>

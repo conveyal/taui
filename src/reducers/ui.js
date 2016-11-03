@@ -1,5 +1,5 @@
+import {DECREMENT_FETCH, INCREMENT_FETCH} from '@conveyal/woonerf/build/lib/fetch'
 import {handleActions} from 'redux-actions'
-import {DECREMENT_FETCH, INCREMENT_FETCH} from 'mastarm/react/fetch'
 
 export default handleActions({
   [`${INCREMENT_FETCH}`]: (state, payload) => {

@@ -5,7 +5,7 @@ import {createAction} from 'redux-actions'
 import fetch, {
   incrementFetches as incrementWork,
   decrementFetches as decrementWork
-} from 'mastarm/react/fetch'
+} from '@conveyal/woonerf/build/lib/fetch'
 
 import featureToLabel from '../utils/feature-to-label'
 import {setKeyTo} from '../utils/hash'
@@ -245,7 +245,13 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
  *  - If Browsochones is loaded, transitive data is generated
  *  - If Browsochones has a surface generated, travel time is calculated
  */
-export function updateDestination ({browsochrones, latlng, label, zoom}) {
+export function updateDestination ({
+  browsochrones,
+  fromLatlng,
+  latlng,
+  label,
+  zoom
+}) {
   const actions = []
 
   // TODO: Remove this!
@@ -266,8 +272,8 @@ export function updateDestination ({browsochrones, latlng, label, zoom}) {
   }
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
-    actions.push(generateDestinationDataFor({browsochrones: browsochrones.base, toLatlng: latlng, name: 'base', zoom}))
-    actions.push(generateDestinationDataFor({browsochrones: browsochrones.comparison, toLatlng: latlng, name: 'comparison', zoom}))
+    actions.push(generateDestinationDataFor({browsochrones: browsochrones.base, fromLatlng, toLatlng: latlng, name: 'base', zoom}))
+    actions.push(generateDestinationDataFor({browsochrones: browsochrones.comparison, fromLatlng, toLatlng: latlng, name: 'comparison', zoom}))
   }
 
   return actions
