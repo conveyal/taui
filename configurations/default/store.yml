@@ -2,13 +2,13 @@ browsochrones:
   active: base
   base: null
   comparison: null
-  gridsUrl: https://s3.amazonaws.com/analyst-static/indy-baseline-z9/intgrids
+  gridsUrl: https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-z9/intgrids
   grids:
     - Jobs_total
     - Workers_total
   origins:
-    - https://s3.amazonaws.com/analyst-static/indyconnect-marion-v6
-    - https://s3.amazonaws.com/analyst-static/indy-baseline-v6
+    - https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
+    - https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-v6
 geocoder:
   focusLatlng:
     lat: 39.7691
