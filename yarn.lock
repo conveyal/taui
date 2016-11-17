@@ -6369,9 +6369,9 @@ traceur@0.0.105:
     semver "^4.3.3"
     source-map-support "~0.2.8"
 
-transitive-js@0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/transitive-js/-/transitive-js-0.9.0.tgz#aa7c7ac4520a41833151bb6475bba3dc6054e649"
+transitive-js@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/transitive-js/-/transitive-js-0.9.1.tgz#344425c32f14b61b9220822a49a3b6b49fde6735"
   dependencies:
     augment "4.3.0"
     component-each "0.2.6"
