@@ -5,7 +5,7 @@
   "scripts": {
     "prestart": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "start": "mastarm build --serve src/index.js:assets/index.js src/containers/indianapolis/style.css:assets/index.css --flyle",
+    "start": "mastarm build",
     "test": "mastarm lint"
   },
   "repository": {
