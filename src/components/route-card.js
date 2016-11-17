@@ -61,11 +61,15 @@ function TripDiff ({
   oldTravelTime,
   travelTime
 }) {
-  const difference = oldTravelTime - travelTime
+  const actualDiff = travelTime - oldTravelTime
+  const nume = actualDiff > 0
+    ? travelTime - oldTravelTime
+    : oldTravelTime - travelTime
+  const diff = parseInt((nume / oldTravelTime * 100).toFixed(1))
 
   if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /></span>
-  else if (difference > 0) return <span className='increase'><strong>{difference}</strong> {messages.Units.Mins} {messages.Faster}</span>
-  else if (difference < 0) return <span className='decrease'><strong>{difference * -1}</strong> {messages.Units.Mins} {messages.Slower}</span>
+  else if (actualDiff > 0) return <span className='pull-right decrease'><strong>{diff}</strong>%<Icon type='level-up' /></span>
+  else return <span className='pull-right increase'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
 }
 
 function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }) {
@@ -107,16 +111,15 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
   return (
     <div>
       <div className='heading'>{messages.Systems.BestTripTitle}</div>
-      <div className='Metric'>
-        {bestTripSegments}
-        <strong> {travelTime}</strong> {messages.Units.Mins} / <strong>{waitTime}</strong> {messages.Units.Mins} wait
-        {oldTravelTime && <span className='pull-right'>
+      <div className='BestTrip'>
+        <div>{bestTripSegments} <strong> {travelTime}</strong> {messages.Units.Mins}</div>
+        <div>{oldTravelTime &&
           <TripDiff
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}
-            />
-        </span>}
-        <br />
+            />}<br />
+          includes <strong>{waitTime}</strong> {messages.Units.Mins} waiting <br />
+        </div>
       </div>
       {alternateTrips.length > 0 &&
         <div>

@@ -1,4 +1,4 @@
-import mount from 'mastarm/react/mount'
+import mount from '@conveyal/woonerf/build/lib/mount'
 
 import Indianapolis from './containers/indianapolis'
 import reducers from './reducers'

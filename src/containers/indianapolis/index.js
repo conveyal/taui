@@ -31,6 +31,7 @@ class Indianapolis extends Component {
     clearStart: PropTypes.func.isRequired,
     destinations: PropTypes.object,
     geocoder: PropTypes.object,
+    history: PropTypes.any,
     initializeBrowsochrones: PropTypes.func.isRequired,
     mapMarkers: PropTypes.object,
     map: PropTypes.object,
@@ -104,9 +105,10 @@ class Indianapolis extends Component {
     label,
     latlng
   }) => {
-    const {browsochrones, map, moveDestination} = this.props
+    const {browsochrones, map, mapMarkers, moveDestination} = this.props
     moveDestination({
       browsochrones,
+      fromLatlng: mapMarkers.origin.latlng,
       label,
       latlng: lonlng(latlng),
       zoom: map.zoom

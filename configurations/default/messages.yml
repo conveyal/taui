@@ -3,7 +3,7 @@ Systems:
   ComparisonTitle: Current Transit
   TripsTitle: Example trips
   TripsEmpty: No trips found!
-  BestTripTitle: Best trip
+  BestTripTitle: Fastest trip
   AlternateTripsTitle: Alternates
 Faster: faster
 NewTrip: New Trip

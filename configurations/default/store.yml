@@ -7,8 +7,8 @@ browsochrones:
     - Jobs_total
     - Workers_total
   origins:
-    - https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v5/
-    - https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-v5/
+    - https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
+    - https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-v6
 geocoder:
   focusLatlng:
     lat: 39.7691

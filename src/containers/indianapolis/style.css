@@ -189,6 +189,18 @@ body {
   height: 1.5rem;
 }
 
+.Card .BestTrip {
+  display: flex;
+}
+
+.Card .BestTrip > div {
+  flex-grow: 1;
+}
+
+.Card .BestTrip > div:last-of-type {
+  text-align: right;
+}
+
 .Card .Metric > .pull-right {
   margin-top: 0.25rem;
 }
