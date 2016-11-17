@@ -10,12 +10,30 @@ export default handleActions({
       }
     }
   },
+  'set origin label' (state, {payload}) {
+    return {
+      ...state,
+      origin: {
+        ...state.origin,
+        label: payload
+      }
+    }
+  },
   'set destination' (state, {payload}) {
     return {
       ...state,
       destination: {
         label: payload.label,
         value: payload.latlng ? `${payload.latlng.lng},${payload.latlng.lat}` : false
+      }
+    }
+  },
+  'set destination label' (state, {payload}) {
+    return {
+      ...state,
+      destination: {
+        ...state.destination,
+        label: payload
       }
     }
   },

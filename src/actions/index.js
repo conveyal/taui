@@ -35,6 +35,16 @@ export const setOrigin = createAction('set origin', (origin) => {
   return origin
 })
 
+export const setDestinationLabel = createAction('set destination label', (label) => {
+  setKeyTo('end', label)
+  return label
+})
+
+export const setOriginLabel = createAction('set origin label', (label) => {
+  setKeyTo('start', label)
+  return label
+})
+
 export const clearEnd = createAction('clear end', () => {
   setKeyTo('end', null)
 })
@@ -101,7 +111,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
           const label = featureToLabel(features[0])
           return [
             addActionLogItem(`Set start address to: ${label}`),
-            setOrigin({label, latlng: lonlng(features[0].geometry.coordinates)})
+            setOriginLabel(label)
           ]
         })
     )
@@ -270,7 +280,7 @@ export function updateDestination ({
   } else {
     actions.push(
       reverseGeocode({latlng})
-        .then(({features}) => setDestination({label: featureToLabel(features[0]), latlng: lonlng(features[0].geometry.coordinates)}))
+        .then(({features}) => setDestinationLabel(featureToLabel(features[0])))
     )
   }
 
