@@ -180,7 +180,7 @@ function MetricIcon ({
 }) {
   const lc = name.toLowerCase()
   if (lc.indexOf('job') !== -1) return <Icon type='building' />
-  if (lc.indexOf('worker') !== -1) return <Icon type='child' />
+  if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) return <Icon type='child' />
 }
 
 function showAccess (keys, base) {
