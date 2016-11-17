@@ -212,7 +212,10 @@ function generateDestinationDataFor ({browsochrones, fromLatlng, toLatlng, name,
       const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(toLatlng, zoom), zoom)
       const data = await browsochrones.generateDestinationData({
         from: fromLatlng || null,
-        to: destinationPoint
+        to: {
+          ...toLatlng,
+          ...destinationPoint
+        }
       })
       data.transitive.key = `${name}-${lonlng.toString(toLatlng)}`
       return [
