@@ -3,6 +3,7 @@
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
   "scripts": {
+    "deploy": "mastarm deploy --env production --minify",
     "prestart": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "mastarm build",

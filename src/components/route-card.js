@@ -67,9 +67,9 @@ function TripDiff ({
     : oldTravelTime - travelTime
   const diff = parseInt((nume / oldTravelTime * 100).toFixed(1))
 
-  if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /></span>
-  else if (actualDiff > 0) return <span className='pull-right decrease'><strong>{diff}</strong>%<Icon type='level-up' /></span>
-  else return <span className='pull-right increase'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
+  if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /><br /></span>
+  else if (actualDiff > 0) return <span className='pull-right decrease'><strong>{diff}</strong>%<Icon type='level-up' /><br /></span>
+  else return <span className='pull-right increase'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /><br /></span>
 }
 
 function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }) {
@@ -117,7 +117,7 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
           <TripDiff
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}
-            />}<br />
+            />}
           includes <strong>{waitTime}</strong> {messages.Units.Mins} waiting <br />
         </div>
       </div>
@@ -181,6 +181,7 @@ function MetricIcon ({
   const lc = name.toLowerCase()
   if (lc.indexOf('job') !== -1) return <Icon type='building' />
   if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) return <Icon type='child' />
+  return <span />
 }
 
 function showAccess (keys, base) {

@@ -1,12 +1,22 @@
 import {Browser} from 'leaflet'
+import {mapbox} from 'mapbox.js'
 import React, {PropTypes} from 'react'
-import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer} from 'react-leaflet'
+import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 'react-leaflet'
 
 import DeepEqual from '../../components/deep-equal'
 import Icon from '../../components/icon'
 import messages from '../../utils/messages'
 import TransitiveLayer from '../../components/transitive-map-layer'
 import transitiveStyle from './transitive-style'
+
+const startIcon = mapbox.marker.icon({
+  'marker-size': 'large',
+  'marker-symbol': 'star',
+  'marker-color': '#4269a4'
+})
+const endIcon = mapbox.marker.icon({
+  'marker-color': '#ff8c00'
+})
 
 export default class Map extends DeepEqual {
   static propTypes = {
@@ -87,7 +97,10 @@ export default class Map extends DeepEqual {
         zoom={zoom}
         onClick={this._onMapClick}
         onZoom={onZoom}
+        preferCanvas
+        zoomControl={false}
         >
+        <ZoomControl position='topright' />
         <TileLayer
           url={Browser.retina && process.env.LEAFLET_RETINA_URL ? process.env.LEAFLET_RETINA_URL : process.env.LEAFLET_TILE_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
@@ -97,6 +110,7 @@ export default class Map extends DeepEqual {
           return (
             <Marker
               draggable
+              icon={index === 0 ? startIcon : endIcon}
               key={`marker-${index}`}
               {...m}
               >
