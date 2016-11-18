@@ -233,7 +233,7 @@ class Indianapolis extends Component {
             }
             {ui.showLog && actionLog && actionLog.length > 0 &&
               <div className='Card'>
-                <div className='CardTitle'>Log</div>
+                <div className='CardTitle'>{messages.Log.Title}</div>
                 <Log
                   items={this.props.actionLog}
                   />

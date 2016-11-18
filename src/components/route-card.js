@@ -118,7 +118,7 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}
             />}
-          includes <strong>{waitTime}</strong> {messages.Units.Mins} waiting <br />
+          <strong>{waitTime}</strong> {messages.Units.Mins} {messages.Systems.Waiting}<br />
         </div>
       </div>
       {alternateTrips.length > 0 &&
@@ -187,7 +187,7 @@ function MetricIcon ({
 function showAccess (keys, base) {
   return (
     <div className='CardAccess'>
-      <div className='heading'>Access to</div>
+      <div className='heading'>{messages.System.AccessTitle}</div>
       {keys.map((k, i) => <div className='Metric' key={k}><MetricIcon name={k} /><strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)}</div>)}
     </div>
   )
@@ -210,7 +210,7 @@ function AccessDiffPercentage ({
 function showDiff (keys, base, comparison) {
   return (
     <div className='CardAccess'>
-      <div className='heading'>Access to</div>
+      <div className='heading'>{messages.System.AccessTitle}</div>
       {keys.map((key, i) => {
         return (
           <div className='Metric' key={key}>

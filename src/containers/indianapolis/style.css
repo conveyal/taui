@@ -24,7 +24,7 @@ body {
 .Taui-Dock {
   background-color: #0b2b40; /* Conveyal blue down to 25% brightness in HSB */
   position: absolute;
-  max-width: 414px;
+  width: 414px;
   top: 0;
   left: 0;
   height: 100%;
