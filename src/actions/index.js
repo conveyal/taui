@@ -121,24 +121,24 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
   const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   if (browsochrones.base.pointInQueryBounds(point)) {
-    actions.push(
-      fetchBrowsochronesFor({
-        browsochrones: browsochrones.base,
-        destinationLatlng,
-        latlng,
-        name: 'base',
-        timeCutoff,
-        zoom
-      }),
-      fetchBrowsochronesFor({
+    actions.push(fetchBrowsochronesFor({
+      browsochrones: browsochrones.base,
+      destinationLatlng,
+      latlng,
+      name: 'base',
+      timeCutoff,
+      zoom
+    }))
+    if (browsochrones.comparison) {
+      actions.push(fetchBrowsochronesFor({
         browsochrones: browsochrones.comparison,
         destinationLatlng,
         latlng,
         name: 'comparison',
         timeCutoff,
         zoom
-      })
-    )
+      }))
+    }
   } else {
     console.log('point out of bounds') // TODO: Handle
   }
@@ -243,8 +243,11 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateIsochroneFor({browsochrones: browsochrones.base, latlng, name: 'base', timeCutoff}))
-    actions.push(generateIsochroneFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', timeCutoff}))
     actions.push(generateAccessiblityFor({browsochrones: browsochrones.base, name: 'base', timeCutoff}))
+  }
+
+  if (browsochrones.comparison && browsochrones.comparison.isLoaded()) {
+    actions.push(generateIsochroneFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', timeCutoff}))
     actions.push(generateAccessiblityFor({browsochrones: browsochrones.comparison, name: 'comparison', timeCutoff}))
   }
 
@@ -286,6 +289,9 @@ export function updateDestination ({
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateDestinationDataFor({browsochrones: browsochrones.base, fromLatlng, toLatlng: latlng, name: 'base', zoom}))
+  }
+
+  if (browsochrones.comparison && browsochrones.comparison.isLoaded()) {
     actions.push(generateDestinationDataFor({browsochrones: browsochrones.comparison, fromLatlng, toLatlng: latlng, name: 'comparison', zoom}))
   }
 
