@@ -55,7 +55,7 @@
     "react-select-geocoder": "^0.2.1",
     "redux": "^3.6.0",
     "redux-actions": "^0.12.0",
-    "transitive-js": "^0.9.1"
+    "transitive-js": "^0.9.2"
   },
   "standard": {
     "parser": "babel-eslint"
