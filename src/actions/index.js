@@ -35,6 +35,16 @@ export const setOrigin = createAction('set origin', (origin) => {
   return origin
 })
 
+export const setDestinationLabel = createAction('set destination label', (label) => {
+  setKeyTo('end', label)
+  return label
+})
+
+export const setOriginLabel = createAction('set origin label', (label) => {
+  setKeyTo('start', label)
+  return label
+})
+
 export const clearEnd = createAction('clear end', () => {
   setKeyTo('end', null)
 })
@@ -94,6 +104,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
     )
   } else {
     actions.push(
+      setOrigin({latlng}),
       addActionLogItem(`Finding start address for ${lonlng(latlng).toString()}`),
       reverseGeocode({latlng})
         .then(({features}) => {
@@ -101,7 +112,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
           const label = featureToLabel(features[0])
           return [
             addActionLogItem(`Set start address to: ${label}`),
-            setOrigin({label, latlng: lonlng(features[0].geometry.coordinates)})
+            setOriginLabel(label)
           ]
         })
     )
@@ -111,24 +122,24 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
   const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   if (browsochrones.base.pointInQueryBounds(point)) {
-    actions.push(
-      fetchBrowsochronesFor({
-        browsochrones: browsochrones.base,
-        destinationLatlng,
-        latlng,
-        name: 'base',
-        timeCutoff,
-        zoom
-      }),
-      fetchBrowsochronesFor({
+    actions.push(fetchBrowsochronesFor({
+      browsochrones: browsochrones.base,
+      destinationLatlng,
+      latlng,
+      name: 'base',
+      timeCutoff,
+      zoom
+    }))
+    if (browsochrones.comparison) {
+      actions.push(fetchBrowsochronesFor({
         browsochrones: browsochrones.comparison,
         destinationLatlng,
         latlng,
         name: 'comparison',
         timeCutoff,
         zoom
-      })
-    )
+      }))
+    }
   } else {
     console.log('point out of bounds') // TODO: Handle
   }
@@ -156,7 +167,7 @@ function fetchBrowsochronesFor ({
 
         return [
           decrementWork(),
-          generateAccessiblityFor({browsochrones, name, timeCutoff}),
+          generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
           generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
           destinationLatlng && generateDestinationDataFor({
             browsochrones,
@@ -171,14 +182,19 @@ function fetchBrowsochronesFor ({
   ]
 }
 
-function generateAccessiblityFor ({browsochrones, name, timeCutoff}) {
+const storedAccessibility = {}
+const storedIsochrones = {}
+
+function generateAccessiblityFor ({browsochrones, latlng, name, timeCutoff}) {
   return [
     incrementWork(),
     addActionLogItem(`Generating accessibility surface for ${name}`),
     (async () => {
       const accessibility = {}
       for (const grid of browsochrones.grids) {
-        accessibility[grid] = await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
+        const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}-${grid}`
+        accessibility[grid] = storedAccessibility[key] || await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
+        storedAccessibility[key] = accessibility[grid]
       }
       return [
         setAccessibilityFor({accessibility, name}),
@@ -193,8 +209,10 @@ function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
     incrementWork(),
     addActionLogItem(`Generating travel time isochrone for ${name}`),
     (async () => {
-      const isochrone = await browsochrones.getIsochrone(timeCutoff)
-      isochrone.key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
+      const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
+      const isochrone = storedIsochrones[key] || await browsochrones.getIsochrone(timeCutoff)
+      isochrone.key = key
+      storedIsochrones[key] = isochrone
 
       return [
         setIsochroneFor({isochrone, name}),
@@ -212,7 +230,10 @@ function generateDestinationDataFor ({browsochrones, fromLatlng, toLatlng, name,
       const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(toLatlng, zoom), zoom)
       const data = await browsochrones.generateDestinationData({
         from: fromLatlng || null,
-        to: destinationPoint
+        to: {
+          ...toLatlng,
+          ...destinationPoint
+        }
       })
       data.transitive.key = `${name}-${lonlng.toString(toLatlng)}`
       return [
@@ -230,9 +251,12 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateIsochroneFor({browsochrones: browsochrones.base, latlng, name: 'base', timeCutoff}))
+    actions.push(generateAccessiblityFor({browsochrones: browsochrones.base, latlng, name: 'base', timeCutoff}))
+  }
+
+  if (browsochrones.comparison && browsochrones.comparison.isLoaded()) {
     actions.push(generateIsochroneFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', timeCutoff}))
-    actions.push(generateAccessiblityFor({browsochrones: browsochrones.base, name: 'base', timeCutoff}))
-    actions.push(generateAccessiblityFor({browsochrones: browsochrones.comparison, name: 'comparison', timeCutoff}))
+    actions.push(generateAccessiblityFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', timeCutoff}))
   }
 
   return actions
@@ -266,13 +290,17 @@ export function updateDestination ({
     actions.push(setDestination({label, latlng}))
   } else {
     actions.push(
+      setDestination({latlng}),
       reverseGeocode({latlng})
-        .then(({features}) => setDestination({label: featureToLabel(features[0]), latlng: lonlng(features[0].geometry.coordinates)}))
+        .then(({features}) => setDestinationLabel(featureToLabel(features[0])))
     )
   }
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateDestinationDataFor({browsochrones: browsochrones.base, fromLatlng, toLatlng: latlng, name: 'base', zoom}))
+  }
+
+  if (browsochrones.comparison && browsochrones.comparison.isLoaded()) {
     actions.push(generateDestinationDataFor({browsochrones: browsochrones.comparison, fromLatlng, toLatlng: latlng, name: 'comparison', zoom}))
   }
 

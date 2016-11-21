@@ -58,7 +58,7 @@ export default class Form extends DeepEqual {
                 type='range'
                 min={10}
                 max={120}
-                step={10}
+                step={5}
                 />
             </div>
           </div>

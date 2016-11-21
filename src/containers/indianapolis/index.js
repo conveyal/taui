@@ -43,7 +43,7 @@ class Indianapolis extends Component {
     timeCutoff: PropTypes.shape({
       selected: PropTypes.number
     }),
-    ui: PropTypes.object,
+    ui: PropTypes.object.isRequired,
     zoom: PropTypes.number
   }
 
@@ -231,9 +231,9 @@ class Indianapolis extends Component {
                 {messages.Systems.ComparisonTitle}
               </RouteCard>
             }
-            {actionLog && actionLog.length > 0 &&
+            {ui.showLog && actionLog && actionLog.length > 0 &&
               <div className='Card'>
-                <div className='CardTitle'>Log</div>
+                <div className='CardTitle'>{messages.Log.Title}</div>
                 <Log
                   items={this.props.actionLog}
                   />

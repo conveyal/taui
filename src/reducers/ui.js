@@ -15,5 +15,6 @@ export default handleActions({
     }
   }
 }, {
-  fetches: 0
+  fetches: 0,
+  showLog: true
 })

@@ -24,7 +24,7 @@ body {
 .Taui-Dock {
   background-color: #0b2b40; /* Conveyal blue down to 25% brightness in HSB */
   position: absolute;
-  max-width: 414px;
+  width: 414px;
   top: 0;
   left: 0;
   height: 100%;
@@ -162,6 +162,7 @@ body {
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
   display: inline-block;
 }
 
@@ -206,7 +207,7 @@ body {
 }
 
 .CardIndex {
-  margin-right: 0.5rem;
+  margin-right: 0.25rem;
   font-weight: bold;
   display: inline-block;
   width: 1rem;
@@ -217,7 +218,8 @@ body {
 .map-tooltip {
   border-radius: 0.5rem;
   background-color: #0b2b40;
-
+  font-size: 1rem;
+  color: #fff;
 }
 
 .leaflet-popup-close-button + .leaflet-popup-content-wrapper .leaflet-popup-content,

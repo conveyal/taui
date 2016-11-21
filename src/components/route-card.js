@@ -67,9 +67,9 @@ function TripDiff ({
     : oldTravelTime - travelTime
   const diff = parseInt((nume / oldTravelTime * 100).toFixed(1))
 
-  if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /></span>
-  else if (actualDiff > 0) return <span className='pull-right decrease'><strong>{diff}</strong>%<Icon type='level-up' /></span>
-  else return <span className='pull-right increase'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
+  if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /><br /></span>
+  else if (actualDiff > 0) return <span className='pull-right decrease'><strong>{diff}</strong>%<Icon type='level-up' /><br /></span>
+  else return <span className='pull-right increase'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /><br /></span>
 }
 
 function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }) {
@@ -102,8 +102,7 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
   const alternateTrips = alternateTripSegments.map((segments, jindex) => {
     return (
       <div className='Trip' key={`journey-${jindex}`}>
-        <span className='CardIndex'>#{jindex + 1}</span>
-        {segments}
+        <span className='CardIndex'>{jindex + 1}.</span>{segments}
       </div>
     )
   })
@@ -117,8 +116,8 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
           <TripDiff
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}
-            />}<br />
-          includes <strong>{waitTime}</strong> {messages.Units.Mins} waiting <br />
+            />}
+          <strong>{waitTime}</strong> {messages.Units.Mins} {messages.Systems.Waiting}<br />
         </div>
       </div>
       {alternateTrips.length > 0 &&
@@ -146,7 +145,7 @@ function extractRelevantTransitiveInfo ({
           const pid = s.pattern_id || s.patterns[0].pattern_id
           const seg = {}
           const route = findRouteForPattern({id: pid, patterns, routes})
-          const color = route.route_color ? Color(`#${route.route_color}`) : Color(s.color)
+          const color = route.route_color ? Color(`#${route.route_color}`) : Color('#0b2b40')
           seg.name = toCapitalCase(route.route_short_name)
 
           if (s.patterns && s.patterns.length > 0) {
@@ -180,13 +179,14 @@ function MetricIcon ({
 }) {
   const lc = name.toLowerCase()
   if (lc.indexOf('job') !== -1) return <Icon type='building' />
-  if (lc.indexOf('worker') !== -1) return <Icon type='child' />
+  if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) return <Icon type='child' />
+  return <span />
 }
 
 function showAccess (keys, base) {
   return (
     <div className='CardAccess'>
-      <div className='heading'>Access to</div>
+      <div className='heading'>{messages.Systems.AccessTitle}</div>
       {keys.map((k, i) => <div className='Metric' key={k}><MetricIcon name={k} /><strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)}</div>)}
     </div>
   )
@@ -209,7 +209,7 @@ function AccessDiffPercentage ({
 function showDiff (keys, base, comparison) {
   return (
     <div className='CardAccess'>
-      <div className='heading'>Access to</div>
+      <div className='heading'>{messages.Systems.AccessTitle}</div>
       {keys.map((key, i) => {
         return (
           <div className='Metric' key={key}>

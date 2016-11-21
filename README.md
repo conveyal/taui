@@ -23,6 +23,17 @@ After cloning the repository, run:
  - `npm install`
  - `npm start`
 
+## Deploy
+
+Once you see that TAUI is working properly with your static site data, deploy it to the S3 bucket specified in settings.yml with the following command (replacing the --config switch to point to default or wherever):
+
+`mastarm deploy --config configurations/marseilles --minify --env production`
+
+The AWS SDK for JS will detect and use the same AWS credentials you should have set up for AWSCLI. The deployment copies JS and CSS files into a sub-bucket called assets, but does not upload `index.html`. You need to edit `index.html` in the root of the TAUI repository to customize the page name, then upload it with `aws s3 cp index.html s3://mamp-static/index.html`.
+
+`mastarm deploy` will not create the bucket or set its contents public. You need to ensure the bucket exists before running `mastarm deploy` and set all its contents public afterward using the S3 web console or CLI. You don’t need to set any permissions on the bucket itself.
+
+If S3 reports “access denied” when you try to fetch a page over HTTP in your browser, this is often because an object you are requesting does not exist.
 
 [npm-image]: https://img.shields.io/npm/v/@conveyal/taui.svg?maxAge=2592000&style=flat-square
 [npm-url]: https://www.npmjs.com/package/@conveyal/taui
