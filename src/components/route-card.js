@@ -102,8 +102,7 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
   const alternateTrips = alternateTripSegments.map((segments, jindex) => {
     return (
       <div className='Trip' key={`journey-${jindex}`}>
-        <span className='CardIndex'>#{jindex + 1}</span>
-        {segments}
+        <span className='CardIndex'>{jindex + 1}.</span>{segments}
       </div>
     )
   })
