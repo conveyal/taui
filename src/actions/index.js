@@ -167,7 +167,7 @@ function fetchBrowsochronesFor ({
 
         return [
           decrementWork(),
-          generateAccessiblityFor({browsochrones, name, timeCutoff}),
+          generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
           generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
           destinationLatlng && generateDestinationDataFor({
             browsochrones,
@@ -182,14 +182,19 @@ function fetchBrowsochronesFor ({
   ]
 }
 
-function generateAccessiblityFor ({browsochrones, name, timeCutoff}) {
+const storedAccessibility = {}
+const storedIsochrones = {}
+
+function generateAccessiblityFor ({browsochrones, latlng, name, timeCutoff}) {
   return [
     incrementWork(),
     addActionLogItem(`Generating accessibility surface for ${name}`),
     (async () => {
       const accessibility = {}
       for (const grid of browsochrones.grids) {
-        accessibility[grid] = await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
+        const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}-${grid}`
+        accessibility[grid] = storedAccessibility[key] || await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
+        storedAccessibility[key] = accessibility[grid]
       }
       return [
         setAccessibilityFor({accessibility, name}),
@@ -204,8 +209,10 @@ function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
     incrementWork(),
     addActionLogItem(`Generating travel time isochrone for ${name}`),
     (async () => {
-      const isochrone = await browsochrones.getIsochrone(timeCutoff)
-      isochrone.key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
+      const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
+      const isochrone = storedIsochrones[key] || await browsochrones.getIsochrone(timeCutoff)
+      isochrone.key = key
+      storedIsochrones[key] = isochrone
 
       return [
         setIsochroneFor({isochrone, name}),
@@ -244,12 +251,12 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
 
   if (browsochrones.base && browsochrones.base.isLoaded()) {
     actions.push(generateIsochroneFor({browsochrones: browsochrones.base, latlng, name: 'base', timeCutoff}))
-    actions.push(generateAccessiblityFor({browsochrones: browsochrones.base, name: 'base', timeCutoff}))
+    actions.push(generateAccessiblityFor({browsochrones: browsochrones.base, latlng, name: 'base', timeCutoff}))
   }
 
   if (browsochrones.comparison && browsochrones.comparison.isLoaded()) {
     actions.push(generateIsochroneFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', timeCutoff}))
-    actions.push(generateAccessiblityFor({browsochrones: browsochrones.comparison, name: 'comparison', timeCutoff}))
+    actions.push(generateAccessiblityFor({browsochrones: browsochrones.comparison, latlng, name: 'comparison', timeCutoff}))
   }
 
   return actions
