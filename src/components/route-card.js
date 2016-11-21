@@ -146,7 +146,7 @@ function extractRelevantTransitiveInfo ({
           const pid = s.pattern_id || s.patterns[0].pattern_id
           const seg = {}
           const route = findRouteForPattern({id: pid, patterns, routes})
-          const color = route.route_color ? Color(`#${route.route_color}`) : Color(s.color)
+          const color = route.route_color ? Color(`#${route.route_color}`) : Color('#0b2b40')
           seg.name = toCapitalCase(route.route_short_name)
 
           if (s.patterns && s.patterns.length > 0) {
