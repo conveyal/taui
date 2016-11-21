@@ -8,6 +8,7 @@
 @import url(src/components/log/style.css);
 @import url(src/components/log-item/style.css);
 @import url(src/components/transitive-map-layer/style.css);
+@import url(src/utils/leaflet-icons/index.css);
 
 body {
   font-size: 16px;

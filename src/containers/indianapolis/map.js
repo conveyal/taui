@@ -5,6 +5,7 @@ import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 
 
 import DeepEqual from '../../components/deep-equal'
 import Icon from '../../components/icon'
+import leafletIcon from '../../utils/leaflet-icons'
 import messages from '../../utils/messages'
 import TransitiveLayer from '../../components/transitive-map-layer'
 import transitiveStyle from './transitive-style'
@@ -14,9 +15,9 @@ const startIcon = mapbox.marker.icon({
   'marker-symbol': 'star',
   'marker-color': '#4269a4'
 })
-const endIcon = mapbox.marker.icon({
+const endIcon = leafletIcon({markerColor: 'darkblue'}) /* mapbox.marker.icon({
   'marker-color': '#ff8c00'
-})
+})*/
 
 export default class Map extends DeepEqual {
   static propTypes = {
