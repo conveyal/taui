@@ -1300,9 +1300,9 @@ browserslist@^1.0.0, browserslist@^1.0.1, browserslist@^1.4.0, browserslist@~1.4
   dependencies:
     caniuse-db "^1.0.30000539"
 
-browsochrones@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/browsochrones/-/browsochrones-0.9.0.tgz#0e3586c0289963e3b7d3ad8501d062b6efc513c4"
+browsochrones@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/browsochrones/-/browsochrones-0.9.1.tgz#38f688bbc1a180cb461fb8650e30afea1f041b22"
   dependencies:
     color "^0.11.3"
     debug "^2.2.0"
