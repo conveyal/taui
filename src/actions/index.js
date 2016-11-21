@@ -104,6 +104,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
     )
   } else {
     actions.push(
+      setOrigin({latlng}),
       addActionLogItem(`Finding start address for ${lonlng(latlng).toString()}`),
       reverseGeocode({latlng})
         .then(({features}) => {
@@ -282,6 +283,7 @@ export function updateDestination ({
     actions.push(setDestination({label, latlng}))
   } else {
     actions.push(
+      setDestination({latlng}),
       reverseGeocode({latlng})
         .then(({features}) => setDestinationLabel(featureToLabel(features[0])))
     )
