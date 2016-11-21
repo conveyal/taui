@@ -218,7 +218,8 @@ body {
 .map-tooltip {
   border-radius: 0.5rem;
   background-color: #0b2b40;
-
+  font-size: 1rem;
+  color: #fff;
 }
 
 .leaflet-popup-close-button + .leaflet-popup-content-wrapper .leaflet-popup-content,
