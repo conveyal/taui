@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
-    "mastarm": "^2.0.0",
+    "mastarm": "^3.0.0",
     "semantic-release": "^4.3.5"
   },
   "dependencies": {
