@@ -1,21 +1,22 @@
 import {Browser} from 'leaflet'
-import {mapbox} from 'mapbox.js'
 import React, {PropTypes} from 'react'
 import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 'react-leaflet'
 
 import DeepEqual from '../../components/deep-equal'
 import Icon from '../../components/icon'
+import leafletIcon from '../../utils/leaflet-icons'
 import messages from '../../utils/messages'
 import TransitiveLayer from '../../components/transitive-map-layer'
 import transitiveStyle from './transitive-style'
 
-const startIcon = mapbox.marker.icon({
-  'marker-size': 'large',
-  'marker-symbol': 'star',
-  'marker-color': '#4269a4'
+const startIcon = leafletIcon({
+  icon: 'play',
+  markerColor: 'darkblue'
 })
-const endIcon = mapbox.marker.icon({
-  'marker-color': '#ff8c00'
+
+const endIcon = leafletIcon({
+  icon: 'stop',
+  markerColor: 'orange'
 })
 
 export default class Map extends DeepEqual {
