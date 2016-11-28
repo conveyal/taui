@@ -1,15 +1,17 @@
+import Pure from '@conveyal/woonerf/components/pure'
 import React from 'react'
 
-import {pure} from './deep-equal'
+export default class Icon extends Pure {
+  render () {
+    const {
+      className = '',
+      type,
+      ...props
+    } = this.props
 
-const Icon = ({
-  className = '',
-  type,
-  ...props
-}) =>
-  <i
-    className={`fa fa-${type} fa-fw ${className}`}
-    {...props}
-    />
-
-export default pure(Icon)
+    return <i
+      className={`fa fa-${type} fa-fw ${className}`}
+      {...props}
+      />
+  }
+}

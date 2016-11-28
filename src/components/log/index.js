@@ -1,9 +1,9 @@
+import Pure from '@conveyal/woonerf/components/pure'
 import React, {PropTypes} from 'react'
 
-import DeepEqual from '../deep-equal'
 import LogItem from '../log-item'
 
-export default class Log extends DeepEqual {
+export default class Log extends Pure {
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.object).isRequired
   };
