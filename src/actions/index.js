@@ -5,7 +5,7 @@ import {createAction} from 'redux-actions'
 import fetch, {
   incrementFetches as incrementWork,
   decrementFetches as decrementWork
-} from '@conveyal/woonerf/build/lib/fetch'
+} from '@conveyal/woonerf/fetch'
 
 import featureToLabel from '../utils/feature-to-label'
 import {setKeyTo} from '../utils/hash'

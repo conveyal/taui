@@ -1,12 +1,12 @@
+import Pure from '@conveyal/woonerf/components/pure'
 import React from 'react'
 import Geocoder from 'react-select-geocoder'
 
-import DeepEqual from '../../components/deep-equal'
-import featureToLabel from '../../utils/feature-to-label'
-import {search} from '../../utils/mapbox-geocoder'
-import messages from '../../utils/messages'
+import featureToLabel from '../utils/feature-to-label'
+import {search} from '../utils/mapbox-geocoder'
+import messages from '../utils/messages'
 
-export default class Form extends DeepEqual {
+export default class Form extends Pure {
   render () {
     const {
       geocoder,
