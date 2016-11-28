@@ -24,11 +24,11 @@
   },
   "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
-    "mastarm": "^2.0.0",
-    "semantic-release": "^4.3.5"
+    "mastarm": "^3.0.0",
+    "semantic-release": "^6.3.2"
   },
   "dependencies": {
-    "@conveyal/woonerf": "^0.2.1",
+    "@conveyal/woonerf": "^0.3.1",
     "browsochrones": "^0.9.1",
     "color": "^0.11.1",
     "debug": "^2.2.0",

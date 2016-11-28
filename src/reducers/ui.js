@@ -1,4 +1,4 @@
-import {DECREMENT_FETCH, INCREMENT_FETCH} from '@conveyal/woonerf/build/lib/fetch'
+import {DECREMENT_FETCH, INCREMENT_FETCH} from '@conveyal/woonerf/fetch'
 import {handleActions} from 'redux-actions'
 
 export default handleActions({

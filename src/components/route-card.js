@@ -1,14 +1,14 @@
+import Pure from '@conveyal/woonerf/components/pure'
 import Color from 'color'
 import React from 'react'
 import toCapitalCase from 'lodash.capitalize'
 import toSpaceCase from 'lodash.lowercase'
 import unique from 'lodash.uniq'
 
-import DeepEqual from './deep-equal'
 import Icon from './icon'
 import messages from '../utils/messages'
 
-export default class RouteCard extends DeepEqual {
+export default class RouteCard extends Pure {
   render () {
     const {
       active,

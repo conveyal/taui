@@ -1,13 +1,13 @@
+import Pure from '@conveyal/woonerf/components/pure'
 import {Browser} from 'leaflet'
 import React, {PropTypes} from 'react'
 import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 'react-leaflet'
 
-import DeepEqual from '../../components/deep-equal'
-import Icon from '../../components/icon'
-import leafletIcon from '../../utils/leaflet-icons'
-import messages from '../../utils/messages'
-import TransitiveLayer from '../../components/transitive-map-layer'
-import transitiveStyle from './transitive-style'
+import Icon from './icon'
+import leafletIcon from '../utils/leaflet-icons'
+import messages from '../utils/messages'
+import TransitiveLayer from './transitive-map-layer'
+import transitiveStyle from '../transitive-style'
 
 const startIcon = leafletIcon({
   icon: 'play',
@@ -19,7 +19,7 @@ const endIcon = leafletIcon({
   markerColor: 'orange'
 })
 
-export default class Map extends DeepEqual {
+export default class Map extends Pure {
   static propTypes = {
     centerCoordinates: PropTypes.arrayOf(PropTypes.number),
     clearStartAndEnd: PropTypes.func.isRequired,

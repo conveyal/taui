@@ -1,28 +1,17 @@
 import lonlng from 'lonlng'
 import React, {Component, PropTypes} from 'react'
-import {connect} from 'react-redux'
 
-import {
-  clearEnd,
-  clearIsochrone,
-  clearStart,
-  setBaseActive,
-  setComparisonActive,
-  updateDestination,
-  updateOrigin,
-  updateSelectedTimeCutoff
-} from '../../actions'
-import featureToLabel from '../../utils/feature-to-label'
+import featureToLabel from '../utils/feature-to-label'
 import Form from './form'
-import Fullscreen from '../../components/fullscreen'
-import Icon from '../../components/icon'
-import Log from '../../components/log'
+import Fullscreen from './fullscreen'
+import Icon from './icon'
+import Log from './log'
 import Map from './map'
-import messages from '../../utils/messages'
-import RouteCard from '../../components/route-card'
-import initializeBrowsochrones from '../../utils/initialize-browsochrones'
+import messages from '../utils/messages'
+import RouteCard from './route-card'
+import initializeBrowsochrones from '../utils/initialize-browsochrones'
 
-class Indianapolis extends Component {
+export default class Application extends Component {
   static propTypes = {
     actionLog: PropTypes.arrayOf(PropTypes.object),
     browsochrones: PropTypes.object.isRequired,
@@ -245,23 +234,3 @@ class Indianapolis extends Component {
     )
   }
 }
-
-function mapStateToProps (state, ownProps) {
-  return state
-}
-
-function mapDispatchToProps (dispatch, ownProps) {
-  return {
-    clearEnd: () => dispatch(clearEnd()),
-    clearIsochrone: () => dispatch(clearIsochrone()),
-    clearStart: () => dispatch(clearStart()),
-    initializeBrowsochrones: (actions) => dispatch(actions),
-    moveOrigin: (options) => dispatch(updateOrigin(options)),
-    moveDestination: (options) => dispatch(updateDestination(options)),
-    onTimeCutoffChange: (options) => dispatch(updateSelectedTimeCutoff(options)),
-    setBaseActive: () => dispatch(setBaseActive()),
-    setComparisonActive: () => dispatch(setComparisonActive())
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Indianapolis)

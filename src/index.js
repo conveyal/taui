@@ -1,9 +1,9 @@
-import mount from '@conveyal/woonerf/build/lib/mount'
+import mount from '@conveyal/woonerf/mount'
 
-import Indianapolis from './containers/indianapolis'
+import Application from './containers/application'
 import reducers from './reducers'
 
 mount({
-  app: Indianapolis,
+  app: Application,
   reducers
 })

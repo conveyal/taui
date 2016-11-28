@@ -1,7 +1,8 @@
+import Pure from '@conveyal/woonerf/components/pure'
 import React from 'react'
 
-import {pure} from '../deep-equal'
-
-const Fullscreen = (props) => <div className='Fullscreen'>{props.children}</div>
-
-export default pure(Fullscreen)
+export default class Fullscreen extends Pure {
+  render () {
+    return <div className='Fullscreen'>{this.props.children}</div>
+  }
+}

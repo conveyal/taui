@@ -1,11 +1,10 @@
+import Pure from '@conveyal/woonerf/components/pure'
 import React, {PropTypes} from 'react'
 import moment from 'moment'
 
-import DeepEqual from '../deep-equal'
-
 const format = 'HH:mm:ss'
 
-export default class LogItem extends DeepEqual {
+export default class LogItem extends Pure {
   static propTypes = {
     createdAt: PropTypes.object,
     level: PropTypes.string,
