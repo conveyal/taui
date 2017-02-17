@@ -1,13 +1,20 @@
+import Icon from '@conveyal/woonerf/components/icon'
 import Pure from '@conveyal/woonerf/components/pure'
 import {Browser} from 'leaflet'
 import React, {PropTypes} from 'react'
-import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 'react-leaflet'
+import {GeoJSON, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 'react-leaflet'
 
-import Icon from './icon'
 import leafletIcon from '../utils/leaflet-icons'
 import messages from '../utils/messages'
 import TransitiveLayer from './transitive-map-layer'
 import transitiveStyle from '../transitive-style'
+
+const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
+  ? process.env.LEAFLET_RETINA_URL
+  : process.env.LEAFLET_TILE_URL
+const TILE_LAYER_PROPS = Browser.retina
+  ? {tileSize: 512, zoomOffset: -1}
+  : {}
 
 const startIcon = leafletIcon({
   icon: 'play',
@@ -83,12 +90,6 @@ export default class Map extends Pure {
   render () {
     const {centerCoordinates, geojson, geojsonColor, markers, onZoom, transitive, zoom} = this.props
     const {showSelectOriginOrDestination, lastClickedLatlng} = this.state
-    const tileLayerProps = {}
-
-    if (Browser.retina) {
-      tileLayerProps.tileSize = 512
-      tileLayerProps.zoomOffset = -1
-    }
 
     return (
       <LeafletMap
@@ -103,9 +104,9 @@ export default class Map extends Pure {
         >
         <ZoomControl position='topright' />
         <TileLayer
-          url={Browser.retina && process.env.LEAFLET_RETINA_URL ? process.env.LEAFLET_RETINA_URL : process.env.LEAFLET_TILE_URL}
+          url={TILE_LAYER_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
-          {...tileLayerProps}
+          {...TILE_LAYER_PROPS}
         />
         {markers.map((m, index) => {
           return (
@@ -121,7 +122,7 @@ export default class Map extends Pure {
         })}
 
         {geojson.map((g) => {
-          return <GeoJson
+          return <GeoJSON
             key={`${g.key}`}
             data={g}
             style={{

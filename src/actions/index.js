@@ -1,5 +1,4 @@
 import lonlat from '@conveyal/lonlat'
-import Leaflet from 'leaflet'
 import {createAction} from 'redux-actions'
 
 import fetch, {
@@ -120,13 +119,14 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
   if (!browsochrones.base) return actions
 
-  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
-  if (browsochrones.base.pointInQueryBounds(point)) {
+  try {
+    const point = browsochrones.base.latLonToOriginPoint(latlng)
     actions.push(fetchBrowsochronesFor({
       browsochrones: browsochrones.base,
       destinationLatlng,
       latlng,
       name: 'base',
+      point,
       timeCutoff,
       zoom
     }))
@@ -135,13 +135,14 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
         browsochrones: browsochrones.comparison,
         destinationLatlng,
         latlng,
+        point,
         name: 'comparison',
         timeCutoff,
         zoom
       }))
     }
-  } else {
-    console.log('point out of bounds') // TODO: Handle
+  } catch (e) {
+    console.error(e)
   }
 
   return actions
@@ -152,31 +153,38 @@ function fetchBrowsochronesFor ({
   destinationLatlng,
   latlng,
   name,
+  point,
   timeCutoff,
   zoom
 }) {
-  const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
   return [
     incrementWork(), // to include the time taking to set the origin and generate the surface
     addActionLogItem(`Fetching origin data for ${name} scenario`),
     fetch({
       url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
-      next: async (response) => {
-        await browsochrones.setOrigin(response.value, point)
-        await browsochrones.generateSurface()
+      next: async (error, response) => {
+        if (error) {
+          console.error(error)
+        } else {
+          await browsochrones.setOrigin(response.value, point)
 
-        return [
-          decrementWork(),
-          generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
-          generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
-          destinationLatlng && generateDestinationDataFor({
-            browsochrones,
-            fromLatlng: latlng,
-            toLatlng: destinationLatlng,
-            name,
-            zoom
-          })
-        ]
+          for (const name of browsochrones.gridNames) {
+            await browsochrones.generateSurface(name)
+          }
+
+          return [
+            decrementWork(),
+            generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
+            generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
+            destinationLatlng && generateDestinationDataFor({
+              browsochrones,
+              fromLatlng: latlng,
+              toLatlng: destinationLatlng,
+              name,
+              zoom
+            })
+          ]
+        }
       }
     })
   ]
@@ -227,7 +235,7 @@ function generateDestinationDataFor ({browsochrones, fromLatlng, toLatlng, name,
     incrementWork(),
     addActionLogItem(`Generating transit data for ${name}`),
     (async () => {
-      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(toLatlng, zoom), zoom)
+      const destinationPoint = browsochrones.latLonToOriginPoint(toLatlng)
       const data = await browsochrones.generateDestinationData({
         from: fromLatlng || null,
         to: {
