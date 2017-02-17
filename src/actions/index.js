@@ -168,7 +168,7 @@ function fetchBrowsochronesFor ({
         } else {
           await browsochrones.setOrigin(response.value, point)
 
-          for (const name of browsochrones.gridNames) {
+          for (const name of browsochrones.grids) {
             await browsochrones.generateSurface(name)
           }
 

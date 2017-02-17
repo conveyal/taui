@@ -1,5 +1,5 @@
 import Pure from '@conveyal/woonerf/components/pure'
-import {hsl} from 'd3-color'
+import {rgb} from 'd3-color'
 import React from 'react'
 import toCapitalCase from 'lodash.capitalize'
 import toSpaceCase from 'lodash.lowercase'
@@ -145,7 +145,7 @@ function extractRelevantTransitiveInfo ({
           const pid = s.pattern_id || s.patterns[0].pattern_id
           const seg = {}
           const route = findRouteForPattern({id: pid, patterns, routes})
-          const color = route.route_color ? hsl(`#${route.route_color}`) : hsl('#0b2b40')
+          const color = route.route_color ? rgb(`#${route.route_color}`) : rgb('#0b2b40')
           seg.name = toCapitalCase(route.route_short_name)
 
           if (s.patterns && s.patterns.length > 0) {
@@ -155,7 +155,7 @@ function extractRelevantTransitiveInfo ({
           }
 
           seg.backgroundColor = color.toString()
-          seg.color = color.l > 0.5 ? '#000' : '#fff'
+          seg.color = isLight(color) ? '#000' : '#fff'
           seg.type = typeToIcon[route.route_type]
 
           return seg
@@ -220,4 +220,10 @@ function showDiff (keys, base, comparison) {
       })}
     </div>
   )
+}
+
+function isLight (color) {
+  // YIQ equation from http://24ways.org/2010/calculating-color-contrast
+  const yiq = ((color.r * 299 + color.g * 587 + color.b * 114) / 1000) < 128
+  return yiq < 128
 }

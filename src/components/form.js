@@ -24,6 +24,7 @@ export default class Form extends Pure {
             {...geocoder}
             featureToLabel={featureToLabel}
             featureToValue={(f) => f.id}
+            geolocate
             name='start-address'
             onChange={onChangeStart}
             placeholder={messages.Geocoding.StartPlaceholder}
@@ -41,6 +42,7 @@ export default class Form extends Pure {
                 {...geocoder}
                 featureToLabel={featureToLabel}
                 featureToValue={(f) => f.id}
+                geolocate
                 name='end-address'
                 onChange={onChangeEnd}
                 placeholder={messages.Geocoding.EndPlaceholder}

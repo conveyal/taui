@@ -54,11 +54,7 @@ async function load (url, grids) {
   await bs.setStopTrees(stopTrees)
   await bs.setTransitiveNetwork(query.transitiveData)
 
-  bs.gridNames = []
-  const putGrids = grids.map((grid) => {
-    bs.gridNames.push(grid.name)
-    bs.putGrid(grid.name, grid)
-  })
+  const putGrids = grids.map((grid) => bs.putGrid(grid.name, grid))
   await Promise.all(putGrids)
 
   return bs
