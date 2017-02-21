@@ -1,6 +1,6 @@
-import Leaflet from 'leaflet'
-import lonlng from 'lonlng'
+import lonlat from '@conveyal/lonlat'
 import {createAction} from 'redux-actions'
+import uuid from 'uuid'
 
 import fetch, {
   incrementFetches as incrementWork,
@@ -105,7 +105,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
   } else {
     actions.push(
       setOrigin({latlng}),
-      addActionLogItem(`Finding start address for ${lonlng(latlng).toString()}`),
+      addActionLogItem(`Finding start address for ${lonlat(latlng).toString()}`),
       reverseGeocode({latlng})
         .then(({features}) => {
           if (!features || features.length < 1) return
@@ -120,28 +120,23 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
   if (!browsochrones.base) return actions
 
-  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
-  if (browsochrones.base.pointInQueryBounds(point)) {
+  actions.push(fetchBrowsochronesFor({
+    browsochrones: browsochrones.base,
+    destinationLatlng,
+    latlng,
+    name: 'base',
+    timeCutoff,
+    zoom
+  }))
+  if (browsochrones.comparison) {
     actions.push(fetchBrowsochronesFor({
-      browsochrones: browsochrones.base,
+      browsochrones: browsochrones.comparison,
       destinationLatlng,
       latlng,
-      name: 'base',
+      name: 'comparison',
       timeCutoff,
       zoom
     }))
-    if (browsochrones.comparison) {
-      actions.push(fetchBrowsochronesFor({
-        browsochrones: browsochrones.comparison,
-        destinationLatlng,
-        latlng,
-        name: 'comparison',
-        timeCutoff,
-        zoom
-      }))
-    }
-  } else {
-    console.log('point out of bounds') // TODO: Handle
   }
 
   return actions
@@ -155,91 +150,119 @@ function fetchBrowsochronesFor ({
   timeCutoff,
   zoom
 }) {
-  const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
-  return [
-    incrementWork(), // to include the time taking to set the origin and generate the surface
-    addActionLogItem(`Fetching origin data for ${name} scenario`),
-    fetch({
-      url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
-      next: async (response) => {
-        await browsochrones.setOrigin(response.value, point)
-        await browsochrones.generateSurface()
+  const id = `fetch browsochrones for ${name} (${uuid.v4()})`
+  try {
+    const point = browsochrones.latLonToOriginPoint(latlng)
+    return [
+      incrementWork(id), // to include the time taking to set the origin and generate the surface
+      addActionLogItem(`Fetching origin data for ${name} scenario`),
+      fetch({
+        url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
+        next: async (error, response) => {
+          if (error) {
+            console.error(error)
+          } else {
+            await browsochrones.setOrigin(response.value, point)
 
-        return [
-          decrementWork(),
-          generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
-          generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
-          destinationLatlng && generateDestinationDataFor({
-            browsochrones,
-            fromLatlng: latlng,
-            toLatlng: destinationLatlng,
-            name,
-            zoom
-          })
-        ]
-      }
-    })
-  ]
+            for (const name of browsochrones.grids) {
+              await browsochrones.generateSurface(name)
+            }
+
+            return [
+              decrementWork(id),
+              generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
+              generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
+              destinationLatlng && generateDestinationDataFor({
+                browsochrones,
+                fromLatlng: latlng,
+                toLatlng: destinationLatlng,
+                name,
+                zoom
+              })
+            ]
+          }
+        }
+      })
+    ]
+  } catch (e) {
+    console.error(e)
+    return addActionLogItem(e)
+  }
 }
 
 const storedAccessibility = {}
 const storedIsochrones = {}
 
 function generateAccessiblityFor ({browsochrones, latlng, name, timeCutoff}) {
+  const id = `generate accessibility for ${name} (${uuid.v4()})`
   return [
-    incrementWork(),
+    incrementWork(id),
     addActionLogItem(`Generating accessibility surface for ${name}`),
     (async () => {
-      const accessibility = {}
-      for (const grid of browsochrones.grids) {
-        const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}-${grid}`
-        accessibility[grid] = storedAccessibility[key] || await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
-        storedAccessibility[key] = accessibility[grid]
+      try {
+        const accessibility = {}
+        for (const grid of browsochrones.grids) {
+          const key = `${name}-${lonlat.toString(latlng)}-${timeCutoff}-${grid}`
+          accessibility[grid] = storedAccessibility[key] || await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
+          storedAccessibility[key] = accessibility[grid]
+        }
+        return [
+          setAccessibilityFor({accessibility, name}),
+          decrementWork(id)
+        ]
+      } catch (e) {
+        console.error(e)
       }
-      return [
-        setAccessibilityFor({accessibility, name}),
-        decrementWork()
-      ]
     })()
   ]
 }
 
 function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
+  const id = `generate isochrone for ${name} (${uuid.v4()})`
   return [
-    incrementWork(),
+    incrementWork(id),
     addActionLogItem(`Generating travel time isochrone for ${name}`),
     (async () => {
-      const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
-      const isochrone = storedIsochrones[key] || await browsochrones.getIsochrone(timeCutoff)
-      isochrone.key = key
-      storedIsochrones[key] = isochrone
+      try {
+        const key = `${name}-${lonlat.toString(latlng)}-${timeCutoff}`
+        const isochrone = storedIsochrones[key] || await browsochrones.getIsochrone(timeCutoff)
+        isochrone.key = key
+        storedIsochrones[key] = isochrone
 
-      return [
-        setIsochroneFor({isochrone, name}),
-        decrementWork()
-      ]
+        return [
+          setIsochroneFor({isochrone, name}),
+          decrementWork(id)
+        ]
+      } catch (e) {
+        console.error(e)
+      }
     })()
   ]
 }
 
 function generateDestinationDataFor ({browsochrones, fromLatlng, toLatlng, name, zoom}) {
+  const id = `generate destination data for ${name} (${uuid.v4()})`
   return [
-    incrementWork(),
+    incrementWork(id),
     addActionLogItem(`Generating transit data for ${name}`),
     (async () => {
-      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(toLatlng, zoom), zoom)
-      const data = await browsochrones.generateDestinationData({
-        from: fromLatlng || null,
-        to: {
-          ...toLatlng,
-          ...destinationPoint
-        }
-      })
-      data.transitive.key = `${name}-${lonlng.toString(toLatlng)}`
-      return [
-        setDestinationDataFor({data, name}),
-        decrementWork()
-      ]
+      try {
+        const destinationPoint = browsochrones.latLonToOriginPoint(toLatlng)
+        const data = await browsochrones.generateDestinationData({
+          from: fromLatlng || null,
+          to: {
+            ...toLatlng,
+            ...destinationPoint
+          }
+        })
+        data.transitive.key = `${name}-${lonlat.toString(toLatlng)}`
+        return [
+          setDestinationDataFor({data, name}),
+          decrementWork(id)
+        ]
+      } catch (e) {
+        console.error(e)
+      }
     })()
   ]
 }

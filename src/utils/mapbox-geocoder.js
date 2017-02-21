@@ -1,4 +1,4 @@
-import lonlng from 'lonlng'
+import lonlat from '@conveyal/lonlat'
 import {mapbox} from 'mapbox.js'
 
 mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
@@ -24,7 +24,7 @@ export function geocode ({
   return new Promise((resolve, reject) => {
     geocoder.query({
       country: boundary.country,
-      proximity: lonlng.toCoordinates(focusLatlng),
+      proximity: lonlat.toCoordinates(focusLatlng),
       query: text,
       types: MAPBOX_TYPES
     }, (err, response) => {

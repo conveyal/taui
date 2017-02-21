@@ -1,4 +1,4 @@
-import lonlng from 'lonlng'
+import lonlat from '@conveyal/lonlat'
 import React, {Component, PropTypes} from 'react'
 
 import featureToLabel from '../utils/feature-to-label'
@@ -67,7 +67,7 @@ export default class Application extends Component {
       browsochrones,
       destinationLatlng,
       label,
-      latlng: lonlng(latlng),
+      latlng: lonlat(latlng),
       timeCutoff: timeCutoff.selected,
       zoom: map.zoom
     })
@@ -99,7 +99,7 @@ export default class Application extends Component {
       browsochrones,
       fromLatlng: mapMarkers.origin.latlng,
       label,
-      latlng: lonlng(latlng),
+      latlng: lonlat(latlng),
       zoom: map.zoom
     })
   }
@@ -181,7 +181,7 @@ export default class Application extends Component {
         <div className='Taui-Dock'>
           <div className='Taui-Dock-content'>
             <div className='title'>
-              {ui.fetches > 0
+              {ui.fetchCount > 0
                 ? <Icon type='spinner' className='fa-spin' />
                 : <Icon type='map' />} {messages.Title}
             </div>
