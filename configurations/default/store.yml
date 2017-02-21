@@ -28,4 +28,6 @@ map:
   geojson: []
   zoom: 11
 ui:
-  fetches: 0
+  fetchCount: 0
+  fetches: []
+  showLog: true

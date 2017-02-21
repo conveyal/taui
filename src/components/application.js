@@ -181,7 +181,7 @@ export default class Application extends Component {
         <div className='Taui-Dock'>
           <div className='Taui-Dock-content'>
             <div className='title'>
-              {ui.fetches > 0
+              {ui.fetchCount > 0
                 ? <Icon type='spinner' className='fa-spin' />
                 : <Icon type='map' />} {messages.Title}
             </div>
