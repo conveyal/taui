@@ -5,6 +5,7 @@
   "scripts": {
     "deploy": "mastarm deploy --env production --minify",
     "prestart": "yarn",
+    "pretest": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "mastarm build",
     "test": "mastarm lint"
@@ -24,7 +25,7 @@
   },
   "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
-    "mastarm": "^3.0.0",
+    "mastarm": "^3.4.0",
     "semantic-release": "^6.3.2"
   },
   "dependencies": {
