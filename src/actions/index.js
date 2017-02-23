@@ -161,22 +161,26 @@ function fetchBrowsochronesFor ({
     addActionLogItem(`Fetching origin data for ${name} scenario`),
     fetch({
       url: `${browsochrones.originsUrl}/${point.x | 0}/${point.y | 0}.dat`,
-      next: async (response) => {
-        await browsochrones.setOrigin(response.value, point)
-        await browsochrones.generateSurface()
+      next: async (error, response) => {
+        if (error) {
+          console.error(error)
+        } else {
+          await browsochrones.setOrigin(response.value, point)
+          await browsochrones.generateSurface()
 
-        return [
-          decrementWork(),
-          generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
-          generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
-          destinationLatlng && generateDestinationDataFor({
-            browsochrones,
-            fromLatlng: latlng,
-            toLatlng: destinationLatlng,
-            name,
-            zoom
-          })
-        ]
+          return [
+            decrementWork(),
+            generateAccessiblityFor({browsochrones, latlng, name, timeCutoff}),
+            generateIsochroneFor({browsochrones, latlng, name, timeCutoff}),
+            destinationLatlng && generateDestinationDataFor({
+              browsochrones,
+              fromLatlng: latlng,
+              toLatlng: destinationLatlng,
+              name,
+              zoom
+            })
+          ]
+        }
       }
     })
   ]
