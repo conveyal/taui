@@ -1,5 +1,5 @@
+import lonlat from '@conveyal/lonlat'
 import Leaflet from 'leaflet'
-import lonlng from 'lonlng'
 import {createAction} from 'redux-actions'
 
 import fetch, {
@@ -105,7 +105,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
   } else {
     actions.push(
       setOrigin({latlng}),
-      addActionLogItem(`Finding start address for ${lonlng(latlng).toString()}`),
+      addActionLogItem(`Finding start address for ${lonlat(latlng).toString()}`),
       reverseGeocode({latlng})
         .then(({features}) => {
           if (!features || features.length < 1) return
@@ -120,7 +120,7 @@ export function updateOrigin ({browsochrones, destinationLatlng, latlng, label, 
 
   if (!browsochrones.base) return actions
 
-  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+  const point = browsochrones.base.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(lonlat.toLeaflet(latlng), zoom), zoom)
   if (browsochrones.base.pointInQueryBounds(point)) {
     actions.push(fetchBrowsochronesFor({
       browsochrones: browsochrones.base,
@@ -155,7 +155,7 @@ function fetchBrowsochronesFor ({
   timeCutoff,
   zoom
 }) {
-  const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(latlng, zoom), zoom)
+  const point = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(lonlat.toLeaflet(latlng), zoom), zoom)
   return [
     incrementWork(), // to include the time taking to set the origin and generate the surface
     addActionLogItem(`Fetching origin data for ${name} scenario`),
@@ -196,7 +196,7 @@ function generateAccessiblityFor ({browsochrones, latlng, name, timeCutoff}) {
     (async () => {
       const accessibility = {}
       for (const grid of browsochrones.grids) {
-        const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}-${grid}`
+        const key = `${name}-${lonlat.toString(latlng)}-${timeCutoff}-${grid}`
         accessibility[grid] = storedAccessibility[key] || await browsochrones.getAccessibilityForGrid(grid, timeCutoff)
         storedAccessibility[key] = accessibility[grid]
       }
@@ -213,7 +213,7 @@ function generateIsochroneFor ({browsochrones, latlng, name, timeCutoff}) {
     incrementWork(),
     addActionLogItem(`Generating travel time isochrone for ${name}`),
     (async () => {
-      const key = `${name}-${lonlng.toString(latlng)}-${timeCutoff}`
+      const key = `${name}-${lonlat.toString(latlng)}-${timeCutoff}`
       const isochrone = storedIsochrones[key] || await browsochrones.getIsochrone(timeCutoff)
       isochrone.key = key
       storedIsochrones[key] = isochrone
@@ -231,7 +231,7 @@ function generateDestinationDataFor ({browsochrones, fromLatlng, toLatlng, name,
     incrementWork(),
     addActionLogItem(`Generating transit data for ${name}`),
     (async () => {
-      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(toLatlng, zoom), zoom)
+      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(lonlat.toLeaflet(toLatlng), zoom), zoom)
       const data = await browsochrones.generateDestinationData({
         from: fromLatlng || null,
         to: {
@@ -239,7 +239,7 @@ function generateDestinationDataFor ({browsochrones, fromLatlng, toLatlng, name,
           ...destinationPoint
         }
       })
-      data.transitive.key = `${name}-${lonlng.toString(toLatlng)}`
+      data.transitive.key = `${name}-${lonlat.toString(toLatlng)}`
       return [
         setDestinationDataFor({data, name}),
         decrementWork()
