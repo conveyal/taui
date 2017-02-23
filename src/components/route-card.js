@@ -154,7 +154,7 @@ function extractRelevantTransitiveInfo ({
             seg.name = unique(patternNames).join(' / ')
           }
 
-          seg.backgroundColor = color.rgbaString()
+          seg.backgroundColor = color.string()
           seg.color = color.light() ? '#000' : '#fff'
           seg.type = typeToIcon[route.route_type]
 

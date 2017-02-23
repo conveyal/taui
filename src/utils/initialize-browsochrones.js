@@ -1,6 +1,6 @@
+import lonlat from '@conveyal/lonlat'
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
-import lonlng from 'lonlng'
 
 import {getAsObject as getHash} from './hash'
 import {geocode} from './mapbox-geocoder'
@@ -77,14 +77,14 @@ async function loadFromQueryString ({
       })))
     if (startResults.features.length > 0) {
       const destination = endResults && endResults.features.length > 0
-        ? { latlng: lonlng(endResults.features[0].geometry.coordinates), label: endResults.features[0].place_name }
+        ? { latlng: lonlat(endResults.features[0].geometry.coordinates), label: endResults.features[0].place_name }
         : {}
       return [
         updateOrigin({
           browsochrones: { active: 'base', base: bs1, comparison: bs2 },
           label: startResults.features[0].place_name,
           destinationLatlng: destination.latlng,
-          latlng: lonlng(startResults.features[0].geometry.coordinates),
+          latlng: lonlat(startResults.features[0].geometry.coordinates),
           zoom: map.zoom
         }),
         setDestination(destination)

@@ -1,4 +1,4 @@
-import lonlng from 'lonlng'
+import lonlat from '@conveyal/lonlat'
 import {handleActions} from 'redux-actions'
 
 export default handleActions({
@@ -49,8 +49,8 @@ export default handleActions({
     const base = data[0]
     const comparison = data[1]
 
-    base.transitive.key = `base-${lonlng.toString(latlng)}`
-    comparison.transitive.key = `comparison-${lonlng.toString(latlng)}`
+    base.transitive.key = `base-${lonlat.toString(latlng)}`
+    comparison.transitive.key = `comparison-${lonlat.toString(latlng)}`
 
     const transitive = active === 'base'
       ? base.transitive
