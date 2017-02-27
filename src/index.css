@@ -167,10 +167,9 @@ body {
 }
 
 .CardSegment {
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem;
   border-radius: 0.25rem;
   margin-right: 0.25rem;
-  margin-bottom: 0.25rem;
   display: inline-block;
 }
 
@@ -204,14 +203,12 @@ body {
 
 .Card .BestTrip {
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .Card .BestTrip > div {
   flex-grow: 1;
-}
-
-.Card .BestTrip > div:last-of-type {
-  text-align: right;
 }
 
 .Card .Metric > .pull-right {
