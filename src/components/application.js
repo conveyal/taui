@@ -9,41 +9,39 @@ import Log from './log'
 import Map from './map'
 import messages from '../utils/messages'
 import RouteCard from './route-card'
-import initializeBrowsochrones from '../utils/initialize-browsochrones'
 
 export default class Application extends Component {
   static propTypes = {
     actionLog: PropTypes.arrayOf(PropTypes.object),
     browsochrones: PropTypes.object.isRequired,
-    clearEnd: PropTypes.func.isRequired,
-    clearIsochrone: PropTypes.func.isRequired,
-    clearStart: PropTypes.func.isRequired,
     destinations: PropTypes.object,
     geocoder: PropTypes.object,
     history: PropTypes.any,
-    initializeBrowsochrones: PropTypes.func.isRequired,
     mapMarkers: PropTypes.object,
     map: PropTypes.object,
-    moveDestination: PropTypes.func.isRequired,
-    moveOrigin: PropTypes.func.isRequired,
-    onTimeCutoffChange: PropTypes.func.isRequired,
-    setBaseActive: PropTypes.func,
-    setComparisonActive: PropTypes.func,
     timeCutoff: PropTypes.shape({
       selected: PropTypes.number
     }),
     ui: PropTypes.object.isRequired,
-    zoom: PropTypes.number
+    zoom: PropTypes.number,
+
+    clearEnd: PropTypes.func.isRequired,
+    clearIsochrone: PropTypes.func.isRequired,
+    clearStart: PropTypes.func.isRequired,
+    initializeBrowsochrones: PropTypes.func.isRequired,
+    moveDestination: PropTypes.func.isRequired,
+    moveOrigin: PropTypes.func.isRequired,
+    onTimeCutoffChange: PropTypes.func.isRequired,
+    setBaseActive: PropTypes.func,
+    setComparisonActive: PropTypes.func
   }
 
   componentWillMount () {
-    const {browsochrones, geocoder, map} = this.props
+    const {browsochrones, initializeBrowsochrones, geocoder, map} = this.props
     initializeBrowsochrones({
       browsochrones,
       geocoder,
       map
-    }).then((actions) => {
-      this.props.initializeBrowsochrones(actions)
     })
   }
 

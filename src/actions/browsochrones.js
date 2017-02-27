@@ -2,9 +2,9 @@ import lonlat from '@conveyal/lonlat'
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
 
-import {getAsObject as getHash} from './hash'
-import {geocode} from './mapbox-geocoder'
-import messages from './messages'
+import {getAsObject as getHash} from '../utils/hash'
+import {geocode} from '../utils/mapbox-geocoder'
+import messages from '../utils/messages'
 
 import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, setDestination, updateOrigin} from '../actions'
 

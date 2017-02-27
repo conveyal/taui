@@ -1,5 +1,4 @@
 
-@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
 @import url(node_modules/normalize.css/normalize.css);
 @import url(node_modules/mapbox.js/theme/style.css);
 @import url(node_modules/font-awesome/css/font-awesome.css);
@@ -197,6 +196,10 @@ body {
 
 .Card .Metric {
   height: 1.5rem;
+}
+
+.Card .Metric > .fa-fw {
+  width: inherit;
 }
 
 .Card .BestTrip {

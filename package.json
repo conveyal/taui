@@ -36,7 +36,7 @@
     "debug": "^2.6.1",
     "font-awesome": "^4.6.3",
     "isomorphic-fetch": "^2.2.1",
-    "isomorphic-mapzen-search": "1.0.0",
+    "isomorphic-mapzen-search": "^1.0.0",
     "leaflet": "^0.7.7",
     "leaflet-transitivelayer": "^0.2.0",
     "lodash.camelcase": "^4.3.0",
