@@ -1,27 +1,20 @@
-import lonlat from '@conveyal/lonlat'
 import {handleActions} from 'redux-actions'
 
 export default handleActions({
   'update map' (state, action) {
-    return Object.assign({}, state, action.payload)
+    return {...state, ...action.payload}
   },
   'clear isochrone' (state, action) {
     return {...state, geojson: []}
   },
   'set isochrone for' (state, {payload}) {
-    const {name, isochrone} = payload
+    const {index, isochrone} = payload
+    const isochrones = [...state.isochrones]
+    isochrones[index] = isochrone
     return {
       ...state,
-      geojson: state.active === name ? [isochrone] : state.geojson,
-      [`${name}Isochrone`]: isochrone
-    }
-  },
-  'set isochrones' (state, {payload}) {
-    return {
-      ...state,
-      geojson: [payload[payload.active]],
-      baseIsochrone: payload.base,
-      comparisonIsochrone: payload.comparison
+      geojson: state.active === index ? [isochrone] : state.geojson,
+      isochrones
     }
   },
   'set isochrone' (state, action) {
@@ -31,68 +24,49 @@ export default handleActions({
     }
   },
   'set origin' (state) {
-    return Object.assign({}, state, {transitive: null})
+    return {
+      ...state,
+      transitive: null
+    }
   },
   'set destination data for' (state, {payload}) {
-    const {data, name} = payload
-    return {
-      ...state,
-      [`${name}InVehicleTravelTime`]: data.inVehicleTravelTime,
-      [`${name}Transitive`]: data.transitive,
-      [`${name}TravelTime`]: data.travelTime,
-      [`${name}WaitTime`]: data.waitTime,
-      transitive: state.active === name ? data.transitive : state.transitive
-    }
-  },
-  'set transitive network' (state, {payload}) {
-    const {active, data, latlng} = payload
-    const base = data[0]
-    const comparison = data[1]
+    const {data, index} = payload
 
-    base.transitive.key = `base-${lonlat.toString(latlng)}`
-    comparison.transitive.key = `comparison-${lonlat.toString(latlng)}`
+    const inVehicleTravelTimes = [...state.inVehicleTravelTimes]
+    const transitives = [...state.transitives]
+    const travelTimes = [...state.travelTimes]
+    const waitTimes = [...state.waitTimes]
 
-    const transitive = active === 'base'
-      ? base.transitive
-      : comparison.transitive
+    inVehicleTravelTimes[index] = data.inVehicleTravelTime
+    transitives[index] = data.transitive
+    travelTimes[index] = data.travelTime
+    waitTimes[index] = data.waitTime
 
     return {
       ...state,
-      baseInVehicleTravelTime: base.inVehicleTravelTime,
-      baseTransitive: base.transitive,
-      baseTravelTime: base.travelTime,
-      baseWaitTime: base.waitTime,
-      comparisonInVehicleTravelTime: comparison.inVehicleTravelTime,
-      comparisonTransitive: comparison.transitive,
-      comparisonTravelTime: comparison.travelTime,
-      comparisonWaitTime: comparison.waitTime,
-      transitive
+      inVehicleTravelTimes,
+      transitive: state.active === index ? data.transitive : state.transitive,
+      transitives,
+      travelTimes,
+      waitTimes
     }
   },
-  'set base active' (state, action) {
-    return Object.assign({}, state, {
-      active: 'base',
-      geojson: [state.baseIsochrone],
-      transitive: state.baseTransitive
-    })
-  },
-  'set comparison active' (state, action) {
-    return Object.assign({}, state, {
-      active: 'comparison',
-      geojson: [state.comparisonIsochrone],
-      transitive: state.comparisonTransitive
-    })
+  'set active browsochrones instance' (state, action) {
+    const index = action.payload
+    return {
+      ...state,
+      active: index,
+      geojson: [state.isochrones[index]],
+      transitive: state.transitives[index]
+    }
   },
   'clear start' (state, action) {
     return {
       ...state,
       geojson: [],
-      baseIsochrone: null,
-      baseTransitive: null,
-      baseTravelTime: null,
-      comparisonIsochrone: null,
-      comparisonTransitive: null,
-      comparisonTravelTime: null
+      isochrones: [],
+      transitives: [],
+      travelTimes: []
     }
   },
   'clear end' (state, action) {
@@ -102,15 +76,14 @@ export default handleActions({
     }
   }
 }, {
-  active: 'base',
+  active: 0,
   geojson: [],
   map: null,
   transitive: null,
-  baseIsochrone: null,
-  baseTransitive: {},
-  baseTravelTime: null,
-  comparisonIsochrone: null,
-  comparisonTransitive: {},
-  comparisonTravelTime: null,
+  isochrones: [],
+  transitives: [],
+  travelTimes: [],
+  inVehicleTravelTimes: [],
+  waitTimes: [],
   zoom: 11
 })

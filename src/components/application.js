@@ -32,8 +32,7 @@ export default class Application extends Component {
     moveDestination: PropTypes.func.isRequired,
     moveOrigin: PropTypes.func.isRequired,
     onTimeCutoffChange: PropTypes.func.isRequired,
-    setBaseActive: PropTypes.func,
-    setComparisonActive: PropTypes.func
+    setActiveBrowsochronesInstance: PropTypes.func
   }
 
   componentWillMount () {
@@ -151,7 +150,7 @@ export default class Application extends Component {
     return <Map
       {...map}
       clearStartAndEnd={this._clearStartAndEnd}
-      geojsonColor={browsochrones.active === 'base' ? '#4269a4' : 'darkorange'}
+      geojsonColor={browsochrones.active === 0 ? '#4269a4' : 'darkorange'}
       markers={markers}
       setEnd={this._setEnd}
       setStart={this._setStart}
@@ -165,8 +164,7 @@ export default class Application extends Component {
       destinations,
       geocoder,
       map,
-      setBaseActive,
-      setComparisonActive,
+      setActiveBrowsochronesInstance,
       timeCutoff,
       ui
     } = this.props
@@ -184,40 +182,30 @@ export default class Application extends Component {
                 : <Icon type='map' />} {messages.Title}
             </div>
             <Form
-              accessibility={destinations.accessibility}
               geocoder={geocoder}
               onTimeCutoffChange={this._onTimeCutoffChange}
               onChangeEnd={this._setEndWithFeature}
               onChangeStart={this._setStartWithFeature}
               selectedTimeCutoff={timeCutoff.selected}
               />
-            {destinations.accessibility.base &&
-              <RouteCard
-                accessibility={destinations.accessibility.base}
-                active={browsochrones.active === 'base'}
-                oldAccessibility={destinations.accessibility.comparison}
-                oldTravelTime={map.comparisonTravelTime}
-                onClick={setBaseActive}
-                transitiveData={map.baseTransitive}
-                travelTime={map.baseTravelTime}
-                waitTime={map.baseWaitTime}
-                >
-                {messages.Systems.BaseTitle}
-              </RouteCard>
-            }
-            {destinations.accessibility.comparison &&
-              <RouteCard
-                alternate
-                active={browsochrones.active === 'comparison'}
-                accessibility={destinations.accessibility.comparison}
-                onClick={setComparisonActive}
-                transitiveData={map.comparisonTransitive}
-                travelTime={map.comparisonTravelTime}
-                waitTime={map.comparisonWaitTime}
-                >
-                {messages.Systems.ComparisonTitle}
-              </RouteCard>
-            }
+            {destinations.accessibility
+              .filter((accessibility) => !!accessibility)
+              .map((accessibility, index) =>
+                <RouteCard
+                  accessibility={accessibility}
+                  active={browsochrones.active === index}
+                  alternate={index !== 0}
+                  key={`${index}-route-card`}
+                  oldAccessibility={destinations.accessibility[0]}
+                  oldTravelTime={map.travelTimes[0]}
+                  onClick={() => setActiveBrowsochronesInstance(index)}
+                  transitiveData={map.transitives[index]}
+                  travelTime={map.travelTimes[index]}
+                  waitTime={map.waitTimes[index]}
+                  >
+                  {index !== 0 ? `${messages.Systems.BaseTitle} ${index}` : messages.Systems.ComparisonTitle}
+                </RouteCard>
+              )}
             {ui.showLog && actionLog && actionLog.length > 0 &&
               <div className='Card'>
                 <div className='CardTitle'>{messages.Log.Title}</div>

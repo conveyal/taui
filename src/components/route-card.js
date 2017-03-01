@@ -112,7 +112,7 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
       <div className='heading'>{messages.Systems.BestTripTitle}</div>
       <div className='BestTrip'>
         <div>{bestTripSegments} <strong> {travelTime}</strong> {messages.Units.Mins}</div>
-        <div>{oldTravelTime &&
+        <div>{oldTravelTime && oldTravelTime !== travelTime &&
           <TripDiff
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}

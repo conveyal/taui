@@ -4,8 +4,7 @@ import {
   clearEnd,
   clearIsochrone,
   clearStart,
-  setBaseActive,
-  setComparisonActive,
+  setActiveBrowsochronesInstance,
   updateDestination,
   updateOrigin,
   updateSelectedTimeCutoff
@@ -26,8 +25,7 @@ function mapDispatchToProps (dispatch, ownProps) {
     moveOrigin: (options) => dispatch(updateOrigin(options)),
     moveDestination: (options) => dispatch(updateDestination(options)),
     onTimeCutoffChange: (options) => dispatch(updateSelectedTimeCutoff(options)),
-    setBaseActive: () => dispatch(setBaseActive()),
-    setComparisonActive: () => dispatch(setComparisonActive())
+    setActiveBrowsochronesInstance: (index) => dispatch(setActiveBrowsochronesInstance(index))
   }
 }
 

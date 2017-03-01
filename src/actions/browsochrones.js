@@ -6,7 +6,7 @@ import {getAsObject as getHash} from '../utils/hash'
 import {geocode} from '../utils/mapbox-geocoder'
 import messages from '../utils/messages'
 
-import {addActionLogItem, setBrowsochronesBase, setBrowsochronesComparison, setDestination, updateOrigin} from '../actions'
+import {addActionLogItem, setBrowsochronesInstances, setDestination, updateOrigin} from '../actions'
 
 export default async function initialize ({
   browsochrones,
@@ -23,19 +23,17 @@ export default async function initialize ({
   })
   const fetchedGrids = await Promise.all(fetchGrids)
 
-  const bs1 = await load(origins[0], fetchedGrids)
-  actions.push(setBrowsochronesBase(bs1))
-
-  const bs2 = origins[1]
-    ? await load(origins[1], fetchedGrids)
-    : false
-  if (bs2) {
-    actions.push(setBrowsochronesComparison(bs2))
-  }
+  const instances = await Promise.all(origins.map((origin) => load(origin, fetchedGrids)))
+  actions.push(setBrowsochronesInstances(instances))
 
   const qs = getHash()
   if (qs.start) {
-    actions.push(...(await loadFromQueryString({bs1, bs2, geocoder, map, qs})))
+    actions.push(...(await loadFromQueryString({
+      instances,
+      geocoder,
+      map,
+      qs
+    })))
   }
 
   return [...actions, addActionLogItem(messages.Strings.ApplicationReady)]
@@ -61,8 +59,7 @@ async function load (url, grids) {
 }
 
 async function loadFromQueryString ({
-  bs1,
-  bs2,
+  instances,
   geocoder,
   map,
   qs
@@ -81,7 +78,7 @@ async function loadFromQueryString ({
         : {}
       return [
         updateOrigin({
-          browsochrones: { active: 'base', base: bs1, comparison: bs2 },
+          browsochronesInstances: instances,
           label: startResults.features[0].place_name,
           destinationLatlng: destination.latlng,
           latlng: lonlat(startResults.features[0].geometry.coordinates),
