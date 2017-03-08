@@ -111,14 +111,15 @@ function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }
     <div>
       <div className='heading'>{messages.Systems.BestTripTitle}</div>
       <div className='BestTrip'>
-        <div>{bestTripSegments} <strong> {travelTime}</strong> {messages.Units.Mins}</div>
+        <div><strong> {travelTime}</strong> {messages.Units.Mins}</div>
         <div>{oldTravelTime && oldTravelTime !== travelTime &&
           <TripDiff
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}
             />}
-          <strong>{waitTime}</strong> {messages.Units.Mins} {messages.Systems.Waiting}<br />
         </div>
+        <div><strong>{waitTime}</strong> {messages.Units.Mins} {messages.Systems.Waiting}</div>
+        <div>{bestTripSegments}</div>
       </div>
       {alternateTrips.length > 0 &&
         <div>

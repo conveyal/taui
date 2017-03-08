@@ -201,14 +201,14 @@ body {
   width: inherit;
 }
 
-.Card .BestTrip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.Card .BestTrip > div {
+  width: 50%;
+  display: inline-block;
+  padding-bottom: 0.25rem;
 }
 
-.Card .BestTrip > div {
-  flex-grow: 1;
+.Card .BestTrip > div:nth-child(2) {
+  text-align: right;
 }
 
 .Card .Metric > .pull-right {

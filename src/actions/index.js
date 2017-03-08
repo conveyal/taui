@@ -165,6 +165,7 @@ function fetchBrowsochronesFor ({
             destinationLatlng && generateDestinationDataFor({
               browsochrones,
               fromLatlng: latlng,
+              index,
               toLatlng: destinationLatlng,
               zoom
             })
@@ -249,10 +250,11 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
   ]
 
   browsochrones.instances
-    .filter((instance) => instance.isLoaded())
     .map((instance, index) => {
-      actions.push(generateIsochroneFor({browsochrones: instance, index, latlng, timeCutoff}))
-      actions.push(generateAccessiblityFor({browsochrones: instance, index, latlng, timeCutoff}))
+      if (instance.isLoaded()) {
+        actions.push(generateIsochroneFor({browsochrones: instance, index, latlng, timeCutoff}))
+        actions.push(generateAccessiblityFor({browsochrones: instance, index, latlng, timeCutoff}))
+      }
     })
 
   return actions
@@ -293,15 +295,16 @@ export function updateDestination ({
   }
 
   browsochrones.instances
-    .filter((instance) => instance.isLoaded())
     .map((instance, index) => {
-      actions.push(generateDestinationDataFor({
-        browsochrones: instance,
-        fromLatlng,
-        index,
-        toLatlng: latlng,
-        zoom
-      }))
+      if (instance.isLoaded()) {
+        actions.push(generateDestinationDataFor({
+          browsochrones: instance,
+          fromLatlng,
+          index,
+          toLatlng: latlng,
+          zoom
+        }))
+      }
     })
 
   return actions
