@@ -16,12 +16,10 @@ geocoder:
   boundary:
     country: us
     rect:
-      maxLatlng:
-        lat: 40.271143686084194
-        lng: -85.462646484375
-      minLatlng:
-        lat: 39.35978526869001
-        lng: -86.8524169921875
+      maxLat: 40.271143686084194
+      maxLon: -85.462646484375
+      minLat: 39.35978526869001
+      minLon: -86.8524169921875
 map:
   active: 0
   centerCoordinates: [39.7691, -86.1570]
