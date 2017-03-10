@@ -72,7 +72,11 @@ export default handleActions({
   'clear end' (state, action) {
     return {
       ...state,
-      transitive: null
+      transitive: null,
+      transitives: [],
+      travelTimes: [],
+      inVehicleTravelTimes: [],
+      waitTimes: []
     }
   }
 }, {
