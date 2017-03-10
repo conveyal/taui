@@ -202,21 +202,20 @@ export default class Application extends Component {
               selectedTimeCutoff={timeCutoff.selected}
               />
             {destinations.accessibility
-              .filter((accessibility) => !!accessibility)
               .map((accessibility, index) =>
                 <RouteCard
-                  accessibility={accessibility}
+                  accessibility={accessibility.accessibility}
                   active={browsochrones.active === index}
                   alternate={index !== 0}
                   key={`${index}-route-card`}
-                  oldAccessibility={destinations.accessibility[0]}
+                  oldAccessibility={destinations.accessibility[0].accessibility}
                   oldTravelTime={map.travelTimes[0]}
                   onClick={() => setActiveBrowsochronesInstance(index)}
                   transitiveData={map.transitives[index]}
                   travelTime={map.travelTimes[index]}
                   waitTime={map.waitTimes[index]}
                   >
-                  {index !== 0 ? `${messages.Systems.BaseTitle} ${index}` : messages.Systems.ComparisonTitle}
+                  {accessibility.name}
                 </RouteCard>
               )}
             {ui.showLog && actionLog && actionLog.length > 0 &&

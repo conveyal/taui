@@ -8,7 +8,10 @@ import {
 export default handleActions({
   'set accessibility for' (state, {payload}) {
     const accessibility = [...state.accessibility]
-    accessibility[payload.index] = payload.accessibility
+    accessibility[payload.index] = {
+      accessibility: payload.accessibility,
+      name: payload.name
+    }
     return {
       ...state,
       accessibility
@@ -16,7 +19,10 @@ export default handleActions({
   },
   'set accessibility to empty for' (state, {payload}) {
     const accessibility = [...state.accessibility]
-    accessibility[payload] = ACCESSIBILITY_IS_EMPTY
+    accessibility[payload.index] = {
+      accessibility: ACCESSIBILITY_IS_EMPTY,
+      name: payload.name
+    }
     return {
       ...state,
       accessibility
@@ -24,7 +30,10 @@ export default handleActions({
   },
   'set accessibility to loading for' (state, {payload}) {
     const accessibility = [...state.accessibility]
-    accessibility[payload] = ACCESSIBILITY_IS_LOADING
+    accessibility[payload.index] = {
+      accessibility: ACCESSIBILITY_IS_LOADING,
+      name: payload.name
+    }
     return {
       ...state,
       accessibility
@@ -33,7 +42,10 @@ export default handleActions({
   'clear start' (state, action) {
     return {
       ...state,
-      accessibility: []
+      accessibility: state.accessibility.map((a) => ({
+        accessibility: ACCESSIBILITY_IS_EMPTY,
+        name: a.name
+      }))
     }
   }
 }, {

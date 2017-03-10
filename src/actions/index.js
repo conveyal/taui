@@ -90,8 +90,8 @@ export function updateStart ({
     addActionLogItem('Generating origins...'),
     clearIsochrone(),
     ...browsochronesInstances
-      .map((_, index) =>
-        setAccessibilityToLoadingFor(index))
+      .map((instance, index) =>
+        setAccessibilityToLoadingFor({index, name: instance.name}))
   ]
 
   // TODO: Remove this!
@@ -213,7 +213,7 @@ function generateAccessiblityFor ({browsochrones, index, latlng, timeCutoff}) {
         storedAccessibility[key] = accessibility[grid]
       }
       return [
-        setAccessibilityFor({accessibility, index}),
+        setAccessibilityFor({accessibility, index, name: browsochrones.name}),
         decrementWork()
       ]
     })()

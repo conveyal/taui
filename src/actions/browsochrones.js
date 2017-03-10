@@ -33,10 +33,10 @@ export default function initialize ({
     incrementFetches(),
     setStartLabel(qs.start), // may not exist
     setEndLabel(qs.end), // may not exist
-    ...browsochrones.origins
-      .map((_, index) => qs.start
-        ? setAccessibilityToLoadingFor(index)
-        : setAccessibilityToEmptyFor(index)),
+    ...origins
+      .map((origin, index) => qs.start
+        ? setAccessibilityToLoadingFor({index, name: origin.name})
+        : setAccessibilityToEmptyFor({index, name: origin.name})),
     geocodeQs({geocoder, qs})
       .then(([start, end]) => {
         const actions = []
@@ -103,13 +103,14 @@ function loadAllOrigins ({
   return Promise.all(origins.map((origin) => load(origin, grids)))
 }
 
-async function load (url, grids) {
+async function load (origin, grids) {
   const bs = new Browsochrones()
-  bs.originsUrl = url
+  bs.name = origin.name
+  bs.originsUrl = origin.url
   bs.grids = grids.map((g) => g.name)
   const fetches = [
-    fetch(`${url}/query.json`).then((res) => res.json()),
-    fetch(`${url}/stop_trees.dat`).then((res) => res.arrayBuffer())
+    fetch(`${origin.url}/query.json`).then((res) => res.json()),
+    fetch(`${origin.url}/stop_trees.dat`).then((res) => res.arrayBuffer())
   ]
   const [query, stopTrees] = await Promise.all(fetches)
   await bs.setQuery(query)
