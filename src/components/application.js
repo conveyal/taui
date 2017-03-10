@@ -94,7 +94,7 @@ export default class Application extends Component {
       : null
 
     updateStart({
-      browsochrones,
+      browsochronesInstances: browsochrones.instances,
       endLatlng,
       label,
       latlng: lonlat(latlng),
@@ -126,7 +126,7 @@ export default class Application extends Component {
   }) => {
     const {browsochrones, map, mapMarkers, updateEnd} = this.props
     updateEnd({
-      browsochrones,
+      browsochronesInstances: browsochrones.instances,
       startLatlng: mapMarkers.start.latlng,
       label,
       latlng: lonlat(latlng),

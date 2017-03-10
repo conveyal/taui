@@ -13,7 +13,8 @@ import messages from '../utils/messages'
 import {
   addActionLogItem,
   fetchAllBrowsochrones,
-  setAccessibilityFor,
+  setAccessibilityToEmptyFor,
+  setAccessibilityToLoadingFor,
   setBrowsochronesInstances,
   setEnd,
   setEndLabel,
@@ -33,8 +34,9 @@ export default function initialize ({
     setStartLabel(qs.start), // may not exist
     setEndLabel(qs.end), // may not exist
     ...browsochrones.origins
-      .map((_, index) =>
-        setAccessibilityFor({accessibility: -1, index})),
+      .map((_, index) => qs.start
+        ? setAccessibilityToLoadingFor(index)
+        : setAccessibilityToEmptyFor(index)),
     geocodeQs({geocoder, qs})
       .then(([start, end]) => {
         const actions = []

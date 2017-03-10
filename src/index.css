@@ -145,6 +145,7 @@ body {
   padding: 0.5rem 1rem;
   font-weight: 700;
   cursor: pointer;
+  display: block;
 }
 
 .Card-active > .CardTitle {
@@ -207,7 +208,7 @@ body {
   padding-bottom: 0.25rem;
 }
 
-.Card .BestTrip > div:nth-child(2) {
+.Card .BestTrip > div:nth-child(even) {
   text-align: right;
 }
 

@@ -5,6 +5,10 @@ import toCapitalCase from 'lodash.capitalize'
 import toSpaceCase from 'lodash.lowercase'
 import unique from 'lodash.uniq'
 
+import {
+  ACCESSIBILITY_IS_EMPTY,
+  ACCESSIBILITY_IS_LOADING
+} from '../constants'
 import Icon from './icon'
 import messages from '../utils/messages'
 
@@ -27,23 +31,13 @@ export default class RouteCard extends Pure {
     const accessibilityKeys = Object.keys(accessibility)
     const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
 
-    const access = comparisonAccessibilityKeys.length > 0
-      ? showDiff(accessibilityKeys, accessibility, oldAccessibility)
-      : showAccess(accessibilityKeys, accessibility)
-
     return (
       <div
         className={className}
         >
-        <div
+        <a
           className='CardTitle'
           onClick={onClick}
-          onKeyDown={(e) => {
-            if (document.activeElement === e.target && e.which === 13) {
-              onClick()
-            }
-          }}
-          role='button'
           tabIndex={0}
           title='Set system active'
           >{children}
@@ -51,17 +45,20 @@ export default class RouteCard extends Pure {
             {active && <Icon type='map' />}
             {!active && 'show'}
           </span>
-        </div>
+        </a>
         <div className='CardContent'>
-          {access}
-          {travelTime && transitiveData &&
-            renderJourneys({
-              oldTravelTime,
-              oldWaitTime,
-              travelTime,
-              transitiveData,
-              waitTime
-            })}
+          {comparisonAccessibilityKeys.length > 0
+            ? <ShowAccess keys={accessibilityKeys} base={accessibility} />
+            : <ShowDiff keys={accessibilityKeys} base={accessibility} comparison={oldAccessibility} />}
+          {accessibility !== ACCESSIBILITY_IS_EMPTY &&
+          accessibility !== ACCESSIBILITY_IS_LOADING &&
+            <Journeys
+              oldTravelTime={oldTravelTime}
+              oldWaitTime={oldWaitTime}
+              travelTime={travelTime}
+              transitiveData={transitiveData}
+              waitTime={waitTime}
+              />}
         </div>
       </div>
     )
@@ -83,7 +80,19 @@ function TripDiff ({
   else return <span className='pull-right increase'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /><br /></span>
 }
 
-function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }) {
+function Journeys ({
+  oldTravelTime,
+  transitiveData,
+  travelTime,
+  waitTime
+}) {
+  if (!travelTime || !transitiveData) {
+    return <div className='CardJourneys'>
+      <div className='heading'>{messages.Systems.TripsTitle}</div>
+      <div>{messages.Systems.SelectEnd}</div>
+    </div>
+  }
+
   const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
@@ -195,11 +204,20 @@ function MetricIcon ({
   return <span />
 }
 
-function showAccess (keys, base) {
+function ShowAccess ({keys, base}) {
   return (
     <div className='CardAccess'>
       <div className='heading'>{messages.Systems.AccessTitle}</div>
-      {keys.map((k, i) => <div className='Metric' key={k}><MetricIcon name={k} /><strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)}</div>)}
+      {base === ACCESSIBILITY_IS_EMPTY
+        ? <span>{messages.Systems.SelectStart}</span>
+        : base === ACCESSIBILITY_IS_LOADING
+          ? <span>{messages.Systems.CalculatingAccessibility}</span>
+          : keys.map((k, i) =>
+            <div className='Metric' key={k}>
+              <MetricIcon name={k} />
+              <strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)}
+            </div>
+          )}
     </div>
   )
 }
@@ -218,18 +236,24 @@ function AccessDiffPercentage ({
   else return <span className='pull-right decrease'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
 }
 
-function showDiff (keys, base, comparison) {
+function ShowDiff ({
+  keys,
+  base,
+  comparison
+}) {
   return (
     <div className='CardAccess'>
       <div className='heading'>{messages.Systems.AccessTitle}</div>
-      {keys.map((key, i) => {
-        return (
-          <div className='Metric' key={key}>
-            <MetricIcon name={key} /><strong> {(base[key] | 0).toLocaleString()} </strong> {toSpaceCase(key)}
-            <AccessDiffPercentage newAccess={base[key]} originalAccess={comparison[key]} />
-          </div>
-        )
-      })}
+      {base === ACCESSIBILITY_IS_EMPTY
+        ? <span>{messages.Systems.SelectStart}</span>
+        : base === ACCESSIBILITY_IS_LOADING
+          ? <span>{messages.Systems.CalculatingAccessibility}</span>
+          : keys.map((key, i) =>
+            <div className='Metric' key={key}>
+              <MetricIcon name={key} /><strong> {(base[key] | 0).toLocaleString()} </strong> {toSpaceCase(key)}
+              <AccessDiffPercentage newAccess={base[key]} originalAccess={comparison[key]} />
+            </div>
+          )}
     </div>
   )
 }

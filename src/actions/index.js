@@ -52,6 +52,8 @@ export const clearEnd = createAction('clear end', () => setKeyTo(END, null))
 export const clearStart = createAction('clear start', () => setKeyTo(START, null))
 
 export const setAccessibilityFor = createAction('set accessibility for')
+export const setAccessibilityToEmptyFor = createAction('set accessibility to empty for')
+export const setAccessibilityToLoadingFor = createAction('set accessibility to loading for')
 
 export const setActiveBrowsochronesInstance = createAction('set active browsochrones instance')
 export const setBrowsochronesInstances = createAction('set browsochrones instances')
@@ -89,7 +91,7 @@ export function updateStart ({
     clearIsochrone(),
     ...browsochronesInstances
       .map((_, index) =>
-        setAccessibilityFor({accessibility: -1, index}))
+        setAccessibilityToLoadingFor(index))
   ]
 
   // TODO: Remove this!
