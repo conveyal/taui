@@ -11,6 +11,9 @@ import featureToLabel from '../utils/feature-to-label'
 import {setKeyTo} from '../utils/hash'
 import {reverse} from '../utils/mapbox-geocoder'
 
+const END = 'end'
+const START = 'start'
+
 const reverseGeocode = ({latlng}) => reverse(process.env.MAPBOX_ACCESS_TOKEN, latlng)
 
 export const addActionLogItem = createAction('add action log item', (item) => {
@@ -25,39 +28,37 @@ export const addActionLogItem = createAction('add action log item', (item) => {
   }
 })
 
-export const setDestination = createAction('set destination', (destination) => {
-  setKeyTo('end', destination ? destination.label : null)
-  return destination
+export const setEnd = createAction('set end', (end) => {
+  setKeyTo(END, end ? end.label : null)
+  return end
 })
 
-export const setOrigin = createAction('set origin', (origin) => {
-  setKeyTo('start', origin ? origin.label : null)
-  return origin
+export const setStart = createAction('set start', (start) => {
+  setKeyTo(START, start ? start.label : null)
+  return start
 })
 
-export const setDestinationLabel = createAction('set destination label', (label) => {
-  setKeyTo('end', label)
+export const setEndLabel = createAction('set end label', (label) => {
+  setKeyTo(END, label)
   return label
 })
 
-export const setOriginLabel = createAction('set origin label', (label) => {
-  setKeyTo('start', label)
+export const setStartLabel = createAction('set start label', (label) => {
+  setKeyTo(START, label)
   return label
 })
 
-export const clearEnd = createAction('clear end', () => {
-  setKeyTo('end', null)
-})
-export const clearStart = createAction('clear start', () => {
-  setKeyTo('start', null)
-})
+export const clearEnd = createAction('clear end', () => setKeyTo(END, null))
+export const clearStart = createAction('clear start', () => setKeyTo(START, null))
 
 export const setAccessibilityFor = createAction('set accessibility for')
 
 export const setActiveBrowsochronesInstance = createAction('set active browsochrones instance')
 export const setBrowsochronesInstances = createAction('set browsochrones instances')
+
 export const setSelectedTimeCutoff = createAction('set selected time cutoff')
 export const setDestinationDataFor = createAction('set destination data for')
+
 export const showMapMarker = createAction('show map marker')
 export const hideMapMarker = createAction('hide map marker')
 
@@ -68,24 +69,27 @@ export const setIsochroneFor = createAction('set isochrone for')
 export const updateMap = createAction('update map')
 
 /**
- * What happens on origin update:
- *  - Map marker should get set to the new origin immmediately (if it wasn't a drag/drop)
+ * What happens on start update:
+ *  - Map marker should get set to the new start immmediately (if it wasn't a drag/drop)
  *  - If there's no label, the latlng point should be reverse geocoded and saved
- *  - If Browsochones is loaded, new origin data is retreived
+ *  - If Browsochones is loaded, new start data is retreived
  *    - A new surface is generated
  *      - A new jsonline generated
  *      - Accessibility is calculated for grids
  */
-export function updateOrigin ({
+export function updateStart ({
   browsochronesInstances,
-  destinationLatlng,
+  endLatlng,
   latlng, label,
   timeCutoff,
   zoom
 }) {
   const actions = [
     addActionLogItem('Generating origins...'),
-    clearIsochrone()
+    clearIsochrone(),
+    ...browsochronesInstances
+      .map((_, index) =>
+        setAccessibilityFor({accessibility: -1, index}))
   ]
 
   // TODO: Remove this!
@@ -99,11 +103,11 @@ export function updateOrigin ({
   if (label) {
     actions.push(
       addActionLogItem(`Set start address to: ${label}`),
-      setOrigin({label, latlng})
+      setStart({label, latlng})
     )
   } else {
     actions.push(
-      setOrigin({latlng}),
+      setStart({latlng}),
       addActionLogItem(`Finding start address for ${lonlat(latlng).toString()}`),
       reverseGeocode({latlng})
         .then(({features}) => {
@@ -111,7 +115,7 @@ export function updateOrigin ({
           const label = featureToLabel(features[0])
           return [
             addActionLogItem(`Set start address to: ${label}`),
-            setOriginLabel(label)
+            setStartLabel(label)
           ]
         })
     )
@@ -119,27 +123,43 @@ export function updateOrigin ({
 
   if (!browsochronesInstances || browsochronesInstances.length === 0) return actions
 
-  const point = Leaflet.CRS.EPSG3857.latLngToPoint(lonlat.toLeaflet(latlng), zoom)
-  const originPoint = browsochronesInstances[0].pixelToOriginPoint(point, zoom)
-  if (browsochronesInstances[0].pointInQueryBounds(originPoint)) {
-    actions.push(browsochronesInstances.map((instance, index) => fetchBrowsochronesFor({
-      browsochrones: instance,
-      destinationLatlng,
-      index,
-      latlng,
-      timeCutoff,
-      zoom
-    })))
-  } else {
-    console.log('point out of bounds') // TODO: Handle
-  }
+  actions.push(fetchAllBrowsochrones({
+    browsochronesInstances,
+    endLatlng,
+    latlng,
+    timeCutoff,
+    zoom
+  }))
 
   return actions
 }
 
+export function fetchAllBrowsochrones ({
+  browsochronesInstances,
+  endLatlng,
+  latlng,
+  timeCutoff,
+  zoom
+}) {
+  const point = Leaflet.CRS.EPSG3857.latLngToPoint(lonlat.toLeaflet(latlng), zoom)
+  const originPoint = browsochronesInstances[0].pixelToOriginPoint(point, zoom)
+  if (browsochronesInstances[0].pointInQueryBounds(originPoint)) {
+    return browsochronesInstances.map((instance, index) => fetchBrowsochronesFor({
+      browsochrones: instance,
+      endLatlng,
+      index,
+      latlng,
+      timeCutoff,
+      zoom
+    }))
+  } else {
+    console.log('point out of bounds') // TODO: Handle
+  }
+}
+
 function fetchBrowsochronesFor ({
   browsochrones,
-  destinationLatlng,
+  endLatlng,
   index,
   latlng,
   timeCutoff,
@@ -162,11 +182,11 @@ function fetchBrowsochronesFor ({
             decrementWork(),
             generateAccessiblityFor({browsochrones, index, latlng, timeCutoff}),
             generateIsochroneFor({browsochrones, index, latlng, timeCutoff}),
-            destinationLatlng && generateDestinationDataFor({
+            endLatlng && generateDestinationDataFor({
               browsochrones,
-              fromLatlng: latlng,
+              startLatlng: latlng,
               index,
-              toLatlng: destinationLatlng,
+              endLatlng: endLatlng,
               zoom
             })
           ]
@@ -218,24 +238,24 @@ function generateIsochroneFor ({browsochrones, index, latlng, timeCutoff}) {
 
 function generateDestinationDataFor ({
   browsochrones,
-  fromLatlng,
+  startLatlng,
   index,
-  toLatlng,
+  endLatlng,
   zoom
 }) {
   return [
     incrementWork(),
     addActionLogItem(`Generating transit data for scenario ${index}`),
     (async () => {
-      const destinationPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(lonlat.toLeaflet(toLatlng), zoom), zoom)
+      const endPoint = browsochrones.pixelToOriginPoint(Leaflet.CRS.EPSG3857.latLngToPoint(lonlat.toLeaflet(endLatlng), zoom), zoom)
       const data = await browsochrones.generateDestinationData({
-        from: fromLatlng || null,
+        from: startLatlng || null,
         to: {
-          ...toLatlng,
-          ...destinationPoint
+          ...endLatlng,
+          ...endPoint
         }
       })
-      data.transitive.key = `${index}-${lonlat.toString(toLatlng)}`
+      data.transitive.key = `${index}-${lonlat.toString(endLatlng)}`
       return [
         setDestinationDataFor({data, index}),
         decrementWork()
@@ -261,15 +281,15 @@ export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
 }
 
 /**
- * What happens on destination update:
- *  - Map marker is set to the new destination immmediately (if it wasn't a drag/drop)
+ * What happens on end update:
+ *  - Map marker is set to the new end point immmediately (if it wasn't a drag/drop)
  *  - If there's no label, the latlng point should be reverse geocoded and saved
  *  - If Browsochones is loaded, transitive data is generated
  *  - If Browsochones has a surface generated, travel time is calculated
  */
-export function updateDestination ({
-  browsochrones,
-  fromLatlng,
+export function updateEnd ({
+  browsochronesInstances,
+  startLatlng,
   latlng,
   label,
   zoom
@@ -285,23 +305,23 @@ export function updateDestination ({
   }
 
   if (label) {
-    actions.push(setDestination({label, latlng}))
+    actions.push(setEnd({label, latlng}))
   } else {
     actions.push(
-      setDestination({latlng}),
+      setEnd({latlng}),
       reverseGeocode({latlng})
-        .then(({features}) => setDestinationLabel(featureToLabel(features[0])))
+        .then(({features}) => setEndLabel(featureToLabel(features[0])))
     )
   }
 
-  browsochrones.instances
+  browsochronesInstances
     .map((instance, index) => {
       if (instance.isLoaded()) {
         actions.push(generateDestinationDataFor({
           browsochrones: instance,
-          fromLatlng,
+          startLatlng,
           index,
-          toLatlng: latlng,
+          endLatlng: latlng,
           zoom
         }))
       }

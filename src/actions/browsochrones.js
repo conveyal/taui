@@ -1,4 +1,8 @@
 import lonlat from '@conveyal/lonlat'
+import {
+  decrementFetches,
+  incrementFetches
+} from '@conveyal/woonerf/fetch'
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
 
@@ -6,37 +10,95 @@ import {getAsObject as getHash} from '../utils/hash'
 import {geocode} from '../utils/mapbox-geocoder'
 import messages from '../utils/messages'
 
-import {addActionLogItem, setBrowsochronesInstances, setDestination, updateOrigin} from '../actions'
+import {
+  addActionLogItem,
+  fetchAllBrowsochrones,
+  setAccessibilityFor,
+  setBrowsochronesInstances,
+  setEnd,
+  setEndLabel,
+  setStart,
+  setStartLabel
+} from '../actions'
 
-export default async function initialize ({
+export default function initialize ({
   browsochrones,
   geocoder,
   map
 }) {
-  const actions = []
-  const {grids, gridsUrl, origins} = browsochrones
-  const fetchGrids = grids.map(async (name) => {
+  const {origins} = browsochrones
+  const qs = getHash()
+  return [
+    incrementFetches(),
+    setStartLabel(qs.start), // may not exist
+    setEndLabel(qs.end), // may not exist
+    ...browsochrones.origins
+      .map((_, index) =>
+        setAccessibilityFor({accessibility: -1, index})),
+    geocodeQs({geocoder, qs})
+      .then(([start, end]) => {
+        const actions = []
+        if (start) actions.push(setStart(start))
+        if (end) actions.push(setEnd(end))
+        actions.push(fetchGrids(browsochrones)
+          .then((grids) => loadAllOrigins({grids, origins}))
+          .then((instances) => [
+            setBrowsochronesInstances(instances),
+            start && fetchAllBrowsochrones({
+              browsochronesInstances: instances,
+              endLatlng: end && end.latlng,
+              latlng: start.latlng,
+              zoom: map.zoom
+            }),
+            addActionLogItem(messages.Strings.ApplicationReady),
+            decrementFetches()
+          ])
+        )
+        return actions
+      })
+  ]
+}
+
+function geocodeQs ({
+  geocoder,
+  qs
+}) {
+  return Promise
+    .all(['start', 'end']
+    .map(async (p) => {
+      if (qs[p]) {
+        const results = await geocode({
+          boundary: geocoder.boundary,
+          focusLatlng: geocoder.focusLatlng,
+          text: qs[p]
+        })
+        if (results.features.length > 0) {
+          return {
+            label: results.features[0].place_name,
+            latlng: lonlat(results.features[0].geometry.coordinates)
+          }
+        }
+      }
+    }))
+}
+
+function fetchGrids ({
+  grids,
+  gridsUrl
+}) {
+  return Promise.all(grids.map(async (name) => {
     const res = await fetch(`${gridsUrl}/${name}.grid`)
     const grid = await res.arrayBuffer()
     grid.name = name
     return grid
-  })
-  const fetchedGrids = await Promise.all(fetchGrids)
+  }))
+}
 
-  const instances = await Promise.all(origins.map((origin) => load(origin, fetchedGrids)))
-  actions.push(setBrowsochronesInstances(instances))
-
-  const qs = getHash()
-  if (qs.start) {
-    actions.push(...(await loadFromQueryString({
-      instances,
-      geocoder,
-      map,
-      qs
-    })))
-  }
-
-  return [...actions, addActionLogItem(messages.Strings.ApplicationReady)]
+function loadAllOrigins ({
+  grids,
+  origins
+}) {
+  return Promise.all(origins.map((origin) => load(origin, grids)))
 }
 
 async function load (url, grids) {
@@ -56,39 +118,4 @@ async function load (url, grids) {
   await Promise.all(putGrids)
 
   return bs
-}
-
-async function loadFromQueryString ({
-  instances,
-  geocoder,
-  map,
-  qs
-}) {
-  try {
-    const [startResults, endResults] = await Promise.all(['start', 'end']
-      .filter((d) => !!qs[d])
-      .map((d) => geocode({
-        boundary: geocoder.boundary,
-        focusLatlng: geocoder.focusLatlng,
-        text: qs[d]
-      })))
-    if (startResults.features.length > 0) {
-      const destination = endResults && endResults.features.length > 0
-        ? { latlng: lonlat(endResults.features[0].geometry.coordinates), label: endResults.features[0].place_name }
-        : {}
-      return [
-        updateOrigin({
-          browsochronesInstances: instances,
-          label: startResults.features[0].place_name,
-          destinationLatlng: destination.latlng,
-          latlng: lonlat(startResults.features[0].geometry.coordinates),
-          zoom: map.zoom
-        }),
-        setDestination(destination)
-      ]
-    }
-  } catch (e) {
-    console.error(e)
-    return []
-  }
 }

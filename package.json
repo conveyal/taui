@@ -7,7 +7,7 @@
     "prestart": "yarn",
     "pretest": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "start": "mastarm build",
+    "start": "mastarm build --serve --env development",
     "test": "mastarm lint"
   },
   "repository": {
@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
-    "mastarm": "^3.4.0",
+    "mastarm": "^3.5.1",
     "semantic-release": "^6.3.2"
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 import lonlat from '@conveyal/lonlat'
+import isEqual from 'lodash.isequal'
 import React, {Component, PropTypes} from 'react'
 
 import featureToLabel from '../utils/feature-to-label'
@@ -29,19 +30,30 @@ export default class Application extends Component {
     clearIsochrone: PropTypes.func.isRequired,
     clearStart: PropTypes.func.isRequired,
     initializeBrowsochrones: PropTypes.func.isRequired,
-    moveDestination: PropTypes.func.isRequired,
-    moveOrigin: PropTypes.func.isRequired,
-    onTimeCutoffChange: PropTypes.func.isRequired,
-    setActiveBrowsochronesInstance: PropTypes.func
+    setActiveBrowsochronesInstance: PropTypes.func.isRequired,
+    updateEnd: PropTypes.func.isRequired,
+    updateStart: PropTypes.func.isRequired,
+    updateSelectedTimeCutoff: PropTypes.func.isRequired
   }
 
-  componentWillMount () {
-    const {browsochrones, initializeBrowsochrones, geocoder, map} = this.props
+  state = {
+    markers: this._createMarkersFromProps(this.props)
+  }
+
+  constructor (props) {
+    super(props)
+    const {browsochrones, initializeBrowsochrones, geocoder, map} = props
     initializeBrowsochrones({
       browsochrones,
       geocoder,
       map
     })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (!isEqual(this.props.mapMarkers, nextProps.mapMarkers)) {
+      this.setState({markers: this._createMarkersFromProps(nextProps)})
+    }
   }
 
   _clearStartAndEnd = () => {
@@ -51,18 +63,39 @@ export default class Application extends Component {
     clearEnd()
   }
 
+  _createMarkersFromProps (props) {
+    const {mapMarkers} = props
+    const markers = []
+    if (mapMarkers.start && mapMarkers.start.latlng) {
+      markers.push({
+        position: mapMarkers.start.latlng,
+        label: mapMarkers.start.label || '',
+        onDragEnd: this._setStartWithEvent
+      })
+    }
+
+    if (mapMarkers.end && mapMarkers.end.latlng) {
+      markers.push({
+        position: mapMarkers.end.latlng,
+        label: mapMarkers.end.label || '',
+        onDragEnd: this._setEndWithEvent
+      })
+    }
+    return markers
+  }
+
   _setStart = ({
     label,
     latlng
   }) => {
-    const {browsochrones, map, mapMarkers, moveOrigin, timeCutoff} = this.props
-    const destinationLatlng = mapMarkers.destination && mapMarkers.destination.latlng
-      ? mapMarkers.destination.latlng
+    const {browsochrones, map, mapMarkers, timeCutoff, updateStart} = this.props
+    const endLatlng = mapMarkers.end && mapMarkers.end.latlng
+      ? mapMarkers.end.latlng
       : null
 
-    moveOrigin({
+    updateStart({
       browsochrones,
-      destinationLatlng,
+      endLatlng,
       label,
       latlng: lonlat(latlng),
       timeCutoff: timeCutoff.selected,
@@ -91,10 +124,10 @@ export default class Application extends Component {
     label,
     latlng
   }) => {
-    const {browsochrones, map, mapMarkers, moveDestination} = this.props
-    moveDestination({
+    const {browsochrones, map, mapMarkers, updateEnd} = this.props
+    updateEnd({
       browsochrones,
-      fromLatlng: mapMarkers.origin.latlng,
+      startLatlng: mapMarkers.start.latlng,
       label,
       latlng: lonlat(latlng),
       zoom: map.zoom
@@ -119,44 +152,16 @@ export default class Application extends Component {
   }
 
   _onTimeCutoffChange = (event) => {
+    const {browsochrones, mapMarkers, updateSelectedTimeCutoff} = this.props
     const timeCutoff = parseInt(event.target.value, 10)
-    this.props.onTimeCutoffChange({
-      browsochrones: this.props.browsochrones,
-      latlng: this.props.mapMarkers.origin.latlng,
+    updateSelectedTimeCutoff({
+      browsochrones,
+      latlng: mapMarkers.start.latlng,
       timeCutoff
     })
   }
 
-  renderMap () {
-    const {browsochrones, map, mapMarkers} = this.props
-
-    const markers = []
-    if (mapMarkers.origin && mapMarkers.origin.latlng) {
-      markers.push({
-        position: mapMarkers.origin.latlng,
-        label: mapMarkers.origin.label || '',
-        onDragEnd: this._setStartWithEvent
-      })
-    }
-
-    if (mapMarkers.destination && mapMarkers.destination.latlng) {
-      markers.push({
-        position: mapMarkers.destination.latlng,
-        label: mapMarkers.destination.label || '',
-        onDragEnd: this._setEndWithEvent
-      })
-    }
-
-    return <Map
-      {...map}
-      clearStartAndEnd={this._clearStartAndEnd}
-      geojsonColor={browsochrones.active === 0 ? '#4269a4' : 'darkorange'}
-      markers={markers}
-      setEnd={this._setEnd}
-      setStart={this._setStart}
-      />
-  }
-
+  count = 0
   render () {
     const {
       actionLog,
@@ -168,11 +173,19 @@ export default class Application extends Component {
       timeCutoff,
       ui
     } = this.props
+    const {markers} = this.state
 
     return (
       <div>
         <Fullscreen>
-          {this.renderMap({})}
+          <Map
+            {...map}
+            clearStartAndEnd={this._clearStartAndEnd}
+            geojsonColor={browsochrones.active === 0 ? '#4269a4' : 'darkorange'}
+            markers={markers}
+            setEnd={this._setEnd}
+            setStart={this._setStart}
+            />
         </Fullscreen>
         <div className='Taui-Dock'>
           <div className='Taui-Dock-content'>

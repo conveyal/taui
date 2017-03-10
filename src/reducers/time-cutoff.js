@@ -10,7 +10,10 @@ for (let i = timeMin; i < timeMax; i += timeStep) times.push({ name: `${i} ${mes
 
 export default handleActions({
   'set selected time cutoff' (state, action) {
-    return Object.assign({}, state, { selected: action.payload })
+    return {
+      ...state,
+      selected: action.payload
+    }
   }
 }, {
   selected: 60,

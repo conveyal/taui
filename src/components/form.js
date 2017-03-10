@@ -29,10 +29,10 @@ export default class Form extends Pure {
             placeholder={messages.Geocoding.StartPlaceholder}
             search={search}
             searchPromptText={messages.Geocoding.PromptText}
-            value={geocoder.origin}
+            value={geocoder.start}
             />
         </div>
-        {geocoder.origin &&
+        {geocoder.start &&
           <div>
             <div className='heading'>{messages.Geocoding.EndTitle}</div>
             <div className='Geocoder'>
@@ -46,7 +46,7 @@ export default class Form extends Pure {
                 placeholder={messages.Geocoding.EndPlaceholder}
                 search={search}
                 searchPromptText={messages.Geocoding.PromptText}
-                value={geocoder.destination}
+                value={geocoder.end}
                 />
             </div>
             <div className='heading'>{messages.Strings.HighlightAreaAccessibleWithin}</div>

@@ -35,7 +35,18 @@ export default class RouteCard extends Pure {
       <div
         className={className}
         >
-        <div className='CardTitle' onClick={onClick}>{children}
+        <div
+          className='CardTitle'
+          onClick={onClick}
+          onKeyDown={(e) => {
+            if (document.activeElement === e.target && e.which === 13) {
+              onClick()
+            }
+          }}
+          role='button'
+          tabIndex={0}
+          title='Set system active'
+          >{children}
           <span className='pull-right'>
             {active && <Icon type='map' />}
             {!active && 'show'}

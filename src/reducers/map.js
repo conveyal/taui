@@ -23,7 +23,7 @@ export default handleActions({
       geojson: [action.payload]
     }
   },
-  'set origin' (state) {
+  'set start' (state) {
     return {
       ...state,
       transitive: null
