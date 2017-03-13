@@ -2,7 +2,6 @@ import lonlat from '@conveyal/lonlat'
 import isEqual from 'lodash.isequal'
 import React, {Component, PropTypes} from 'react'
 
-import featureToLabel from '../utils/feature-to-label'
 import Form from './form'
 import Fullscreen from './fullscreen'
 import Icon from './icon'
@@ -114,7 +113,7 @@ export default class Application extends Component {
       const {geometry} = feature
 
       this._setStart({
-        label: featureToLabel(feature),
+        label: feature.properties.label,
         latlng: geometry.coordinates
       })
     }
@@ -145,7 +144,7 @@ export default class Application extends Component {
       const {geometry} = feature
 
       this._setEnd({
-        label: featureToLabel(feature),
+        label: feature.properties.label,
         latlng: geometry.coordinates
       })
     }
