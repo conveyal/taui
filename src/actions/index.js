@@ -1,20 +1,21 @@
 import lonlat from '@conveyal/lonlat'
-import Leaflet from 'leaflet'
-import {createAction} from 'redux-actions'
-
 import fetch, {
   incrementFetches as incrementWork,
   decrementFetches as decrementWork
 } from '@conveyal/woonerf/fetch'
+import {reverse} from 'isomorphic-mapzen-search'
+import Leaflet from 'leaflet'
+import {createAction} from 'redux-actions'
 
-import featureToLabel from '../utils/feature-to-label'
 import {setKeyTo} from '../utils/hash'
-import {reverse} from '../utils/mapbox-geocoder'
 
 const END = 'end'
 const START = 'start'
 
-const reverseGeocode = ({latlng}) => reverse(process.env.MAPBOX_ACCESS_TOKEN, latlng)
+const reverseGeocode = ({latlng}) => reverse({
+  apiKey: process.env.MAPZEN_SEARCH_KEY,
+  point: latlng
+})
 
 export const addActionLogItem = createAction('add action log item', (item) => {
   const payload = typeof item === 'string'
@@ -114,7 +115,7 @@ export function updateStart ({
       reverseGeocode({latlng})
         .then(({features}) => {
           if (!features || features.length < 1) return
-          const label = featureToLabel(features[0])
+          const label = features[0].properties.label
           return [
             addActionLogItem(`Set start address to: ${label}`),
             setStartLabel(label)
@@ -312,7 +313,7 @@ export function updateEnd ({
     actions.push(
       setEnd({latlng}),
       reverseGeocode({latlng})
-        .then(({features}) => setEndLabel(featureToLabel(features[0])))
+        .then(({features}) => setEndLabel(features[0].properties.label))
     )
   }
 

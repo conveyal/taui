@@ -5,9 +5,9 @@ import {
 } from '@conveyal/woonerf/fetch'
 import Browsochrones from 'browsochrones'
 import fetch from 'isomorphic-fetch'
+import {search as geocode} from 'isomorphic-mapzen-search'
 
 import {getAsObject as getHash} from '../utils/hash'
-import {geocode} from '../utils/mapbox-geocoder'
 import messages from '../utils/messages'
 
 import {
@@ -70,13 +70,14 @@ function geocodeQs ({
     .map(async (p) => {
       if (qs[p]) {
         const results = await geocode({
+          apiKey: process.env.MAPZEN_SEARCH_KEY,
           boundary: geocoder.boundary,
-          focusLatlng: geocoder.focusLatlng,
+          focusPoint: geocoder.focusLatlng,
           text: qs[p]
         })
         if (results.features.length > 0) {
           return {
-            label: results.features[0].place_name,
+            label: results.features[0].properties.label,
             latlng: lonlat(results.features[0].geometry.coordinates)
           }
         }

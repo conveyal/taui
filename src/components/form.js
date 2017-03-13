@@ -1,7 +1,6 @@
 import Pure from '@conveyal/woonerf/components/pure'
 import React from 'react'
 import Geocoder from 'react-select-geocoder'
-import featureToLabel from '../utils/feature-to-label'
 import messages from '../utils/messages'
 
 export default class Form extends Pure {
@@ -20,8 +19,6 @@ export default class Form extends Pure {
           <Geocoder
             apiKey={process.env.MAPZEN_SEARCH_KEY}
             {...geocoder}
-            featureToLabel={featureToLabel}
-            featureToValue={(f) => f.id}
             name='start-address'
             onChange={onChangeStart}
             placeholder={messages.Geocoding.StartPlaceholder}
@@ -36,8 +33,6 @@ export default class Form extends Pure {
               <Geocoder
                 apiKey={process.env.MAPZEN_SEARCH_KEY}
                 {...geocoder}
-                featureToLabel={featureToLabel}
-                featureToValue={(f) => f.id}
                 name='end-address'
                 onChange={onChangeEnd}
                 placeholder={messages.Geocoding.EndPlaceholder}
