@@ -1,9 +1,6 @@
 import Pure from '@conveyal/woonerf/components/pure'
 import React from 'react'
 import Geocoder from 'react-select-geocoder'
-
-import featureToLabel from '../utils/feature-to-label'
-import {search} from '../utils/mapbox-geocoder'
 import messages from '../utils/messages'
 
 export default class Form extends Pure {
@@ -22,31 +19,25 @@ export default class Form extends Pure {
           <Geocoder
             apiKey={process.env.MAPZEN_SEARCH_KEY}
             {...geocoder}
-            featureToLabel={featureToLabel}
-            featureToValue={(f) => f.id}
             name='start-address'
             onChange={onChangeStart}
             placeholder={messages.Geocoding.StartPlaceholder}
-            search={search}
             searchPromptText={messages.Geocoding.PromptText}
-            value={geocoder.origin}
+            value={geocoder.start}
             />
         </div>
-        {geocoder.origin &&
+        {geocoder.start &&
           <div>
             <div className='heading'>{messages.Geocoding.EndTitle}</div>
             <div className='Geocoder'>
               <Geocoder
                 apiKey={process.env.MAPZEN_SEARCH_KEY}
                 {...geocoder}
-                featureToLabel={featureToLabel}
-                featureToValue={(f) => f.id}
                 name='end-address'
                 onChange={onChangeEnd}
                 placeholder={messages.Geocoding.EndPlaceholder}
-                search={search}
                 searchPromptText={messages.Geocoding.PromptText}
-                value={geocoder.destination}
+                value={geocoder.end}
                 />
             </div>
             <div className='heading'>{messages.Strings.HighlightAreaAccessibleWithin}</div>

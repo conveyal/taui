@@ -2,36 +2,42 @@ import {handleActions} from 'redux-actions'
 
 export default handleActions({
   'hide map marker' (state, {payload}) {
-    return Object.assign({}, state, {
+    return {
+      ...state,
       [payload.id]: null
-    })
+    }
   },
   'show map marker' (state, {payload}) {
-    return Object.assign({}, state, {
+    return {
+      ...state,
       [payload.id]: payload
-    })
+    }
   },
-  'set origin' (state, {payload}) {
-    return Object.assign({}, state, { origin: payload })
+  'set start' (state, {payload}) {
+    return {
+      ...state,
+      start: payload
+    }
   },
-  'set destination' (state, {payload}) {
-    return Object.assign({}, state, {
-      destination: payload
-    })
+  'set end' (state, {payload}) {
+    return {
+      ...state,
+      end: payload
+    }
   },
   'clear end' (state) {
     return {
       ...state,
-      destination: null
+      end: null
     }
   },
   'clear start' (state) {
     return {
       ...state,
-      origin: null
+      start: null
     }
   }
 }, {
-  origin: {},
-  destination: {}
+  start: {},
+  end: {}
 })

@@ -34,7 +34,7 @@ export default class Map extends Pure {
   }
 
   state = {
-    showSelectOriginOrDestination: false,
+    showSelectStartOrEnd: false,
     lastClickedLatlng: null
   }
 
@@ -43,7 +43,7 @@ export default class Map extends Pure {
     clearStartAndEnd()
     this.setState({
       ...this.state,
-      showSelectOriginOrDestination: false
+      showSelectStartOrEnd: false
     })
   }
 
@@ -54,7 +54,7 @@ export default class Map extends Pure {
     } else {
       this.setState({
         ...this.state,
-        showSelectOriginOrDestination: !this.state.showSelectOriginOrDestination,
+        showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
         lastClickedLatlng: e.latlng
       })
     }
@@ -65,7 +65,7 @@ export default class Map extends Pure {
     const {lastClickedLatlng} = this.state
     setEnd({latlng: lastClickedLatlng})
     this.setState({
-      showSelectOriginOrDestination: false,
+      showSelectStartOrEnd: false,
       lastClickedLatlng: null
     })
   }
@@ -75,14 +75,14 @@ export default class Map extends Pure {
     const {lastClickedLatlng} = this.state
     setStart({latlng: lastClickedLatlng})
     this.setState({
-      showSelectOriginOrDestination: false,
+      showSelectStartOrEnd: false,
       lastClickedLatlng: null
     })
   }
 
   render () {
     const {centerCoordinates, geojson, geojsonColor, markers, onZoom, transitive, zoom} = this.props
-    const {showSelectOriginOrDestination, lastClickedLatlng} = this.state
+    const {showSelectStartOrEnd, lastClickedLatlng} = this.state
     const tileLayerProps = {}
 
     if (Browser.retina) {
@@ -140,7 +140,7 @@ export default class Map extends Pure {
             />
         }
 
-        {showSelectOriginOrDestination &&
+        {showSelectStartOrEnd &&
           <Popup
             closeButton={false}
             position={lastClickedLatlng}

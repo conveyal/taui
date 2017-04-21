@@ -1,55 +1,69 @@
 import {handleActions} from 'redux-actions'
 
 export default handleActions({
-  'set origin' (state, {payload}) {
+  'set start' (state, {payload}) {
     return {
       ...state,
-      origin: {
+      start: {
         label: payload.label,
         value: payload.latlng ? `${payload.latlng.lng},${payload.latlng.lat}` : false
       }
     }
   },
-  'set origin label' (state, {payload}) {
-    return {
-      ...state,
-      origin: {
-        ...state.origin,
-        label: payload
+  'set start label' (state, {payload}) {
+    if (payload) {
+      return {
+        ...state,
+        start: {
+          ...state.start,
+          label: payload
+        }
+      }
+    } else {
+      return {
+        ...state,
+        start: null
       }
     }
   },
-  'set destination' (state, {payload}) {
+  'set end' (state, {payload}) {
     return {
       ...state,
-      destination: {
+      end: {
         label: payload.label,
         value: payload.latlng ? `${payload.latlng.lng},${payload.latlng.lat}` : false
       }
     }
   },
-  'set destination label' (state, {payload}) {
-    return {
-      ...state,
-      destination: {
-        ...state.destination,
-        label: payload
+  'set end label' (state, {payload}) {
+    if (payload) {
+      return {
+        ...state,
+        end: {
+          ...state.end,
+          label: payload
+        }
+      }
+    } else {
+      return {
+        ...state,
+        end: null
       }
     }
   },
   'clear start' (state) {
     return {
       ...state,
-      origin: null
+      start: null
     }
   },
   'clear end' (state) {
     return {
       ...state,
-      destination: null
+      end: null
     }
   }
 }, {
-  origin: null,
-  destination: null
+  start: null,
+  end: null
 })
