@@ -1,9 +1,9 @@
 import Pure from '@conveyal/woonerf/components/pure'
 import Color from 'color'
 import React from 'react'
-import toCapitalCase from 'lodash.capitalize'
-import toSpaceCase from 'lodash.lowercase'
-import unique from 'lodash.uniq'
+import toCapitalCase from 'lodash/capitalize'
+import toSpaceCase from 'lodash/lowercase'
+import unique from 'lodash/uniq'
 
 import {
   ACCESSIBILITY_IS_EMPTY,

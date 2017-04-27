@@ -1,5 +1,5 @@
 import lonlat from '@conveyal/lonlat'
-import isEqual from 'lodash.isequal'
+import isEqual from 'lodash/isequal'
 import React, {Component, PropTypes} from 'react'
 
 import Form from './form'

@@ -100,4 +100,9 @@ const Icon = L.Icon.extend({
   }
 })
 
-export default function (options) { return new Icon(options) }
+export default function (options) {
+  if (process.env.NODE_ENV === 'test') {
+    return {}
+  }
+  return new Icon(options)
+}

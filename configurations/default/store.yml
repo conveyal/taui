@@ -9,6 +9,8 @@ browsochrones:
     - https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-v6
     - https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
     - https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
+destinations:
+  accessibility: []
 geocoder:
   focusLatlng:
     lat: 39.7691
@@ -32,6 +34,12 @@ map:
   inVehicleTravelTimes: []
   waitTimes: []
   zoom: 11
+mapMarkers:
+  start: {}
+  end: {}
+timeCutoff:
+  selected: 60
+  times: []
 ui:
   fetches: 0
   showLog: true
