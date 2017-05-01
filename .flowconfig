@@ -1,4 +1,9 @@
 [ignore]
+.*/node_modules/auth0-lock/.*
+.*/node_modules/config-chain/.*
+.*/node_modules/npmconf/.*
+.*/node_modules/mapbox.js/docs/examples/.*
+.*/node_modules/react-leaflet/src/.*
 
 [include]
 

@@ -3,13 +3,13 @@
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
   "scripts": {
-    "flow": "flow",
+    "build": "mastarm build",
     "deploy": "mastarm deploy --env production --minify",
     "prestart": "yarn",
     "pretest": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "mastarm build --serve --env development",
-    "test": "mastarm lint && mastarm test --env test"
+    "test": "mastarm lint && mastarm flow && mastarm test --env test"
   },
   "repository": {
     "type": "git",
@@ -61,5 +61,10 @@
   },
   "standard": {
     "parser": "babel-eslint"
+  },
+  "mastarm lint": {
+    "ignore": [
+      "flow-typed"
+    ]
   }
 }
