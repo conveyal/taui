@@ -616,7 +616,6 @@ exports[`Taui render the application container 1`] = `
                     position="topright"
                   />
                   <TileLayer
-                    attribution="<a href=\\"http://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors, &copy; <a href='https://www.mapbox.com/about/maps/'>Mapbox</a>"
                     layerContainer={
                       MapMock {
                         "_addLayers": [Function],
@@ -1029,7 +1028,6 @@ exports[`Taui render the application container 1`] = `
                         "zoomOut": [Function],
                       }
                     }
-                    url="http://localhost:9966/tile?url=https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY29udmV5YWwiLCJhIjoiMDliQURXOCJ9.9JWPsqJY7dGIdX777An7Pw"
                   />
                 </div>
               </Map>
@@ -1088,7 +1086,6 @@ exports[`Taui render the application container 1`] = `
                   className="Geocoder"
                 >
                   <Geocoder
-                    apiKey="search-pITifOg"
                     boundary={
                       Object {
                         "country": "us",
@@ -1118,7 +1115,6 @@ exports[`Taui render the application container 1`] = `
                     useLocationText="Use Current Location"
                   >
                     <Async
-                      apiKey="search-pITifOg"
                       autoBlur={true}
                       autoload={false}
                       boundary={
@@ -1160,7 +1156,6 @@ exports[`Taui render the application container 1`] = `
                     >
                       <Select
                         addLabelText="Add \\"{label}\\"?"
-                        apiKey="search-pITifOg"
                         arrowRenderer={[Function]}
                         autoBlur={true}
                         autoload={false}
