@@ -1,5 +1,5 @@
 import {Map} from 'leaflet'
-import isEqual from 'lodash/isequal'
+import isEqual from 'lodash/isEqual'
 import {PropTypes} from 'react'
 import {MapLayer} from 'react-leaflet'
 import Transitive from 'transitive-js'
