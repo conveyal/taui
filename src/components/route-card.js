@@ -2,7 +2,7 @@ import Pure from '@conveyal/woonerf/components/pure'
 import Color from 'color'
 import React from 'react'
 import toCapitalCase from 'lodash/capitalize'
-import toSpaceCase from 'lodash/lowercase'
+import toSpaceCase from 'lodash/lowerCase'
 import unique from 'lodash/uniq'
 
 import {
