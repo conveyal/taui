@@ -1,10 +1,9 @@
 import {parse as parseQueryString} from 'qs'
 
 function set (opts) {
-  window.location.hash = Object
-    .keys(opts)
-    .filter((key) => opts[key] !== undefined && opts[key] !== null)
-    .map((key) => `${key}=${encodeURIComponent(opts[key])}`)
+  window.location.hash = Object.keys(opts)
+    .filter(key => opts[key] !== undefined && opts[key] !== null)
+    .map(key => `${key}=${encodeURIComponent(opts[key])}`)
     .join('&')
 }
 

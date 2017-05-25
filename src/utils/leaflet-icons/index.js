@@ -29,7 +29,8 @@ const Icon = L.Icon.extend({
     }
 
     if (options.bgPos) {
-      div.style.backgroundPosition = (-options.bgPos.x) + 'px ' + (-options.bgPos.y) + 'px'
+      div.style.backgroundPosition =
+        -options.bgPos.x + 'px ' + -options.bgPos.y + 'px'
     }
 
     this._setIconStyles(div, 'icon-' + options.markerColor)
@@ -43,7 +44,9 @@ const Icon = L.Icon.extend({
     let iconColorStyle = ''
     const options = this.options
 
-    if (options.icon.slice(0, options.prefix.length + 1) === options.prefix + '-') {
+    if (
+      options.icon.slice(0, options.prefix.length + 1) === options.prefix + '-'
+    ) {
       iconClass = options.icon
     } else {
       iconClass = options.prefix + '-' + options.icon
@@ -82,8 +85,8 @@ const Icon = L.Icon.extend({
     img.className = 'awesome-marker-' + name + ' ' + options.className
 
     if (anchor) {
-      img.style.marginLeft = (-anchor.x) + 'px'
-      img.style.marginTop = (-anchor.y) + 'px'
+      img.style.marginLeft = -anchor.x + 'px'
+      img.style.marginTop = -anchor.y + 'px'
     }
 
     if (size) {

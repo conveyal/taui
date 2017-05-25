@@ -24,7 +24,7 @@ export default class Form extends Pure {
             placeholder={messages.Geocoding.StartPlaceholder}
             searchPromptText={messages.Geocoding.PromptText}
             value={geocoder.start}
-            />
+          />
         </div>
         {geocoder.start &&
           <div>
@@ -38,11 +38,15 @@ export default class Form extends Pure {
                 placeholder={messages.Geocoding.EndPlaceholder}
                 searchPromptText={messages.Geocoding.PromptText}
                 value={geocoder.end}
-                />
+              />
             </div>
-            <div className='heading'>{messages.Strings.HighlightAreaAccessibleWithin}</div>
+            <div className='heading'>
+              {messages.Strings.HighlightAreaAccessibleWithin}
+            </div>
             <div className='TimeCutoff'>
-              <div className='Time'>{selectedTimeCutoff} {messages.Units.Minutes}</div>
+              <div className='Time'>
+                {selectedTimeCutoff} {messages.Units.Minutes}
+              </div>
               <input
                 defaultValue={selectedTimeCutoff}
                 onChange={onTimeCutoffChange}
@@ -50,10 +54,9 @@ export default class Form extends Pure {
                 min={10}
                 max={120}
                 step={5}
-                />
+              />
             </div>
-          </div>
-        }
+          </div>}
       </div>
     )
   }

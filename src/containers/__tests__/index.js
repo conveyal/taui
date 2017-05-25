@@ -17,9 +17,7 @@ describe('Taui', () => {
     const store = makeMockStore(JSON.parse(process.env.STORE))
     const component = mount(
       <Provider store={store}>
-        <Application
-          store={store}
-          />
+        <Application store={store} />
       </Provider>
     )
     expect(mountToJson(component)).toMatchSnapshot()

@@ -1,7 +1,14 @@
 import Pure from '@conveyal/woonerf/components/pure'
 import {Browser} from 'leaflet'
 import React, {PropTypes} from 'react'
-import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 'react-leaflet'
+import {
+  GeoJson,
+  Map as LeafletMap,
+  Marker,
+  Popup,
+  TileLayer,
+  ZoomControl
+} from 'react-leaflet'
 
 import Icon from './icon'
 import leafletIcon from '../utils/leaflet-icons'
@@ -47,7 +54,7 @@ export default class Map extends Pure {
     })
   }
 
-  _onMapClick = (e) => {
+  _onMapClick = e => {
     const {markers, setStart} = this.props
     if (markers.length === 0) {
       setStart({latlng: e.latlng})
@@ -81,7 +88,15 @@ export default class Map extends Pure {
   }
 
   render () {
-    const {centerCoordinates, geojson, geojsonColor, markers, onZoom, transitive, zoom} = this.props
+    const {
+      centerCoordinates,
+      geojson,
+      geojsonColor,
+      markers,
+      onZoom,
+      transitive,
+      zoom
+    } = this.props
     const {showSelectStartOrEnd, lastClickedLatlng} = this.state
     const tileLayerProps = {}
 
@@ -100,10 +115,14 @@ export default class Map extends Pure {
         onZoom={onZoom}
         preferCanvas
         zoomControl={false}
-        >
+      >
         <ZoomControl position='topright' />
         <TileLayer
-          url={Browser.retina && process.env.LEAFLET_RETINA_URL ? process.env.LEAFLET_RETINA_URL : process.env.LEAFLET_TILE_URL}
+          url={
+            Browser.retina && process.env.LEAFLET_RETINA_URL
+              ? process.env.LEAFLET_RETINA_URL
+              : process.env.LEAFLET_TILE_URL
+          }
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...tileLayerProps}
         />
@@ -114,44 +133,50 @@ export default class Map extends Pure {
               icon={index === 0 ? startIcon : endIcon}
               key={`marker-${index}`}
               {...m}
-              >
+            >
               {m.label && <Popup><span>{m.label}</span></Popup>}
             </Marker>
           )
         })}
 
-        {geojson.map((g) => {
-          return <GeoJson
-            key={`${g.key}`}
-            data={g}
-            style={{
-              fillColor: geojsonColor,
-              pointerEvents: 'none',
-              stroke: geojsonColor,
-              weight: 1
-            }}
+        {geojson.map(g => {
+          return (
+            <GeoJson
+              key={`${g.key}`}
+              data={g}
+              style={{
+                fillColor: geojsonColor,
+                pointerEvents: 'none',
+                stroke: geojsonColor,
+                weight: 1
+              }}
             />
+          )
         })}
 
         {transitive &&
-          <TransitiveLayer
-            data={transitive}
-            styles={transitiveStyle}
-            />
-        }
+          <TransitiveLayer data={transitive} styles={transitiveStyle} />}
 
         {showSelectStartOrEnd &&
-          <Popup
-            closeButton={false}
-            position={lastClickedLatlng}
-            >
+          <Popup closeButton={false} position={lastClickedLatlng}>
             <div className='Popup'>
-              <button onClick={this._setStart}><Icon type='map-marker' /> {messages.Map.SetLocationPopup.SetStart}</button>
-              <button onClick={this._setEnd}><Icon type='map-marker' /> {messages.Map.SetLocationPopup.SetEnd}</button>
-              <button onClick={this._clearStartAndEnd}><Icon type='times' /> {messages.Map.SetLocationPopup.ClearMarkers}</button>
+              <button onClick={this._setStart}>
+                <Icon type='map-marker' />
+                {' '}
+                {messages.Map.SetLocationPopup.SetStart}
+              </button>
+              <button onClick={this._setEnd}>
+                <Icon type='map-marker' />
+                {' '}
+                {messages.Map.SetLocationPopup.SetEnd}
+              </button>
+              <button onClick={this._clearStartAndEnd}>
+                <Icon type='times' />
+                {' '}
+                {messages.Map.SetLocationPopup.ClearMarkers}
+              </button>
             </div>
-          </Popup>
-        }
+          </Popup>}
       </LeafletMap>
     )
   }

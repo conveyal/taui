@@ -83,10 +83,7 @@ export default class Application extends Component {
     return markers
   }
 
-  _setStart = ({
-    label,
-    latlng
-  }) => {
+  _setStart = ({label, latlng}) => {
     const {browsochrones, map, mapMarkers, timeCutoff, updateStart} = this.props
     const endLatlng = mapMarkers.end && mapMarkers.end.latlng
       ? mapMarkers.end.latlng
@@ -102,11 +99,11 @@ export default class Application extends Component {
     })
   }
 
-  _setStartWithEvent = (event) => {
+  _setStartWithEvent = event => {
     this._setStart({latlng: event.latlng || event.target._latlng})
   }
 
-  _setStartWithFeature = (feature) => {
+  _setStartWithFeature = feature => {
     if (!feature) {
       this._clearStartAndEnd()
     } else {
@@ -119,10 +116,7 @@ export default class Application extends Component {
     }
   }
 
-  _setEnd = ({
-    label,
-    latlng
-  }) => {
+  _setEnd = ({label, latlng}) => {
     const {browsochrones, map, mapMarkers, updateEnd} = this.props
     updateEnd({
       browsochronesInstances: browsochrones.instances,
@@ -133,11 +127,11 @@ export default class Application extends Component {
     })
   }
 
-  _setEndWithEvent = (event) => {
+  _setEndWithEvent = event => {
     this._setEnd({latlng: event.latlng || event.target._latlng})
   }
 
-  _setEndWithFeature = (feature) => {
+  _setEndWithFeature = feature => {
     if (!feature) {
       this.props.clearEnd()
     } else {
@@ -150,7 +144,7 @@ export default class Application extends Component {
     }
   }
 
-  _onTimeCutoffChange = (event) => {
+  _onTimeCutoffChange = event => {
     const {browsochrones, mapMarkers, updateSelectedTimeCutoff} = this.props
     const timeCutoff = parseInt(event.target.value, 10)
     updateSelectedTimeCutoff({
@@ -184,14 +178,16 @@ export default class Application extends Component {
             markers={markers}
             setEnd={this._setEnd}
             setStart={this._setStart}
-            />
+          />
         </Fullscreen>
         <div className='Taui-Dock'>
           <div className='Taui-Dock-content'>
             <div className='title'>
               {ui.fetches > 0
                 ? <Icon type='spinner' className='fa-spin' />
-                : <Icon type='map' />} {messages.Title}
+                : <Icon type='map' />}
+              {' '}
+              {messages.Title}
             </div>
             <Form
               geocoder={geocoder}
@@ -199,32 +195,30 @@ export default class Application extends Component {
               onChangeEnd={this._setEndWithFeature}
               onChangeStart={this._setStartWithFeature}
               selectedTimeCutoff={timeCutoff.selected}
-              />
-            {destinations.accessibility
-              .map((accessibility, index) =>
-                <RouteCard
-                  accessibility={accessibility.accessibility}
-                  active={browsochrones.active === index}
-                  alternate={index !== 0}
-                  key={`${index}-route-card`}
-                  oldAccessibility={destinations.accessibility[0].accessibility}
-                  oldTravelTime={map.travelTimes[0]}
-                  onClick={() => setActiveBrowsochronesInstance(index)}
-                  transitiveData={map.transitives[index]}
-                  travelTime={map.travelTimes[index]}
-                  waitTime={map.waitTimes[index]}
-                  >
-                  {accessibility.name}
-                </RouteCard>
-              )}
-            {ui.showLog && actionLog && actionLog.length > 0 &&
+            />
+            {destinations.accessibility.map((accessibility, index) => (
+              <RouteCard
+                accessibility={accessibility.accessibility}
+                active={browsochrones.active === index}
+                alternate={index !== 0}
+                key={`${index}-route-card`}
+                oldAccessibility={destinations.accessibility[0].accessibility}
+                oldTravelTime={map.travelTimes[0]}
+                onClick={() => setActiveBrowsochronesInstance(index)}
+                transitiveData={map.transitives[index]}
+                travelTime={map.travelTimes[index]}
+                waitTime={map.waitTimes[index]}
+              >
+                {accessibility.name}
+              </RouteCard>
+            ))}
+            {ui.showLog &&
+              actionLog &&
+              actionLog.length > 0 &&
               <div className='Card'>
                 <div className='CardTitle'>{messages.Log.Title}</div>
-                <Log
-                  items={this.props.actionLog}
-                  />
-              </div>
-            }
+                <Log items={this.props.actionLog} />
+              </div>}
           </div>
         </div>
       </div>

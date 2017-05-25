@@ -9,13 +9,15 @@ export default class LogItem extends Pure {
     createdAt: PropTypes.object,
     level: PropTypes.string,
     text: PropTypes.string.isRequired
-  };
+  }
 
   render () {
     const {createdAt, text} = this.props
     return (
       <div className='LogItem'>
-        <small className='LogItem-createdAt'>{moment(createdAt).format(format)}</small>
+        <small className='LogItem-createdAt'>
+          {moment(createdAt).format(format)}
+        </small>
         <span className='LogItem-text'>{text}</span>
       </div>
     )

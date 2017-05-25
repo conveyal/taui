@@ -39,7 +39,6 @@ exports.places = {
       return '10px'
     }
   }
-
 }
 
 exports.segment_labels = {
@@ -77,7 +76,9 @@ exports.segments = {
         return '5px'
       case 'TRANSIT':
         // bus segments:
-        if (segment.mode === 3) return utils.pixels(display.zoom.scale(), 2, 4, 6) + 'px'
+        if (segment.mode === 3) {
+          return utils.pixels(display.zoom.scale(), 2, 4, 6) + 'px'
+        }
         // all others:
         return utils.pixels(display.zoom.scale(), 5, 7, 9) + 'px'
     }
@@ -111,7 +112,9 @@ exports.segments = {
   envelope: function (display, segment, index, utils) {
     switch (segment.type) {
       case 'TRANSIT':
-        if (segment.mode === 3) return utils.pixels(display.zoom.scale(), 2, 4, 6) + 'px'
+        if (segment.mode === 3) {
+          return utils.pixels(display.zoom.scale(), 2, 4, 6) + 'px'
+        }
         // all others:
         return utils.pixels(display.zoom.scale(), 5, 7, 9) + 'px'
     }
