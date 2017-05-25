@@ -1,3 +1,4 @@
+// @flow
 import actionLog from './action-log'
 import browsochrones from './browsochrones'
 import destinations from './destinations'

@@ -1,4 +1,4 @@
-import Pure from '@conveyal/woonerf/components/pure'
+// @flow
 import Color from 'color'
 import React from 'react'
 import toCapitalCase from 'lodash/capitalize'
@@ -9,63 +9,72 @@ import {ACCESSIBILITY_IS_EMPTY, ACCESSIBILITY_IS_LOADING} from '../constants'
 import Icon from './icon'
 import messages from '../utils/messages'
 
-export default class RouteCard extends Pure {
-  render () {
-    const {
-      active,
-      alternate,
-      accessibility,
-      children,
-      oldAccessibility,
-      oldTravelTime,
-      oldWaitTime,
-      onClick,
-      transitiveData,
-      travelTime,
-      waitTime
-    } = this.props
-    const className =
-      'Card' +
-      (alternate ? ' Card-alternate' : '') +
-      (active ? ' Card-active' : '')
-    const accessibilityKeys = Object.keys(accessibility)
-    const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
+type Props = {
+  active: boolean,
+  alternate: boolean,
+  accessibility: any,
+  children?: any,
+  oldAccessibility: any,
+  oldTravelTime: number,
+  onClick(): void,
+  transitiveData: any,
+  travelTime: number,
+  waitTime: number
+}
 
-    return (
-      <div className={className}>
-        <a
-          className='CardTitle'
-          onClick={onClick}
-          tabIndex={0}
-          title='Set system active'
-        >
-          {children}
-          <span className='pull-right'>
-            {active && <Icon type='map' />}
-            {!active && 'show'}
-          </span>
-        </a>
-        <div className='CardContent'>
-          {comparisonAccessibilityKeys.length > 0
-            ? <ShowAccess keys={accessibilityKeys} base={accessibility} />
-            : <ShowDiff
-              keys={accessibilityKeys}
-              base={accessibility}
-              comparison={oldAccessibility}
-              />}
-          {accessibility !== ACCESSIBILITY_IS_EMPTY &&
-            accessibility !== ACCESSIBILITY_IS_LOADING &&
-            <Journeys
-              oldTravelTime={oldTravelTime}
-              oldWaitTime={oldWaitTime}
-              travelTime={travelTime}
-              transitiveData={transitiveData}
-              waitTime={waitTime}
+export default (props: Props) => {
+  const {
+    active,
+    alternate,
+    accessibility,
+    children,
+    oldAccessibility,
+    oldTravelTime,
+    onClick,
+    transitiveData,
+    travelTime,
+    waitTime
+  } = props
+  const className =
+    'Card' +
+    (alternate ? ' Card-alternate' : '') +
+    (active ? ' Card-active' : '')
+  const accessibilityKeys = Object.keys(accessibility)
+  const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
+
+  return (
+    <div className={className}>
+      <a
+        className='CardTitle'
+        onClick={onClick}
+        tabIndex={0}
+        title='Set system active'
+      >
+        {children}
+        <span className='pull-right'>
+          {active && <Icon type='map' />}
+          {!active && 'show'}
+        </span>
+      </a>
+      <div className='CardContent'>
+        {comparisonAccessibilityKeys.length > 0
+          ? <ShowAccess keys={accessibilityKeys} base={accessibility} />
+          : <ShowDiff
+            keys={accessibilityKeys}
+            base={accessibility}
+            comparison={oldAccessibility}
             />}
-        </div>
+        {accessibility !== ACCESSIBILITY_IS_EMPTY &&
+          accessibility !== ACCESSIBILITY_IS_LOADING &&
+          <Journeys
+            oldTravelTime={oldTravelTime}
+            travelTime={travelTime}
+            transitiveData={transitiveData}
+            waitTime={waitTime}
+          />}
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 function TripDiff ({oldTravelTime, travelTime}) {
@@ -213,12 +222,7 @@ function findRouteForPattern ({id, patterns, routes}) {
   )
 }
 
-const typeToIcon = {
-  0: 'subway',
-  1: 'subway',
-  2: 'train',
-  3: 'bus'
-}
+const typeToIcon = ['subway', 'subway', 'train', 'bus']
 
 function MetricIcon ({name}) {
   const lc = name.toLowerCase()

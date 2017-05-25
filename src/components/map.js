@@ -1,6 +1,6 @@
-import Pure from '@conveyal/woonerf/components/pure'
+// @flow
 import {Browser} from 'leaflet'
-import React, {PropTypes} from 'react'
+import React, {PureComponent} from 'react'
 import {
   GeoJson,
   Map as LeafletMap,
@@ -16,6 +16,12 @@ import messages from '../utils/messages'
 import TransitiveLayer from './transitive-map-layer'
 import transitiveStyle from '../transitive-style'
 
+import type {Coordinate, Feature, MapEvent} from '../types'
+
+const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
+  ? process.env.LEAFLET_RETINA_URL
+  : process.env.LEAFLET_TILE_URL
+
 const startIcon = leafletIcon({
   icon: 'play',
   markerColor: 'darkblue'
@@ -26,20 +32,25 @@ const endIcon = leafletIcon({
   markerColor: 'orange'
 })
 
-export default class Map extends Pure {
-  static propTypes = {
-    centerCoordinates: PropTypes.arrayOf(PropTypes.number),
-    clearStartAndEnd: PropTypes.func.isRequired,
-    geojson: PropTypes.arrayOf(PropTypes.object).isRequired,
-    geojsonColor: PropTypes.string,
-    markers: PropTypes.arrayOf(PropTypes.object).isRequired,
-    onZoom: PropTypes.func,
-    setEnd: PropTypes.func.isRequired,
-    setStart: PropTypes.func.isRequired,
-    transitive: PropTypes.object,
-    zoom: PropTypes.number
-  }
+type Props = {
+  centerCoordinates: Coordinate,
+  clearStartAndEnd(): void,
+  geojson: Feature[],
+  geojsonColor: string,
+  markers: any[],
+  onZoom(): void,
+  setEnd(): void,
+  setStart(): void,
+  transitive: any,
+  zoom: number
+}
 
+type State = {
+  showSelectStartOrEnd: boolean,
+  lastClickedLatlng: null | Coordinate
+}
+
+export default class Map extends PureComponent<void, Props, State> {
   state = {
     showSelectStartOrEnd: false,
     lastClickedLatlng: null
@@ -49,18 +60,16 @@ export default class Map extends Pure {
     const {clearStartAndEnd} = this.props
     clearStartAndEnd()
     this.setState({
-      ...this.state,
       showSelectStartOrEnd: false
     })
   }
 
-  _onMapClick = e => {
+  _onMapClick = (e: MapEvent) => {
     const {markers, setStart} = this.props
     if (markers.length === 0) {
       setStart({latlng: e.latlng})
     } else {
       this.setState({
-        ...this.state,
         showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
         lastClickedLatlng: e.latlng
       })
@@ -118,11 +127,7 @@ export default class Map extends Pure {
       >
         <ZoomControl position='topright' />
         <TileLayer
-          url={
-            Browser.retina && process.env.LEAFLET_RETINA_URL
-              ? process.env.LEAFLET_RETINA_URL
-              : process.env.LEAFLET_TILE_URL
-          }
+          url={TILE_LAYER_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...tileLayerProps}
         />

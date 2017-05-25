@@ -6,9 +6,10 @@ browsochrones:
     - Jobs_total
     - Workers_total
   origins:
-    - https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-v6
-    - https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
-    - https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
+    - name: Baseline
+      url: https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-v6
+    - name: Marion
+      url: https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
 destinations:
   accessibility: []
 geocoder:
@@ -34,6 +35,11 @@ map:
   inVehicleTravelTimes: []
   waitTimes: []
   zoom: 11
+  pointsOfInterest:
+    - name: Location 1
+      coordinates: [39.7691, -86.1570]
+    - name: Location 2
+      coordinates: [39.7681, -86.1580]
 mapMarkers:
   start: {}
   end: {}

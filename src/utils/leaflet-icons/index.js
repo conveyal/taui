@@ -1,4 +1,20 @@
+// @flow
 import L from 'leaflet'
+
+type IconOptions = {
+  iconSize?: [number, number],
+  iconAnchor?: [number, number],
+  popupAnchor?: [number, number],
+  shadowAnchor?: [number, number],
+  shadowSize?: [number, number],
+  className?: string,
+  prefix?: string,
+  spinClass?: string,
+  extraClasses?: string,
+  icon?: string,
+  markerColor?: string,
+  iconColor?: string
+}
 
 const Icon = L.Icon.extend({
   options: {
@@ -103,7 +119,7 @@ const Icon = L.Icon.extend({
   }
 })
 
-export default function (options) {
+export default function (options: IconOptions) {
   if (process.env.NODE_ENV === 'test') {
     return {}
   }

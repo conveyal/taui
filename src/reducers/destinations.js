@@ -1,3 +1,4 @@
+// @flow
 import {handleActions} from 'redux-actions'
 
 import {ACCESSIBILITY_IS_EMPTY, ACCESSIBILITY_IS_LOADING} from '../constants'

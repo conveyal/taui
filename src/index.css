@@ -3,7 +3,6 @@
 @import url(node_modules/mapbox.js/theme/style.css);
 @import url(node_modules/font-awesome/css/font-awesome.css);
 @import url(node_modules/react-select/dist/react-select.css);
-@import url(src/components/fullscreen/style.css);
 @import url(src/components/log/style.css);
 @import url(src/components/log-item/style.css);
 @import url(src/components/transitive-map-layer/style.css);
@@ -261,4 +260,12 @@ body {
 
 .leaflet-popup-tip {
   border-top-color: #0b2b40;
+}
+
+.Fullscreen {
+  position: absolute;
+  height: 100%;
+  right: 0;
+  left: 414px;
+  overflow: hidden;
 }
