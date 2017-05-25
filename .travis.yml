@@ -1,16 +1,17 @@
 sudo: false
 language: node_js
 cache:
-  directories:
-    - ~/.yarn-cache
+  yarn: true
 notifications:
   email: false
 node_js:
   - '6'
 before_install:
-  - npm i -g yarn
-install:
-  - yarn
+  - yarn global add codecov
+scripts:
+  - yarn test -- --coverage --coverage-paths src/**/*.js
+  - codecov
+  - yarn run build
 after_success:
   - yarn run semantic-release
 branches:

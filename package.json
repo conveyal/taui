@@ -3,12 +3,13 @@
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
   "scripts": {
+    "build": "mastarm build",
     "deploy": "mastarm deploy --env production --minify",
     "prestart": "yarn",
     "pretest": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "mastarm build --serve --env development",
-    "test": "mastarm lint"
+    "test": "mastarm lint && mastarm flow && mastarm test --env test"
   },
   "repository": {
     "type": "git",
@@ -25,7 +26,12 @@
   },
   "homepage": "https://github.com/conveyal/taui",
   "devDependencies": {
-    "mastarm": "^3.5.1",
+    "enzyme": "^2.8.2",
+    "enzyme-to-json": "^1.5.1",
+    "flow-bin": "^0.45.0",
+    "mastarm": "^3.8.0",
+    "react-addons-test-utils": "^15.5.1",
+    "redux-mock-store": "^1.2.3",
     "semantic-release": "^6.3.2"
   },
   "dependencies": {
@@ -39,12 +45,7 @@
     "isomorphic-mapzen-search": "^1.2.0",
     "leaflet": "^0.7.7",
     "leaflet-transitivelayer": "^0.2.0",
-    "lodash.camelcase": "^4.3.0",
-    "lodash.capitalize": "^4.2.1",
-    "lodash.isequal": "^4.5.0",
-    "lodash.lowercase": "^4.3.0",
-    "lodash.merge": "^4.6.0",
-    "lodash.uniq": "^4.5.0",
+    "lodash": "^4.17.4",
     "mapbox.js": "^2.4.0",
     "moment": "^2.17.1",
     "normalize.css": "^5.0.0",
@@ -60,5 +61,10 @@
   },
   "standard": {
     "parser": "babel-eslint"
+  },
+  "mastarm lint": {
+    "ignore": [
+      "flow-typed"
+    ]
   }
 }

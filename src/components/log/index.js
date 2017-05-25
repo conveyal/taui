@@ -1,3 +1,4 @@
+// @flow
 import Pure from '@conveyal/woonerf/components/pure'
 import React, {PropTypes} from 'react'
 
