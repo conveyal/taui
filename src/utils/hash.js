@@ -1,4 +1,4 @@
-import {parse as parseQueryString} from 'qs'
+import {parse as parseQueryString} from 'querystring'
 
 function set (opts) {
   window.location.hash = Object.keys(opts)
