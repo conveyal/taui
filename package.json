@@ -9,7 +9,7 @@
     "pretest": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "mastarm build --serve --env development",
-    "test": "mastarm lint && mastarm flow && mastarm test --env test"
+    "test": "mastarm lint && mastarm flow && mastarm test --env test --config configurations/test"
   },
   "repository": {
     "type": "git",
