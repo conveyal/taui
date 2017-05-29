@@ -74,15 +74,10 @@ export default class Map extends PureComponent<void, Props, State> {
   }
 
   _onMapClick = (e: MapEvent) => {
-    const {markers, setStart} = this.props
-    if (markers.length === 0) {
-      setStart({latlng: e.latlng})
-    } else {
-      this.setState({
-        showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
-        lastClickedLatlng: e.latlng
-      })
-    }
+    this.setState({
+      showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
+      lastClickedLatlng: e.latlng
+    })
   }
 
   _setEnd = () => {
@@ -151,7 +146,7 @@ export default class Map extends PureComponent<void, Props, State> {
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...tileLayerProps}
         />
-        {markers.length === 0 &&
+        {markers.length < 2 &&
           <MapboxGeoJson
             data={pointsOfInterest.map(poi => poi.feature)}
             onClick={this._clickPoi}
