@@ -227,7 +227,9 @@ const typeToIcon = ['subway', 'subway', 'train', 'bus']
 function MetricIcon ({name}) {
   const lc = name.toLowerCase()
   if (lc.indexOf('job') !== -1) return <Icon type='building' />
-  if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) { return <Icon type='child' /> }
+  if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) {
+    return <Icon type='child' />
+  }
   return <span />
 }
 

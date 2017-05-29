@@ -7,7 +7,9 @@ const timeMin = 10
 const timeMax = 120
 const times = []
 
-for (let i = timeMin; i < timeMax; i += timeStep) { times.push({name: `${i} ${messages.Strings.Minutes}`, value: i}) }
+for (let i = timeMin; i < timeMax; i += timeStep) {
+  times.push({name: `${i} ${messages.Strings.Minutes}`, value: i})
+}
 
 export default handleActions(
   {

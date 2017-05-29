@@ -7,5 +7,6 @@ type Props = {
   props?: any
 }
 
-export default ({className = '', type, ...props}: Props) =>
+export default ({className = '', type, ...props}: Props) => (
   <i className={`fa fa-${type} fa-fw ${className}`} {...props} />
+)

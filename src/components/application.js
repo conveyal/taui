@@ -10,18 +10,29 @@ import Map from './map'
 import messages from '../utils/messages'
 import RouteCard from './route-card'
 
-import type {Coordinate, LogItems, InputEvent, MapEvent, PointFeature} from '../types'
+import type {
+  Accessibility,
+  BrowsochronesStore,
+  Coordinate,
+  GeocoderStore,
+  LogItems,
+  InputEvent,
+  MapEvent,
+  PointFeature,
+  PointsOfInterest,
+  UIStore
+} from '../types'
 
 type Props = {
   actionLog: LogItems,
-  browsochrones: any,
-  destinations: any,
-  geocoder: any,
+  browsochrones: BrowsochronesStore,
+  destinations: Accessibility[],
+  geocoder: GeocoderStore,
   mapMarkers: any,
   map: any,
+  pointsOfInterest: PointsOfInterest,
   timeCutoff: any,
-  ui: any,
-  zoom: number,
+  ui: UIStore,
 
   clearEnd(): void,
   clearIsochrone(): void,
@@ -50,11 +61,18 @@ export default class Application extends Component<void, Props, State> {
 
   constructor (props: Props) {
     super(props)
-    const {browsochrones, initializeBrowsochrones, geocoder, map} = props
+    const {
+      browsochrones,
+      initializeBrowsochrones,
+      geocoder,
+      map,
+      timeCutoff
+    } = props
     initializeBrowsochrones({
       browsochrones,
       geocoder,
-      map
+      map,
+      timeCutoff
     })
   }
 
@@ -92,7 +110,10 @@ export default class Application extends Component<void, Props, State> {
     return markers
   }
 
-  _setStart = ({label, latlng}: {
+  _setStart = ({
+    label,
+    latlng
+  }: {
     label?: string,
     latlng: Coordinate
   }) => {
@@ -128,7 +149,10 @@ export default class Application extends Component<void, Props, State> {
     }
   }
 
-  _setEnd = ({label, latlng}: {
+  _setEnd = ({
+    label,
+    latlng
+  }: {
     label?: string,
     latlng: Coordinate
   }) => {
@@ -177,6 +201,7 @@ export default class Application extends Component<void, Props, State> {
       destinations,
       geocoder,
       map,
+      pointsOfInterest,
       setActiveBrowsochronesInstance,
       timeCutoff,
       ui
@@ -187,12 +212,16 @@ export default class Application extends Component<void, Props, State> {
       <div>
         <div className='Fullscreen'>
           <Map
-            {...map}
+            centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
+            geojson={map.geojson}
             geojsonColor={browsochrones.active === 0 ? '#4269a4' : 'darkorange'}
             markers={markers}
+            pointsOfInterest={pointsOfInterest}
             setEnd={this._setEnd}
             setStart={this._setStart}
+            transitive={map.transitive}
+            zoom={map.zoom}
           />
         </div>
         <div className='Taui-Dock'>
@@ -205,19 +234,23 @@ export default class Application extends Component<void, Props, State> {
               {messages.Title}
             </div>
             <Form
-              geocoder={geocoder}
+              boundary={geocoder.boundary}
+              end={geocoder.end}
+              focusLatlng={geocoder.focusLatlng}
               onTimeCutoffChange={this._onTimeCutoffChange}
               onChangeEnd={this._setEndWithFeature}
               onChangeStart={this._setStartWithFeature}
+              pointsOfInterest={pointsOfInterest}
               selectedTimeCutoff={timeCutoff.selected}
+              start={geocoder.start}
             />
-            {destinations.accessibility.map((accessibility, index) => (
+            {destinations.map((accessibility, index) => (
               <RouteCard
                 accessibility={accessibility.accessibility}
                 active={browsochrones.active === index}
                 alternate={index !== 0}
                 key={`${index}-route-card`}
-                oldAccessibility={destinations.accessibility[0].accessibility}
+                oldAccessibility={destinations[0].accessibility}
                 oldTravelTime={map.travelTimes[0]}
                 onClick={() => setActiveBrowsochronesInstance(index)}
                 transitiveData={map.transitives[index]}
@@ -232,7 +265,7 @@ export default class Application extends Component<void, Props, State> {
               actionLog.length > 0 &&
               <div className='Card'>
                 <div className='CardTitle'>{messages.Log.Title}</div>
-                <Log items={this.props.actionLog} />
+                <Log items={actionLog} />
               </div>}
           </div>
         </div>

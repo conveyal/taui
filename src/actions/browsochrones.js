@@ -22,7 +22,12 @@ import {
 
 import type {Store} from '../types'
 
-export default function initialize ({browsochrones, geocoder, map, timeCutoff}: Store) {
+export default function initialize ({
+  browsochrones,
+  geocoder,
+  map,
+  timeCutoff
+}: Store) {
   const {origins} = browsochrones
   const qs = getHash()
   return [
@@ -41,7 +46,9 @@ export default function initialize ({browsochrones, geocoder, map, timeCutoff}: 
       if (end) actions.push(setEnd(end))
       actions.push(
         fetchGrids(browsochrones)
-          .then(grids => loadAllOrigins({grids, origins, gridNames: browsochrones.grids}))
+          .then(grids =>
+            loadAllOrigins({grids, origins, gridNames: browsochrones.grids})
+          )
           .then(instances => [
             setBrowsochronesInstances(instances),
             start &&
@@ -81,14 +88,18 @@ async function geocodeQs ({geocoder, qs}) {
   return [await geocodeP('start'), await geocodeP('end')]
 }
 
-function fetchGrids ({grids, gridsUrl}: {
+function fetchGrids ({
+  grids,
+  gridsUrl
+}: {
   grids: string[],
   gridsUrl: string
 }): Promise<ArrayBuffer[]> {
   return Promise.all(
-    grids.map((name) => fetch(`${gridsUrl}/${name}.grid`)
-      .then((r) => r.arrayBuffer())
-  ))
+    grids.map(name =>
+      fetch(`${gridsUrl}/${name}.grid`).then(r => r.arrayBuffer())
+    )
+  )
 }
 
 function loadAllOrigins ({grids, origins, gridNames}) {
@@ -109,7 +120,9 @@ async function load (origin, grids, gridNames) {
   await bs.setStopTrees(stopTrees)
   await bs.setTransitiveNetwork(query.transitiveData)
 
-  const putGrids = grids.map((grid, index) => bs.putGrid(gridNames[index], grid))
+  const putGrids = grids.map((grid, index) =>
+    bs.putGrid(gridNames[index], grid)
+  )
   await Promise.all(putGrids)
 
   return bs

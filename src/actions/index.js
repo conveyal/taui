@@ -146,7 +146,9 @@ export function updateStart ({
     )
   }
 
-  if (!browsochronesInstances || browsochronesInstances.length === 0) { return actions }
+  if (!browsochronesInstances || browsochronesInstances.length === 0) {
+    return actions
+  }
 
   actions.push(
     fetchAllBrowsochrones({
@@ -306,7 +308,11 @@ function generateDestinationDataFor ({
   ]
 }
 
-export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}: {
+export function updateSelectedTimeCutoff ({
+  browsochrones,
+  latlng,
+  timeCutoff
+}: {
   browsochrones: Browsochrones,
   latlng: LatLng,
   timeCutoff: number

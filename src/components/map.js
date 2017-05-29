@@ -1,5 +1,6 @@
 // @flow
-import {Browser} from 'leaflet'
+import {Browser, LatLng} from 'leaflet'
+import {mapbox} from 'mapbox.js'
 import React, {PureComponent} from 'react'
 import {
   GeoJson,
@@ -16,7 +17,7 @@ import messages from '../utils/messages'
 import TransitiveLayer from './transitive-map-layer'
 import transitiveStyle from '../transitive-style'
 
-import type {Coordinate, Feature, MapEvent} from '../types'
+import type {Coordinate, Feature, MapEvent, PointsOfInterest} from '../types'
 
 const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
@@ -38,30 +39,38 @@ type Props = {
   geojson: Feature[],
   geojsonColor: string,
   markers: any[],
-  onZoom(): void,
-  setEnd(): void,
-  setStart(): void,
+  pointsOfInterest: PointsOfInterest,
+  setEnd(any): void,
+  setStart(any): void,
   transitive: any,
   zoom: number
 }
 
 type State = {
   showSelectStartOrEnd: boolean,
-  lastClickedLatlng: null | Coordinate
+  lastClickedLabel: null,
+  lastClickedLatlng: null | LatLng
 }
 
 export default class Map extends PureComponent<void, Props, State> {
   state = {
     showSelectStartOrEnd: false,
+    lastClickedLabel: null,
     lastClickedLatlng: null
+  }
+
+  _clearState () {
+    this.setState({
+      showSelectStartOrEnd: false,
+      lastClickedLabel: null,
+      lastClickedLatlng: null
+    })
   }
 
   _clearStartAndEnd = () => {
     const {clearStartAndEnd} = this.props
     clearStartAndEnd()
-    this.setState({
-      showSelectStartOrEnd: false
-    })
+    this._clearState()
   }
 
   _onMapClick = (e: MapEvent) => {
@@ -80,19 +89,27 @@ export default class Map extends PureComponent<void, Props, State> {
     const {setEnd} = this.props
     const {lastClickedLatlng} = this.state
     setEnd({latlng: lastClickedLatlng})
-    this.setState({
-      showSelectStartOrEnd: false,
-      lastClickedLatlng: null
-    })
+    this._clearState()
   }
 
   _setStart = () => {
     const {setStart} = this.props
     const {lastClickedLatlng} = this.state
     setStart({latlng: lastClickedLatlng})
+    this._clearState()
+  }
+
+  _clickPoi = (event: Event & {layer: {feature: Feature}}) => {
+    if (!event.layer || !event.layer.feature) {
+      return this._clearState()
+    }
+
+    const {feature} = event.layer
+    const {coordinates} = feature.geometry
     this.setState({
-      showSelectStartOrEnd: false,
-      lastClickedLatlng: null
+      lastClickedLabel: feature.properties.label,
+      lastClickedLatlng: {lat: coordinates[1], lng: coordinates[0]},
+      showSelectStartOrEnd: true
     })
   }
 
@@ -102,11 +119,15 @@ export default class Map extends PureComponent<void, Props, State> {
       geojson,
       geojsonColor,
       markers,
-      onZoom,
+      pointsOfInterest,
       transitive,
       zoom
     } = this.props
-    const {showSelectStartOrEnd, lastClickedLatlng} = this.state
+    const {
+      lastClickedLabel,
+      lastClickedLatlng,
+      showSelectStartOrEnd
+    } = this.state
     const tileLayerProps = {}
 
     if (Browser.retina) {
@@ -121,7 +142,6 @@ export default class Map extends PureComponent<void, Props, State> {
         ref='map'
         zoom={zoom}
         onClick={this._onMapClick}
-        onZoom={onZoom}
         preferCanvas
         zoomControl={false}
       >
@@ -131,18 +151,23 @@ export default class Map extends PureComponent<void, Props, State> {
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...tileLayerProps}
         />
-        {markers.map((m, index) => {
-          return (
-            <Marker
-              draggable
-              icon={index === 0 ? startIcon : endIcon}
-              key={`marker-${index}`}
-              {...m}
-            >
-              {m.label && <Popup><span>{m.label}</span></Popup>}
-            </Marker>
-          )
-        })}
+        {markers.length === 0 &&
+          <MapboxGeoJson
+            data={pointsOfInterest.map(poi => poi.feature)}
+            onClick={this._clickPoi}
+          />}
+
+        {markers.map((m, index) => (
+          <Marker
+            draggable
+            icon={index === 0 ? startIcon : endIcon}
+            key={`marker-${index}`}
+            onDragEnd={m.onDragEnd}
+            position={m.position}
+          >
+            {m.label && <Popup><span>{m.label}</span></Popup>}
+          </Marker>
+        ))}
 
         {geojson.map(g => {
           return (
@@ -165,24 +190,36 @@ export default class Map extends PureComponent<void, Props, State> {
         {showSelectStartOrEnd &&
           <Popup closeButton={false} position={lastClickedLatlng}>
             <div className='Popup'>
+              {lastClickedLabel && <h3>{lastClickedLabel}</h3>}
               <button onClick={this._setStart}>
                 <Icon type='map-marker' />
                 {' '}
                 {messages.Map.SetLocationPopup.SetStart}
               </button>
-              <button onClick={this._setEnd}>
-                <Icon type='map-marker' />
-                {' '}
-                {messages.Map.SetLocationPopup.SetEnd}
-              </button>
-              <button onClick={this._clearStartAndEnd}>
-                <Icon type='times' />
-                {' '}
-                {messages.Map.SetLocationPopup.ClearMarkers}
-              </button>
+              {markers.length > 0 &&
+                <button onClick={this._setEnd}>
+                  <Icon type='map-marker' />
+                  {' '}
+                  {messages.Map.SetLocationPopup.SetEnd}
+                </button>}
+              {markers.length > 0 &&
+                <button onClick={this._clearStartAndEnd}>
+                  <Icon type='times' />
+                  {' '}
+                  {messages.Map.SetLocationPopup.ClearMarkers}
+                </button>}
             </div>
           </Popup>}
       </LeafletMap>
     )
+  }
+}
+
+mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
+class MapboxGeoJson extends GeoJson {
+  componentWillMount () {
+    super.componentWillMount()
+    const {data} = this.props
+    this.leafletElement = mapbox.featureLayer(data)
   }
 }
