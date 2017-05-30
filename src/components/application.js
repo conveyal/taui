@@ -197,7 +197,7 @@ export default class Application extends Component<void, Props, State> {
     })
   }
 
-  _setActiveBrowsochronesInstance = memoize((index) => () =>
+  _setActiveBrowsochronesInstance = memoize(index => () =>
     this.props.setActiveBrowsochronesInstance(index))
 
   count = 0

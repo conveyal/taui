@@ -5,14 +5,14 @@ import unique from 'lodash/uniq'
 import {createSelector} from 'reselect'
 
 export default createSelector(
-  (state) => state.map.transitives,
+  state => state.map.transitives,
   (transitiveData = []) => transitiveData.map(extractRelevantTransitiveInfo)
 )
 
 // TODO: filter journeys that have same pattern id sequences
-function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
-  return journeys.map(j => {
-    return j.segments.filter(s => !!s.pattern_id || !!s.patterns).map(s => {
+const extractRelevantTransitiveInfo = ({journeys, patterns, routes, stops}) =>
+  journeys.map(j =>
+    j.segments.filter(s => !!s.pattern_id || !!s.patterns).map(s => {
       const pid = s.pattern_id || s.patterns[0].pattern_id
       const seg = {}
       const route = findRouteForPattern({id: pid, patterns, routes})
@@ -37,13 +37,11 @@ function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
 
       return seg
     })
-  })
-}
+  )
 
-function findRouteForPattern ({id, patterns, routes}) {
-  return routes.find(
+const findRouteForPattern = ({id, patterns, routes}) =>
+  routes.find(
     r => r.route_id === patterns.find(p => p.pattern_id === id).route_id
   )
-}
 
 const typeToIcon = ['subway', 'subway', 'train', 'bus']

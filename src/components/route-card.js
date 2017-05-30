@@ -21,60 +21,58 @@ type Props = {
   waitTime: number
 }
 
-export default (props: Props) => {
-  const {
-    active,
-    alternate,
-    accessibility,
-    accessibilityKeys,
-    children,
-    journeys,
-    oldAccessibility,
-    oldTravelTime,
-    onClick,
-    showComparison,
-    travelTime,
-    waitTime
-  } = props
-  const className =
-    'Card' +
-    (alternate ? ' Card-alternate' : '') +
-    (active ? ' Card-active' : '')
-
-  return (
-    <div className={className}>
-      <a
-        className='CardTitle'
-        onClick={onClick}
-        tabIndex={0}
-        title='Set system active'
-      >
-        {children}
-        <span className='pull-right'>
-          {active && <Icon type='map' />}
-          {!active && messages.Systems.Show}
-        </span>
-      </a>
-      <div className='CardContent'>
-        {showComparison
-          ? <ShowDiff
-            keys={accessibilityKeys}
-            base={accessibility}
-            comparison={oldAccessibility}
-            />
-          : <ShowAccess keys={accessibilityKeys} base={accessibility} />}
-        {accessibility !== ACCESSIBILITY_IS_EMPTY &&
-          accessibility !== ACCESSIBILITY_IS_LOADING &&
-          <Journeys
-            journeys={journeys}
-            oldTravelTime={oldTravelTime}
-            travelTime={travelTime}
-            waitTime={waitTime}
-          />}
-      </div>
+export default ({
+  active,
+  alternate,
+  accessibility,
+  accessibilityKeys,
+  children,
+  journeys,
+  oldAccessibility,
+  oldTravelTime,
+  onClick,
+  showComparison,
+  travelTime,
+  waitTime
+}: Props) => (
+  <div
+    className={
+      'Card' +
+        (alternate ? ' Card-alternate' : '') +
+        (active ? ' Card-active' : '')
+    }
+  >
+    <a
+      className='CardTitle'
+      onClick={onClick}
+      tabIndex={0}
+      title='Set system active'
+    >
+      {children}
+      <span className='pull-right'>
+        {active && <Icon type='map' />}
+        {!active && messages.Systems.Show}
+      </span>
+    </a>
+    <div className='CardContent'>
+      {showComparison
+        ? <ShowDiff
+          keys={accessibilityKeys}
+          base={accessibility}
+          comparison={oldAccessibility}
+          />
+        : <ShowAccess keys={accessibilityKeys} base={accessibility} />}
+      {accessibility !== ACCESSIBILITY_IS_EMPTY &&
+        accessibility !== ACCESSIBILITY_IS_LOADING &&
+        <Journeys
+          journeys={journeys}
+          oldTravelTime={oldTravelTime}
+          travelTime={travelTime}
+          waitTime={waitTime}
+        />}
     </div>
-  )
-}
+  </div>
+)
 
 function TripDiff ({oldTravelTime, travelTime}) {
   const actualDiff = travelTime - oldTravelTime
@@ -145,24 +143,31 @@ function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
           {' '}
           {messages.Systems.Waiting}
         </div>
-        <div>{bestJourney.map((segment, index) =>
-          <Segment key={index} segment={segment} />)}</div>
+        <div>
+          {bestJourney.map((segment, index) => (
+            <Segment key={index} segment={segment} />
+          ))}
+        </div>
       </div>
       {journeys.length > 1 &&
         <div>
           <div className='heading'>{messages.Systems.AlternateTripsTitle}</div>
-          <div className='Trips'>{alternateJourneys.map((segments, jindex) =>
-            <div className='Trip' key={jindex}>
-              <span className='CardIndex'>{jindex + 1}.</span>{segments.map((segment, index) =>
-                <Segment key={index} segment={segment} />)}
-            </div>
-          )}</div>
+          <div className='Trips'>
+            {alternateJourneys.map((segments, jindex) => (
+              <div className='Trip' key={jindex}>
+                <span className='CardIndex'>{jindex + 1}.</span>
+                {segments.map((segment, index) => (
+                  <Segment key={index} segment={segment} />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>}
     </div>
   )
 }
 
-const Segment = ({segment}) =>
+const Segment = ({segment}) => (
   <span
     className='CardSegment'
     style={{
@@ -172,6 +177,7 @@ const Segment = ({segment}) =>
   >
     <i className={`fa fa-${segment.type}`} /> {segment.name}
   </span>
+)
 
 function MetricIcon ({name}) {
   const lc = name.toLowerCase()
@@ -182,7 +188,10 @@ function MetricIcon ({name}) {
   return <span />
 }
 
-function ShowAccess ({keys, base}: {
+function ShowAccess ({
+  keys,
+  base
+}: {
   keys: string[],
   base: {
     [name: string]: number
