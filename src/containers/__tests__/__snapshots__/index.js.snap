@@ -51,11 +51,7 @@ exports[`Taui render the application container 1`] = `
       clearEnd={[Function]}
       clearIsochrone={[Function]}
       clearStart={[Function]}
-      destinations={
-        Object {
-          "accessibility": Array [],
-        }
-      }
+      destinations={Array []}
       fetchAllBrowsochrones={[Function]}
       geocoder={
         Object {
@@ -72,6 +68,22 @@ exports[`Taui render the application container 1`] = `
             "lat": 39.7691,
             "lng": -86.157,
           },
+          "pointsOfInterest": Array [
+            Object {
+              "coordinates": Array [
+                -86.157,
+                39.7691,
+              ],
+              "name": "Location 1",
+            },
+            Object {
+              "coordinates": Array [
+                -86.158,
+                39.7681,
+              ],
+              "name": "Location 2",
+            },
+          ],
         }
       }
       hideMapMarker={[Function]}
@@ -86,22 +98,6 @@ exports[`Taui render the application container 1`] = `
           "geojson": Array [],
           "inVehicleTravelTimes": Array [],
           "isochrones": Array [],
-          "pointsOfInterest": Array [
-            Object {
-              "coordinates": Array [
-                39.7691,
-                -86.157,
-              ],
-              "name": "Location 1",
-            },
-            Object {
-              "coordinates": Array [
-                39.7681,
-                -86.158,
-              ],
-              "name": "Location 2",
-            },
-          ],
           "transitive": null,
           "transitives": Array [],
           "travelTimes": Array [],
@@ -114,6 +110,48 @@ exports[`Taui render the application container 1`] = `
           "end": Object {},
           "start": Object {},
         }
+      }
+      pointsOfInterest={
+        Array [
+          Object {
+            "feature": Object {
+              "geometry": Object {
+                "coordinates": Array [
+                  -86.157,
+                  39.7691,
+                ],
+                "type": "Point",
+              },
+              "properties": Object {
+                "label": "Location 1",
+                "marker-color": "#0b2b40",
+                "marker-size": "small",
+              },
+              "type": "Feature",
+            },
+            "label": "Location 1",
+            "value": "poi-Location 1--86.157,39.7691",
+          },
+          Object {
+            "feature": Object {
+              "geometry": Object {
+                "coordinates": Array [
+                  -86.158,
+                  39.7681,
+                ],
+                "type": "Point",
+              },
+              "properties": Object {
+                "label": "Location 2",
+                "marker-color": "#0b2b40",
+                "marker-size": "small",
+              },
+              "type": "Feature",
+            },
+            "label": "Location 2",
+            "value": "poi-Location 2--86.158,39.7681",
+          },
+        ]
       }
       setAccessibilityFor={[Function]}
       setAccessibilityToEmptyFor={[Function]}
@@ -181,7 +219,6 @@ exports[`Taui render the application container 1`] = `
           className="Fullscreen"
         >
           <Map
-            active={0}
             centerCoordinates={
               Array [
                 39.7691,
@@ -191,33 +228,52 @@ exports[`Taui render the application container 1`] = `
             clearStartAndEnd={[Function]}
             geojson={Array []}
             geojsonColor="#4269a4"
-            inVehicleTravelTimes={Array []}
-            isochrones={Array []}
             markers={Array []}
             pointsOfInterest={
               Array [
                 Object {
-                  "coordinates": Array [
-                    39.7691,
-                    -86.157,
-                  ],
-                  "name": "Location 1",
+                  "feature": Object {
+                    "geometry": Object {
+                      "coordinates": Array [
+                        -86.157,
+                        39.7691,
+                      ],
+                      "type": "Point",
+                    },
+                    "properties": Object {
+                      "label": "Location 1",
+                      "marker-color": "#0b2b40",
+                      "marker-size": "small",
+                    },
+                    "type": "Feature",
+                  },
+                  "label": "Location 1",
+                  "value": "poi-Location 1--86.157,39.7691",
                 },
                 Object {
-                  "coordinates": Array [
-                    39.7681,
-                    -86.158,
-                  ],
-                  "name": "Location 2",
+                  "feature": Object {
+                    "geometry": Object {
+                      "coordinates": Array [
+                        -86.158,
+                        39.7681,
+                      ],
+                      "type": "Point",
+                    },
+                    "properties": Object {
+                      "label": "Location 2",
+                      "marker-color": "#0b2b40",
+                      "marker-size": "small",
+                    },
+                    "type": "Feature",
+                  },
+                  "label": "Location 2",
+                  "value": "poi-Location 2--86.158,39.7681",
                 },
               ]
             }
             setEnd={[Function]}
             setStart={[Function]}
             transitive={null}
-            transitives={Array []}
-            travelTimes={Array []}
-            waitTimes={Array []}
             zoom={11}
           >
             <Map
@@ -278,12 +334,6 @@ exports[`Taui render the application container 1`] = `
                         "click": Array [
                           Object {
                             "action": [Function],
-                            "context": [Circular],
-                          },
-                        ],
-                        "zoom": Array [
-                          Object {
-                            "action": undefined,
                             "context": [Circular],
                           },
                         ],
@@ -413,7 +463,6 @@ exports[`Taui render the application container 1`] = `
                         "keyboardZoomOffset": 1,
                         "markerZoomAnimation": false,
                         "onClick": [Function],
-                        "onZoom": undefined,
                         "preferCanvas": true,
                         "scrollWheelZoom": true,
                         "tap": true,
@@ -487,12 +536,6 @@ exports[`Taui render the application container 1`] = `
                             "context": [Circular],
                           },
                         ],
-                        "zoom": Array [
-                          Object {
-                            "action": undefined,
-                            "context": [Circular],
-                          },
-                        ],
                       },
                       "_limitCenter": [Function],
                       "_limitOffset": [Function],
@@ -619,7 +662,6 @@ exports[`Taui render the application container 1`] = `
                         "keyboardZoomOffset": 1,
                         "markerZoomAnimation": false,
                         "onClick": [Function],
-                        "onZoom": undefined,
                         "preferCanvas": true,
                         "scrollWheelZoom": true,
                         "tap": true,
@@ -697,12 +739,6 @@ exports[`Taui render the application container 1`] = `
                             "context": [Circular],
                           },
                         ],
-                        "zoom": Array [
-                          Object {
-                            "action": undefined,
-                            "context": [Circular],
-                          },
-                        ],
                       },
                       "_limitCenter": [Function],
                       "_limitOffset": [Function],
@@ -829,7 +865,6 @@ exports[`Taui render the application container 1`] = `
                         "keyboardZoomOffset": 1,
                         "markerZoomAnimation": false,
                         "onClick": [Function],
-                        "onZoom": undefined,
                         "preferCanvas": true,
                         "scrollWheelZoom": true,
                         "tap": true,
@@ -903,9 +938,239 @@ exports[`Taui render the application container 1`] = `
                             "context": [Circular],
                           },
                         ],
-                        "zoom": Array [
+                      },
+                      "_limitCenter": [Function],
+                      "_limitOffset": [Function],
+                      "_limitZoom": [Function],
+                      "_moved": [Function],
+                      "_nothingToAnimate": [Function],
+                      "_onMouseClick": [Function],
+                      "_onPanTransitionEnd": [Function],
+                      "_onPanTransitionStep": [Function],
+                      "_onResize": [Function],
+                      "_onTileLayerLoad": [Function],
+                      "_onZoomTransitionEnd": [Function],
+                      "_panInsideMaxBounds": [Function],
+                      "_rawPanBy": [Function],
+                      "_rebound": [Function],
+                      "_resetView": [Function],
+                      "_tryAnimatedPan": [Function],
+                      "_tryAnimatedZoom": [Function],
+                      "_updateCanvasViewport": [Function],
+                      "_updatePathViewport": [Function],
+                      "_updateSvgViewport": [Function],
+                      "_updateZoomLevels": [Function],
+                      "_zoom": 11,
+                      "addControl": [Function],
+                      "addEventListener": [Function],
+                      "addHandler": [Function],
+                      "addLayer": [Function],
+                      "addOneTimeEventListener": [Function],
+                      "callInitHooks": [Function],
+                      "clearAllEventListeners": [Function],
+                      "closePopup": [Function],
+                      "containerPointToLatLng": [Function],
+                      "containerPointToLayerPoint": [Function],
+                      "eachLayer": [Function],
+                      "fire": [Function],
+                      "fireEvent": [Function],
+                      "fitBounds": [Function],
+                      "fitWorld": [Function],
+                      "getBounds": [Function],
+                      "getBoundsZoom": [Function],
+                      "getCenter": [Function],
+                      "getContainer": [Function],
+                      "getMaxZoom": [Function],
+                      "getMinZoom": [Function],
+                      "getPanes": [Function],
+                      "getPixelBounds": [Function],
+                      "getPixelOrigin": [Function],
+                      "getScaleZoom": [Function],
+                      "getSize": [Function],
+                      "getZoom": [Function],
+                      "getZoomScale": [Function],
+                      "hasEventListeners": [Function],
+                      "hasLayer": [Function],
+                      "initialize": [Function],
+                      "invalidateSize": [Function],
+                      "latLngToContainerPoint": [Function],
+                      "latLngToLayerPoint": [Function],
+                      "layerPointToContainerPoint": [Function],
+                      "layerPointToLatLng": [Function],
+                      "locate": [Function],
+                      "mouseEventToContainerPoint": [Function],
+                      "mouseEventToLatLng": [Function],
+                      "mouseEventToLayerPoint": [Function],
+                      "off": [Function],
+                      "on": [Function],
+                      "once": [Function],
+                      "openPopup": [Function],
+                      "options": Object {
+                        "animate": false,
+                        "attributionControl": true,
+                        "bounceAtZoomLimits": true,
+                        "boxZoom": true,
+                        "center": Array [
+                          39.7691,
+                          -86.157,
+                        ],
+                        "closePopupOnClick": true,
+                        "crs": Object {
+                          "Simple": Object {
+                            "getSize": [Function],
+                            "latLngToPoint": [Function],
+                            "pointToLatLng": [Function],
+                            "project": [Function],
+                            "projection": Object {
+                              "project": [Function],
+                              "unproject": [Function],
+                            },
+                            "scale": [Function],
+                            "transformation": Object {
+                              "_a": 1,
+                              "_b": 0,
+                              "_c": -1,
+                              "_d": 0,
+                            },
+                          },
+                          "code": "EPSG:3857",
+                          "getSize": [Function],
+                          "latLngToPoint": [Function],
+                          "pointToLatLng": [Function],
+                          "project": [Function],
+                          "projection": Object {
+                            "MAX_LATITUDE": 85.0511287798,
+                            "project": [Function],
+                            "unproject": [Function],
+                          },
+                          "scale": [Function],
+                          "transformation": Object {
+                            "_a": 0.15915494309189535,
+                            "_b": 0.5,
+                            "_c": -0.15915494309189535,
+                            "_d": 0.5,
+                          },
+                        },
+                        "doubleClickZoom": true,
+                        "dragging": true,
+                        "easeLinearity": 0.25,
+                        "fadeAnimation": true,
+                        "inertia": true,
+                        "inertiaDeceleration": 3400,
+                        "inertiaMaxSpeed": Infinity,
+                        "inertiaThreshold": 18,
+                        "keyboard": true,
+                        "keyboardPanOffset": 80,
+                        "keyboardZoomOffset": 1,
+                        "markerZoomAnimation": false,
+                        "onClick": [Function],
+                        "preferCanvas": true,
+                        "scrollWheelZoom": true,
+                        "tap": true,
+                        "tapTolerance": 15,
+                        "touchZoom": undefined,
+                        "trackResize": true,
+                        "worldCopyJump": false,
+                        "zoom": 11,
+                        "zoomAnimation": true,
+                        "zoomAnimationThreshold": 4,
+                        "zoomControl": false,
+                      },
+                      "panBy": [Function],
+                      "panInsideBounds": [Function],
+                      "panTo": [Function],
+                      "project": [Function],
+                      "remove": [Function],
+                      "removeControl": [Function],
+                      "removeEventListener": [Function],
+                      "removeLayer": [Function],
+                      "setMaxBounds": [Function],
+                      "setView": [Function],
+                      "setZoom": [Function],
+                      "setZoomAround": [Function],
+                      "stopLocate": [Function],
+                      "unproject": [Function],
+                      "whenReady": [Function],
+                      "zoomIn": [Function],
+                      "zoomOut": [Function],
+                    }
+                  }
+                  url="null"
+                />
+                <MapboxGeoJson
+                  data={
+                    Array [
+                      Object {
+                        "geometry": Object {
+                          "coordinates": Array [
+                            -86.157,
+                            39.7691,
+                          ],
+                          "type": "Point",
+                        },
+                        "properties": Object {
+                          "label": "Location 1",
+                          "marker-color": "#0b2b40",
+                          "marker-size": "small",
+                        },
+                        "type": "Feature",
+                      },
+                      Object {
+                        "geometry": Object {
+                          "coordinates": Array [
+                            -86.158,
+                            39.7681,
+                          ],
+                          "type": "Point",
+                        },
+                        "properties": Object {
+                          "label": "Location 2",
+                          "marker-color": "#0b2b40",
+                          "marker-size": "small",
+                        },
+                        "type": "Feature",
+                      },
+                    ]
+                  }
+                  layerContainer={
+                    MapMock {
+                      "_addLayers": [Function],
+                      "_animatePathZoom": [Function],
+                      "_animateZoom": [Function],
+                      "_catchTransitionEnd": [Function],
+                      "_checkIfLoaded": [Function],
+                      "_clearControlPos": [Function],
+                      "_clearHandlers": [Function],
+                      "_clearPanes": [Function],
+                      "_container": "map1",
+                      "_createPane": [Function],
+                      "_endPathZoom": [Function],
+                      "_fireMouseEvent": [Function],
+                      "_getBoundsOffset": [Function],
+                      "_getCenterLayerPoint": [Function],
+                      "_getCenterOffset": [Function],
+                      "_getMapPanePos": [Function],
+                      "_getNewTopLeftPoint": [Function],
+                      "_getTopLeftPoint": [Function],
+                      "_getZoomSpan": [Function],
+                      "_handleGeolocationError": [Function],
+                      "_handleGeolocationResponse": [Function],
+                      "_initContainer": [Function],
+                      "_initControlPos": [Function],
+                      "_initEvents": [Function],
+                      "_initLayout": [Function],
+                      "_initPanes": [Function],
+                      "_initPathRoot": [Function],
+                      "_initialCenter": Object {
+                        "lat": 39.7691,
+                        "lng": -86.157,
+                      },
+                      "_latLngToNewLayerPoint": [Function],
+                      "_layerAdd": [Function],
+                      "_leaflet_events": Object {
+                        "click": Array [
                           Object {
-                            "action": undefined,
+                            "action": [Function],
                             "context": [Circular],
                           },
                         ],
@@ -1035,7 +1300,6 @@ exports[`Taui render the application container 1`] = `
                         "keyboardZoomOffset": 1,
                         "markerZoomAnimation": false,
                         "onClick": [Function],
-                        "onZoom": undefined,
                         "preferCanvas": true,
                         "scrollWheelZoom": true,
                         "tap": true,
@@ -1067,8 +1331,215 @@ exports[`Taui render the application container 1`] = `
                       "zoomOut": [Function],
                     }
                   }
-                  url="null"
-                />
+                  map={
+                    MapMock {
+                      "_addLayers": [Function],
+                      "_animatePathZoom": [Function],
+                      "_animateZoom": [Function],
+                      "_catchTransitionEnd": [Function],
+                      "_checkIfLoaded": [Function],
+                      "_clearControlPos": [Function],
+                      "_clearHandlers": [Function],
+                      "_clearPanes": [Function],
+                      "_container": "map1",
+                      "_createPane": [Function],
+                      "_endPathZoom": [Function],
+                      "_fireMouseEvent": [Function],
+                      "_getBoundsOffset": [Function],
+                      "_getCenterLayerPoint": [Function],
+                      "_getCenterOffset": [Function],
+                      "_getMapPanePos": [Function],
+                      "_getNewTopLeftPoint": [Function],
+                      "_getTopLeftPoint": [Function],
+                      "_getZoomSpan": [Function],
+                      "_handleGeolocationError": [Function],
+                      "_handleGeolocationResponse": [Function],
+                      "_initContainer": [Function],
+                      "_initControlPos": [Function],
+                      "_initEvents": [Function],
+                      "_initLayout": [Function],
+                      "_initPanes": [Function],
+                      "_initPathRoot": [Function],
+                      "_initialCenter": Object {
+                        "lat": 39.7691,
+                        "lng": -86.157,
+                      },
+                      "_latLngToNewLayerPoint": [Function],
+                      "_layerAdd": [Function],
+                      "_leaflet_events": Object {
+                        "click": Array [
+                          Object {
+                            "action": [Function],
+                            "context": [Circular],
+                          },
+                        ],
+                      },
+                      "_limitCenter": [Function],
+                      "_limitOffset": [Function],
+                      "_limitZoom": [Function],
+                      "_moved": [Function],
+                      "_nothingToAnimate": [Function],
+                      "_onMouseClick": [Function],
+                      "_onPanTransitionEnd": [Function],
+                      "_onPanTransitionStep": [Function],
+                      "_onResize": [Function],
+                      "_onTileLayerLoad": [Function],
+                      "_onZoomTransitionEnd": [Function],
+                      "_panInsideMaxBounds": [Function],
+                      "_rawPanBy": [Function],
+                      "_rebound": [Function],
+                      "_resetView": [Function],
+                      "_tryAnimatedPan": [Function],
+                      "_tryAnimatedZoom": [Function],
+                      "_updateCanvasViewport": [Function],
+                      "_updatePathViewport": [Function],
+                      "_updateSvgViewport": [Function],
+                      "_updateZoomLevels": [Function],
+                      "_zoom": 11,
+                      "addControl": [Function],
+                      "addEventListener": [Function],
+                      "addHandler": [Function],
+                      "addLayer": [Function],
+                      "addOneTimeEventListener": [Function],
+                      "callInitHooks": [Function],
+                      "clearAllEventListeners": [Function],
+                      "closePopup": [Function],
+                      "containerPointToLatLng": [Function],
+                      "containerPointToLayerPoint": [Function],
+                      "eachLayer": [Function],
+                      "fire": [Function],
+                      "fireEvent": [Function],
+                      "fitBounds": [Function],
+                      "fitWorld": [Function],
+                      "getBounds": [Function],
+                      "getBoundsZoom": [Function],
+                      "getCenter": [Function],
+                      "getContainer": [Function],
+                      "getMaxZoom": [Function],
+                      "getMinZoom": [Function],
+                      "getPanes": [Function],
+                      "getPixelBounds": [Function],
+                      "getPixelOrigin": [Function],
+                      "getScaleZoom": [Function],
+                      "getSize": [Function],
+                      "getZoom": [Function],
+                      "getZoomScale": [Function],
+                      "hasEventListeners": [Function],
+                      "hasLayer": [Function],
+                      "initialize": [Function],
+                      "invalidateSize": [Function],
+                      "latLngToContainerPoint": [Function],
+                      "latLngToLayerPoint": [Function],
+                      "layerPointToContainerPoint": [Function],
+                      "layerPointToLatLng": [Function],
+                      "locate": [Function],
+                      "mouseEventToContainerPoint": [Function],
+                      "mouseEventToLatLng": [Function],
+                      "mouseEventToLayerPoint": [Function],
+                      "off": [Function],
+                      "on": [Function],
+                      "once": [Function],
+                      "openPopup": [Function],
+                      "options": Object {
+                        "animate": false,
+                        "attributionControl": true,
+                        "bounceAtZoomLimits": true,
+                        "boxZoom": true,
+                        "center": Array [
+                          39.7691,
+                          -86.157,
+                        ],
+                        "closePopupOnClick": true,
+                        "crs": Object {
+                          "Simple": Object {
+                            "getSize": [Function],
+                            "latLngToPoint": [Function],
+                            "pointToLatLng": [Function],
+                            "project": [Function],
+                            "projection": Object {
+                              "project": [Function],
+                              "unproject": [Function],
+                            },
+                            "scale": [Function],
+                            "transformation": Object {
+                              "_a": 1,
+                              "_b": 0,
+                              "_c": -1,
+                              "_d": 0,
+                            },
+                          },
+                          "code": "EPSG:3857",
+                          "getSize": [Function],
+                          "latLngToPoint": [Function],
+                          "pointToLatLng": [Function],
+                          "project": [Function],
+                          "projection": Object {
+                            "MAX_LATITUDE": 85.0511287798,
+                            "project": [Function],
+                            "unproject": [Function],
+                          },
+                          "scale": [Function],
+                          "transformation": Object {
+                            "_a": 0.15915494309189535,
+                            "_b": 0.5,
+                            "_c": -0.15915494309189535,
+                            "_d": 0.5,
+                          },
+                        },
+                        "doubleClickZoom": true,
+                        "dragging": true,
+                        "easeLinearity": 0.25,
+                        "fadeAnimation": true,
+                        "inertia": true,
+                        "inertiaDeceleration": 3400,
+                        "inertiaMaxSpeed": Infinity,
+                        "inertiaThreshold": 18,
+                        "keyboard": true,
+                        "keyboardPanOffset": 80,
+                        "keyboardZoomOffset": 1,
+                        "markerZoomAnimation": false,
+                        "onClick": [Function],
+                        "preferCanvas": true,
+                        "scrollWheelZoom": true,
+                        "tap": true,
+                        "tapTolerance": 15,
+                        "touchZoom": undefined,
+                        "trackResize": true,
+                        "worldCopyJump": false,
+                        "zoom": 11,
+                        "zoomAnimation": true,
+                        "zoomAnimationThreshold": 4,
+                        "zoomControl": false,
+                      },
+                      "panBy": [Function],
+                      "panInsideBounds": [Function],
+                      "panTo": [Function],
+                      "project": [Function],
+                      "remove": [Function],
+                      "removeControl": [Function],
+                      "removeEventListener": [Function],
+                      "removeLayer": [Function],
+                      "setMaxBounds": [Function],
+                      "setView": [Function],
+                      "setZoom": [Function],
+                      "setZoomAround": [Function],
+                      "stopLocate": [Function],
+                      "unproject": [Function],
+                      "whenReady": [Function],
+                      "zoomIn": [Function],
+                      "zoomOut": [Function],
+                    }
+                  }
+                  onClick={[Function]}
+                >
+                  <div
+                    style={
+                      Object {
+                        "display": "none",
+                      }
+                    }
+                  />
+                </MapboxGeoJson>
               </div>
             </Map>
           </Map>
@@ -1093,26 +1564,68 @@ exports[`Taui render the application container 1`] = `
               IndyConnect
             </div>
             <Component
-              geocoder={
+              boundary={
                 Object {
-                  "boundary": Object {
-                    "country": "us",
-                    "rect": Object {
-                      "maxLat": 40.271143686084194,
-                      "maxLon": -85.462646484375,
-                      "minLat": 39.35978526869001,
-                      "minLon": -86.8524169921875,
-                    },
+                  "country": "us",
+                  "rect": Object {
+                    "maxLat": 40.271143686084194,
+                    "maxLon": -85.462646484375,
+                    "minLat": 39.35978526869001,
+                    "minLon": -86.8524169921875,
                   },
-                  "focusLatlng": Object {
-                    "lat": 39.7691,
-                    "lng": -86.157,
-                  },
+                }
+              }
+              focusLatlng={
+                Object {
+                  "lat": 39.7691,
+                  "lng": -86.157,
                 }
               }
               onChangeEnd={[Function]}
               onChangeStart={[Function]}
               onTimeCutoffChange={[Function]}
+              pointsOfInterest={
+                Array [
+                  Object {
+                    "feature": Object {
+                      "geometry": Object {
+                        "coordinates": Array [
+                          -86.157,
+                          39.7691,
+                        ],
+                        "type": "Point",
+                      },
+                      "properties": Object {
+                        "label": "Location 1",
+                        "marker-color": "#0b2b40",
+                        "marker-size": "small",
+                      },
+                      "type": "Feature",
+                    },
+                    "label": "Location 1",
+                    "value": "poi-Location 1--86.157,39.7691",
+                  },
+                  Object {
+                    "feature": Object {
+                      "geometry": Object {
+                        "coordinates": Array [
+                          -86.158,
+                          39.7681,
+                        ],
+                        "type": "Point",
+                      },
+                      "properties": Object {
+                        "label": "Location 2",
+                        "marker-color": "#0b2b40",
+                        "marker-size": "small",
+                      },
+                      "type": "Feature",
+                    },
+                    "label": "Location 2",
+                    "value": "poi-Location 2--86.158,39.7681",
+                  },
+                ]
+              }
               selectedTimeCutoff={60}
             >
               <div>
@@ -1148,6 +1661,48 @@ exports[`Taui render the application container 1`] = `
                     }
                     name="start-address"
                     onChange={[Function]}
+                    options={
+                      Array [
+                        Object {
+                          "feature": Object {
+                            "geometry": Object {
+                              "coordinates": Array [
+                                -86.157,
+                                39.7691,
+                              ],
+                              "type": "Point",
+                            },
+                            "properties": Object {
+                              "label": "Location 1",
+                              "marker-color": "#0b2b40",
+                              "marker-size": "small",
+                            },
+                            "type": "Feature",
+                          },
+                          "label": "Location 1",
+                          "value": "poi-Location 1--86.157,39.7691",
+                        },
+                        Object {
+                          "feature": Object {
+                            "geometry": Object {
+                              "coordinates": Array [
+                                -86.158,
+                                39.7681,
+                              ],
+                              "type": "Point",
+                            },
+                            "properties": Object {
+                              "label": "Location 2",
+                              "marker-color": "#0b2b40",
+                              "marker-size": "small",
+                            },
+                            "type": "Feature",
+                          },
+                          "label": "Location 2",
+                          "value": "poi-Location 2--86.158,39.7681",
+                        },
+                      ]
+                    }
                     placeholder="Start"
                     reverseSearch={[Function]}
                     search={[Function]}
@@ -1187,7 +1742,48 @@ exports[`Taui render the application container 1`] = `
                       minimumInput={3}
                       name="start-address"
                       onChange={[Function]}
-                      options={Array []}
+                      options={
+                        Array [
+                          Object {
+                            "feature": Object {
+                              "geometry": Object {
+                                "coordinates": Array [
+                                  -86.157,
+                                  39.7691,
+                                ],
+                                "type": "Point",
+                              },
+                              "properties": Object {
+                                "label": "Location 1",
+                                "marker-color": "#0b2b40",
+                                "marker-size": "small",
+                              },
+                              "type": "Feature",
+                            },
+                            "label": "Location 1",
+                            "value": "poi-Location 1--86.157,39.7691",
+                          },
+                          Object {
+                            "feature": Object {
+                              "geometry": Object {
+                                "coordinates": Array [
+                                  -86.158,
+                                  39.7681,
+                                ],
+                                "type": "Point",
+                              },
+                              "properties": Object {
+                                "label": "Location 2",
+                                "marker-color": "#0b2b40",
+                                "marker-size": "small",
+                              },
+                              "type": "Feature",
+                            },
+                            "label": "Location 2",
+                            "value": "poi-Location 2--86.158,39.7681",
+                          },
+                        ]
+                      }
                       placeholder="Start"
                       reverseSearch={[Function]}
                       search={[Function]}
@@ -1256,7 +1852,48 @@ exports[`Taui render the application container 1`] = `
                         onInputChange={[Function]}
                         openAfterFocus={false}
                         optionComponent={[Function]}
-                        options={Array []}
+                        options={
+                          Array [
+                            Object {
+                              "feature": Object {
+                                "geometry": Object {
+                                  "coordinates": Array [
+                                    -86.157,
+                                    39.7691,
+                                  ],
+                                  "type": "Point",
+                                },
+                                "properties": Object {
+                                  "label": "Location 1",
+                                  "marker-color": "#0b2b40",
+                                  "marker-size": "small",
+                                },
+                                "type": "Feature",
+                              },
+                              "label": "Location 1",
+                              "value": "poi-Location 1--86.157,39.7691",
+                            },
+                            Object {
+                              "feature": Object {
+                                "geometry": Object {
+                                  "coordinates": Array [
+                                    -86.158,
+                                    39.7681,
+                                  ],
+                                  "type": "Point",
+                                },
+                                "properties": Object {
+                                  "label": "Location 2",
+                                  "marker-color": "#0b2b40",
+                                  "marker-size": "small",
+                                },
+                                "type": "Feature",
+                              },
+                              "label": "Location 2",
+                              "value": "poi-Location 2--86.158,39.7681",
+                            },
+                          ]
+                        }
                         pageSize={5}
                         placeholder="Start"
                         required={false}

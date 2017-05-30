@@ -1,6 +1,5 @@
 // @flow
 import {Browser, LatLng} from 'leaflet'
-import {mapbox} from 'mapbox.js'
 import React, {PureComponent} from 'react'
 import {
   GeoJson,
@@ -210,11 +209,12 @@ export default class Map extends PureComponent<void, Props, State> {
   }
 }
 
-mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
 class MapboxGeoJson extends GeoJson {
   componentWillMount () {
+    const {mapbox} = require('mapbox.js')
     super.componentWillMount()
     const {data} = this.props
+    mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
     this.leafletElement = mapbox.featureLayer(data)
   }
 }
