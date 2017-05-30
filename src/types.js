@@ -127,7 +127,7 @@ export type InputEvent = Event & {
 
 export type MapEvent = {
   latlng?: Coordinate,
-  currentTarget: {
+  target: {
     _latlng: Coordinate
   }
 }

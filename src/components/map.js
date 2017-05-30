@@ -58,7 +58,7 @@ export default class Map extends PureComponent<void, Props, State> {
     lastClickedLatlng: null
   }
 
-  _clearState () {
+  _clearState (): void {
     this.setState({
       showSelectStartOrEnd: false,
       lastClickedLabel: null,
@@ -66,34 +66,34 @@ export default class Map extends PureComponent<void, Props, State> {
     })
   }
 
-  _clearStartAndEnd = () => {
+  _clearStartAndEnd = (): void => {
     const {clearStartAndEnd} = this.props
     clearStartAndEnd()
     this._clearState()
   }
 
-  _onMapClick = (e: MapEvent) => {
+  _onMapClick = (e: MapEvent): void => {
     this.setState({
       showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
       lastClickedLatlng: e.latlng
     })
   }
 
-  _setEnd = () => {
+  _setEnd = (): void => {
     const {setEnd} = this.props
     const {lastClickedLatlng} = this.state
     setEnd({latlng: lastClickedLatlng})
     this._clearState()
   }
 
-  _setStart = () => {
+  _setStart = (): void => {
     const {setStart} = this.props
     const {lastClickedLatlng} = this.state
     setStart({latlng: lastClickedLatlng})
     this._clearState()
   }
 
-  _clickPoi = (event: Event & {layer: {feature: Feature}}) => {
+  _clickPoi = (event: Event & {layer: {feature: Feature}}): void => {
     if (!event.layer || !event.layer.feature) {
       return this._clearState()
     }
@@ -107,7 +107,7 @@ export default class Map extends PureComponent<void, Props, State> {
     })
   }
 
-  render () {
+  render (): React$Element<LeafletMap> {
     const {
       centerCoordinates,
       geojson,

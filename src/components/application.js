@@ -1,6 +1,7 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
 import isEqual from 'lodash/isEqual'
+import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
 
 import Form from './form'
@@ -24,6 +25,7 @@ import type {
 } from '../types'
 
 type Props = {
+  accessibilityKeys: string[],
   actionLog: LogItems,
   browsochrones: BrowsochronesStore,
   destinations: Accessibility[],
@@ -31,6 +33,7 @@ type Props = {
   mapMarkers: any,
   map: any,
   pointsOfInterest: PointsOfInterest,
+  showComparison: boolean,
   timeCutoff: any,
   ui: UIStore,
 
@@ -133,7 +136,7 @@ export default class Application extends Component<void, Props, State> {
   }
 
   _setStartWithEvent = (event: MapEvent) => {
-    this._setStart({latlng: event.latlng || event.currentTarget._latlng})
+    this._setStart({latlng: event.latlng || event.target._latlng})
   }
 
   _setStartWithFeature = (feature: PointFeature) => {
@@ -167,7 +170,7 @@ export default class Application extends Component<void, Props, State> {
   }
 
   _setEndWithEvent = (event: MapEvent) => {
-    this._setEnd({latlng: event.latlng || event.currentTarget._latlng})
+    this._setEnd({latlng: event.latlng || event.target._latlng})
   }
 
   _setEndWithFeature = (feature: PointFeature) => {
@@ -193,16 +196,20 @@ export default class Application extends Component<void, Props, State> {
     })
   }
 
+  _setActiveBrowsochronesInstance = memoize((index) => () =>
+    this.props.setActiveBrowsochronesInstance(index))
+
   count = 0
   render () {
     const {
+      accessibilityKeys,
       actionLog,
       browsochrones,
       destinations,
       geocoder,
       map,
       pointsOfInterest,
-      setActiveBrowsochronesInstance,
+      showComparison,
       timeCutoff,
       ui
     } = this.props
@@ -247,12 +254,14 @@ export default class Application extends Component<void, Props, State> {
             {destinations.map((accessibility, index) => (
               <RouteCard
                 accessibility={accessibility.accessibility}
+                accessibilityKeys={accessibilityKeys}
                 active={browsochrones.active === index}
                 alternate={index !== 0}
                 key={`${index}-route-card`}
                 oldAccessibility={destinations[0].accessibility}
                 oldTravelTime={map.travelTimes[0]}
-                onClick={() => setActiveBrowsochronesInstance(index)}
+                onClick={this._setActiveBrowsochronesInstance(index)}
+                showComparison={showComparison}
                 transitiveData={map.transitives[index]}
                 travelTime={map.travelTimes[index]}
                 waitTime={map.waitTimes[index]}

@@ -13,10 +13,12 @@ type Props = {
   active: boolean,
   alternate: boolean,
   accessibility: any,
+  accessibilityKeys: string[],
   children?: any,
   oldAccessibility: any,
   oldTravelTime: number,
   onClick(): void,
+  showComparison: boolean,
   transitiveData: any,
   travelTime: number,
   waitTime: number
@@ -27,10 +29,12 @@ export default (props: Props) => {
     active,
     alternate,
     accessibility,
+    accessibilityKeys,
     children,
     oldAccessibility,
     oldTravelTime,
     onClick,
+    showComparison,
     transitiveData,
     travelTime,
     waitTime
@@ -39,8 +43,6 @@ export default (props: Props) => {
     'Card' +
     (alternate ? ' Card-alternate' : '') +
     (active ? ' Card-active' : '')
-  const accessibilityKeys = Object.keys(accessibility)
-  const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
 
   return (
     <div className={className}>
@@ -57,13 +59,13 @@ export default (props: Props) => {
         </span>
       </a>
       <div className='CardContent'>
-        {comparisonAccessibilityKeys.length > 0
-          ? <ShowAccess keys={accessibilityKeys} base={accessibility} />
-          : <ShowDiff
+        {showComparison
+          ? <ShowDiff
             keys={accessibilityKeys}
             base={accessibility}
             comparison={oldAccessibility}
-            />}
+            />
+          : <ShowAccess keys={accessibilityKeys} base={accessibility} />}
         {accessibility !== ACCESSIBILITY_IS_EMPTY &&
           accessibility !== ACCESSIBILITY_IS_LOADING &&
           <Journeys
@@ -233,7 +235,12 @@ function MetricIcon ({name}) {
   return <span />
 }
 
-function ShowAccess ({keys, base}) {
+function ShowAccess ({keys, base}: {
+  keys: string[],
+  base: {
+    [name: string]: number
+  }
+}) {
   return (
     <div className='CardAccess'>
       <div className='heading'>{messages.Systems.AccessTitle}</div>
