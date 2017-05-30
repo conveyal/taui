@@ -26,6 +26,7 @@ exports[`Taui render the application container 1`] = `
     }
   >
     <Application
+      accessibilityKeys={Array []}
       addActionLogItem={[Function]}
       browsochrones={
         Object {
@@ -88,6 +89,7 @@ exports[`Taui render the application container 1`] = `
       }
       hideMapMarker={[Function]}
       initializeBrowsochrones={[Function]}
+      journeys={Array []}
       map={
         Object {
           "active": 0,
@@ -166,6 +168,7 @@ exports[`Taui render the application container 1`] = `
       setSelectedTimeCutoff={[Function]}
       setStart={[Function]}
       setStartLabel={[Function]}
+      showComparison={false}
       showMapMarker={[Function]}
       store={
         Object {
