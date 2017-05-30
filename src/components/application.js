@@ -30,6 +30,7 @@ type Props = {
   browsochrones: BrowsochronesStore,
   destinations: Accessibility[],
   geocoder: GeocoderStore,
+  journeys: any[],
   mapMarkers: any,
   map: any,
   pointsOfInterest: PointsOfInterest,
@@ -207,6 +208,7 @@ export default class Application extends Component<void, Props, State> {
       browsochrones,
       destinations,
       geocoder,
+      journeys,
       map,
       pointsOfInterest,
       showComparison,
@@ -258,11 +260,11 @@ export default class Application extends Component<void, Props, State> {
                 active={browsochrones.active === index}
                 alternate={index !== 0}
                 key={`${index}-route-card`}
+                journeys={journeys[index]}
                 oldAccessibility={destinations[0].accessibility}
                 oldTravelTime={map.travelTimes[0]}
                 onClick={this._setActiveBrowsochronesInstance(index)}
                 showComparison={showComparison}
-                transitiveData={map.transitives[index]}
                 travelTime={map.travelTimes[index]}
                 waitTime={map.waitTimes[index]}
               >

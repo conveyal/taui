@@ -1,9 +1,6 @@
 // @flow
-import Color from 'color'
 import React from 'react'
-import toCapitalCase from 'lodash/capitalize'
 import toSpaceCase from 'lodash/lowerCase'
-import unique from 'lodash/uniq'
 
 import {ACCESSIBILITY_IS_EMPTY, ACCESSIBILITY_IS_LOADING} from '../constants'
 import Icon from './icon'
@@ -15,11 +12,11 @@ type Props = {
   accessibility: any,
   accessibilityKeys: string[],
   children?: any,
+  journeys: any[],
   oldAccessibility: any,
   oldTravelTime: number,
   onClick(): void,
   showComparison: boolean,
-  transitiveData: any,
   travelTime: number,
   waitTime: number
 }
@@ -31,11 +28,11 @@ export default (props: Props) => {
     accessibility,
     accessibilityKeys,
     children,
+    journeys,
     oldAccessibility,
     oldTravelTime,
     onClick,
     showComparison,
-    transitiveData,
     travelTime,
     waitTime
   } = props
@@ -55,7 +52,7 @@ export default (props: Props) => {
         {children}
         <span className='pull-right'>
           {active && <Icon type='map' />}
-          {!active && 'show'}
+          {!active && messages.Systems.Show}
         </span>
       </a>
       <div className='CardContent'>
@@ -69,9 +66,9 @@ export default (props: Props) => {
         {accessibility !== ACCESSIBILITY_IS_EMPTY &&
           accessibility !== ACCESSIBILITY_IS_LOADING &&
           <Journeys
+            journeys={journeys}
             oldTravelTime={oldTravelTime}
             travelTime={travelTime}
-            transitiveData={transitiveData}
             waitTime={waitTime}
           />}
       </div>
@@ -110,8 +107,8 @@ function TripDiff ({oldTravelTime, travelTime}) {
   }
 }
 
-function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
-  if (!travelTime || !transitiveData) {
+function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
+  if (!travelTime || !journeys) {
     return (
       <div className='CardJourneys'>
         <div className='heading'>{messages.Systems.TripsTitle}</div>
@@ -119,8 +116,6 @@ function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
       </div>
     )
   }
-
-  const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
     return (
@@ -131,33 +126,7 @@ function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
     )
   }
 
-  const [
-    bestTripSegments,
-    ...alternateTripSegments
-  ] = journeys.map((segments, jindex) => {
-    return segments.map((s, sindex) => {
-      return (
-        <span
-          className='CardSegment'
-          key={`journey-${jindex}-segment-${sindex}`}
-          style={{
-            backgroundColor: s.backgroundColor || 'inherit',
-            color: s.color || 'inherit'
-          }}
-        >
-          <i className={`fa fa-${s.type}`} /> {s.name}
-        </span>
-      )
-    })
-  })
-
-  const alternateTrips = alternateTripSegments.map((segments, jindex) => {
-    return (
-      <div className='Trip' key={`journey-${jindex}`}>
-        <span className='CardIndex'>{jindex + 1}.</span>{segments}
-      </div>
-    )
-  })
+  const [bestJourney, ...alternateJourneys] = journeys
 
   return (
     <div>
@@ -176,55 +145,33 @@ function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
           {' '}
           {messages.Systems.Waiting}
         </div>
-        <div>{bestTripSegments}</div>
+        <div>{bestJourney.map((segment, index) =>
+          <Segment key={index} segment={segment} />)}</div>
       </div>
-      {alternateTrips.length > 0 &&
+      {journeys.length > 1 &&
         <div>
           <div className='heading'>{messages.Systems.AlternateTripsTitle}</div>
-          <div className='Trips'>{alternateTrips}</div>
+          <div className='Trips'>{alternateJourneys.map((segments, jindex) =>
+            <div className='Trip' key={jindex}>
+              <span className='CardIndex'>{jindex + 1}.</span>{segments.map((segment, index) =>
+                <Segment key={index} segment={segment} />)}
+            </div>
+          )}</div>
         </div>}
     </div>
   )
 }
 
-// TODO: filter journeys that have same pattern id sequences
-function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
-  return journeys.map(j => {
-    return j.segments.filter(s => !!s.pattern_id || !!s.patterns).map(s => {
-      const pid = s.pattern_id || s.patterns[0].pattern_id
-      const seg = {}
-      const route = findRouteForPattern({id: pid, patterns, routes})
-      const color = route.route_color
-        ? Color(`#${route.route_color}`)
-        : Color('#0b2b40')
-      seg.name = toCapitalCase(route.route_short_name)
-
-      if (s.patterns && s.patterns.length > 0) {
-        const patternNames = s.patterns.map(p =>
-          toCapitalCase(
-            findRouteForPattern({id: p.pattern_id, patterns, routes})
-              .route_short_name
-          )
-        )
-        seg.name = unique(patternNames).join(' / ')
-      }
-
-      seg.backgroundColor = color.string()
-      seg.color = color.light() ? '#000' : '#fff'
-      seg.type = typeToIcon[route.route_type]
-
-      return seg
-    })
-  })
-}
-
-function findRouteForPattern ({id, patterns, routes}) {
-  return routes.find(
-    r => r.route_id === patterns.find(p => p.pattern_id === id).route_id
-  )
-}
-
-const typeToIcon = ['subway', 'subway', 'train', 'bus']
+const Segment = ({segment}) =>
+  <span
+    className='CardSegment'
+    style={{
+      backgroundColor: segment.backgroundColor || 'inherit',
+      color: segment.color || 'inherit'
+    }}
+  >
+    <i className={`fa fa-${segment.type}`} /> {segment.name}
+  </span>
 
 function MetricIcon ({name}) {
   const lc = name.toLowerCase()
