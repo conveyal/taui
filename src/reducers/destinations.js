@@ -1,45 +1,40 @@
+// @flow
 import {handleActions} from 'redux-actions'
 
-export default handleActions({
-  'set accessibility' (state, action) {
-    return Object.assign({}, state, {accessibility: action.payload})
-  },
-  'set accessibility for' (state, {payload}) {
-    const {accessibility, name} = payload
-    return {
-      ...state,
-      accessibility: {
-        ...state.accessibility,
-        [`${name}`]: accessibility
+import {ACCESSIBILITY_IS_EMPTY, ACCESSIBILITY_IS_LOADING} from '../constants'
+
+export default handleActions(
+  {
+    'set accessibility for' (state, {payload}) {
+      const accessibility = [...state]
+      accessibility[payload.index] = {
+        accessibility: payload.accessibility,
+        name: payload.name
       }
+      return accessibility
+    },
+    'set accessibility to empty for' (state, {payload}) {
+      const accessibility = [...state]
+      accessibility[payload.index] = {
+        accessibility: ACCESSIBILITY_IS_EMPTY,
+        name: payload.name
+      }
+      return accessibility
+    },
+    'set accessibility to loading for' (state, {payload}) {
+      const accessibility = [...state]
+      accessibility[payload.index] = {
+        accessibility: ACCESSIBILITY_IS_LOADING,
+        name: payload.name
+      }
+      return accessibility
+    },
+    'clear start' (state, action) {
+      return state.map(a => ({
+        accessibility: ACCESSIBILITY_IS_EMPTY,
+        name: a.name
+      }))
     }
   },
-  'clear start' (state, action) {
-    return {
-      ...state,
-      accessibility: {
-        base: null,
-        comparison: null
-      }
-    }
-  },
-  'update selected destination' (state, action) {
-    return {...state, selected: action.payload}
-  }
-}, {
-  accessibility: {
-    base: null,
-    comparison: null
-  },
-  selected: 'none',
-  sets: [{
-    label: 'None',
-    value: 'none'
-  }, {
-    label: 'Jobs',
-    value: 'Jobs_total'
-  }, {
-    label: 'Workers',
-    value: 'Workers_total'
-  }]
-})
+  []
+)

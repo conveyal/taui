@@ -1,4 +1,20 @@
+// @flow
 import L from 'leaflet'
+
+type IconOptions = {
+  iconSize?: [number, number],
+  iconAnchor?: [number, number],
+  popupAnchor?: [number, number],
+  shadowAnchor?: [number, number],
+  shadowSize?: [number, number],
+  className?: string,
+  prefix?: string,
+  spinClass?: string,
+  extraClasses?: string,
+  icon?: string,
+  markerColor?: string,
+  iconColor?: string
+}
 
 const Icon = L.Icon.extend({
   options: {
@@ -29,7 +45,8 @@ const Icon = L.Icon.extend({
     }
 
     if (options.bgPos) {
-      div.style.backgroundPosition = (-options.bgPos.x) + 'px ' + (-options.bgPos.y) + 'px'
+      div.style.backgroundPosition =
+        -options.bgPos.x + 'px ' + -options.bgPos.y + 'px'
     }
 
     this._setIconStyles(div, 'icon-' + options.markerColor)
@@ -43,7 +60,9 @@ const Icon = L.Icon.extend({
     let iconColorStyle = ''
     const options = this.options
 
-    if (options.icon.slice(0, options.prefix.length + 1) === options.prefix + '-') {
+    if (
+      options.icon.slice(0, options.prefix.length + 1) === options.prefix + '-'
+    ) {
       iconClass = options.icon
     } else {
       iconClass = options.prefix + '-' + options.icon
@@ -82,8 +101,8 @@ const Icon = L.Icon.extend({
     img.className = 'awesome-marker-' + name + ' ' + options.className
 
     if (anchor) {
-      img.style.marginLeft = (-anchor.x) + 'px'
-      img.style.marginTop = (-anchor.y) + 'px'
+      img.style.marginLeft = -anchor.x + 'px'
+      img.style.marginTop = -anchor.y + 'px'
     }
 
     if (size) {
@@ -100,4 +119,9 @@ const Icon = L.Icon.extend({
   }
 })
 
-export default function (options) { return new Icon(options) }
+export default function (options: IconOptions) {
+  if (process.env.NODE_ENV === 'test') {
+    return {}
+  }
+  return new Icon(options)
+}

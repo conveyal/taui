@@ -1,10 +1,8 @@
 
-@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
 @import url(node_modules/normalize.css/normalize.css);
 @import url(node_modules/mapbox.js/theme/style.css);
 @import url(node_modules/font-awesome/css/font-awesome.css);
 @import url(node_modules/react-select/dist/react-select.css);
-@import url(src/components/fullscreen/style.css);
 @import url(src/components/log/style.css);
 @import url(src/components/log-item/style.css);
 @import url(src/components/transitive-map-layer/style.css);
@@ -12,7 +10,15 @@
 
 body {
   font-size: 16px;
-  font-family: 'Raleway', sans-serif;
+  font-family: -apple-system,
+               BlinkMacSystemFont,
+               "Segoe UI",
+               Roboto,
+               Oxygen-Sans,
+               Ubuntu,
+               Cantarell,
+               "Helvetica Neue",
+               sans-serif;
   color: #0b2b40;
 }
 
@@ -138,6 +144,7 @@ body {
   padding: 0.5rem 1rem;
   font-weight: 700;
   cursor: pointer;
+  display: block;
 }
 
 .Card-active > .CardTitle {
@@ -160,10 +167,9 @@ body {
 }
 
 .CardSegment {
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem;
   border-radius: 0.25rem;
   margin-right: 0.25rem;
-  margin-bottom: 0.25rem;
   display: inline-block;
 }
 
@@ -191,15 +197,17 @@ body {
   height: 1.5rem;
 }
 
-.Card .BestTrip {
-  display: flex;
+.Card .Metric > .fa-fw {
+  width: inherit;
 }
 
 .Card .BestTrip > div {
-  flex-grow: 1;
+  width: 50%;
+  display: inline-block;
+  padding-bottom: 0.25rem;
 }
 
-.Card .BestTrip > div:last-of-type {
+.Card .BestTrip > div:nth-child(even) {
   text-align: right;
 }
 
@@ -252,4 +260,12 @@ body {
 
 .leaflet-popup-tip {
   border-top-color: #0b2b40;
+}
+
+.Fullscreen {
+  position: absolute;
+  height: 100%;
+  right: 0;
+  left: 414px;
+  overflow: hidden;
 }

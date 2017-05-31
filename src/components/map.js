@@ -1,13 +1,26 @@
-import Pure from '@conveyal/woonerf/components/pure'
-import {Browser} from 'leaflet'
-import React, {PropTypes} from 'react'
-import {GeoJson, Map as LeafletMap, Marker, Popup, TileLayer, ZoomControl} from 'react-leaflet'
+// @flow
+import {Browser, LatLng} from 'leaflet'
+import React, {PureComponent} from 'react'
+import {
+  GeoJson,
+  Map as LeafletMap,
+  Marker,
+  Popup,
+  TileLayer,
+  ZoomControl
+} from 'react-leaflet'
 
 import Icon from './icon'
 import leafletIcon from '../utils/leaflet-icons'
 import messages from '../utils/messages'
 import TransitiveLayer from './transitive-map-layer'
 import transitiveStyle from '../transitive-style'
+
+import type {Coordinate, Feature, MapEvent, PointsOfInterest} from '../types'
+
+const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
+  ? process.env.LEAFLET_RETINA_URL
+  : process.env.LEAFLET_TILE_URL
 
 const startIcon = leafletIcon({
   icon: 'play',
@@ -19,70 +32,96 @@ const endIcon = leafletIcon({
   markerColor: 'orange'
 })
 
-export default class Map extends Pure {
-  static propTypes = {
-    centerCoordinates: PropTypes.arrayOf(PropTypes.number),
-    clearStartAndEnd: PropTypes.func.isRequired,
-    geojson: PropTypes.arrayOf(PropTypes.object).isRequired,
-    geojsonColor: PropTypes.string,
-    markers: PropTypes.arrayOf(PropTypes.object).isRequired,
-    onZoom: PropTypes.func,
-    setEnd: PropTypes.func.isRequired,
-    setStart: PropTypes.func.isRequired,
-    transitive: PropTypes.object,
-    zoom: PropTypes.number
-  }
+type Props = {
+  centerCoordinates: Coordinate,
+  clearStartAndEnd(): void,
+  geojson: Feature[],
+  geojsonColor: string,
+  markers: any[],
+  pointsOfInterest: PointsOfInterest,
+  setEnd(any): void,
+  setStart(any): void,
+  transitive: any,
+  zoom: number
+}
 
+type State = {
+  showSelectStartOrEnd: boolean,
+  lastClickedLabel: null,
+  lastClickedLatlng: null | LatLng
+}
+
+export default class Map extends PureComponent<void, Props, State> {
   state = {
-    showSelectOriginOrDestination: false,
+    showSelectStartOrEnd: false,
+    lastClickedLabel: null,
     lastClickedLatlng: null
   }
 
-  _clearStartAndEnd = () => {
-    const {clearStartAndEnd} = this.props
-    clearStartAndEnd()
+  _clearState (): void {
     this.setState({
-      ...this.state,
-      showSelectOriginOrDestination: false
+      showSelectStartOrEnd: false,
+      lastClickedLabel: null,
+      lastClickedLatlng: null
     })
   }
 
-  _onMapClick = (e) => {
-    const {markers, setStart} = this.props
-    if (markers.length === 0) {
-      setStart({latlng: e.latlng})
-    } else {
-      this.setState({
-        ...this.state,
-        showSelectOriginOrDestination: !this.state.showSelectOriginOrDestination,
-        lastClickedLatlng: e.latlng
-      })
-    }
+  _clearStartAndEnd = (): void => {
+    const {clearStartAndEnd} = this.props
+    clearStartAndEnd()
+    this._clearState()
   }
 
-  _setEnd = () => {
+  _onMapClick = (e: MapEvent): void => {
+    this.setState({
+      showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
+      lastClickedLatlng: e.latlng
+    })
+  }
+
+  _setEnd = (): void => {
     const {setEnd} = this.props
     const {lastClickedLatlng} = this.state
     setEnd({latlng: lastClickedLatlng})
-    this.setState({
-      showSelectOriginOrDestination: false,
-      lastClickedLatlng: null
-    })
+    this._clearState()
   }
 
-  _setStart = () => {
+  _setStart = (): void => {
     const {setStart} = this.props
     const {lastClickedLatlng} = this.state
     setStart({latlng: lastClickedLatlng})
+    this._clearState()
+  }
+
+  _clickPoi = (event: Event & {layer: {feature: Feature}}): void => {
+    if (!event.layer || !event.layer.feature) {
+      return this._clearState()
+    }
+
+    const {feature} = event.layer
+    const {coordinates} = feature.geometry
     this.setState({
-      showSelectOriginOrDestination: false,
-      lastClickedLatlng: null
+      lastClickedLabel: feature.properties.label,
+      lastClickedLatlng: {lat: coordinates[1], lng: coordinates[0]},
+      showSelectStartOrEnd: true
     })
   }
 
-  render () {
-    const {centerCoordinates, geojson, geojsonColor, markers, onZoom, transitive, zoom} = this.props
-    const {showSelectOriginOrDestination, lastClickedLatlng} = this.state
+  render (): React$Element<LeafletMap> {
+    const {
+      centerCoordinates,
+      geojson,
+      geojsonColor,
+      markers,
+      pointsOfInterest,
+      transitive,
+      zoom
+    } = this.props
+    const {
+      lastClickedLabel,
+      lastClickedLatlng,
+      showSelectStartOrEnd
+    } = this.state
     const tileLayerProps = {}
 
     if (Browser.retina) {
@@ -97,62 +136,85 @@ export default class Map extends Pure {
         ref='map'
         zoom={zoom}
         onClick={this._onMapClick}
-        onZoom={onZoom}
         preferCanvas
         zoomControl={false}
-        >
+      >
         <ZoomControl position='topright' />
         <TileLayer
-          url={Browser.retina && process.env.LEAFLET_RETINA_URL ? process.env.LEAFLET_RETINA_URL : process.env.LEAFLET_TILE_URL}
+          url={TILE_LAYER_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...tileLayerProps}
         />
-        {markers.map((m, index) => {
+        {markers.length < 2 &&
+          <MapboxGeoJson
+            data={pointsOfInterest.map(poi => poi.feature)}
+            onClick={this._clickPoi}
+          />}
+
+        {markers.map((m, index) => (
+          <Marker
+            draggable
+            icon={index === 0 ? startIcon : endIcon}
+            key={`marker-${index}`}
+            onDragEnd={m.onDragEnd}
+            position={m.position}
+          >
+            {m.label && <Popup><span>{m.label}</span></Popup>}
+          </Marker>
+        ))}
+
+        {geojson.map(g => {
           return (
-            <Marker
-              draggable
-              icon={index === 0 ? startIcon : endIcon}
-              key={`marker-${index}`}
-              {...m}
-              >
-              {m.label && <Popup><span>{m.label}</span></Popup>}
-            </Marker>
+            <GeoJson
+              key={`${g.key}`}
+              data={g}
+              style={{
+                fillColor: geojsonColor,
+                pointerEvents: 'none',
+                stroke: geojsonColor,
+                weight: 1
+              }}
+            />
           )
         })}
 
-        {geojson.map((g) => {
-          return <GeoJson
-            key={`${g.key}`}
-            data={g}
-            style={{
-              fillColor: geojsonColor,
-              pointerEvents: 'none',
-              stroke: geojsonColor,
-              weight: 1
-            }}
-            />
-        })}
-
         {transitive &&
-          <TransitiveLayer
-            data={transitive}
-            styles={transitiveStyle}
-            />
-        }
+          <TransitiveLayer data={transitive} styles={transitiveStyle} />}
 
-        {showSelectOriginOrDestination &&
-          <Popup
-            closeButton={false}
-            position={lastClickedLatlng}
-            >
+        {showSelectStartOrEnd &&
+          <Popup closeButton={false} position={lastClickedLatlng}>
             <div className='Popup'>
-              <button onClick={this._setStart}><Icon type='map-marker' /> {messages.Map.SetLocationPopup.SetStart}</button>
-              <button onClick={this._setEnd}><Icon type='map-marker' /> {messages.Map.SetLocationPopup.SetEnd}</button>
-              <button onClick={this._clearStartAndEnd}><Icon type='times' /> {messages.Map.SetLocationPopup.ClearMarkers}</button>
+              {lastClickedLabel && <h3>{lastClickedLabel}</h3>}
+              <button onClick={this._setStart}>
+                <Icon type='map-marker' />
+                {' '}
+                {messages.Map.SetLocationPopup.SetStart}
+              </button>
+              {markers.length > 0 &&
+                <button onClick={this._setEnd}>
+                  <Icon type='map-marker' />
+                  {' '}
+                  {messages.Map.SetLocationPopup.SetEnd}
+                </button>}
+              {markers.length > 0 &&
+                <button onClick={this._clearStartAndEnd}>
+                  <Icon type='times' />
+                  {' '}
+                  {messages.Map.SetLocationPopup.ClearMarkers}
+                </button>}
             </div>
-          </Popup>
-        }
+          </Popup>}
       </LeafletMap>
     )
+  }
+}
+
+class MapboxGeoJson extends GeoJson {
+  componentWillMount () {
+    const {mapbox} = require('mapbox.js')
+    super.componentWillMount()
+    const {data} = this.props
+    mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
+    this.leafletElement = mapbox.featureLayer(data)
   }
 }

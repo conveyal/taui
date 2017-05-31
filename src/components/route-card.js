@@ -1,223 +1,270 @@
-import Pure from '@conveyal/woonerf/components/pure'
-import Color from 'color'
+// @flow
 import React from 'react'
-import toCapitalCase from 'lodash.capitalize'
-import toSpaceCase from 'lodash.lowercase'
-import unique from 'lodash.uniq'
+import toSpaceCase from 'lodash/lowerCase'
 
+import {ACCESSIBILITY_IS_EMPTY, ACCESSIBILITY_IS_LOADING} from '../constants'
 import Icon from './icon'
 import messages from '../utils/messages'
 
-export default class RouteCard extends Pure {
-  render () {
-    const {
-      active,
-      alternate,
-      accessibility,
-      children,
-      oldAccessibility,
-      oldTravelTime,
-      oldWaitTime,
-      onClick,
-      transitiveData,
-      travelTime,
-      waitTime
-    } = this.props
-    const className = 'Card' + (alternate ? ' Card-alternate' : '') + (active ? ' Card-active' : '')
-    const accessibilityKeys = Object.keys(accessibility)
-    const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
-
-    const access = comparisonAccessibilityKeys.length > 0
-      ? showDiff(accessibilityKeys, accessibility, oldAccessibility)
-      : showAccess(accessibilityKeys, accessibility)
-
-    return (
-      <div
-        className={className}
-        >
-        <div className='CardTitle' onClick={onClick}>{children}
-          <span className='pull-right'>
-            {active && <Icon type='map' />}
-            {!active && 'show'}
-          </span>
-        </div>
-        <div className='CardContent'>
-          {access}
-          {travelTime && transitiveData &&
-            renderJourneys({
-              oldTravelTime,
-              oldWaitTime,
-              travelTime,
-              transitiveData,
-              waitTime
-            })}
-        </div>
-      </div>
-    )
-  }
+type Props = {
+  active: boolean,
+  alternate: boolean,
+  accessibility: any,
+  accessibilityKeys: string[],
+  children?: any,
+  journeys: any[],
+  oldAccessibility: any,
+  oldTravelTime: number,
+  onClick(): void,
+  showComparison: boolean,
+  travelTime: number,
+  waitTime: number
 }
 
-function TripDiff ({
+export default ({
+  active,
+  alternate,
+  accessibility,
+  accessibilityKeys,
+  children,
+  journeys,
+  oldAccessibility,
   oldTravelTime,
-  travelTime
-}) {
+  onClick,
+  showComparison,
+  travelTime,
+  waitTime
+}: Props) => (
+  <div
+    className={
+      'Card' +
+        (alternate ? ' Card-alternate' : '') +
+        (active ? ' Card-active' : '')
+    }
+  >
+    <a
+      className='CardTitle'
+      onClick={onClick}
+      tabIndex={0}
+      title='Set system active'
+    >
+      {children}
+      <span className='pull-right'>
+        {active && <Icon type='map' />}
+        {!active && messages.Systems.Show}
+      </span>
+    </a>
+    <div className='CardContent'>
+      {showComparison
+        ? <ShowDiff
+          keys={accessibilityKeys}
+          base={accessibility}
+          comparison={oldAccessibility}
+          />
+        : <ShowAccess keys={accessibilityKeys} base={accessibility} />}
+      {accessibility !== ACCESSIBILITY_IS_EMPTY &&
+        accessibility !== ACCESSIBILITY_IS_LOADING &&
+        <Journeys
+          journeys={journeys}
+          oldTravelTime={oldTravelTime}
+          travelTime={travelTime}
+          waitTime={waitTime}
+        />}
+    </div>
+  </div>
+)
+
+function TripDiff ({oldTravelTime, travelTime}) {
   const actualDiff = travelTime - oldTravelTime
   const nume = actualDiff > 0
     ? travelTime - oldTravelTime
     : oldTravelTime - travelTime
   const diff = parseInt((nume / oldTravelTime * 100).toFixed(1))
 
-  if (oldTravelTime === 255) return <span className='increase'>{messages.NewTrip} <Icon type='star' /><br /></span>
-  else if (actualDiff > 0) return <span className='pull-right decrease'><strong>{diff}</strong>%<Icon type='level-up' /><br /></span>
-  else return <span className='pull-right increase'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /><br /></span>
+  if (oldTravelTime === 255) {
+    return (
+      <span className='increase'>
+        {messages.NewTrip} <Icon type='star' /><br />
+      </span>
+    )
+  } else if (actualDiff > 0) {
+    return (
+      <span className='pull-right decrease'>
+        <strong>{diff}</strong>%<Icon type='level-up' /><br />
+      </span>
+    )
+  } else {
+    return (
+      <span className='pull-right increase'>
+        <strong>{diff * -1}</strong>
+        %
+        <Icon className='fa-rotate-180' type='level-up' />
+        <br />
+      </span>
+    )
+  }
 }
 
-function renderJourneys ({ oldTravelTime, transitiveData, travelTime, waitTime }) {
-  const journeys = extractRelevantTransitiveInfo(transitiveData)
-
-  if (travelTime === 255 || journeys.length === 0) {
-    return <div className='CardJourneys'>
-      <div className='heading'>{messages.Systems.TripsTitle}</div>
-      <div>{messages.Systems.TripsEmpty}</div>
-    </div>
-  }
-
-  const [bestTripSegments, ...alternateTripSegments] = journeys.map((segments, jindex) => {
-    return segments.map((s, sindex) => {
-      return (
-        <span
-          className='CardSegment'
-          key={`journey-${jindex}-segment-${sindex}`}
-          style={{
-            backgroundColor: (s.backgroundColor || 'inherit'),
-            color: (s.color || 'inherit')
-          }}
-          >
-          <i className={`fa fa-${s.type}`} /> {s.name}
-        </span>
-      )
-    })
-  })
-
-  const alternateTrips = alternateTripSegments.map((segments, jindex) => {
+function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
+  if (!travelTime || !journeys) {
     return (
-      <div className='Trip' key={`journey-${jindex}`}>
-        <span className='CardIndex'>{jindex + 1}.</span>{segments}
+      <div className='CardJourneys'>
+        <div className='heading'>{messages.Systems.TripsTitle}</div>
+        <div>{messages.Systems.SelectEnd}</div>
       </div>
     )
-  })
+  }
+
+  if (travelTime === 255 || journeys.length === 0) {
+    return (
+      <div className='CardJourneys'>
+        <div className='heading'>{messages.Systems.TripsTitle}</div>
+        <div>{messages.Systems.TripsEmpty}</div>
+      </div>
+    )
+  }
+
+  const [bestJourney, ...alternateJourneys] = journeys
 
   return (
     <div>
       <div className='heading'>{messages.Systems.BestTripTitle}</div>
       <div className='BestTrip'>
-        <div>{bestTripSegments} <strong> {travelTime}</strong> {messages.Units.Mins}</div>
-        <div>{oldTravelTime &&
-          <TripDiff
-            oldTravelTime={oldTravelTime}
-            travelTime={travelTime}
-            />}
-          <strong>{waitTime}</strong> {messages.Units.Mins} {messages.Systems.Waiting}<br />
+        <div><strong> {travelTime}</strong> {messages.Units.Mins}</div>
+        <div>
+          {oldTravelTime &&
+            oldTravelTime !== travelTime &&
+            <TripDiff oldTravelTime={oldTravelTime} travelTime={travelTime} />}
+        </div>
+        <div>
+          <strong>{waitTime}</strong>
+          {' '}
+          {messages.Units.Mins}
+          {' '}
+          {messages.Systems.Waiting}
+        </div>
+        <div>
+          {bestJourney.map((segment, index) => (
+            <Segment key={index} segment={segment} />
+          ))}
         </div>
       </div>
-      {alternateTrips.length > 0 &&
+      {journeys.length > 1 &&
         <div>
           <div className='heading'>{messages.Systems.AlternateTripsTitle}</div>
-          <div className='Trips'>{alternateTrips}</div>
-        </div>
-      }
+          <div className='Trips'>
+            {alternateJourneys.map((segments, jindex) => (
+              <div className='Trip' key={jindex}>
+                <span className='CardIndex'>{jindex + 1}.</span>
+                {segments.map((segment, index) => (
+                  <Segment key={index} segment={segment} />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>}
     </div>
   )
 }
 
-// TODO: filter journeys that have same pattern id sequences
-function extractRelevantTransitiveInfo ({
-  journeys,
-  patterns,
-  routes,
-  stops
+const Segment = ({segment}) => (
+  <span
+    className='CardSegment'
+    style={{
+      backgroundColor: segment.backgroundColor || 'inherit',
+      color: segment.color || 'inherit'
+    }}
+  >
+    <i className={`fa fa-${segment.type}`} /> {segment.name}
+  </span>
+)
+
+function MetricIcon ({name}) {
+  switch (name.toLowerCase()) {
+    case 'banen': // Dutch for job
+    case 'job':
+      return <Icon type='building' />
+    case 'worker':
+    case 'population':
+    case 'bewoners': // Dutch for residents
+      return <Icon type='child' />
+    default:
+      return <span />
+  }
+}
+
+function ShowAccess ({
+  keys,
+  base
+}: {
+  keys: string[],
+  base: {
+    [name: string]: number
+  }
 }) {
-  return journeys
-    .map((j) => {
-      return j.segments
-        .filter((s) => !!s.pattern_id || !!s.patterns)
-        .map((s) => {
-          const pid = s.pattern_id || s.patterns[0].pattern_id
-          const seg = {}
-          const route = findRouteForPattern({id: pid, patterns, routes})
-          const color = route.route_color ? Color(`#${route.route_color}`) : Color('#0b2b40')
-          seg.name = toCapitalCase(route.route_short_name)
-
-          if (s.patterns && s.patterns.length > 0) {
-            const patternNames = s.patterns.map((p) =>
-              toCapitalCase(findRouteForPattern({id: p.pattern_id, patterns, routes}).route_short_name))
-            seg.name = unique(patternNames).join(' / ')
-          }
-
-          seg.backgroundColor = color.rgbaString()
-          seg.color = color.light() ? '#000' : '#fff'
-          seg.type = typeToIcon[route.route_type]
-
-          return seg
-        })
-    })
-}
-
-function findRouteForPattern ({id, patterns, routes}) {
-  return routes.find((r) => r.route_id === patterns.find((p) => p.pattern_id === id).route_id)
-}
-
-const typeToIcon = {
-  0: 'subway',
-  1: 'subway',
-  2: 'train',
-  3: 'bus'
-}
-
-function MetricIcon ({
-  name
-}) {
-  const lc = name.toLowerCase()
-  if (lc.indexOf('job') !== -1) return <Icon type='building' />
-  if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) return <Icon type='child' />
-  return <span />
-}
-
-function showAccess (keys, base) {
   return (
     <div className='CardAccess'>
       <div className='heading'>{messages.Systems.AccessTitle}</div>
-      {keys.map((k, i) => <div className='Metric' key={k}><MetricIcon name={k} /><strong> {(base[k] | 0).toLocaleString()} </strong> {toSpaceCase(k)}</div>)}
+      {base === ACCESSIBILITY_IS_EMPTY
+        ? <span>{messages.Systems.SelectStart}</span>
+        : base === ACCESSIBILITY_IS_LOADING
+            ? <span>{messages.Systems.CalculatingAccessibility}</span>
+            : keys.map((k, i) => (
+              <div className='Metric' key={k}>
+                <MetricIcon name={k} />
+                <strong> {(base[k] | 0).toLocaleString()} </strong>
+                {' '}
+                {toSpaceCase(k)}
+              </div>
+              ))}
     </div>
   )
 }
 
-function AccessDiffPercentage ({
-  newAccess,
-  originalAccess
-}) {
+function AccessDiffPercentage ({newAccess, originalAccess}) {
   const actualDiff = newAccess - originalAccess
   const nume = actualDiff > 0
     ? newAccess - originalAccess
     : originalAccess - newAccess
   const diff = parseInt((nume / originalAccess * 100).toFixed(1))
-  if (diff === 0) return <span />
-  else if (actualDiff > 0) return <span className='pull-right increase'><strong>{diff}</strong>%<Icon type='level-up' /></span>
-  else return <span className='pull-right decrease'><strong>{diff * -1}</strong>%<Icon className='fa-rotate-180' type='level-up' /></span>
+  if (diff === 0 || isNaN(diff)) return <span />
+  else if (actualDiff > 0) {
+    return (
+      <span className='pull-right increase'>
+        <strong>{diff}</strong>%<Icon type='level-up' />
+      </span>
+    )
+  } else {
+    return (
+      <span className='pull-right decrease'>
+        <strong>{diff * -1}</strong>
+        %
+        <Icon className='fa-rotate-180' type='level-up' />
+      </span>
+    )
+  }
 }
 
-function showDiff (keys, base, comparison) {
+function ShowDiff ({keys, base, comparison}) {
   return (
     <div className='CardAccess'>
       <div className='heading'>{messages.Systems.AccessTitle}</div>
-      {keys.map((key, i) => {
-        return (
-          <div className='Metric' key={key}>
-            <MetricIcon name={key} /><strong> {(base[key] | 0).toLocaleString()} </strong> {toSpaceCase(key)}
-            <AccessDiffPercentage newAccess={base[key]} originalAccess={comparison[key]} />
-          </div>
-        )
-      })}
+      {base === ACCESSIBILITY_IS_EMPTY
+        ? <span>{messages.Systems.SelectStart}</span>
+        : base === ACCESSIBILITY_IS_LOADING
+            ? <span>{messages.Systems.CalculatingAccessibility}</span>
+            : keys.map((key, i) => (
+              <div className='Metric' key={key}>
+                <MetricIcon name={key} />
+                <strong> {(base[key] | 0).toLocaleString()} </strong>
+                {' '}
+                {toSpaceCase(key)}
+                <AccessDiffPercentage
+                  newAccess={base[key]}
+                  originalAccess={comparison[key]}
+                  />
+              </div>
+              ))}
     </div>
   )
 }

@@ -1,55 +1,77 @@
+// @flow
 import {handleActions} from 'redux-actions'
 
-export default handleActions({
-  'set origin' (state, {payload}) {
-    return {
-      ...state,
-      origin: {
-        label: payload.label,
-        value: payload.latlng ? `${payload.latlng.lng},${payload.latlng.lat}` : false
+export default handleActions(
+  {
+    'set start' (state, {payload}) {
+      return {
+        ...state,
+        start: {
+          label: payload.label,
+          value: payload.latlng
+            ? `${payload.latlng.lng},${payload.latlng.lat}`
+            : false
+        }
+      }
+    },
+    'set start label' (state, {payload}) {
+      if (payload) {
+        return {
+          ...state,
+          start: {
+            ...state.start,
+            label: payload
+          }
+        }
+      } else {
+        return {
+          ...state,
+          start: null
+        }
+      }
+    },
+    'set end' (state, {payload}) {
+      return {
+        ...state,
+        end: {
+          label: payload.label,
+          value: payload.latlng
+            ? `${payload.latlng.lng},${payload.latlng.lat}`
+            : false
+        }
+      }
+    },
+    'set end label' (state, {payload}) {
+      if (payload) {
+        return {
+          ...state,
+          end: {
+            ...state.end,
+            label: payload
+          }
+        }
+      } else {
+        return {
+          ...state,
+          end: null
+        }
+      }
+    },
+    'clear start' (state) {
+      return {
+        ...state,
+        start: null
+      }
+    },
+    'clear end' (state) {
+      return {
+        ...state,
+        end: null
       }
     }
   },
-  'set origin label' (state, {payload}) {
-    return {
-      ...state,
-      origin: {
-        ...state.origin,
-        label: payload
-      }
-    }
-  },
-  'set destination' (state, {payload}) {
-    return {
-      ...state,
-      destination: {
-        label: payload.label,
-        value: payload.latlng ? `${payload.latlng.lng},${payload.latlng.lat}` : false
-      }
-    }
-  },
-  'set destination label' (state, {payload}) {
-    return {
-      ...state,
-      destination: {
-        ...state.destination,
-        label: payload
-      }
-    }
-  },
-  'clear start' (state) {
-    return {
-      ...state,
-      origin: null
-    }
-  },
-  'clear end' (state) {
-    return {
-      ...state,
-      destination: null
-    }
+  {
+    start: null,
+    end: null
   }
-}, {
-  origin: null,
-  destination: null
-})
+)

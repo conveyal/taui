@@ -1,50 +1,89 @@
-import lonlng from 'lonlng'
-import React, {Component, PropTypes} from 'react'
+// @flow
+import lonlat from '@conveyal/lonlat'
+import isEqual from 'lodash/isEqual'
+import memoize from 'lodash/memoize'
+import React, {Component} from 'react'
 
-import featureToLabel from '../utils/feature-to-label'
 import Form from './form'
-import Fullscreen from './fullscreen'
 import Icon from './icon'
 import Log from './log'
 import Map from './map'
 import messages from '../utils/messages'
 import RouteCard from './route-card'
-import initializeBrowsochrones from '../utils/initialize-browsochrones'
 
-export default class Application extends Component {
-  static propTypes = {
-    actionLog: PropTypes.arrayOf(PropTypes.object),
-    browsochrones: PropTypes.object.isRequired,
-    clearEnd: PropTypes.func.isRequired,
-    clearIsochrone: PropTypes.func.isRequired,
-    clearStart: PropTypes.func.isRequired,
-    destinations: PropTypes.object,
-    geocoder: PropTypes.object,
-    history: PropTypes.any,
-    initializeBrowsochrones: PropTypes.func.isRequired,
-    mapMarkers: PropTypes.object,
-    map: PropTypes.object,
-    moveDestination: PropTypes.func.isRequired,
-    moveOrigin: PropTypes.func.isRequired,
-    onTimeCutoffChange: PropTypes.func.isRequired,
-    setBaseActive: PropTypes.func,
-    setComparisonActive: PropTypes.func,
-    timeCutoff: PropTypes.shape({
-      selected: PropTypes.number
-    }),
-    ui: PropTypes.object.isRequired,
-    zoom: PropTypes.number
+import type {
+  Accessibility,
+  BrowsochronesStore,
+  Coordinate,
+  GeocoderStore,
+  LogItems,
+  InputEvent,
+  MapEvent,
+  PointFeature,
+  PointsOfInterest,
+  UIStore
+} from '../types'
+
+type Props = {
+  accessibilityKeys: string[],
+  actionLog: LogItems,
+  browsochrones: BrowsochronesStore,
+  destinations: Accessibility[],
+  geocoder: GeocoderStore,
+  journeys: any[],
+  mapMarkers: any,
+  map: any,
+  pointsOfInterest: PointsOfInterest,
+  showComparison: boolean,
+  timeCutoff: any,
+  ui: UIStore,
+
+  clearEnd(): void,
+  clearIsochrone(): void,
+  clearStart(): void,
+  initializeBrowsochrones(any): void,
+  setActiveBrowsochronesInstance(number): void,
+  updateEnd(any): void,
+  updateStart(any): void,
+  updateSelectedTimeCutoff(any): void
+}
+
+type Marker = {
+  position: Coordinate,
+  label: string,
+  onDragEnd(MapEvent): void
+}
+
+type State = {
+  markers: Marker[]
+}
+
+export default class Application extends Component<void, Props, State> {
+  state = {
+    markers: this._createMarkersFromProps(this.props)
   }
 
-  componentWillMount () {
-    const {browsochrones, geocoder, map} = this.props
+  constructor (props: Props) {
+    super(props)
+    const {
+      browsochrones,
+      initializeBrowsochrones,
+      geocoder,
+      map,
+      timeCutoff
+    } = props
     initializeBrowsochrones({
       browsochrones,
       geocoder,
-      map
-    }).then((actions) => {
-      this.props.initializeBrowsochrones(actions)
+      map,
+      timeCutoff
     })
+  }
+
+  componentWillReceiveProps (nextProps: Props) {
+    if (!isEqual(this.props.mapMarkers, nextProps.mapMarkers)) {
+      this.setState({markers: this._createMarkersFromProps(nextProps)})
+    }
   }
 
   _clearStartAndEnd = () => {
@@ -54,37 +93,61 @@ export default class Application extends Component {
     clearEnd()
   }
 
+  _createMarkersFromProps (props: Props) {
+    const {mapMarkers} = props
+    const markers = []
+    if (mapMarkers.start && mapMarkers.start.latlng) {
+      markers.push({
+        position: mapMarkers.start.latlng,
+        label: mapMarkers.start.label || '',
+        onDragEnd: this._setStartWithEvent
+      })
+    }
+
+    if (mapMarkers.end && mapMarkers.end.latlng) {
+      markers.push({
+        position: mapMarkers.end.latlng,
+        label: mapMarkers.end.label || '',
+        onDragEnd: this._setEndWithEvent
+      })
+    }
+    return markers
+  }
+
   _setStart = ({
     label,
     latlng
+  }: {
+    label?: string,
+    latlng: Coordinate
   }) => {
-    const {browsochrones, map, mapMarkers, moveOrigin, timeCutoff} = this.props
-    const destinationLatlng = mapMarkers.destination && mapMarkers.destination.latlng
-      ? mapMarkers.destination.latlng
+    const {browsochrones, map, mapMarkers, timeCutoff, updateStart} = this.props
+    const endLatlng = mapMarkers.end && mapMarkers.end.latlng
+      ? mapMarkers.end.latlng
       : null
 
-    moveOrigin({
-      browsochrones,
-      destinationLatlng,
+    updateStart({
+      browsochronesInstances: browsochrones.instances,
+      endLatlng,
       label,
-      latlng: lonlng(latlng),
+      latlng: lonlat(latlng),
       timeCutoff: timeCutoff.selected,
       zoom: map.zoom
     })
   }
 
-  _setStartWithEvent = (event) => {
+  _setStartWithEvent = (event: MapEvent) => {
     this._setStart({latlng: event.latlng || event.target._latlng})
   }
 
-  _setStartWithFeature = (feature) => {
+  _setStartWithFeature = (feature: PointFeature) => {
     if (!feature) {
       this._clearStartAndEnd()
     } else {
       const {geometry} = feature
 
       this._setStart({
-        label: featureToLabel(feature),
+        label: feature.properties.label,
         latlng: geometry.coordinates
       })
     }
@@ -93,141 +156,128 @@ export default class Application extends Component {
   _setEnd = ({
     label,
     latlng
+  }: {
+    label?: string,
+    latlng: Coordinate
   }) => {
-    const {browsochrones, map, mapMarkers, moveDestination} = this.props
-    moveDestination({
-      browsochrones,
-      fromLatlng: mapMarkers.origin.latlng,
+    const {browsochrones, map, mapMarkers, updateEnd} = this.props
+    updateEnd({
+      browsochronesInstances: browsochrones.instances,
+      startLatlng: mapMarkers.start.latlng,
       label,
-      latlng: lonlng(latlng),
+      latlng: lonlat(latlng),
       zoom: map.zoom
     })
   }
 
-  _setEndWithEvent = (event) => {
+  _setEndWithEvent = (event: MapEvent) => {
     this._setEnd({latlng: event.latlng || event.target._latlng})
   }
 
-  _setEndWithFeature = (feature) => {
+  _setEndWithFeature = (feature: PointFeature) => {
     if (!feature) {
       this.props.clearEnd()
     } else {
       const {geometry} = feature
 
       this._setEnd({
-        label: featureToLabel(feature),
+        label: feature.properties.label,
         latlng: geometry.coordinates
       })
     }
   }
 
-  _onTimeCutoffChange = (event) => {
-    const timeCutoff = parseInt(event.target.value, 10)
-    this.props.onTimeCutoffChange({
-      browsochrones: this.props.browsochrones,
-      latlng: this.props.mapMarkers.origin.latlng,
+  _onTimeCutoffChange = (event: InputEvent) => {
+    const {browsochrones, mapMarkers, updateSelectedTimeCutoff} = this.props
+    const timeCutoff = parseInt(event.currentTarget.value, 10)
+    updateSelectedTimeCutoff({
+      browsochrones,
+      latlng: mapMarkers.start.latlng,
       timeCutoff
     })
   }
 
-  renderMap () {
-    const {browsochrones, map, mapMarkers} = this.props
+  _setActiveBrowsochronesInstance = memoize(index => () =>
+    this.props.setActiveBrowsochronesInstance(index))
 
-    const markers = []
-    if (mapMarkers.origin && mapMarkers.origin.latlng) {
-      markers.push({
-        position: mapMarkers.origin.latlng,
-        label: mapMarkers.origin.label || '',
-        onDragEnd: this._setStartWithEvent
-      })
-    }
-
-    if (mapMarkers.destination && mapMarkers.destination.latlng) {
-      markers.push({
-        position: mapMarkers.destination.latlng,
-        label: mapMarkers.destination.label || '',
-        onDragEnd: this._setEndWithEvent
-      })
-    }
-
-    return <Map
-      {...map}
-      clearStartAndEnd={this._clearStartAndEnd}
-      geojsonColor={browsochrones.active === 'base' ? '#4269a4' : 'darkorange'}
-      markers={markers}
-      setEnd={this._setEnd}
-      setStart={this._setStart}
-      />
-  }
-
+  count = 0
   render () {
     const {
+      accessibilityKeys,
       actionLog,
       browsochrones,
       destinations,
       geocoder,
+      journeys,
       map,
-      setBaseActive,
-      setComparisonActive,
+      pointsOfInterest,
+      showComparison,
       timeCutoff,
       ui
     } = this.props
+    const {markers} = this.state
 
     return (
       <div>
-        <Fullscreen>
-          {this.renderMap({})}
-        </Fullscreen>
+        <div className='Fullscreen'>
+          <Map
+            centerCoordinates={map.centerCoordinates}
+            clearStartAndEnd={this._clearStartAndEnd}
+            geojson={map.geojson}
+            geojsonColor={browsochrones.active === 0 ? '#4269a4' : 'darkorange'}
+            markers={markers}
+            pointsOfInterest={pointsOfInterest}
+            setEnd={this._setEnd}
+            setStart={this._setStart}
+            transitive={map.transitive}
+            zoom={map.zoom}
+          />
+        </div>
         <div className='Taui-Dock'>
           <div className='Taui-Dock-content'>
             <div className='title'>
               {ui.fetches > 0
                 ? <Icon type='spinner' className='fa-spin' />
-                : <Icon type='map' />} {messages.Title}
+                : <Icon type='map' />}
+              {' '}
+              {messages.Title}
             </div>
             <Form
-              accessibility={destinations.accessibility}
-              geocoder={geocoder}
+              boundary={geocoder.boundary}
+              end={geocoder.end}
+              focusLatlng={geocoder.focusLatlng}
               onTimeCutoffChange={this._onTimeCutoffChange}
               onChangeEnd={this._setEndWithFeature}
               onChangeStart={this._setStartWithFeature}
+              pointsOfInterest={pointsOfInterest}
               selectedTimeCutoff={timeCutoff.selected}
-              />
-            {destinations.accessibility.base &&
+              start={geocoder.start}
+            />
+            {destinations.map((accessibility, index) => (
               <RouteCard
-                accessibility={destinations.accessibility.base}
-                active={browsochrones.active === 'base'}
-                oldAccessibility={destinations.accessibility.comparison}
-                oldTravelTime={map.comparisonTravelTime}
-                onClick={setBaseActive}
-                transitiveData={map.baseTransitive}
-                travelTime={map.baseTravelTime}
-                waitTime={map.baseWaitTime}
-                >
-                {messages.Systems.BaseTitle}
+                accessibility={accessibility.accessibility}
+                accessibilityKeys={accessibilityKeys}
+                active={browsochrones.active === index}
+                alternate={index !== 0}
+                key={`${index}-route-card`}
+                journeys={journeys[index]}
+                oldAccessibility={destinations[0].accessibility}
+                oldTravelTime={map.travelTimes[0]}
+                onClick={this._setActiveBrowsochronesInstance(index)}
+                showComparison={showComparison}
+                travelTime={map.travelTimes[index]}
+                waitTime={map.waitTimes[index]}
+              >
+                {accessibility.name}
               </RouteCard>
-            }
-            {destinations.accessibility.comparison &&
-              <RouteCard
-                alternate
-                active={browsochrones.active === 'comparison'}
-                accessibility={destinations.accessibility.comparison}
-                onClick={setComparisonActive}
-                transitiveData={map.comparisonTransitive}
-                travelTime={map.comparisonTravelTime}
-                waitTime={map.comparisonWaitTime}
-                >
-                {messages.Systems.ComparisonTitle}
-              </RouteCard>
-            }
-            {ui.showLog && actionLog && actionLog.length > 0 &&
+            ))}
+            {ui.showLog &&
+              actionLog &&
+              actionLog.length > 0 &&
               <div className='Card'>
                 <div className='CardTitle'>{messages.Log.Title}</div>
-                <Log
-                  items={this.props.actionLog}
-                  />
-              </div>
-            }
+                <Log items={actionLog} />
+              </div>}
           </div>
         </div>
       </div>

@@ -1,69 +1,107 @@
-import Pure from '@conveyal/woonerf/components/pure'
+// @flow
 import React from 'react'
 import Geocoder from 'react-select-geocoder'
-
-import featureToLabel from '../utils/feature-to-label'
-import {search} from '../utils/mapbox-geocoder'
 import messages from '../utils/messages'
 
-export default class Form extends Pure {
-  render () {
-    const {
-      geocoder,
-      onChangeEnd,
-      onChangeStart,
-      onTimeCutoffChange,
-      selectedTimeCutoff
-    } = this.props
-    return (
+import type {
+  GeocoderBoundary,
+  InputEvent,
+  LatLng,
+  Option,
+  PointFeature,
+  PointsOfInterest
+} from '../types'
+
+type Props = {
+  boundary: GeocoderBoundary,
+  end: null | Option,
+  focusLatlng: LatLng,
+  onChangeEnd(PointFeature): void,
+  onChangeStart(PointFeature): void,
+  onTimeCutoffChange(InputEvent): void,
+  pointsOfInterest: PointsOfInterest,
+  selectedTimeCutoff: number,
+  start: null | Option
+}
+
+const setGeocoderOptionsToPois = (
+  pointsOfInterest,
+  currentValue
+) => geocoder => {
+  if (
+    geocoder &&
+    (!currentValue || !currentValue.value || currentValue.value.length === 0)
+  ) {
+    pointsOfInterest.forEach(poi => {
+      geocoder.options[poi.value] = poi.feature
+    })
+  }
+}
+
+export default ({
+  boundary,
+  end,
+  focusLatlng,
+  onChangeEnd,
+  onChangeStart,
+  onTimeCutoffChange,
+  pointsOfInterest,
+  selectedTimeCutoff,
+  start
+}: Props) => (
+  <div>
+    <div className='heading'>{messages.Geocoding.StartTitle}</div>
+    <div className='Geocoder'>
+      <Geocoder
+        apiKey={process.env.MAPZEN_SEARCH_KEY}
+        boundary={boundary}
+        focusLatlng={focusLatlng}
+        name='start-address'
+        onChange={onChangeStart}
+        options={
+          start && start.value && start.value.length > 0 ? [] : pointsOfInterest
+        }
+        ref={setGeocoderOptionsToPois(pointsOfInterest, start)}
+        placeholder={messages.Geocoding.StartPlaceholder}
+        searchPromptText={messages.Geocoding.PromptText}
+        value={start}
+      />
+    </div>
+    {start &&
       <div>
-        <div className='heading'>{messages.Geocoding.StartTitle}</div>
+        <div className='heading'>{messages.Geocoding.EndTitle}</div>
         <div className='Geocoder'>
           <Geocoder
             apiKey={process.env.MAPZEN_SEARCH_KEY}
-            {...geocoder}
-            featureToLabel={featureToLabel}
-            featureToValue={(f) => f.id}
-            name='start-address'
-            onChange={onChangeStart}
-            placeholder={messages.Geocoding.StartPlaceholder}
-            search={search}
+            boundary={boundary}
+            focusLatlng={focusLatlng}
+            name='end-address'
+            onChange={onChangeEnd}
+            options={
+              end && end.value && end.value.length > 0 ? [] : pointsOfInterest
+            }
+            placeholder={messages.Geocoding.EndPlaceholder}
+            ref={setGeocoderOptionsToPois(pointsOfInterest, end)}
             searchPromptText={messages.Geocoding.PromptText}
-            value={geocoder.origin}
-            />
+            value={end}
+          />
         </div>
-        {geocoder.origin &&
-          <div>
-            <div className='heading'>{messages.Geocoding.EndTitle}</div>
-            <div className='Geocoder'>
-              <Geocoder
-                apiKey={process.env.MAPZEN_SEARCH_KEY}
-                {...geocoder}
-                featureToLabel={featureToLabel}
-                featureToValue={(f) => f.id}
-                name='end-address'
-                onChange={onChangeEnd}
-                placeholder={messages.Geocoding.EndPlaceholder}
-                search={search}
-                searchPromptText={messages.Geocoding.PromptText}
-                value={geocoder.destination}
-                />
-            </div>
-            <div className='heading'>{messages.Strings.HighlightAreaAccessibleWithin}</div>
-            <div className='TimeCutoff'>
-              <div className='Time'>{selectedTimeCutoff} {messages.Units.Minutes}</div>
-              <input
-                defaultValue={selectedTimeCutoff}
-                onChange={onTimeCutoffChange}
-                type='range'
-                min={10}
-                max={120}
-                step={5}
-                />
-            </div>
+        <div className='heading'>
+          {messages.Strings.HighlightAreaAccessibleWithin}
+        </div>
+        <div className='TimeCutoff'>
+          <div className='Time'>
+            {selectedTimeCutoff} {messages.Units.Minutes}
           </div>
-        }
-      </div>
-    )
-  }
-}
+          <input
+            defaultValue={selectedTimeCutoff}
+            onChange={onTimeCutoffChange}
+            type='range'
+            min={10}
+            max={120}
+            step={5}
+          />
+        </div>
+      </div>}
+  </div>
+)

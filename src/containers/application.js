@@ -1,33 +1,24 @@
+// @flow
 import {connect} from 'react-redux'
 
-import {
-  clearEnd,
-  clearIsochrone,
-  clearStart,
-  setBaseActive,
-  setComparisonActive,
-  updateDestination,
-  updateOrigin,
-  updateSelectedTimeCutoff
-} from '../actions'
+import * as actions from '../actions'
+import initializeBrowsochrones from '../actions/browsochrones'
 import Application from '../components/application'
+import selectAccessibilityKeys from '../selectors/accessibility-keys'
+import selectJourneysFromTransitive from '../selectors/journeys-from-transitive'
+import selectPointsOfInterest from '../selectors/points-of-interest'
+import selectShowComparison from '../selectors/show-comparison'
 
 function mapStateToProps (state, ownProps) {
-  return state
-}
-
-function mapDispatchToProps (dispatch, ownProps) {
   return {
-    clearEnd: () => dispatch(clearEnd()),
-    clearIsochrone: () => dispatch(clearIsochrone()),
-    clearStart: () => dispatch(clearStart()),
-    initializeBrowsochrones: (actions) => dispatch(actions),
-    moveOrigin: (options) => dispatch(updateOrigin(options)),
-    moveDestination: (options) => dispatch(updateDestination(options)),
-    onTimeCutoffChange: (options) => dispatch(updateSelectedTimeCutoff(options)),
-    setBaseActive: () => dispatch(setBaseActive()),
-    setComparisonActive: () => dispatch(setComparisonActive())
+    ...state,
+    accessibilityKeys: selectAccessibilityKeys(state, ownProps),
+    journeys: selectJourneysFromTransitive(state, ownProps),
+    pointsOfInterest: selectPointsOfInterest(state, ownProps),
+    showComparison: selectShowComparison(state, ownProps)
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Application)
+export default connect(mapStateToProps, {...actions, initializeBrowsochrones})(
+  Application
+)

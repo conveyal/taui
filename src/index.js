@@ -1,3 +1,4 @@
+// @flow
 import mount from '@conveyal/woonerf/mount'
 
 import Application from './containers/application'

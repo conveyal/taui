@@ -1,20 +1,20 @@
+// @flow
 import {handleActions} from 'redux-actions'
 
-export default handleActions({
-  'set base active' (state, action) {
-    state.active = 'base'
-    return state
+export default handleActions(
+  {
+    'set active browsochrones instance' (state, action) {
+      return {
+        ...state,
+        active: action.payload
+      }
+    },
+    'set browsochrones instances' (state, action) {
+      return {
+        ...state,
+        instances: action.payload
+      }
+    }
   },
-  'set comparison active' (state, action) {
-    state.active = 'comparison'
-    return state
-  },
-  'set browsochrones base' (state, action) {
-    state.base = action.payload
-    return state
-  },
-  'set browsochrones comparison' (state, action) {
-    state.comparison = action.payload
-    return state
-  }
-}, {})
+  {}
+)
