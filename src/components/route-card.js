@@ -180,12 +180,17 @@ const Segment = ({segment}) => (
 )
 
 function MetricIcon ({name}) {
-  const lc = name.toLowerCase()
-  if (lc.indexOf('job') !== -1) return <Icon type='building' />
-  if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) {
-    return <Icon type='child' />
+  switch (name.toLowerCase()) {
+    case 'banen': // Dutch for job
+    case 'job':
+      return <Icon type='building' />
+    case 'worker':
+    case 'population':
+    case 'bewoners': // Dutch for residents
+      return <Icon type='child' />
+    default:
+      return <span />
   }
-  return <span />
 }
 
 function ShowAccess ({
@@ -222,7 +227,7 @@ function AccessDiffPercentage ({newAccess, originalAccess}) {
     ? newAccess - originalAccess
     : originalAccess - newAccess
   const diff = parseInt((nume / originalAccess * 100).toFixed(1))
-  if (diff === 0) return <span />
+  if (diff === 0 || isNaN(diff)) return <span />
   else if (actualDiff > 0) {
     return (
       <span className='pull-right increase'>
