@@ -1,3 +1,4 @@
+// @flow
 import lonlat from '@conveyal/lonlat'
 import {decrementFetches, incrementFetches} from '@conveyal/woonerf/fetch'
 import Browsochrones from 'browsochrones'
@@ -19,7 +20,14 @@ import {
   setStartLabel
 } from '../actions'
 
-export default function initialize ({browsochrones, geocoder, map}) {
+import type {Store} from '../types'
+
+export default function initialize ({
+  browsochrones,
+  geocoder,
+  map,
+  timeCutoff
+}: Store) {
   const {origins} = browsochrones
   const qs = getHash()
   return [
@@ -38,7 +46,9 @@ export default function initialize ({browsochrones, geocoder, map}) {
       if (end) actions.push(setEnd(end))
       actions.push(
         fetchGrids(browsochrones)
-          .then(grids => loadAllOrigins({grids, origins}))
+          .then(grids =>
+            loadAllOrigins({grids, origins, gridNames: browsochrones.grids})
+          )
           .then(instances => [
             setBrowsochronesInstances(instances),
             start &&
@@ -46,6 +56,7 @@ export default function initialize ({browsochrones, geocoder, map}) {
                 browsochronesInstances: instances,
                 endLatlng: end && end.latlng,
                 latlng: start.latlng,
+                timeCutoff: timeCutoff.selected,
                 zoom: map.zoom
               }),
             addActionLogItem(messages.Strings.ApplicationReady),
@@ -57,47 +68,49 @@ export default function initialize ({browsochrones, geocoder, map}) {
   ]
 }
 
-function geocodeQs ({geocoder, qs}) {
-  return Promise.all(
-    ['start', 'end'].map(async p => {
-      if (qs[p]) {
-        const results = await geocode({
-          apiKey: process.env.MAPZEN_SEARCH_KEY,
-          boundary: geocoder.boundary,
-          focusPoint: geocoder.focusLatlng,
-          text: qs[p]
-        })
-        if (results.features.length > 0) {
-          return {
-            label: results.features[0].properties.label,
-            latlng: lonlat(results.features[0].geometry.coordinates)
-          }
+async function geocodeQs ({geocoder, qs}) {
+  async function geocodeP (p) {
+    if (qs[p]) {
+      const results = await geocode({
+        apiKey: process.env.MAPZEN_SEARCH_KEY,
+        boundary: geocoder.boundary,
+        focusPoint: geocoder.focusLatlng,
+        text: qs[p]
+      })
+      if (results.features.length > 0) {
+        return {
+          label: results.features[0].properties.label,
+          latlng: lonlat(results.features[0].geometry.coordinates)
         }
       }
-    })
-  )
+    }
+  }
+  return [await geocodeP('start'), await geocodeP('end')]
 }
 
-function fetchGrids ({grids, gridsUrl}) {
+function fetchGrids ({
+  grids,
+  gridsUrl
+}: {
+  grids: string[],
+  gridsUrl: string
+}): Promise<ArrayBuffer[]> {
   return Promise.all(
-    grids.map(async name => {
-      const res = await fetch(`${gridsUrl}/${name}.grid`)
-      const grid = await res.arrayBuffer()
-      grid.name = name
-      return grid
-    })
+    grids.map(name =>
+      fetch(`${gridsUrl}/${name}.grid`).then(r => r.arrayBuffer())
+    )
   )
 }
 
-function loadAllOrigins ({grids, origins}) {
-  return Promise.all(origins.map(origin => load(origin, grids)))
+function loadAllOrigins ({grids, origins, gridNames}) {
+  return Promise.all(origins.map(origin => load(origin, grids, gridNames)))
 }
 
-async function load (origin, grids) {
+async function load (origin, grids, gridNames) {
   const bs = new Browsochrones()
   bs.name = origin.name
   bs.originsUrl = origin.url
-  bs.grids = grids.map(g => g.name)
+  bs.grids = gridNames
   const fetches = [
     fetch(`${origin.url}/query.json`).then(res => res.json()),
     fetch(`${origin.url}/stop_trees.dat`).then(res => res.arrayBuffer())
@@ -107,7 +120,9 @@ async function load (origin, grids) {
   await bs.setStopTrees(stopTrees)
   await bs.setTransitiveNetwork(query.transitiveData)
 
-  const putGrids = grids.map(grid => bs.putGrid(grid.name, grid))
+  const putGrids = grids.map((grid, index) =>
+    bs.putGrid(gridNames[index], grid)
+  )
   await Promise.all(putGrids)
 
   return bs

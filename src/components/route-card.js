@@ -1,72 +1,78 @@
-import Pure from '@conveyal/woonerf/components/pure'
-import Color from 'color'
+// @flow
 import React from 'react'
-import toCapitalCase from 'lodash/capitalize'
 import toSpaceCase from 'lodash/lowerCase'
-import unique from 'lodash/uniq'
 
 import {ACCESSIBILITY_IS_EMPTY, ACCESSIBILITY_IS_LOADING} from '../constants'
 import Icon from './icon'
 import messages from '../utils/messages'
 
-export default class RouteCard extends Pure {
-  render () {
-    const {
-      active,
-      alternate,
-      accessibility,
-      children,
-      oldAccessibility,
-      oldTravelTime,
-      oldWaitTime,
-      onClick,
-      transitiveData,
-      travelTime,
-      waitTime
-    } = this.props
-    const className =
-      'Card' +
-      (alternate ? ' Card-alternate' : '') +
-      (active ? ' Card-active' : '')
-    const accessibilityKeys = Object.keys(accessibility)
-    const comparisonAccessibilityKeys = Object.keys(oldAccessibility || {})
-
-    return (
-      <div className={className}>
-        <a
-          className='CardTitle'
-          onClick={onClick}
-          tabIndex={0}
-          title='Set system active'
-        >
-          {children}
-          <span className='pull-right'>
-            {active && <Icon type='map' />}
-            {!active && 'show'}
-          </span>
-        </a>
-        <div className='CardContent'>
-          {comparisonAccessibilityKeys.length > 0
-            ? <ShowAccess keys={accessibilityKeys} base={accessibility} />
-            : <ShowDiff
-              keys={accessibilityKeys}
-              base={accessibility}
-              comparison={oldAccessibility}
-              />}
-          {accessibility !== ACCESSIBILITY_IS_EMPTY &&
-            accessibility !== ACCESSIBILITY_IS_LOADING &&
-            <Journeys
-              oldTravelTime={oldTravelTime}
-              oldWaitTime={oldWaitTime}
-              travelTime={travelTime}
-              transitiveData={transitiveData}
-              waitTime={waitTime}
-            />}
-        </div>
-      </div>
-    )
-  }
+type Props = {
+  active: boolean,
+  alternate: boolean,
+  accessibility: any,
+  accessibilityKeys: string[],
+  children?: any,
+  journeys: any[],
+  oldAccessibility: any,
+  oldTravelTime: number,
+  onClick(): void,
+  showComparison: boolean,
+  travelTime: number,
+  waitTime: number
 }
+
+export default ({
+  active,
+  alternate,
+  accessibility,
+  accessibilityKeys,
+  children,
+  journeys,
+  oldAccessibility,
+  oldTravelTime,
+  onClick,
+  showComparison,
+  travelTime,
+  waitTime
+}: Props) => (
+  <div
+    className={
+      'Card' +
+        (alternate ? ' Card-alternate' : '') +
+        (active ? ' Card-active' : '')
+    }
+  >
+    <a
+      className='CardTitle'
+      onClick={onClick}
+      tabIndex={0}
+      title='Set system active'
+    >
+      {children}
+      <span className='pull-right'>
+        {active && <Icon type='map' />}
+        {!active && messages.Systems.Show}
+      </span>
+    </a>
+    <div className='CardContent'>
+      {showComparison
+        ? <ShowDiff
+          keys={accessibilityKeys}
+          base={accessibility}
+          comparison={oldAccessibility}
+          />
+        : <ShowAccess keys={accessibilityKeys} base={accessibility} />}
+      {accessibility !== ACCESSIBILITY_IS_EMPTY &&
+        accessibility !== ACCESSIBILITY_IS_LOADING &&
+        <Journeys
+          journeys={journeys}
+          oldTravelTime={oldTravelTime}
+          travelTime={travelTime}
+          waitTime={waitTime}
+        />}
+    </div>
+  </div>
+)
 
 function TripDiff ({oldTravelTime, travelTime}) {
   const actualDiff = travelTime - oldTravelTime
@@ -99,8 +105,8 @@ function TripDiff ({oldTravelTime, travelTime}) {
   }
 }
 
-function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
-  if (!travelTime || !transitiveData) {
+function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
+  if (!travelTime || !journeys) {
     return (
       <div className='CardJourneys'>
         <div className='heading'>{messages.Systems.TripsTitle}</div>
@@ -108,8 +114,6 @@ function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
       </div>
     )
   }
-
-  const journeys = extractRelevantTransitiveInfo(transitiveData)
 
   if (travelTime === 255 || journeys.length === 0) {
     return (
@@ -120,33 +124,7 @@ function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
     )
   }
 
-  const [
-    bestTripSegments,
-    ...alternateTripSegments
-  ] = journeys.map((segments, jindex) => {
-    return segments.map((s, sindex) => {
-      return (
-        <span
-          className='CardSegment'
-          key={`journey-${jindex}-segment-${sindex}`}
-          style={{
-            backgroundColor: s.backgroundColor || 'inherit',
-            color: s.color || 'inherit'
-          }}
-        >
-          <i className={`fa fa-${s.type}`} /> {s.name}
-        </span>
-      )
-    })
-  })
-
-  const alternateTrips = alternateTripSegments.map((segments, jindex) => {
-    return (
-      <div className='Trip' key={`journey-${jindex}`}>
-        <span className='CardIndex'>{jindex + 1}.</span>{segments}
-      </div>
-    )
-  })
+  const [bestJourney, ...alternateJourneys] = journeys
 
   return (
     <div>
@@ -165,69 +143,65 @@ function Journeys ({oldTravelTime, transitiveData, travelTime, waitTime}) {
           {' '}
           {messages.Systems.Waiting}
         </div>
-        <div>{bestTripSegments}</div>
+        <div>
+          {bestJourney.map((segment, index) => (
+            <Segment key={index} segment={segment} />
+          ))}
+        </div>
       </div>
-      {alternateTrips.length > 0 &&
+      {journeys.length > 1 &&
         <div>
           <div className='heading'>{messages.Systems.AlternateTripsTitle}</div>
-          <div className='Trips'>{alternateTrips}</div>
+          <div className='Trips'>
+            {alternateJourneys.map((segments, jindex) => (
+              <div className='Trip' key={jindex}>
+                <span className='CardIndex'>{jindex + 1}.</span>
+                {segments.map((segment, index) => (
+                  <Segment key={index} segment={segment} />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>}
     </div>
   )
 }
 
-// TODO: filter journeys that have same pattern id sequences
-function extractRelevantTransitiveInfo ({journeys, patterns, routes, stops}) {
-  return journeys.map(j => {
-    return j.segments.filter(s => !!s.pattern_id || !!s.patterns).map(s => {
-      const pid = s.pattern_id || s.patterns[0].pattern_id
-      const seg = {}
-      const route = findRouteForPattern({id: pid, patterns, routes})
-      const color = route.route_color
-        ? Color(`#${route.route_color}`)
-        : Color('#0b2b40')
-      seg.name = toCapitalCase(route.route_short_name)
-
-      if (s.patterns && s.patterns.length > 0) {
-        const patternNames = s.patterns.map(p =>
-          toCapitalCase(
-            findRouteForPattern({id: p.pattern_id, patterns, routes})
-              .route_short_name
-          )
-        )
-        seg.name = unique(patternNames).join(' / ')
-      }
-
-      seg.backgroundColor = color.string()
-      seg.color = color.light() ? '#000' : '#fff'
-      seg.type = typeToIcon[route.route_type]
-
-      return seg
-    })
-  })
-}
-
-function findRouteForPattern ({id, patterns, routes}) {
-  return routes.find(
-    r => r.route_id === patterns.find(p => p.pattern_id === id).route_id
-  )
-}
-
-const typeToIcon = {
-  0: 'subway',
-  1: 'subway',
-  2: 'train',
-  3: 'bus'
-}
+const Segment = ({segment}) => (
+  <span
+    className='CardSegment'
+    style={{
+      backgroundColor: segment.backgroundColor || 'inherit',
+      color: segment.color || 'inherit'
+    }}
+  >
+    <i className={`fa fa-${segment.type}`} /> {segment.name}
+  </span>
+)
 
 function MetricIcon ({name}) {
-  const lc = name.toLowerCase()
-  if (lc.indexOf('job') !== -1) return <Icon type='building' />
-  if (lc.indexOf('worker') !== -1 || lc.indexOf('population') !== -1) { return <Icon type='child' /> }
-  return <span />
+  switch (name.toLowerCase()) {
+    case 'banen': // Dutch for job
+    case 'job':
+      return <Icon type='building' />
+    case 'worker':
+    case 'population':
+    case 'bewoners': // Dutch for residents
+      return <Icon type='child' />
+    default:
+      return <span />
+  }
 }
 
-function ShowAccess ({keys, base}) {
+function ShowAccess ({
+  keys,
+  base
+}: {
+  keys: string[],
+  base: {
+    [name: string]: number
+  }
+}) {
   return (
     <div className='CardAccess'>
       <div className='heading'>{messages.Systems.AccessTitle}</div>
@@ -253,7 +227,7 @@ function AccessDiffPercentage ({newAccess, originalAccess}) {
     ? newAccess - originalAccess
     : originalAccess - newAccess
   const diff = parseInt((nume / originalAccess * 100).toFixed(1))
-  if (diff === 0) return <span />
+  if (diff === 0 || isNaN(diff)) return <span />
   else if (actualDiff > 0) {
     return (
       <span className='pull-right increase'>

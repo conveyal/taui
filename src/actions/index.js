@@ -1,4 +1,6 @@
+// @flow
 import lonlat from '@conveyal/lonlat'
+import type Browsochrones from 'browsochrones'
 import fetch, {
   incrementFetches as incrementWork,
   decrementFetches as decrementWork
@@ -8,6 +10,8 @@ import Leaflet from 'leaflet'
 import {createAction} from 'redux-actions'
 
 import {setKeyTo} from '../utils/hash'
+
+import type {LatLng} from '../types'
 
 const END = 'end'
 const START = 'start'
@@ -96,6 +100,13 @@ export function updateStart ({
   label,
   timeCutoff,
   zoom
+}: {
+  browsochronesInstances: Browsochrones[],
+  endLatlng: LatLng,
+  latlng: LatLng,
+  label: string,
+  timeCutoff: number,
+  zoom: number
 }) {
   const actions = [
     addActionLogItem('Generating origins...'),
@@ -135,7 +146,9 @@ export function updateStart ({
     )
   }
 
-  if (!browsochronesInstances || browsochronesInstances.length === 0) { return actions }
+  if (!browsochronesInstances || browsochronesInstances.length === 0) {
+    return actions
+  }
 
   actions.push(
     fetchAllBrowsochrones({
@@ -156,6 +169,12 @@ export function fetchAllBrowsochrones ({
   latlng,
   timeCutoff,
   zoom
+}: {
+  browsochronesInstances: Browsochrones[],
+  endLatlng?: LatLng,
+  latlng: LatLng,
+  timeCutoff: number,
+  zoom: number
 }) {
   const point = Leaflet.CRS.EPSG3857.latLngToPoint(
     lonlat.toLeaflet(latlng),
@@ -289,7 +308,15 @@ function generateDestinationDataFor ({
   ]
 }
 
-export function updateSelectedTimeCutoff ({browsochrones, latlng, timeCutoff}) {
+export function updateSelectedTimeCutoff ({
+  browsochrones,
+  latlng,
+  timeCutoff
+}: {
+  browsochrones: Browsochrones,
+  latlng: LatLng,
+  timeCutoff: number
+}) {
   const actions = [setSelectedTimeCutoff(timeCutoff)]
 
   browsochrones.instances.map((instance, index) => {
@@ -329,6 +356,12 @@ export function updateEnd ({
   latlng,
   label,
   zoom
+}: {
+  browsochronesInstances: Browsochrones[],
+  startLatlng: LatLng,
+  latlng: LatLng,
+  label: string,
+  zoom: number
 }) {
   const actions = []
 

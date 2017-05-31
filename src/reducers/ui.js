@@ -1,3 +1,4 @@
+// @flow
 import {DECREMENT_FETCH, INCREMENT_FETCH} from '@conveyal/woonerf/fetch'
 import {handleActions} from 'redux-actions'
 

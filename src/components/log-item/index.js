@@ -1,25 +1,16 @@
-import Pure from '@conveyal/woonerf/components/pure'
-import React, {PropTypes} from 'react'
-import moment from 'moment'
+// @flow
+import formatDate from 'date-fns/format'
+import React from 'react'
 
-const format = 'HH:mm:ss'
+import type {LogItem} from '../../types'
 
-export default class LogItem extends Pure {
-  static propTypes = {
-    createdAt: PropTypes.object,
-    level: PropTypes.string,
-    text: PropTypes.string.isRequired
-  }
+const FORMAT = 'HH:mm:ss'
 
-  render () {
-    const {createdAt, text} = this.props
-    return (
-      <div className='LogItem'>
-        <small className='LogItem-createdAt'>
-          {moment(createdAt).format(format)}
-        </small>
-        <span className='LogItem-text'>{text}</span>
-      </div>
-    )
-  }
-}
+export default (props: LogItem) => (
+  <div className='LogItem'>
+    <small className='LogItem-createdAt'>
+      {formatDate(props.createdAt, FORMAT)}
+    </small>
+    <span className='LogItem-text'>{props.text}</span>
+  </div>
+)
