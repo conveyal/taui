@@ -36,9 +36,9 @@ export default function initialize ({
     setEndLabel(qs.end), // may not exist
     ...origins.map(
       (origin, index) =>
-        (qs.start
+        qs.start
           ? setAccessibilityToLoadingFor({index, name: origin.name})
-          : setAccessibilityToEmptyFor({index, name: origin.name}))
+          : setAccessibilityToEmptyFor({index, name: origin.name})
     ),
     geocodeQs({geocoder, qs}).then(([start, end]) => {
       const actions = []

@@ -48,9 +48,11 @@ export default ({
   pointsOfInterest,
   selectedTimeCutoff,
   start
-}: Props) => (
+}: Props) =>
   <div>
-    <div className='heading'>{messages.Geocoding.StartTitle}</div>
+    <div className='heading'>
+      {messages.Geocoding.StartTitle}
+    </div>
     <div className='Geocoder'>
       <Geocoder
         apiKey={process.env.MAPZEN_SEARCH_KEY}
@@ -69,7 +71,9 @@ export default ({
     </div>
     {start &&
       <div>
-        <div className='heading'>{messages.Geocoding.EndTitle}</div>
+        <div className='heading'>
+          {messages.Geocoding.EndTitle}
+        </div>
         <div className='Geocoder'>
           <Geocoder
             apiKey={process.env.MAPZEN_SEARCH_KEY}
@@ -104,4 +108,3 @@ export default ({
         </div>
       </div>}
   </div>
-)
