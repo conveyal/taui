@@ -18,9 +18,10 @@ import transitiveStyle from '../transitive-style'
 
 import type {Coordinate, Feature, MapEvent, PointsOfInterest} from '../types'
 
-const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
-  ? process.env.LEAFLET_RETINA_URL
-  : process.env.LEAFLET_TILE_URL
+const TILE_LAYER_URL =
+  Browser.retina && process.env.LEAFLET_RETINA_URL
+    ? process.env.LEAFLET_RETINA_URL
+    : process.env.LEAFLET_TILE_URL
 
 const startIcon = leafletIcon({
   icon: 'play',
@@ -151,7 +152,7 @@ export default class Map extends PureComponent<void, Props, State> {
             onClick={this._clickPoi}
           />}
 
-        {markers.map((m, index) => (
+        {markers.map((m, index) =>
           <Marker
             draggable
             icon={index === 0 ? startIcon : endIcon}
@@ -159,9 +160,14 @@ export default class Map extends PureComponent<void, Props, State> {
             onDragEnd={m.onDragEnd}
             position={m.position}
           >
-            {m.label && <Popup><span>{m.label}</span></Popup>}
+            {m.label &&
+              <Popup>
+                <span>
+                  {m.label}
+                </span>
+              </Popup>}
           </Marker>
-        ))}
+        )}
 
         {geojson.map(g => {
           return (
@@ -184,22 +190,22 @@ export default class Map extends PureComponent<void, Props, State> {
         {showSelectStartOrEnd &&
           <Popup closeButton={false} position={lastClickedLatlng}>
             <div className='Popup'>
-              {lastClickedLabel && <h3>{lastClickedLabel}</h3>}
+              {lastClickedLabel &&
+                <h3>
+                  {lastClickedLabel}
+                </h3>}
               <button onClick={this._setStart}>
-                <Icon type='map-marker' />
-                {' '}
+                <Icon type='map-marker' />{' '}
                 {messages.Map.SetLocationPopup.SetStart}
               </button>
               {markers.length > 0 &&
                 <button onClick={this._setEnd}>
-                  <Icon type='map-marker' />
-                  {' '}
+                  <Icon type='map-marker' />{' '}
                   {messages.Map.SetLocationPopup.SetEnd}
                 </button>}
               {markers.length > 0 &&
                 <button onClick={this._clearStartAndEnd}>
-                  <Icon type='times' />
-                  {' '}
+                  <Icon type='times' />{' '}
                   {messages.Map.SetLocationPopup.ClearMarkers}
                 </button>}
             </div>

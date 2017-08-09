@@ -34,12 +34,12 @@ export default ({
   showComparison,
   travelTime,
   waitTime
-}: Props) => (
+}: Props) =>
   <div
     className={
       'Card' +
-        (alternate ? ' Card-alternate' : '') +
-        (active ? ' Card-active' : '')
+      (alternate ? ' Card-alternate' : '') +
+      (active ? ' Card-active' : '')
     }
   >
     <a
@@ -72,25 +72,25 @@ export default ({
         />}
     </div>
   </div>
-)
 
 function TripDiff ({oldTravelTime, travelTime}) {
   const actualDiff = travelTime - oldTravelTime
-  const nume = actualDiff > 0
-    ? travelTime - oldTravelTime
-    : oldTravelTime - travelTime
+  const nume =
+    actualDiff > 0 ? travelTime - oldTravelTime : oldTravelTime - travelTime
   const diff = parseInt((nume / oldTravelTime * 100).toFixed(1))
 
   if (oldTravelTime === 255) {
     return (
       <span className='increase'>
-        {messages.NewTrip} <Icon type='star' /><br />
+        {messages.NewTrip} <Icon type='star' />
+        <br />
       </span>
     )
   } else if (actualDiff > 0) {
     return (
       <span className='pull-right decrease'>
-        <strong>{diff}</strong>%<Icon type='level-up' /><br />
+        <strong>{diff}</strong>%<Icon type='level-up' />
+        <br />
       </span>
     )
   } else {
@@ -109,8 +109,12 @@ function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
   if (!travelTime || !journeys) {
     return (
       <div className='CardJourneys'>
-        <div className='heading'>{messages.Systems.TripsTitle}</div>
-        <div>{messages.Systems.SelectEnd}</div>
+        <div className='heading'>
+          {messages.Systems.TripsTitle}
+        </div>
+        <div>
+          {messages.Systems.SelectEnd}
+        </div>
       </div>
     )
   }
@@ -118,8 +122,12 @@ function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
   if (travelTime === 255 || journeys.length === 0) {
     return (
       <div className='CardJourneys'>
-        <div className='heading'>{messages.Systems.TripsTitle}</div>
-        <div>{messages.Systems.TripsEmpty}</div>
+        <div className='heading'>
+          {messages.Systems.TripsTitle}
+        </div>
+        <div>
+          {messages.Systems.TripsEmpty}
+        </div>
       </div>
     )
   }
@@ -128,46 +136,51 @@ function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
 
   return (
     <div>
-      <div className='heading'>{messages.Systems.BestTripTitle}</div>
+      <div className='heading'>
+        {messages.Systems.BestTripTitle}
+      </div>
       <div className='BestTrip'>
-        <div><strong> {travelTime}</strong> {messages.Units.Mins}</div>
+        <div>
+          <strong> {travelTime}</strong> {messages.Units.Mins}
+        </div>
         <div>
           {oldTravelTime &&
             oldTravelTime !== travelTime &&
             <TripDiff oldTravelTime={oldTravelTime} travelTime={travelTime} />}
         </div>
         <div>
-          <strong>{waitTime}</strong>
-          {' '}
-          {messages.Units.Mins}
-          {' '}
+          <strong>{waitTime}</strong> {messages.Units.Mins}{' '}
           {messages.Systems.Waiting}
         </div>
         <div>
-          {bestJourney.map((segment, index) => (
+          {bestJourney.map((segment, index) =>
             <Segment key={index} segment={segment} />
-          ))}
+          )}
         </div>
       </div>
       {journeys.length > 1 &&
         <div>
-          <div className='heading'>{messages.Systems.AlternateTripsTitle}</div>
+          <div className='heading'>
+            {messages.Systems.AlternateTripsTitle}
+          </div>
           <div className='Trips'>
-            {alternateJourneys.map((segments, jindex) => (
+            {alternateJourneys.map((segments, jindex) =>
               <div className='Trip' key={jindex}>
-                <span className='CardIndex'>{jindex + 1}.</span>
-                {segments.map((segment, index) => (
+                <span className='CardIndex'>
+                  {jindex + 1}.
+                </span>
+                {segments.map((segment, index) =>
                   <Segment key={index} segment={segment} />
-                ))}
+                )}
               </div>
-            ))}
+            )}
           </div>
         </div>}
     </div>
   )
 }
 
-const Segment = ({segment}) => (
+const Segment = ({segment}) =>
   <span
     className='CardSegment'
     style={{
@@ -177,7 +190,6 @@ const Segment = ({segment}) => (
   >
     <i className={`fa fa-${segment.type}`} /> {segment.name}
   </span>
-)
 
 function MetricIcon ({name}) {
   switch (name.toLowerCase()) {
@@ -204,28 +216,32 @@ function ShowAccess ({
 }) {
   return (
     <div className='CardAccess'>
-      <div className='heading'>{messages.Systems.AccessTitle}</div>
+      <div className='heading'>
+        {messages.Systems.AccessTitle}
+      </div>
       {base === ACCESSIBILITY_IS_EMPTY
-        ? <span>{messages.Systems.SelectStart}</span>
+        ? <span>
+          {messages.Systems.SelectStart}
+        </span>
         : base === ACCESSIBILITY_IS_LOADING
-            ? <span>{messages.Systems.CalculatingAccessibility}</span>
-            : keys.map((k, i) => (
-              <div className='Metric' key={k}>
-                <MetricIcon name={k} />
-                <strong> {(base[k] | 0).toLocaleString()} </strong>
-                {' '}
-                {toSpaceCase(k)}
-              </div>
-              ))}
+          ? <span>
+            {messages.Systems.CalculatingAccessibility}
+          </span>
+          : keys.map((k, i) =>
+            <div className='Metric' key={k}>
+              <MetricIcon name={k} />
+              <strong> {(base[k] | 0).toLocaleString()} </strong>{' '}
+              {toSpaceCase(k)}
+            </div>
+            )}
     </div>
   )
 }
 
 function AccessDiffPercentage ({newAccess, originalAccess}) {
   const actualDiff = newAccess - originalAccess
-  const nume = actualDiff > 0
-    ? newAccess - originalAccess
-    : originalAccess - newAccess
+  const nume =
+    actualDiff > 0 ? newAccess - originalAccess : originalAccess - newAccess
   const diff = parseInt((nume / originalAccess * 100).toFixed(1))
   if (diff === 0 || isNaN(diff)) return <span />
   else if (actualDiff > 0) {
@@ -248,23 +264,28 @@ function AccessDiffPercentage ({newAccess, originalAccess}) {
 function ShowDiff ({keys, base, comparison}) {
   return (
     <div className='CardAccess'>
-      <div className='heading'>{messages.Systems.AccessTitle}</div>
+      <div className='heading'>
+        {messages.Systems.AccessTitle}
+      </div>
       {base === ACCESSIBILITY_IS_EMPTY
-        ? <span>{messages.Systems.SelectStart}</span>
+        ? <span>
+          {messages.Systems.SelectStart}
+        </span>
         : base === ACCESSIBILITY_IS_LOADING
-            ? <span>{messages.Systems.CalculatingAccessibility}</span>
-            : keys.map((key, i) => (
-              <div className='Metric' key={key}>
-                <MetricIcon name={key} />
-                <strong> {(base[key] | 0).toLocaleString()} </strong>
-                {' '}
-                {toSpaceCase(key)}
-                <AccessDiffPercentage
-                  newAccess={base[key]}
-                  originalAccess={comparison[key]}
-                  />
-              </div>
-              ))}
+          ? <span>
+            {messages.Systems.CalculatingAccessibility}
+          </span>
+          : keys.map((key, i) =>
+            <div className='Metric' key={key}>
+              <MetricIcon name={key} />
+              <strong> {(base[key] | 0).toLocaleString()} </strong>{' '}
+              {toSpaceCase(key)}
+              <AccessDiffPercentage
+                newAccess={base[key]}
+                originalAccess={comparison[key]}
+                />
+            </div>
+            )}
     </div>
   )
 }
