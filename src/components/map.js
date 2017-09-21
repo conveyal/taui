@@ -11,6 +11,7 @@ import {
 } from 'react-leaflet'
 
 import Icon from './icon'
+import {setKeyTo} from '../utils/hash'
 import leafletIcon from '../utils/leaflet-icons'
 import messages from '../utils/messages'
 import TransitiveLayer from './transitive-map-layer'
@@ -108,6 +109,10 @@ export default class Map extends PureComponent<void, Props, State> {
     })
   }
 
+  _setZoom = (e: MapEvent) => {
+    setKeyTo('zoom', e.target._zoom)
+  }
+
   render (): React$Element<LeafletMap> {
     const {
       centerCoordinates,
@@ -135,6 +140,7 @@ export default class Map extends PureComponent<void, Props, State> {
         center={centerCoordinates}
         className='Taui-Map'
         ref='map'
+        onZoomend={this._setZoom}
         zoom={zoom}
         onClick={this._onMapClick}
         preferCanvas
