@@ -115,9 +115,11 @@ export default class Map extends PureComponent<void, Props, State> {
 
   render (): React$Element<LeafletMap> {
     const {
+      active,
       centerCoordinates,
       geojson,
       geojsonColor,
+      isochrones,
       markers,
       pointsOfInterest,
       transitive,
@@ -134,6 +136,9 @@ export default class Map extends PureComponent<void, Props, State> {
       tileLayerProps.tileSize = 512
       tileLayerProps.zoomOffset = -1
     }
+
+    const baseIsochrone = isochrones[0]
+    const comparisonIsochrone = active !== 0 ? isochrones[active] : null
 
     return (
       <LeafletMap
@@ -175,20 +180,11 @@ export default class Map extends PureComponent<void, Props, State> {
           </Marker>
         )}
 
-        {geojson.map(g => {
-          return (
-            <GeoJson
-              key={`${g.key}`}
-              data={g}
-              style={{
-                fillColor: geojsonColor,
-                pointerEvents: 'none',
-                stroke: geojsonColor,
-                weight: 1
-              }}
-            />
-          )
-        })}
+        {baseIsochrone &&
+          <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
+
+        {comparisonIsochrone &&
+          <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
 
         {transitive &&
           <TransitiveLayer data={transitive} styles={transitiveStyle} />}
@@ -219,6 +215,19 @@ export default class Map extends PureComponent<void, Props, State> {
       </LeafletMap>
     )
   }
+}
+
+function Isochrone ({isochrone, color}) {
+  return <GeoJson
+    key={`${isochrone.key}`}
+    data={isochrone}
+    style={{
+      fillColor: color,
+      pointerEvents: 'none',
+      stroke: color,
+      weight: 1
+    }}
+  />
 }
 
 class MapboxGeoJson extends GeoJson {
