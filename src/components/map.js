@@ -11,6 +11,7 @@ import {
 } from 'react-leaflet'
 
 import Icon from './icon'
+import {setKeyTo} from '../utils/hash'
 import leafletIcon from '../utils/leaflet-icons'
 import messages from '../utils/messages'
 import TransitiveLayer from './transitive-map-layer'
@@ -33,10 +34,10 @@ const endIcon = leafletIcon({
 })
 
 type Props = {
+  active: number,
   centerCoordinates: Coordinate,
   clearStartAndEnd(): void,
-  geojson: Feature[],
-  geojsonColor: string,
+  isochrones: any[],
   markers: any[],
   pointsOfInterest: PointsOfInterest,
   setEnd(any): void,
@@ -107,11 +108,15 @@ export default class Map extends PureComponent<void, Props, State> {
     })
   }
 
+  _setZoom = (e: MapEvent) => {
+    setKeyTo('zoom', e.target._zoom)
+  }
+
   render (): React$Element<LeafletMap> {
     const {
+      active,
       centerCoordinates,
-      geojson,
-      geojsonColor,
+      isochrones,
       markers,
       pointsOfInterest,
       transitive,
@@ -129,11 +134,15 @@ export default class Map extends PureComponent<void, Props, State> {
       tileLayerProps.zoomOffset = -1
     }
 
+    const baseIsochrone = isochrones[0]
+    const comparisonIsochrone = active !== 0 ? isochrones[active] : null
+
     return (
       <LeafletMap
         center={centerCoordinates}
         className='Taui-Map'
         ref='map'
+        onZoomend={this._setZoom}
         zoom={zoom}
         onClick={this._onMapClick}
         preferCanvas
@@ -159,24 +168,20 @@ export default class Map extends PureComponent<void, Props, State> {
             onDragEnd={m.onDragEnd}
             position={m.position}
           >
-            {m.label && <Popup><span>{m.label}</span></Popup>}
+            {m.label &&
+              <Popup>
+                <span>
+                  {m.label}
+                </span>
+              </Popup>}
           </Marker>
         ))}
 
-        {geojson.map(g => {
-          return (
-            <GeoJson
-              key={`${g.key}`}
-              data={g}
-              style={{
-                fillColor: geojsonColor,
-                pointerEvents: 'none',
-                stroke: geojsonColor,
-                weight: 1
-              }}
-            />
-          )
-        })}
+        {baseIsochrone &&
+          <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
+
+        {comparisonIsochrone &&
+          <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
 
         {transitive &&
           <TransitiveLayer data={transitive} styles={transitiveStyle} />}
@@ -184,22 +189,22 @@ export default class Map extends PureComponent<void, Props, State> {
         {showSelectStartOrEnd &&
           <Popup closeButton={false} position={lastClickedLatlng}>
             <div className='Popup'>
-              {lastClickedLabel && <h3>{lastClickedLabel}</h3>}
+              {lastClickedLabel &&
+                <h3>
+                  {lastClickedLabel}
+                </h3>}
               <button onClick={this._setStart}>
-                <Icon type='map-marker' />
-                {' '}
+                <Icon type='map-marker' />{' '}
                 {messages.Map.SetLocationPopup.SetStart}
               </button>
               {markers.length > 0 &&
                 <button onClick={this._setEnd}>
-                  <Icon type='map-marker' />
-                  {' '}
+                  <Icon type='map-marker' />{' '}
                   {messages.Map.SetLocationPopup.SetEnd}
                 </button>}
               {markers.length > 0 &&
                 <button onClick={this._clearStartAndEnd}>
-                  <Icon type='times' />
-                  {' '}
+                  <Icon type='times' />{' '}
                   {messages.Map.SetLocationPopup.ClearMarkers}
                 </button>}
             </div>
@@ -207,6 +212,21 @@ export default class Map extends PureComponent<void, Props, State> {
       </LeafletMap>
     )
   }
+}
+
+function Isochrone ({isochrone, color}) {
+  return (
+    <GeoJson
+      key={`${isochrone.key}`}
+      data={isochrone}
+      style={{
+        fillColor: color,
+        pointerEvents: 'none',
+        stroke: color,
+        weight: 1
+      }}
+    />
+  )
 }
 
 class MapboxGeoJson extends GeoJson {

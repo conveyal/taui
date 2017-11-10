@@ -114,13 +114,7 @@ export default class Application extends Component<void, Props, State> {
     return markers
   }
 
-  _setStart = ({
-    label,
-    latlng
-  }: {
-    label?: string,
-    latlng: Coordinate
-  }) => {
+  _setStart = ({label, latlng}: {label?: string, latlng: Coordinate}) => {
     const {browsochrones, map, mapMarkers, timeCutoff, updateStart} = this.props
     const endLatlng = mapMarkers.end && mapMarkers.end.latlng
       ? mapMarkers.end.latlng
@@ -153,13 +147,7 @@ export default class Application extends Component<void, Props, State> {
     }
   }
 
-  _setEnd = ({
-    label,
-    latlng
-  }: {
-    label?: string,
-    latlng: Coordinate
-  }) => {
+  _setEnd = ({label, latlng}: {label?: string, latlng: Coordinate}) => {
     const {browsochrones, map, mapMarkers, updateEnd} = this.props
     updateEnd({
       browsochronesInstances: browsochrones.instances,
@@ -221,10 +209,10 @@ export default class Application extends Component<void, Props, State> {
       <div>
         <div className='Fullscreen'>
           <Map
+            active={browsochrones.active}
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
-            geojson={map.geojson}
-            geojsonColor={browsochrones.active === 0 ? '#4269a4' : 'darkorange'}
+            isochrones={map.isochrones}
             markers={markers}
             pointsOfInterest={pointsOfInterest}
             setEnd={this._setEnd}
@@ -275,7 +263,9 @@ export default class Application extends Component<void, Props, State> {
               actionLog &&
               actionLog.length > 0 &&
               <div className='Card'>
-                <div className='CardTitle'>{messages.Log.Title}</div>
+                <div className='CardTitle'>
+                  {messages.Log.Title}
+                </div>
                 <Log items={actionLog} />
               </div>}
           </div>

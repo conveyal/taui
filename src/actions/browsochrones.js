@@ -17,7 +17,8 @@ import {
   setEnd,
   setEndLabel,
   setStart,
-  setStartLabel
+  setStartLabel,
+  updateMap
 } from '../actions'
 
 import type {Store} from '../types'
@@ -42,8 +43,14 @@ export default function initialize ({
     ),
     geocodeQs({geocoder, qs}).then(([start, end]) => {
       const actions = []
-      if (start) actions.push(setStart(start))
+      if (start) {
+        actions.push(setStart(start))
+        actions.push(
+          updateMap({centerCoordinates: lonlat.toLeaflet(start.latlng)})
+        )
+      }
       if (end) actions.push(setEnd(end))
+      if (qs.zoom) actions.push(updateMap({zoom: parseInt(qs.zoom, 10)}))
       actions.push(
         fetchGrids(browsochrones)
           .then(grids =>

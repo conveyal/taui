@@ -11,6 +11,8 @@ export default (props: LogItem) => (
     <small className='LogItem-createdAt'>
       {formatDate(props.createdAt, FORMAT)}
     </small>
-    <span className='LogItem-text'>{props.text}</span>
+    <span className='LogItem-text'>
+      {props.text}
+    </span>
   </div>
 )
