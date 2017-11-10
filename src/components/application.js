@@ -209,10 +209,10 @@ export default class Application extends Component<void, Props, State> {
       <div>
         <div className='Fullscreen'>
           <Map
+            active={browsochrones.active}
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
-            geojson={map.geojson}
-            geojsonColor={browsochrones.active === 0 ? '#4269a4' : 'darkorange'}
+            isochrones={map.isochrones}
             markers={markers}
             pointsOfInterest={pointsOfInterest}
             setEnd={this._setEnd}
