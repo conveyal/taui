@@ -35,10 +35,10 @@ const endIcon = leafletIcon({
 })
 
 type Props = {
+  active: number,
   centerCoordinates: Coordinate,
   clearStartAndEnd(): void,
-  geojson: Feature[],
-  geojsonColor: string,
+  isochrones: any[],
   markers: any[],
   pointsOfInterest: PointsOfInterest,
   setEnd(any): void,
@@ -117,8 +117,6 @@ export default class Map extends PureComponent<void, Props, State> {
     const {
       active,
       centerCoordinates,
-      geojson,
-      geojsonColor,
       isochrones,
       markers,
       pointsOfInterest,

@@ -128,6 +128,7 @@ export type InputEvent = Event & {
 export type MapEvent = {
   latlng?: Coordinate,
   target: {
-    _latlng: Coordinate
+    _latlng: Coordinate,
+    _zoom: number
   }
 }

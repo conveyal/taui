@@ -147,6 +147,10 @@ body {
   display: block;
 }
 
+.CardTitle:focus {
+  outline: none;
+}
+
 .Card-active > .CardTitle {
   cursor: inherit;
 }
