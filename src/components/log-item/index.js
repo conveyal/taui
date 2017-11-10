@@ -6,7 +6,7 @@ import type {LogItem} from '../../types'
 
 const FORMAT = 'HH:mm:ss'
 
-export default (props: LogItem) =>
+export default (props: LogItem) => (
   <div className='LogItem'>
     <small className='LogItem-createdAt'>
       {formatDate(props.createdAt, FORMAT)}
@@ -15,3 +15,4 @@ export default (props: LogItem) =>
       {props.text}
     </span>
   </div>
+)

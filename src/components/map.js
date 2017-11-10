@@ -19,10 +19,9 @@ import transitiveStyle from '../transitive-style'
 
 import type {Coordinate, Feature, MapEvent, PointsOfInterest} from '../types'
 
-const TILE_LAYER_URL =
-  Browser.retina && process.env.LEAFLET_RETINA_URL
-    ? process.env.LEAFLET_RETINA_URL
-    : process.env.LEAFLET_TILE_URL
+const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
+  ? process.env.LEAFLET_RETINA_URL
+  : process.env.LEAFLET_TILE_URL
 
 const startIcon = leafletIcon({
   icon: 'play',
@@ -161,7 +160,7 @@ export default class Map extends PureComponent<void, Props, State> {
             onClick={this._clickPoi}
           />}
 
-        {markers.map((m, index) =>
+        {markers.map((m, index) => (
           <Marker
             draggable
             icon={index === 0 ? startIcon : endIcon}
@@ -176,7 +175,7 @@ export default class Map extends PureComponent<void, Props, State> {
                 </span>
               </Popup>}
           </Marker>
-        )}
+        ))}
 
         {baseIsochrone &&
           <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
@@ -216,16 +215,18 @@ export default class Map extends PureComponent<void, Props, State> {
 }
 
 function Isochrone ({isochrone, color}) {
-  return <GeoJson
-    key={`${isochrone.key}`}
-    data={isochrone}
-    style={{
-      fillColor: color,
-      pointerEvents: 'none',
-      stroke: color,
-      weight: 1
-    }}
-  />
+  return (
+    <GeoJson
+      key={`${isochrone.key}`}
+      data={isochrone}
+      style={{
+        fillColor: color,
+        pointerEvents: 'none',
+        stroke: color,
+        weight: 1
+      }}
+    />
+  )
 }
 
 class MapboxGeoJson extends GeoJson {

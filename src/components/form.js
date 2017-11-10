@@ -48,7 +48,7 @@ export default ({
   pointsOfInterest,
   selectedTimeCutoff,
   start
-}: Props) =>
+}: Props) => (
   <div>
     <div className='heading'>
       {messages.Geocoding.StartTitle}
@@ -108,3 +108,4 @@ export default ({
         </div>
       </div>}
   </div>
+)

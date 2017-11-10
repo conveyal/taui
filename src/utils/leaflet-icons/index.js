@@ -61,8 +61,7 @@ const Icon = L.Icon.extend({
     const options = this.options
 
     if (
-      options.icon.slice(0, options.prefix.length + 1) ===
-      options.prefix + '-'
+      options.icon.slice(0, options.prefix.length + 1) === options.prefix + '-'
     ) {
       iconClass = options.icon
     } else {

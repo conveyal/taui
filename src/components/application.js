@@ -116,8 +116,9 @@ export default class Application extends Component<void, Props, State> {
 
   _setStart = ({label, latlng}: {label?: string, latlng: Coordinate}) => {
     const {browsochrones, map, mapMarkers, timeCutoff, updateStart} = this.props
-    const endLatlng =
-      mapMarkers.end && mapMarkers.end.latlng ? mapMarkers.end.latlng : null
+    const endLatlng = mapMarkers.end && mapMarkers.end.latlng
+      ? mapMarkers.end.latlng
+      : null
 
     updateStart({
       browsochronesInstances: browsochrones.instances,
@@ -185,8 +186,7 @@ export default class Application extends Component<void, Props, State> {
   }
 
   _setActiveBrowsochronesInstance = memoize(index => () =>
-    this.props.setActiveBrowsochronesInstance(index)
-  )
+    this.props.setActiveBrowsochronesInstance(index))
 
   count = 0
   render () {
@@ -226,7 +226,8 @@ export default class Application extends Component<void, Props, State> {
             <div className='title'>
               {ui.fetches > 0
                 ? <Icon type='spinner' className='fa-spin' />
-                : <Icon type='map' />}{' '}
+                : <Icon type='map' />}
+              {' '}
               {messages.Title}
             </div>
             <Form
@@ -240,7 +241,7 @@ export default class Application extends Component<void, Props, State> {
               selectedTimeCutoff={timeCutoff.selected}
               start={geocoder.start}
             />
-            {destinations.map((accessibility, index) =>
+            {destinations.map((accessibility, index) => (
               <RouteCard
                 accessibility={accessibility.accessibility}
                 accessibilityKeys={accessibilityKeys}
@@ -257,7 +258,7 @@ export default class Application extends Component<void, Props, State> {
               >
                 {accessibility.name}
               </RouteCard>
-            )}
+            ))}
             {ui.showLog &&
               actionLog &&
               actionLog.length > 0 &&

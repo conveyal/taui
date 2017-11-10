@@ -9,7 +9,8 @@ type Props = {
   items: LogItems
 }
 
-export default (props: Props) =>
+export default (props: Props) => (
   <div className='Log'>
     {props.items.map((item, index) => <LogItem {...item} key={index} />)}
   </div>
+)
