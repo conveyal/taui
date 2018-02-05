@@ -16,9 +16,9 @@ type Props = {
   boundary: GeocoderBoundary,
   end: null | Option,
   focusLatlng: LatLng,
-  onChangeEnd(PointFeature): void,
-  onChangeStart(PointFeature): void,
-  onTimeCutoffChange(InputEvent): void,
+  onChangeEnd: (PointFeature) => void,
+  onChangeStart: (PointFeature) => void,
+  onTimeCutoffChange: (InputEvent) => void,
   pointsOfInterest: PointsOfInterest,
   selectedTimeCutoff: number,
   start: null | Option

@@ -1,5 +1,6 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
+import message from '@conveyal/woonerf/message'
 import isEqual from 'lodash/isEqual'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
@@ -8,15 +9,13 @@ import Form from './form'
 import Icon from './icon'
 import Log from './log'
 import Map from './map'
-import messages from '../utils/messages'
 import RouteCard from './route-card'
 
 import type {
-  Accessibility,
-  BrowsochronesStore,
   Coordinate,
   GeocoderStore,
   LogItems,
+  LonLat,
   InputEvent,
   MapEvent,
   PointFeature,
@@ -24,60 +23,68 @@ import type {
   UIStore
 } from '../types'
 
+type Origin = {
+  name: string,
+  active: boolean
+}
+
+type MapState = {
+  centerCoordinates: Coordinate,
+  tileUrl: string,
+  transitive: any,
+  travelTimes: any[],
+  waitTimes: any[],
+  zoom: number
+}
+
 type Props = {
-  accessibilityKeys: string[],
+  accessibility: number[][],
   actionLog: LogItems,
-  browsochrones: BrowsochronesStore,
-  destinations: Accessibility[],
+  data: {
+    grids: string[],
+    origins: Origin[]
+  },
   geocoder: GeocoderStore,
+  isochrones: any[],
   journeys: any[],
   mapMarkers: any,
-  map: any,
+  map: MapState,
   pointsOfInterest: PointsOfInterest,
   showComparison: boolean,
   timeCutoff: any,
   ui: UIStore,
 
-  clearEnd(): void,
   clearIsochrone(): void,
-  clearStart(): void,
-  initializeBrowsochrones(any): void,
-  setActiveBrowsochronesInstance(number): void,
-  updateEnd(any): void,
-  updateStart(any): void,
-  updateSelectedTimeCutoff(any): void
+  initialize: () => void,
+  setActiveOrigin: (name: string) => void,
+  setEnd: (any) => void,
+  setSelectedTimeCutoff: (any) => void,
+  setStart: (any) => void,
+  updateEnd: (any) => void,
+  updateMap: (any) => void,
+  updateStart: (any) => void
 }
 
 type Marker = {
   position: Coordinate,
   label: string,
-  onDragEnd(MapEvent): void
+  onDragEnd: (MapEvent) => void
 }
 
 type State = {
   markers: Marker[]
 }
 
-export default class Application extends Component<void, Props, State> {
+export default class Application extends Component {
+  props: Props
+  state: State
+
   state = {
     markers: this._createMarkersFromProps(this.props)
   }
 
-  constructor (props: Props) {
-    super(props)
-    const {
-      browsochrones,
-      initializeBrowsochrones,
-      geocoder,
-      map,
-      timeCutoff
-    } = props
-    initializeBrowsochrones({
-      browsochrones,
-      geocoder,
-      map,
-      timeCutoff
-    })
+  componentDidMount () {
+    this.props.initialize()
   }
 
   componentWillReceiveProps (nextProps: Props) {
@@ -87,121 +94,96 @@ export default class Application extends Component<void, Props, State> {
   }
 
   _clearStartAndEnd = () => {
-    const {clearEnd, clearIsochrone, clearStart} = this.props
-    clearStart()
+    const {clearIsochrone, setEnd, setStart} = this.props
+    setStart(null)
     clearIsochrone()
-    clearEnd()
+    setEnd(null)
   }
 
-  _createMarkersFromProps (props: Props) {
+  _createMarkersFromProps (props: Props): Marker[] {
     const {mapMarkers} = props
     const markers = []
-    if (mapMarkers.start && mapMarkers.start.latlng) {
+    if (mapMarkers.start && mapMarkers.start.position) {
       markers.push({
-        position: mapMarkers.start.latlng,
+        position: mapMarkers.start.position,
         label: mapMarkers.start.label || '',
         onDragEnd: this._setStartWithEvent
       })
     }
 
-    if (mapMarkers.end && mapMarkers.end.latlng) {
+    if (mapMarkers.end && mapMarkers.end.position) {
       markers.push({
-        position: mapMarkers.end.latlng,
+        position: mapMarkers.end.position,
         label: mapMarkers.end.label || '',
         onDragEnd: this._setEndWithEvent
       })
     }
+
     return markers
   }
 
-  _setStart = ({label, latlng}: {label?: string, latlng: Coordinate}) => {
-    const {browsochrones, map, mapMarkers, timeCutoff, updateStart} = this.props
-    const endLatlng = mapMarkers.end && mapMarkers.end.latlng
-      ? mapMarkers.end.latlng
-      : null
-
-    updateStart({
-      browsochronesInstances: browsochrones.instances,
-      endLatlng,
-      label,
-      latlng: lonlat(latlng),
-      timeCutoff: timeCutoff.selected,
-      zoom: map.zoom
-    })
+  _setStart = (opts: {label?: string, position: LonLat}) => {
+    this.props.updateStart(opts)
   }
 
   _setStartWithEvent = (event: MapEvent) => {
-    this._setStart({latlng: event.latlng || event.target._latlng})
+    this.props.updateStart({position: lonlat(event.latlng || event.target._latlng)})
   }
 
-  _setStartWithFeature = (feature: PointFeature) => {
+  _setStartWithFeature = (feature?: PointFeature) => {
     if (!feature) {
       this._clearStartAndEnd()
     } else {
-      const {geometry} = feature
-
-      this._setStart({
+      this.props.updateStart({
         label: feature.properties.label,
-        latlng: geometry.coordinates
+        position: lonlat(feature.geometry.coordinates)
       })
     }
   }
 
-  _setEnd = ({label, latlng}: {label?: string, latlng: Coordinate}) => {
-    const {browsochrones, map, mapMarkers, updateEnd} = this.props
-    updateEnd({
-      browsochronesInstances: browsochrones.instances,
-      startLatlng: mapMarkers.start.latlng,
-      label,
-      latlng: lonlat(latlng),
-      zoom: map.zoom
-    })
+  _setEnd = (opts: {label?: string, position: LonLat}) => {
+    this.props.updateEnd(opts)
   }
 
   _setEndWithEvent = (event: MapEvent) => {
-    this._setEnd({latlng: event.latlng || event.target._latlng})
+    this.props.updateEnd({position: lonlat(event.latlng || event.target._latlng)})
   }
 
   _setEndWithFeature = (feature: PointFeature) => {
     if (!feature) {
-      this.props.clearEnd()
+      this.props.setEnd(null)
     } else {
       const {geometry} = feature
 
       this._setEnd({
         label: feature.properties.label,
-        latlng: geometry.coordinates
+        position: lonlat(geometry.coordinates)
       })
     }
   }
 
   _onTimeCutoffChange = (event: InputEvent) => {
-    const {browsochrones, mapMarkers, updateSelectedTimeCutoff} = this.props
-    const timeCutoff = parseInt(event.currentTarget.value, 10)
-    updateSelectedTimeCutoff({
-      browsochrones,
-      latlng: mapMarkers.start.latlng,
-      timeCutoff
-    })
+    this.props.setSelectedTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
 
-  _setActiveBrowsochronesInstance = memoize(index => () =>
-    this.props.setActiveBrowsochronesInstance(index))
+  _setActiveOrigin = memoize(name => () =>
+    this.props.setActiveOrigin(name))
 
   count = 0
   render () {
     const {
-      accessibilityKeys,
+      accessibility,
       actionLog,
-      browsochrones,
-      destinations,
+      data,
       geocoder,
+      isochrones,
       journeys,
       map,
       pointsOfInterest,
       showComparison,
       timeCutoff,
-      ui
+      ui,
+      updateMap
     } = this.props
     const {markers} = this.state
 
@@ -209,15 +191,16 @@ export default class Application extends Component<void, Props, State> {
       <div>
         <div className='Fullscreen'>
           <Map
-            active={browsochrones.active}
+            {...map}
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
-            isochrones={map.isochrones}
+            isochrones={isochrones}
             markers={markers}
             pointsOfInterest={pointsOfInterest}
             setEnd={this._setEnd}
             setStart={this._setStart}
             transitive={map.transitive}
+            updateMap={updateMap}
             zoom={map.zoom}
           />
         </div>
@@ -228,7 +211,7 @@ export default class Application extends Component<void, Props, State> {
                 ? <Icon type='spinner' className='fa-spin' />
                 : <Icon type='map' />}
               {' '}
-              {messages.Title}
+              {message('Title')}
             </div>
             <Form
               boundary={geocoder.boundary}
@@ -241,22 +224,24 @@ export default class Application extends Component<void, Props, State> {
               selectedTimeCutoff={timeCutoff.selected}
               start={geocoder.start}
             />
-            {destinations.map((accessibility, index) => (
+            {data.origins.map((origin, index) => (
               <RouteCard
-                accessibility={accessibility.accessibility}
-                accessibilityKeys={accessibilityKeys}
-                active={browsochrones.active === index}
+                accessibility={accessibility[index]}
+                active={origin.active}
                 alternate={index !== 0}
+                grids={data.grids}
+                hasEnd={!!geocoder.end}
+                hasStart={!!geocoder.start}
                 key={`${index}-route-card`}
                 journeys={journeys[index]}
-                oldAccessibility={destinations[0].accessibility}
+                oldAccessibility={accessibility[0]}
                 oldTravelTime={map.travelTimes[0]}
-                onClick={this._setActiveBrowsochronesInstance(index)}
+                onClick={this._setActiveOrigin(origin.name)}
                 showComparison={showComparison}
                 travelTime={map.travelTimes[index]}
                 waitTime={map.waitTimes[index]}
               >
-                {accessibility.name}
+                {origin.name}
               </RouteCard>
             ))}
             {ui.showLog &&
@@ -264,7 +249,7 @@ export default class Application extends Component<void, Props, State> {
               actionLog.length > 0 &&
               <div className='Card'>
                 <div className='CardTitle'>
-                  {messages.Log.Title}
+                  {message('Log.Title')}
                 </div>
                 <Log items={actionLog} />
               </div>}

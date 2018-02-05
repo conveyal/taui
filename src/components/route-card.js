@@ -2,16 +2,17 @@
 import React from 'react'
 import toSpaceCase from 'lodash/lowerCase'
 
-import {ACCESSIBILITY_IS_EMPTY, ACCESSIBILITY_IS_LOADING} from '../constants'
 import Icon from './icon'
 import messages from '../utils/messages'
 
 type Props = {
   active: boolean,
   alternate: boolean,
-  accessibility: any,
-  accessibilityKeys: string[],
+  accessibility: number[],
   children?: any,
+  grids: any[],
+  hasEnd: boolean,
+  hasStart: boolean,
   journeys: any[],
   oldAccessibility: any,
   oldTravelTime: number,
@@ -25,8 +26,10 @@ export default ({
   active,
   alternate,
   accessibility,
-  accessibilityKeys,
   children,
+  grids,
+  hasEnd,
+  hasStart,
   journeys,
   oldAccessibility,
   oldTravelTime,
@@ -55,15 +58,21 @@ export default ({
       </span>
     </a>
     <div className='CardContent'>
-      {showComparison
-        ? <ShowDiff
-          keys={accessibilityKeys}
-          base={accessibility}
-          comparison={oldAccessibility}
-          />
-        : <ShowAccess keys={accessibilityKeys} base={accessibility} />}
-      {accessibility !== ACCESSIBILITY_IS_EMPTY &&
-        accessibility !== ACCESSIBILITY_IS_LOADING &&
+      <div className='CardAccess'>
+        <div className='heading'>
+          {messages.Systems.AccessTitle}
+        </div>
+        {hasStart
+          ? showComparison
+            ? <ShowDiff
+              accessibility={accessibility}
+              comparison={oldAccessibility}
+              grids={grids}
+              />
+            : <ShowAccess accessibility={accessibility} grids={grids} />
+          : <span>{messages.Systems.SelectStart}</span>}
+      </div>
+      {hasStart && hasEnd && journeys &&
         <Journeys
           journeys={journeys}
           oldTravelTime={oldTravelTime}
@@ -209,36 +218,19 @@ function MetricIcon ({name}) {
 }
 
 function ShowAccess ({
-  keys,
-  base
+  accessibility,
+  grids
 }: {
-  keys: string[],
-  base: {
-    [name: string]: number
-  }
+  accessibility: number[],
+  grids: any[],
 }) {
-  return (
-    <div className='CardAccess'>
-      <div className='heading'>
-        {messages.Systems.AccessTitle}
-      </div>
-      {base === ACCESSIBILITY_IS_EMPTY
-        ? <span>
-          {messages.Systems.SelectStart}
-        </span>
-        : base === ACCESSIBILITY_IS_LOADING
-            ? <span>
-              {messages.Systems.CalculatingAccessibility}
-            </span>
-            : keys.map((k, i) => (
-              <div className='Metric' key={k}>
-                <MetricIcon name={k} />
-                <strong> {(base[k] | 0).toLocaleString()} </strong>{' '}
-                {toSpaceCase(k)}
-              </div>
-              ))}
+  return <div>{grids.map((grid, i) => (
+    <div className='Metric' key={grid.name}>
+      <MetricIcon name={grid.name} />
+      <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
+      {toSpaceCase(grid.name)}
     </div>
-  )
+  ))}</div>
 }
 
 function AccessDiffPercentage ({newAccess, originalAccess}) {
@@ -265,31 +257,16 @@ function AccessDiffPercentage ({newAccess, originalAccess}) {
   }
 }
 
-function ShowDiff ({keys, base, comparison}) {
-  return (
-    <div className='CardAccess'>
-      <div className='heading'>
-        {messages.Systems.AccessTitle}
-      </div>
-      {base === ACCESSIBILITY_IS_EMPTY
-        ? <span>
-          {messages.Systems.SelectStart}
-        </span>
-        : base === ACCESSIBILITY_IS_LOADING
-            ? <span>
-              {messages.Systems.CalculatingAccessibility}
-            </span>
-            : keys.map((key, i) => (
-              <div className='Metric' key={key}>
-                <MetricIcon name={key} />
-                <strong> {(base[key] | 0).toLocaleString()} </strong>{' '}
-                {toSpaceCase(key)}
-                <AccessDiffPercentage
-                  newAccess={base[key]}
-                  originalAccess={comparison[key]}
-                  />
-              </div>
-              ))}
+function ShowDiff ({accessibility, comparison, grids}) {
+  return <div>{grids.map((grid, i) => (
+    <div className='Metric' key={grid.name}>
+      <MetricIcon name={grid.name} />
+      <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
+      {toSpaceCase(grid.name)}
+      <AccessDiffPercentage
+        newAccess={accessibility[i]}
+        originalAccess={comparison[i]}
+        />
     </div>
-  )
+  ))}</div>
 }

@@ -53,15 +53,6 @@ export default handleActions(
         waitTimes
       }
     },
-    'set active browsochrones instance' (state, action) {
-      const index = action.payload
-      return {
-        ...state,
-        active: index,
-        geojson: [state.isochrones[index]],
-        transitive: state.transitives[index]
-      }
-    },
     'clear start' (state, action) {
       return {
         ...state,

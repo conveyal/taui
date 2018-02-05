@@ -1,17 +1,37 @@
 // @flow
-
-import Browsochrones from 'browsochrones'
-
-/**
- * Simple types
- */
 export type LatLng = {
   lat: number,
   lng: number
 }
 
+export type LonLat = {lon: number, lat: number}
+
+export type Location = {
+  label: string,
+  position: LonLat
+}
+
 export type Coordinate = [number, number]
 export type Coordinates = Coordinate[]
+
+export type Grid = {
+  contains: (number, number) => boolean,
+  valueAtPoint: (number, number) => number,
+  data: Int32Array,
+  north: number,
+  west: number,
+  height: number,
+  width: number,
+  zoom: number
+}
+
+export type Query = {
+  height: number,
+  width: number,
+  north: number,
+  west: number,
+  zoom: number
+}
 
 /**
  * GeoJSON
@@ -54,25 +74,11 @@ export type LogItem = {
 
 export type LogItems = LogItem[]
 
-export type BrowsochronesStore = {
-  active: number,
-  instances: Browsochrones[],
-  origins: Array<{
-    name: string,
-    url: string
-  }>,
-  grids: string[],
-  gridsUrl: string
-}
-
-export type Accessibility = {
-  name: string,
-  accessibility: | 'accessibility-is-empty'
-    | 'accessibility-is-loading'
-    | {
-        [key: string]: number
-      }
-}
+export type Accessibility = 'accessibility-is-empty'
+  | 'accessibility-is-loading'
+  | {
+      [key: string]: number
+    }
 
 export type Option = {
   label: string,
@@ -110,8 +116,6 @@ export type UIStore = {
 
 export type Store = {
   actionLog: LogItems,
-  browsochrones: BrowsochronesStore,
-  destinations: Accessibility[],
   geocoder: GeocoderStore,
   map: any,
   mapMarkers: any,

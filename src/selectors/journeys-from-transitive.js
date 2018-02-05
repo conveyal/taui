@@ -1,11 +1,12 @@
 // @flow
 import Color from 'color'
 import toCapitalCase from 'lodash/capitalize'
+import get from 'lodash/get'
 import unique from 'lodash/uniq'
 import {createSelector} from 'reselect'
 
 export default createSelector(
-  state => state.map.transitives,
+  state => get(state, 'data.query.transitiveData'),
   (transitiveData = []) => transitiveData.map(extractRelevantTransitiveInfo)
 )
 

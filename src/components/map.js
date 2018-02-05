@@ -1,5 +1,7 @@
 // @flow
-import {Browser, LatLng} from 'leaflet'
+import lonlat from '@conveyal/lonlat'
+import message from '@conveyal/woonerf/message'
+import {Browser} from 'leaflet'
 import React, {PureComponent} from 'react'
 import {
   GeoJson,
@@ -13,13 +15,12 @@ import {
 import Icon from './icon'
 import {setKeyTo} from '../utils/hash'
 import leafletIcon from '../utils/leaflet-icons'
-import messages from '../utils/messages'
 import TransitiveLayer from './transitive-map-layer'
 import transitiveStyle from '../transitive-style'
 
-import type {Coordinate, Feature, MapEvent, PointsOfInterest} from '../types'
+import type {Coordinate, Feature, LonLat, MapEvent, PointsOfInterest} from '../types'
 
-const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
+const TILE_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
   : process.env.LEAFLET_TILE_URL
 
@@ -34,63 +35,61 @@ const endIcon = leafletIcon({
 })
 
 type Props = {
-  active: number,
   centerCoordinates: Coordinate,
-  clearStartAndEnd(): void,
+  clearStartAndEnd: () => void,
   isochrones: any[],
   markers: any[],
   pointsOfInterest: PointsOfInterest,
-  setEnd(any): void,
-  setStart(any): void,
+  setEnd: (any) => void,
+  setStart: (any) => void,
   transitive: any,
+  updateMap: (any) => void,
   zoom: number
 }
 
 type State = {
   showSelectStartOrEnd: boolean,
   lastClickedLabel: null,
-  lastClickedLatlng: null | LatLng
+  lastClickedPosition: null | LonLat
 }
 
-export default class Map extends PureComponent<void, Props, State> {
+export default class Map extends PureComponent {
+  props: Props
+  state: State
+
   state = {
     showSelectStartOrEnd: false,
     lastClickedLabel: null,
-    lastClickedLatlng: null
+    lastClickedPosition: null
   }
 
   _clearState (): void {
     this.setState({
       showSelectStartOrEnd: false,
       lastClickedLabel: null,
-      lastClickedLatlng: null
+      lastClickedPosition: null
     })
   }
 
   _clearStartAndEnd = (): void => {
-    const {clearStartAndEnd} = this.props
-    clearStartAndEnd()
+    this.props.clearStartAndEnd()
     this._clearState()
   }
 
   _onMapClick = (e: MapEvent): void => {
     this.setState({
       showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
-      lastClickedLatlng: e.latlng
+      lastClickedPosition: lonlat(e.latlng)
     })
   }
 
   _setEnd = (): void => {
-    const {setEnd} = this.props
-    const {lastClickedLatlng} = this.state
-    setEnd({latlng: lastClickedLatlng})
+    this.props.setEnd({position: this.state.lastClickedPosition})
     this._clearState()
   }
 
   _setStart = (): void => {
-    const {setStart} = this.props
-    const {lastClickedLatlng} = this.state
-    setStart({latlng: lastClickedLatlng})
+    this.props.setStart({position: this.state.lastClickedPosition})
     this._clearState()
   }
 
@@ -103,18 +102,19 @@ export default class Map extends PureComponent<void, Props, State> {
     const {coordinates} = feature.geometry
     this.setState({
       lastClickedLabel: feature.properties.label,
-      lastClickedLatlng: {lat: coordinates[1], lng: coordinates[0]},
+      lastClickedPosition: lonlat(coordinates),
       showSelectStartOrEnd: true
     })
   }
 
   _setZoom = (e: MapEvent) => {
-    setKeyTo('zoom', e.target._zoom)
+    const zoom = e.target._zoom
+    this.props.updateMap({zoom})
+    setKeyTo('zoom', zoom)
   }
 
   render (): React$Element<LeafletMap> {
     const {
-      active,
       centerCoordinates,
       isochrones,
       markers,
@@ -124,7 +124,7 @@ export default class Map extends PureComponent<void, Props, State> {
     } = this.props
     const {
       lastClickedLabel,
-      lastClickedLatlng,
+      lastClickedPosition,
       showSelectStartOrEnd
     } = this.state
     const tileLayerProps = {}
@@ -135,7 +135,7 @@ export default class Map extends PureComponent<void, Props, State> {
     }
 
     const baseIsochrone = isochrones[0]
-    const comparisonIsochrone = active !== 0 ? isochrones[active] : null
+    const comparisonIsochrone = null // active !== 0 ? isochrones[active] : null
 
     return (
       <LeafletMap
@@ -150,7 +150,7 @@ export default class Map extends PureComponent<void, Props, State> {
       >
         <ZoomControl position='topright' />
         <TileLayer
-          url={TILE_LAYER_URL}
+          url={TILE_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...tileLayerProps}
         />
@@ -166,7 +166,7 @@ export default class Map extends PureComponent<void, Props, State> {
             icon={index === 0 ? startIcon : endIcon}
             key={`marker-${index}`}
             onDragEnd={m.onDragEnd}
-            position={m.position}
+            position={lonlat.toLeaflet(m.position)}
           >
             {m.label &&
               <Popup>
@@ -187,7 +187,7 @@ export default class Map extends PureComponent<void, Props, State> {
           <TransitiveLayer data={transitive} styles={transitiveStyle} />}
 
         {showSelectStartOrEnd &&
-          <Popup closeButton={false} position={lastClickedLatlng}>
+          <Popup closeButton={false} position={lonlat.toLeaflet(lastClickedPosition)}>
             <div className='Popup'>
               {lastClickedLabel &&
                 <h3>
@@ -195,17 +195,17 @@ export default class Map extends PureComponent<void, Props, State> {
                 </h3>}
               <button onClick={this._setStart}>
                 <Icon type='map-marker' />{' '}
-                {messages.Map.SetLocationPopup.SetStart}
+                {message('Map.SetLocationPopup.SetStart')}
               </button>
               {markers.length > 0 &&
                 <button onClick={this._setEnd}>
                   <Icon type='map-marker' />{' '}
-                  {messages.Map.SetLocationPopup.SetEnd}
+                  {message('Map.SetLocationPopup.SetEnd')}
                 </button>}
               {markers.length > 0 &&
                 <button onClick={this._clearStartAndEnd}>
                   <Icon type='times' />{' '}
-                  {messages.Map.SetLocationPopup.ClearMarkers}
+                  {message('Map.SetLocationPopup.ClearMarkers')}
                 </button>}
             </div>
           </Popup>}
