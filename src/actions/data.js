@@ -158,7 +158,6 @@ function getPointForLonLat (position, currentZoom: number, query) {
 }
 
 const TIMES_GRID_TYPE = 'ACCESSGR'
-const TIMES_HEADER_LENGTH = 9
 
 function parseTimesData (ab: ArrayBuffer) {
   const data = new Int32Array(ab)
@@ -186,7 +185,7 @@ function parseTimesData (ab: ArrayBuffer) {
     width,
     height,
     nSamples,
-    data: data.slice(TIMES_HEADER_LENGTH)
+    data: data.slice(TIMES_GRID_TYPE.length)
   }
 }
 
@@ -194,16 +193,19 @@ function parseTimesData (ab: ArrayBuffer) {
  *
  */
 const PATHS_GRID_TYPE = 'PATHGRID'
-function parsePathsData (ab: ArrayBuffer, nTargets: number, nMinutes: number) {
-  const data = new Int8Array(ab)
+function parsePathsData (ab: ArrayBuffer) {
+  const data = new Int32Array(ab.slice(PATHS_GRID_TYPE.length))
+  const headerData = new Int8Array(ab)
   let offset = PATHS_GRID_TYPE.length
 
-  const headerType = String.fromCharCode(...data.slice(0, offset))
+  const headerType = String.fromCharCode(...headerData.slice(0, offset))
   if (headerType !== PATHS_GRID_TYPE) {
     throw new Error(`Retrieved grid header ${headerType} !== ${PATHS_GRID_TYPE}. Please check your data.`)
   }
 
   const next = () => data[offset++]
+  const nDestinations = next()
+  const nIterations = next()
   const nPathLists = next()
   const pathLists = []
   for (let i = 0; i < nPathLists; i++) {
@@ -216,10 +218,10 @@ function parsePathsData (ab: ArrayBuffer, nTargets: number, nMinutes: number) {
   }
 
   const targets = []
-  for (let i = 0; i < nTargets; i++) {
+  for (let i = 0; i < nDestinations; i++) {
     const pathIndexes = []
     let previousValue = 0
-    for (let j = 0; j < nMinutes; j++) {
+    for (let j = 0; j < nIterations; j++) {
       const delta = next()
       const pathIndex = delta + previousValue
       pathIndexes.push(pathIndex)
