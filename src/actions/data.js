@@ -196,13 +196,13 @@ const PATHS_GRID_TYPE = 'PATHGRID'
 function parsePathsData (ab: ArrayBuffer) {
   const data = new Int32Array(ab.slice(PATHS_GRID_TYPE.length))
   const headerData = new Int8Array(ab)
-  let offset = PATHS_GRID_TYPE.length
 
-  const headerType = String.fromCharCode(...headerData.slice(0, offset))
+  const headerType = String.fromCharCode(...headerData.slice(0, PATHS_GRID_TYPE.length))
   if (headerType !== PATHS_GRID_TYPE) {
     throw new Error(`Retrieved grid header ${headerType} !== ${PATHS_GRID_TYPE}. Please check your data.`)
   }
 
+  let offset = 0
   const next = () => data[offset++]
   const nDestinations = next()
   const nIterations = next()
