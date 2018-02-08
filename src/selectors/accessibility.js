@@ -8,11 +8,13 @@ import accessibilityForGrid from '../utils/accessibility-for-grid'
 export default createSelector(
   selectTravelTimeSurfaces,
   (state) => get(state, 'data.grids'),
-  (state) => get(state, 'data.query'),
+  (state) => get(state, 'data.origins'),
   (state) => get(state, 'timeCutoff.selected'),
-  (surfaces, grids, query, cutoff) =>
-    surfaces.map(surface => grids.map(grid => surface && surface.data && grid.data && query
-      ? accessibilityForGrid({surface: surface.data, grid, query, cutoff})
-      : -1
-    ))
+  (surfaces, grids, origins, cutoff) =>
+    surfaces.map((surface, index) =>
+      grids.map(grid => surface && surface.data && grid.data && origins[index] && origins[index].query
+        ? accessibilityForGrid({surface: surface.data, grid, query: origins[index].query, cutoff})
+        : -1
+      )
+    )
 )

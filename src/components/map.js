@@ -35,6 +35,7 @@ const endIcon = leafletIcon({
 })
 
 type Props = {
+  activeOriginIndex: number,
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
   isochrones: any[],
@@ -115,6 +116,7 @@ export default class Map extends PureComponent {
 
   render (): React$Element<LeafletMap> {
     const {
+      activeOriginIndex,
       centerCoordinates,
       isochrones,
       markers,
@@ -135,7 +137,7 @@ export default class Map extends PureComponent {
     }
 
     const baseIsochrone = isochrones[0]
-    const comparisonIsochrone = null // active !== 0 ? isochrones[active] : null
+    const comparisonIsochrone = activeOriginIndex > 0 ? isochrones[activeOriginIndex] : null
 
     return (
       <LeafletMap

@@ -6,17 +6,17 @@ import {initialize} from '../actions/data'
 import * as locationActions from '../actions/location'
 import Application from '../components/application'
 import * as select from '../selectors'
-import selectPointsOfInterest from '../selectors/points-of-interest'
-import selectShowComparison from '../selectors/show-comparison'
 
 function mapStateToProps (state, ownProps) {
   return {
     ...state,
     accessibility: select.accessibility(state, ownProps),
+    activeOriginIndex: select.activeOriginIndex(state, ownProps),
+    activeTransitive: select.activeTransitive(state, ownProps),
+    allTransitiveData: select.allTransitiveData(state, ownProps),
     isochrones: select.isochrones(state, ownProps),
-    journeys: [], // selectJourneysFromTransitive(state, ownProps),
-    pointsOfInterest: selectPointsOfInterest(state, ownProps),
-    showComparison: selectShowComparison(state, ownProps)
+    pointsOfInterest: select.pointsOfInterest(state, ownProps),
+    showComparison: select.showComparison(state, ownProps)
   }
 }
 

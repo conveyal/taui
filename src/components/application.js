@@ -40,13 +40,15 @@ type MapState = {
 type Props = {
   accessibility: number[][],
   actionLog: LogItems,
+  activeOriginIndex: number,
+  activeTransitive: any,
+  allTransitiveData: any[],
   data: {
     grids: string[],
     origins: Origin[]
   },
   geocoder: GeocoderStore,
   isochrones: any[],
-  journeys: any[],
   mapMarkers: any,
   map: MapState,
   pointsOfInterest: PointsOfInterest,
@@ -174,10 +176,12 @@ export default class Application extends Component {
     const {
       accessibility,
       actionLog,
+      activeOriginIndex,
+      activeTransitive,
+      allTransitiveData,
       data,
       geocoder,
       isochrones,
-      journeys,
       map,
       pointsOfInterest,
       showComparison,
@@ -192,6 +196,7 @@ export default class Application extends Component {
         <div className='Fullscreen'>
           <Map
             {...map}
+            activeOriginIndex={activeOriginIndex}
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
             isochrones={isochrones}
@@ -199,7 +204,7 @@ export default class Application extends Component {
             pointsOfInterest={pointsOfInterest}
             setEnd={this._setEnd}
             setStart={this._setStart}
-            transitive={map.transitive}
+            transitive={activeTransitive}
             updateMap={updateMap}
             zoom={map.zoom}
           />
@@ -233,7 +238,7 @@ export default class Application extends Component {
                 hasEnd={!!geocoder.end}
                 hasStart={!!geocoder.start}
                 key={`${index}-route-card`}
-                journeys={journeys[index]}
+                journeys={(allTransitiveData[index] || {}).journeys}
                 oldAccessibility={accessibility[0]}
                 oldTravelTime={map.travelTimes[0]}
                 onClick={this._setActiveOrigin(origin.name)}

@@ -39,12 +39,6 @@ export default handleActions({
       ...state,
       origins: origins.map(o => o.name === action.payload ? {...o, active: true} : {...o, active: false})
     }
-  },
-  'set query' (state, action) {
-    return {
-      ...state,
-      query: action.payload
-    }
   }
 }, {
   origins: [],

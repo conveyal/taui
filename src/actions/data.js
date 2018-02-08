@@ -17,8 +17,6 @@ import {loadGrid} from './grid'
 
 import type {LonLat} from '../types'
 
-const setQuery = (query) => ({type: 'set query', payload: query})
-
 export function initialize () {
   return (dispatch: Dispatch, getState: any) => {
     const state = getState()
@@ -53,18 +51,24 @@ export function initialize () {
       }))
     } else {
       dispatch(loadOrigins(origins))
-      if (qs.end) {
-        dispatch(setEnd({label: qs.end}))
-        dispatch(geocode(qs.end, (feature) => {
-          dispatch([
-            setEnd({
-              label: qs.end,
-              position: lonlat(feature.center)
-            }),
-            updateMap({centerCoordinates: lonlat.toLeaflet(feature.center)})
-          ])
-        }))
-      }
+    }
+
+    if (qs.end) {
+      dispatch(setEnd({label: qs.end}))
+      dispatch(geocode(qs.end, (feature) => {
+        const position = lonlat(feature.center)
+        dispatch([
+          setEnd({
+            label: qs.end,
+            position: lonlat(feature.center)
+          }),
+          fetchDestinationDataForLonLat(position)
+        ])
+
+        if (!qs.start) {
+          dispatch(updateMap({centerCoordinates: lonlat.toLeaflet(feature.center)}))
+        }
+      }))
     }
   }
 }
@@ -79,18 +83,9 @@ const loadOrigin = (origin, originLonlat?: LonLat, currentZoom?: number) =>
       const query = response.value
 
       if (originLonlat && currentZoom) {
-        return [
-          setQuery(query),
-          fetchDataForOrigin({...origin, query}, originLonlat, currentZoom)
-        ]
+        return fetchDataForOrigin({...origin, query}, originLonlat, currentZoom)
       } else {
-        return [
-          setQuery(query),
-          setOrigin({
-            ...origin,
-            query
-          })
-        ]
+        return setOrigin({...origin, query})
       }
     }
   })
@@ -104,7 +99,7 @@ export const fetchDataForLonLat = (originLonLat: LonLat) =>
   }
 
 const fetchDataForOrigin = (origin, originLonlat, currentZoom) => {
-  const originPoint = getOriginPoint(originLonlat, currentZoom, origin.query)
+  const originPoint = getPointForLonLat(originLonlat, currentZoom, origin.query)
   const originIndex = originPoint.x + originPoint.y * origin.query.width
   return fetchMultiple({
     fetches: [{
@@ -112,19 +107,45 @@ const fetchDataForOrigin = (origin, originLonlat, currentZoom) => {
     }, {
       url: `${origin.url}/${originIndex}_paths.dat`
     }],
-    next: ([timesResponse, pathsResponse]) =>
-      setOrigin({
+    next: ([timesResponse, pathsResponse]) => {
+      const travelTimeSurface = parseTimesData(timesResponse.value)
+      const nTargets = travelTimeSurface.width * travelTimeSurface.height
+      const {pathLists, targets} = parsePathsData(pathsResponse.value, nTargets, 120)
+
+      debugger
+      validatePathLists(pathLists, origin.query.transitiveData)
+
+      return setOrigin({
         ...origin,
         originPoint,
-        travelTimeSurface: parseTimes(timesResponse.value),
-        paths: parsePaths(pathsResponse.value)
+        pathLists,
+        targets,
+        travelTimeSurface
       })
+    }
   })
 }
 
-function getOriginPoint (originLonlat, currentZoom: number, query) {
+export const fetchDestinationDataForLonLat = (position: LonLat) =>
+  (dispatch: Dispatch, getState: any) => {
+    const state = getState()
+    const currentZoom = state.map.zoom
+
+    dispatch(state.data.origins.map(origin =>
+      dispatch(fetchDestinationDataForOrigin(origin, position, currentZoom))))
+  }
+
+const fetchDestinationDataForOrigin = (origin, position, currentZoom) => {
+  const point = getPointForLonLat(position, currentZoom, origin.query)
+  const index = point.x + point.y * origin.query.width
+  return fetch({
+    url: `${origin.url}/${index}_paths.dat`
+  })
+}
+
+function getPointForLonLat (position, currentZoom: number, query) {
   const pixel = Leaflet.CRS.EPSG3857.latLngToPoint(
-    lonlat.toLeaflet(originLonlat),
+    lonlat.toLeaflet(position),
     currentZoom
   )
   const scale = Math.pow(2, query.zoom - currentZoom)
@@ -139,14 +160,13 @@ function getOriginPoint (originLonlat, currentZoom: number, query) {
 const TIMES_GRID_TYPE = 'ACCESSGR'
 const TIMES_HEADER_LENGTH = 9
 
-function parseTimes (ab: ArrayBuffer) {
+function parseTimesData (ab: ArrayBuffer) {
   const data = new Int32Array(ab)
   const headerData = new Int8Array(ab)
-  const header = {}
-  header.type = String.fromCharCode(...headerData.slice(0, TIMES_GRID_TYPE.length))
+  const headerType = String.fromCharCode(...headerData.slice(0, TIMES_GRID_TYPE.length))
 
-  if (header.type !== TIMES_GRID_TYPE) {
-    throw new Error(`Retrieved grid header ${header.type} !== ${TIMES_GRID_TYPE}. Please check your data.`)
+  if (headerType !== TIMES_GRID_TYPE) {
+    throw new Error(`Retrieved grid header ${headerType} !== ${TIMES_GRID_TYPE}. Please check your data.`)
   }
 
   let offset = 2
@@ -170,14 +190,73 @@ function parseTimes (ab: ArrayBuffer) {
   }
 }
 
+/**
+ *
+ */
 const PATHS_GRID_TYPE = 'PATHGRID'
-const PATHS_HEADER_LENGTH = 2
+function parsePathsData (ab: ArrayBuffer, nTargets: number, nMinutes: number) {
+  const data = new Int8Array(ab)
+  let offset = PATHS_GRID_TYPE.length
 
-function parsePaths (ab: ArrayBuffer) {
-  const data = new Int32Array(ab)
-  const headerData = new Int8Array(ab)
-
-  return {
-    data:
+  const headerType = String.fromCharCode(...data.slice(0, offset))
+  if (headerType !== PATHS_GRID_TYPE) {
+    throw new Error(`Retrieved grid header ${headerType} !== ${PATHS_GRID_TYPE}. Please check your data.`)
   }
+
+  const next = () => data[offset++]
+  const nPathLists = next()
+  const pathLists = []
+  for (let i = 0; i < nPathLists; i++) {
+    const nPaths = next()
+    const pathList = []
+    for (let j = 0; j < nPaths; j++) {
+      pathList.push([next(), next(), next()]) // boardStopId, patternId, alightStopId
+    }
+    pathLists.push(pathList)
+  }
+
+  const targets = []
+  for (let i = 0; i < nTargets; i++) {
+    const pathIndexes = []
+    let previousValue = 0
+    for (let j = 0; j < nMinutes; j++) {
+      const delta = next()
+      const pathIndex = delta + previousValue
+      pathIndexes.push(pathIndex)
+      previousValue = pathIndex
+    }
+    targets.push(pathIndexes)
+  }
+
+  return {pathLists, targets}
 }
+
+function validatePathLists (pathLists, td) {
+  const stopInAllData = (id) => hasStop(id, td.stops)
+  pathLists.forEach(pathList => {
+    pathList.forEach(([boardStopId, patternId, alightStopId]) => {
+      const pattern = td.patterns.find(p => p.pattern_id === `${patternId}`)
+      if (!pattern) {
+        console.error(`Pattern ${patternId} not in transitive data.`)
+      }
+
+      const stopInPattern = (id) => hasStop(id, pattern.stops)
+
+      if (!stopInPattern(boardStopId)) {
+        console.error(`Board stop ${boardStopId} not found in pattern`)
+        if (!stopInAllData(boardStopId)) {
+          console.error(`Board stop ${boardStopId} not found in all data`)
+        }
+      }
+
+      if (!stopInPattern(alightStopId)) {
+        console.error(`Alight stop ${alightStopId} not found in pattern`)
+        if (!stopInAllData(alightStopId)) {
+          console.error(`Alight stop ${alightStopId} not found in all data`)
+        }
+      }
+    })
+  })
+}
+
+const hasStop = (stopId, stops) => !!stops.find(s => s.stop_id === `${stopId}`)
