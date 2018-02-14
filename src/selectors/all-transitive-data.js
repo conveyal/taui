@@ -1,6 +1,10 @@
 // @flow
 import get from 'lodash/get'
+import uniq from 'lodash/uniq'
 import {createSelector} from 'reselect'
+
+import selectEndIndexes from './end-indexes'
+import getRouteSegmentsFromJourney from '../utils/get-route-segments-from-journey'
 
 type PathDescriptor = [number, number, number] // [boardStopId, patternId, alightStopId]
 type Stop = {
@@ -20,14 +24,14 @@ const TRANSIT = 'TRANSIT'
 const WALK = 'WALK'
 
 export default createSelector(
-  state => get(state, 'data.origins'),
+  state => get(state, 'data.networks'),
   state => get(state, 'geocoder.start'),
   state => get(state, 'geocoder.end'),
-  state => get(state, 'map.zoom'),
-  (origins, start, end, zoom) =>
-    origins.map(origin => {
-      const patterns = get(origin, 'query.transitiveData.patterns')
-      if (start && start.position && end && end.position && origin.pathLists && patterns) {
+  selectEndIndexes,
+  (networks, start, end, endIndexes) =>
+    networks.map((network, nIndex) => {
+      const td = get(network, 'query.transitiveData')
+      if (start && start.position && end && end.position && network.paths && network.targets && td.patterns) {
         const places = [{
           place_id: 'from',
           place_name: start.label,
@@ -40,25 +44,31 @@ export default createSelector(
           place_lat: end.position.lat
         }]
 
-        const journeys = getJourneys(origin.pathLists, patterns)
+        const targetIndex = endIndexes[nIndex]
+        const targetPathIndexes = uniq(network.targets[targetIndex])
+        const paths = targetPathIndexes.map(i => network.paths[i])
+        const journeys = getJourneys(paths, td.patterns)
 
         return {
-          ...origin.query.transitiveData,
+          ...td,
           journeys,
-          places
+          places,
+          routeSegments: journeys.map(j => getRouteSegmentsFromJourney(j, td.patterns, td.routes))
         }
+      } else {
+        return td
       }
     })
 )
 
-function getJourneys (pathLists, patterns) {
-  return pathLists.map((pathList, pidx) => {
+function getJourneys (paths, patterns) {
+  return paths.map((path, pidx) => {
     return {
       journey_id: pidx,
       journey_name: pidx,
-      segments: pathList.length === 0
+      segments: path.length === 0
         ? createWalkOnlyJourney()
-        : getSegmentsFromPathList(pathList, patterns)
+        : getSegmentsFromPath(path, patterns)
     }
   })
 }
@@ -77,15 +87,15 @@ function createWalkOnlyJourney () {
   }]
 }
 
-function getSegmentsFromPathList (pathList: PathDescriptor[], patterns: Pattern[]) {
-  const originStopId = `${pathList[0][0]}`
+function getSegmentsFromPath (path: PathDescriptor[], patterns: Pattern[]) {
+  const initialStopId = `${path[0][0]}`
   const segments = []
-  let previousStopId = originStopId
-  for (let i = 0; i < pathList.length; i++) {
-    const pathD = pathList[i]
-    const boardStopId = `${pathD[0]}`
-    const patternId = `${pathD[1]}`
-    const alightStopId = `${pathD[2]}`
+  let previousStopId = initialStopId
+  for (let i = 0; i < path.length; i++) {
+    const leg = path[i]
+    const boardStopId = `${leg[0]}`
+    const patternId = `${leg[1]}`
+    const alightStopId = `${leg[2]}`
     const pattern = patterns.find(p => p.pattern_id === patternId)
 
     if (!pattern) {
@@ -134,7 +144,7 @@ function getSegmentsFromPathList (pathList: PathDescriptor[], patterns: Pattern[
     },
     to: {
       type: STOP,
-      stop_id: originStopId
+      stop_id: initialStopId
     }
   }, ...segments, {
     type: WALK,
@@ -148,41 +158,3 @@ function getSegmentsFromPathList (pathList: PathDescriptor[], patterns: Pattern[
     }
   }]
 }
-
-/* TODO: filter journeys that have same pattern id sequences
-const extractRelevantTransitiveInfo = ({journeys, patterns, routes, stops}) =>
-  journeys.map(j =>
-    j.segments.filter(s => !!s.pattern_id || !!s.patterns).map(s => {
-      const pid = s.pattern_id || s.patterns[0].pattern_id
-      const seg = {}
-      const route = findRouteForPattern({id: pid, patterns, routes})
-      const color = route.route_color
-        ? Color(`#${route.route_color}`)
-        : Color('#0b2b40')
-      seg.name = toCapitalCase(route.route_short_name)
-
-      if (s.patterns && s.patterns.length > 0) {
-        const patternNames = s.patterns.map(p =>
-          toCapitalCase(
-            findRouteForPattern({id: p.pattern_id, patterns, routes})
-              .route_short_name
-          )
-        )
-        seg.name = unique(patternNames).join(' / ')
-      }
-
-      seg.backgroundColor = color.string()
-      seg.color = color.light() ? '#000' : '#fff'
-      seg.type = typeToIcon[route.route_type]
-
-      return seg
-    })
-  )
-
-const findRouteForPattern = ({id, patterns, routes}) =>
-  routes.find(
-    r => r.route_id === patterns.find(p => p.pattern_id === id).route_id
-  )
-
-const typeToIcon = ['subway', 'subway', 'train', 'bus']
-*/

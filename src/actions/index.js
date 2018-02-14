@@ -1,65 +1,15 @@
 // @flow
-import {createAction} from 'redux-actions'
+export const setSelectedTimeCutoff = (payload: number) =>
+  ({type: 'set selected time cutoff', payload})
 
-import {setKeyTo} from '../utils/hash'
-
-const END = 'end'
-const START = 'start'
-
-export const setOrigin = (payload: any) => ({type: 'set origin', payload})
-export const addActionLogItem = (item: string) => {
-  const payload = typeof item === 'string' ? {text: item} : item
+/**
+ * Update the map and store the settings as query parameters in the URL
+ */
+export const updateMap = (payload: any) => {
+  // Object.keys(payload).forEach(key => setKeyTo(key, payload[key])) fix for zoom & centerCoordinates
 
   return {
-    type: 'add action log item',
-    payload: {
-      createdAt: new Date(),
-      level: 'info',
-      ...payload
-    }
+    type: 'update map',
+    payload
   }
 }
-
-export const setActiveOrigin = (name: string) =>
-  ({type: 'set active origin', payload: name})
-
-export const setEnd = (end: any) => {
-  setKeyTo(END, end ? end.label : null)
-  return {
-    type: 'set end',
-    payload: end
-  }
-}
-
-export const setStart = (start: any) => {
-  setKeyTo(START, start ? start.label : null)
-  return {
-    type: 'set start',
-    payload: start
-  }
-}
-
-export const clearEnd = createAction('clear end', () => setKeyTo(END, null))
-export const clearStart = createAction('clear start', () =>
-  setKeyTo(START, null)
-)
-
-export const setAccessibilityFor = createAction('set accessibility for')
-export const setAccessibilityToEmptyFor = createAction(
-  'set accessibility to empty for'
-)
-export const setAccessibilityToLoadingFor = createAction(
-  'set accessibility to loading for'
-)
-
-export const setSelectedTimeCutoff = createAction('set selected time cutoff')
-export const setDestinationDataFor = createAction('set destination data for')
-
-export const showMapMarker = createAction('show map marker')
-export const hideMapMarker = createAction('hide map marker')
-
-export const clearIsochrone = createAction('clear isochrone')
-export const setIsochrone = createAction('set isochrone')
-export const setIsochroneFor = createAction('set isochrone for')
-
-export const updateMap = createAction('update map')

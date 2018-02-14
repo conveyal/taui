@@ -1,65 +1,69 @@
 // @flow
-import {ACCESSIBILITY_IS_LOADING} from '../constants'
+import lonlat from '@conveyal/lonlat'
 
-import {
-  addActionLogItem,
-  clearIsochrone,
-  setEnd,
-  setOrigin,
-  setStart
-} from './'
-import {fetchDataForLonLat} from './data'
+import {addActionLogItem} from './log'
+import {fetchDataForCoordinate, setNetworksToLoading} from './network'
 import {reverse as reverseGeocode} from './geocode'
+import {setValues} from '../utils/hash'
 
-import type {Location} from '../types'
+import type {Location, LonLat} from '../types'
+
+const setLocation = (which: 'end' | 'start', location?: Location) => {
+  if (location) {
+    setValues({
+      [`${which}`]: location.label,
+      [`${which}Coordinate`]: location.position
+        ? lonlat.toString(location.position)
+        : null
+    })
+  } else {
+    setValues({
+      [`${which}`]: null,
+      [`${which}Coordinate`]: null
+    })
+  }
+}
+
+export const setEnd = (end: any) => {
+  setLocation('end', end)
+  return {
+    type: 'set end',
+    payload: end
+  }
+}
+
+export const setStart = (start: any) => {
+  setLocation('start', start)
+  return {
+    type: 'set start',
+    payload: start
+  }
+}
 
 /**
  * Update the start
  */
-export const updateStart = (value: Location) =>
-  (dispatch: Dispatch, getState: any) => {
-    const state = getState()
-    const origins = state.data.origins
+export const updateStart = (value: Location) => [
+  setNetworksToLoading(),
+  addActionLogItem(`Updating start to ${value.label}`),
+  setStart(value),
+  fetchDataForCoordinate(value.position)
+]
 
-    dispatch([
-      clearIsochrone(),
-      ...origins.map(o =>
-        setOrigin({name: o.name, accessibility: ACCESSIBILITY_IS_LOADING}))
-    ])
-
-    if (value.label) {
-      dispatch([
-        addActionLogItem(`Updating start to ${value.label}`),
-        setStart(value)
-      ])
-    } else if (value.position) {
-      dispatch(reverseGeocode(value.position, (feature) => {
-        dispatch(setStart({
-          position: value.position,
-          label: feature.place_name
-        }))
-      }))
-    }
-
-    dispatch(fetchDataForLonLat(value.position))
-  }
+export const updateStartPosition = (position: LonLat) => [
+  reverseGeocode(position, (feature) =>
+    setStart({position, label: feature.place_name})),
+  fetchDataForCoordinate(position)
+]
 
 /**
  * Update the end point
  */
-export const updateEnd = (value: Location) =>
-  (dispatch: Dispatch, getState: any) => {
-    if (value.label) {
-      dispatch([
-        addActionLogItem(`Updating end point to ${value.label}`),
-        setEnd(value)
-      ])
-    } else {
-      dispatch(reverseGeocode(value.position, (feature) => {
-        dispatch(setEnd({
-          position: value.position,
-          label: feature.place_name
-        }))
-      }))
-    }
-  }
+export const updateEnd = (value: Location) => [
+  addActionLogItem(`Updating end point to ${value.label}`),
+  setEnd(value)
+]
+
+export const updateEndPosition = (position: LonLat) =>
+  reverseGeocode(position, (feature) =>
+    setEnd({position, label: feature.place_name}))

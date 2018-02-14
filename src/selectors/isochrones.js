@@ -7,20 +7,20 @@ import {createSelector} from 'reselect'
 import uuid from 'uuid'
 
 export default createSelector(
-  (state) => get(state, 'data.origins'),
+  (state) => get(state, 'data.networks'),
   (state) => get(state, 'timeCutoff.selected'),
-  (origins = [], timeCutoff) => origins.map((origin, index) => {
-    if (origin.travelTimeSurface && origin.travelTimeSurface.data) {
-      return getIsochrone(origin, index, timeCutoff)
+  (networks = [], timeCutoff) => networks.map((network, index) => {
+    if (network.travelTimeSurface && network.travelTimeSurface.data) {
+      return getIsochrone(network, index, timeCutoff)
     }
   })
 )
 
 /**
- * Create an isochrone. Save results based on the origin and timecutoff.
+ * Create an isochrone. Save results based on the network and timecutoff.
  */
-const getIsochrone = memoize((origin, index, timeCutoff) => {
-  const surface = origin.travelTimeSurface
+const getIsochrone = memoize((network, index, timeCutoff) => {
+  const surface = network.travelTimeSurface
   const isochrone = jsolines({
     ...surface, // height, width, surface
     surface: surface.data,
@@ -36,4 +36,4 @@ const getIsochrone = memoize((origin, index, timeCutoff) => {
 
   // create the uuid here so that if
   return {...isochrone, key: uuid.v4()}
-}, (o, i, c) => `${o.name}-${i}-${o.originPoint.x}-${o.originPoint.y}-${c}`)
+}, (n, i, c) => `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${c}`)

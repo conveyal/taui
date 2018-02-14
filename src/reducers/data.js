@@ -17,30 +17,30 @@ export default handleActions({
       grids
     }
   },
-  'set origin' (state, action) {
-    const origins = [...state.origins]
-    const originIndex = origins.findIndex((o) => o.name === action.payload.name)
+  'set network' (state, action) {
+    const networks = [...state.networks]
+    const networkIndex = networks.findIndex(n => n.name === action.payload.name)
 
-    if (originIndex > -1) {
-      origins[originIndex] = {...origins[originIndex], ...action.payload}
+    if (networkIndex > -1) {
+      networks[networkIndex] = {...networks[networkIndex], ...action.payload}
     } else {
-      origins.push(action.payload)
+      networks.push(action.payload)
     }
 
     return {
       ...state,
-      origins
+      networks
     }
   },
-  'set active origin' (state, action) {
-    const origins = [...state.origins]
+  'set active network' (state, action) {
+    const networks = [...state.networks]
 
     return {
       ...state,
-      origins: origins.map(o => o.name === action.payload ? {...o, active: true} : {...o, active: false})
+      networks: networks.map(n => n.name === action.payload ? {...n, active: true} : {...n, active: false})
     }
   }
 }, {
-  origins: [],
-  grids: []
+  grids: [],
+  networks: []
 })

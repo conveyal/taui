@@ -13,13 +13,12 @@ type Props = {
   grids: any[],
   hasEnd: boolean,
   hasStart: boolean,
-  journeys: any[],
   oldAccessibility: any,
   oldTravelTime: number,
   onClick(): void,
+  routeSegments: any[],
   showComparison: boolean,
-  travelTime: number,
-  waitTime: number
+  travelTime: number
 }
 
 export default ({
@@ -30,13 +29,12 @@ export default ({
   grids,
   hasEnd,
   hasStart,
-  journeys,
   oldAccessibility,
   oldTravelTime,
   onClick,
+  routeSegments,
   showComparison,
-  travelTime,
-  waitTime
+  travelTime
 }: Props) => (
   <div
     className={
@@ -49,7 +47,7 @@ export default ({
       className='CardTitle'
       onClick={onClick}
       tabIndex={0}
-      title='Set system active'
+      title='Set network active'
     >
       {children}
       <span className='pull-right'>
@@ -72,12 +70,11 @@ export default ({
             : <ShowAccess accessibility={accessibility} grids={grids} />
           : <span>{messages.Systems.SelectStart}</span>}
       </div>
-      {hasStart && hasEnd && journeys &&
-        <Journeys
-          journeys={journeys}
+      {hasStart && hasEnd &&
+        <RouteSegments
+          routeSegments={routeSegments}
           oldTravelTime={oldTravelTime}
           travelTime={travelTime}
-          waitTime={waitTime}
         />}
     </div>
   </div>
@@ -116,8 +113,8 @@ function TripDiff ({oldTravelTime, travelTime}) {
   }
 }
 
-function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
-  if (!travelTime || !journeys) {
+function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
+  if (!travelTime || !routeSegments) {
     return (
       <div className='CardJourneys'>
         <div className='heading'>
@@ -130,7 +127,7 @@ function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
     )
   }
 
-  if (travelTime === 255 || journeys.length === 0) {
+  if (travelTime === 255 || routeSegments.length === 0) {
     return (
       <div className='CardJourneys'>
         <div className='heading'>
@@ -143,7 +140,7 @@ function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
     )
   }
 
-  const [bestJourney, ...alternateJourneys] = journeys
+  const [bestJourney, ...alternateJourneys] = routeSegments
 
   return (
     <div>
@@ -160,16 +157,12 @@ function Journeys ({journeys, oldTravelTime, travelTime, waitTime}) {
             <TripDiff oldTravelTime={oldTravelTime} travelTime={travelTime} />}
         </div>
         <div>
-          <strong>{waitTime}</strong> {messages.Units.Mins}{' '}
-          {messages.Systems.Waiting}
-        </div>
-        <div>
           {bestJourney.map((segment, index) => (
             <Segment key={index} segment={segment} />
           ))}
         </div>
       </div>
-      {journeys.length > 1 &&
+      {routeSegments.length > 1 &&
         <div>
           <div className='heading'>
             {messages.Systems.AlternateTripsTitle}

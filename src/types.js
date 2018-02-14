@@ -1,18 +1,24 @@
 // @flow
+export type Coordinate = [number, number]
+export type Coordinates = Coordinate[]
+
 export type LatLng = {
   lat: number,
   lng: number
 }
 
 export type LonLat = {lon: number, lat: number}
+export type Point = {x: number, y: number}
 
 export type Location = {
   label: string,
   position: LonLat
 }
 
-export type Coordinate = [number, number]
-export type Coordinates = Coordinate[]
+export type PartialLocation = {
+  label: string | void,
+  position: LonLat | void
+}
 
 export type Grid = {
   contains: (number, number) => boolean,

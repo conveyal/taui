@@ -1,11 +1,11 @@
 // @flow
 import {createSelector} from 'reselect'
 
-import selectActiveOriginIndex from './active-origin-index'
+import selectActiveNetworkIndex from './active-network-index'
 import selectTransitiveData from './all-transitive-data'
 
 export default createSelector(
-  selectActiveOriginIndex,
+  selectActiveNetworkIndex,
   selectTransitiveData,
-  (index, transitiveDataForAllOrigins) => transitiveDataForAllOrigins[index]
+  (index, transitiveDataForAllNetworks) => transitiveDataForAllNetworks[index]
 )

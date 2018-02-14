@@ -13,7 +13,6 @@ import {
 } from 'react-leaflet'
 
 import Icon from './icon'
-import {setKeyTo} from '../utils/hash'
 import leafletIcon from '../utils/leaflet-icons'
 import TransitiveLayer from './transitive-map-layer'
 import transitiveStyle from '../transitive-style'
@@ -35,14 +34,14 @@ const endIcon = leafletIcon({
 })
 
 type Props = {
-  activeOriginIndex: number,
+  activeNetworkIndex: number,
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
   isochrones: any[],
   markers: any[],
   pointsOfInterest: PointsOfInterest,
-  setEnd: (any) => void,
-  setStart: (any) => void,
+  setEndPosition: (LonLat) => void,
+  setStartPosition: (LonLat) => void,
   transitive: any,
   updateMap: (any) => void,
   zoom: number
@@ -85,12 +84,12 @@ export default class Map extends PureComponent {
   }
 
   _setEnd = (): void => {
-    this.props.setEnd({position: this.state.lastClickedPosition})
+    if (this.state.lastClickedPosition) { this.props.setEndPosition(this.state.lastClickedPosition) }
     this._clearState()
   }
 
   _setStart = (): void => {
-    this.props.setStart({position: this.state.lastClickedPosition})
+    if (this.state.lastClickedPosition) { this.props.setStartPosition(this.state.lastClickedPosition) }
     this._clearState()
   }
 
@@ -111,12 +110,11 @@ export default class Map extends PureComponent {
   _setZoom = (e: MapEvent) => {
     const zoom = e.target._zoom
     this.props.updateMap({zoom})
-    setKeyTo('zoom', zoom)
   }
 
   render (): React$Element<LeafletMap> {
     const {
-      activeOriginIndex,
+      activeNetworkIndex,
       centerCoordinates,
       isochrones,
       markers,
@@ -137,7 +135,7 @@ export default class Map extends PureComponent {
     }
 
     const baseIsochrone = isochrones[0]
-    const comparisonIsochrone = activeOriginIndex > 0 ? isochrones[activeOriginIndex] : null
+    const comparisonIsochrone = activeNetworkIndex > 0 ? isochrones[activeNetworkIndex] : null
 
     return (
       <LeafletMap

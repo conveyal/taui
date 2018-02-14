@@ -23,7 +23,7 @@ import type {
   UIStore
 } from '../types'
 
-type Origin = {
+type Network = {
   name: string,
   active: boolean
 }
@@ -31,21 +31,18 @@ type Origin = {
 type MapState = {
   centerCoordinates: Coordinate,
   tileUrl: string,
-  transitive: any,
-  travelTimes: any[],
-  waitTimes: any[],
   zoom: number
 }
 
 type Props = {
   accessibility: number[][],
   actionLog: LogItems,
-  activeOriginIndex: number,
+  activeNetworkIndex: number,
   activeTransitive: any,
   allTransitiveData: any[],
   data: {
     grids: string[],
-    origins: Origin[]
+    networks: Network[]
   },
   geocoder: GeocoderStore,
   isochrones: any[],
@@ -54,17 +51,19 @@ type Props = {
   pointsOfInterest: PointsOfInterest,
   showComparison: boolean,
   timeCutoff: any,
+  travelTimes: number[],
   ui: UIStore,
 
-  clearIsochrone(): void,
-  initialize: () => void,
-  setActiveOrigin: (name: string) => void,
+  clearIsochrone: () => void,
+  setActiveNetwork: (name: string) => void,
   setEnd: (any) => void,
   setSelectedTimeCutoff: (any) => void,
   setStart: (any) => void,
   updateEnd: (any) => void,
+  updateEndPosition: (LonLat) => void,
   updateMap: (any) => void,
-  updateStart: (any) => void
+  updateStart: (any) => void,
+  updateStartPosition: (LonLat) => void
 }
 
 type Marker = {
@@ -83,10 +82,6 @@ export default class Application extends Component {
 
   state = {
     markers: this._createMarkersFromProps(this.props)
-  }
-
-  componentDidMount () {
-    this.props.initialize()
   }
 
   componentWillReceiveProps (nextProps: Props) {
@@ -124,12 +119,8 @@ export default class Application extends Component {
     return markers
   }
 
-  _setStart = (opts: {label?: string, position: LonLat}) => {
-    this.props.updateStart(opts)
-  }
-
   _setStartWithEvent = (event: MapEvent) => {
-    this.props.updateStart({position: lonlat(event.latlng || event.target._latlng)})
+    this.props.updateStartPosition(lonlat(event.latlng || event.target._latlng))
   }
 
   _setStartWithFeature = (feature?: PointFeature) => {
@@ -143,12 +134,8 @@ export default class Application extends Component {
     }
   }
 
-  _setEnd = (opts: {label?: string, position: LonLat}) => {
-    this.props.updateEnd(opts)
-  }
-
   _setEndWithEvent = (event: MapEvent) => {
-    this.props.updateEnd({position: lonlat(event.latlng || event.target._latlng)})
+    this.props.updateEndPosition(lonlat(event.latlng || event.target._latlng))
   }
 
   _setEndWithFeature = (feature: PointFeature) => {
@@ -157,7 +144,7 @@ export default class Application extends Component {
     } else {
       const {geometry} = feature
 
-      this._setEnd({
+      this.props.updateEnd({
         label: feature.properties.label,
         position: lonlat(geometry.coordinates)
       })
@@ -168,15 +155,15 @@ export default class Application extends Component {
     this.props.setSelectedTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
 
-  _setActiveOrigin = memoize(name => () =>
-    this.props.setActiveOrigin(name))
+  _setActiveNetwork = memoize(name => () =>
+    this.props.setActiveNetwork(name))
 
   count = 0
   render () {
     const {
       accessibility,
       actionLog,
-      activeOriginIndex,
+      activeNetworkIndex,
       activeTransitive,
       allTransitiveData,
       data,
@@ -186,8 +173,11 @@ export default class Application extends Component {
       pointsOfInterest,
       showComparison,
       timeCutoff,
+      travelTimes,
       ui,
-      updateMap
+      updateEndPosition,
+      updateMap,
+      updateStartPosition
     } = this.props
     const {markers} = this.state
 
@@ -196,14 +186,14 @@ export default class Application extends Component {
         <div className='Fullscreen'>
           <Map
             {...map}
-            activeOriginIndex={activeOriginIndex}
+            activeNetworkIndex={activeNetworkIndex}
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
             isochrones={isochrones}
             markers={markers}
             pointsOfInterest={pointsOfInterest}
-            setEnd={this._setEnd}
-            setStart={this._setStart}
+            setEndPosition={updateEndPosition}
+            setStartPosition={updateStartPosition}
             transitive={activeTransitive}
             updateMap={updateMap}
             zoom={map.zoom}
@@ -229,24 +219,23 @@ export default class Application extends Component {
               selectedTimeCutoff={timeCutoff.selected}
               start={geocoder.start}
             />
-            {data.origins.map((origin, index) => (
+            {data.networks.map((network, index) => (
               <RouteCard
                 accessibility={accessibility[index]}
-                active={origin.active}
+                active={network.active}
                 alternate={index !== 0}
                 grids={data.grids}
                 hasEnd={!!geocoder.end}
                 hasStart={!!geocoder.start}
                 key={`${index}-route-card`}
-                journeys={(allTransitiveData[index] || {}).journeys}
                 oldAccessibility={accessibility[0]}
-                oldTravelTime={map.travelTimes[0]}
-                onClick={this._setActiveOrigin(origin.name)}
+                oldTravelTime={travelTimes[0]}
+                onClick={this._setActiveNetwork(network.name)}
+                routeSegments={(allTransitiveData[index] || {}).routeSegments}
                 showComparison={showComparison}
-                travelTime={map.travelTimes[index]}
-                waitTime={map.waitTimes[index]}
+                travelTime={travelTimes[index]}
               >
-                {origin.name}
+                {network.name}
               </RouteCard>
             ))}
             {ui.showLog &&
