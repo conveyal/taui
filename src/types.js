@@ -108,12 +108,19 @@ export type PointsOfInterest = Array<{
 }>
 
 export type GeocoderStore = {
-  start: Option,
-  end: Option,
+  start: null | Location,
+  end: null | Location,
   focusLatlng: LatLng,
   boundary: GeocoderBoundary,
   pointsOfInterest: PointsOfInterest
 }
+
+export type MapStore = {
+  centerCoordinates: string,
+  zoom: number
+}
+
+export type NetworkStore = any
 
 export type UIStore = {
   fetches: number,
@@ -123,8 +130,8 @@ export type UIStore = {
 export type Store = {
   actionLog: LogItems,
   geocoder: GeocoderStore,
-  map: any,
-  mapMarkers: any,
+  map: MapStore,
+  network: NetworkStore,
   timeCutoff: {
     selected: number
   },

@@ -1,53 +1,52 @@
 // @flow
-import lonlat from '@conveyal/lonlat'
 import message from '@conveyal/woonerf/message'
 import mount from '@conveyal/woonerf/mount'
 import React from 'react'
+import {connect} from 'react-redux'
 
-import {updateMap} from './actions'
-import {initialize} from './actions/network'
-import {updateStart, updateEnd} from './actions/location'
-import Application from './containers/application'
+import actions from './actions'
+import Application from './components/application'
 import reducers from './reducers'
 import * as select from './selectors'
-import {getAsObject} from './utils/hash'
 
 // Set the title
 document.title = message('Title')
 
+function mapStateToProps (state, ownProps) {
+  return {
+    ...state,
+    accessibility: select.accessibility(state, ownProps),
+    activeNetworkIndex: select.activeNetworkIndex(state, ownProps),
+    activeTransitive: select.activeTransitive(state, ownProps),
+    allTransitiveData: select.allTransitiveData(state, ownProps),
+    isochrones: select.isochrones(state, ownProps),
+    pointsOfInterest: select.pointsOfInterest(state, ownProps),
+    showComparison: select.showComparison(state, ownProps),
+    travelTimes: select.travelTimes(state, ownProps)
+  }
+}
+
+const ConnectedApplication = connect(mapStateToProps, actions)(Application)
+
 // Create an Application wrapper
 function InitializationWrapper ({history, store}) {
   if (window) {
-    window.store = store
-    window.select = {}
+    window.app = {
+      action: {},
+      select: {},
+      store
+    }
+
+    Object.keys(actions).forEach(key => {
+      window.app.action[key] = (...args) => store.dispatch(actions[key](...args))
+    })
+
     Object.keys(select).forEach(key => {
-      window.select[key] = () => select[key](store.getState())
+      window.app.select[key] = () => select[key](store.getState())
     })
   }
 
-  store.dispatch(initialize(() => {
-    const qs = getAsObject()
-
-    if (qs.start && qs.startCoordinate) {
-      store.dispatch(updateStart({
-        label: qs.start,
-        position: lonlat.fromString(qs.startCoordinate)
-      }))
-    }
-
-    if (qs.end && qs.endCoordinate) {
-      store.dispatch(updateEnd({
-        label: qs.end,
-        position: lonlat.fromString(qs.endCoordinate)
-      }))
-    }
-
-    if (qs.zoom) {
-      store.dispatch(updateMap({zoom: parseInt(qs.zoom, 10)}))
-    }
-  }))
-
-  return <Application history={history} store={store} />
+  return <ConnectedApplication history={history} store={store} />
 }
 
 // Mount the app

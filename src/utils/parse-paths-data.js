@@ -40,10 +40,6 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
   const nDestinations = next()
   const nIterations = next()
   const nPaths = next()
-  console.log(`nDestinationss`, nDestinations)
-  console.log('nIterations', nIterations)
-  console.log('nPaths', nPaths)
-
   const paths = []
   for (let i = 0; i < nPaths; i++) {
     const nLegs = next()

@@ -1,111 +1,119 @@
 // @flow
+import message from '@conveyal/woonerf/message'
 import React from 'react'
 import Geocoder from 'react-select-geocoder'
-import messages from '../utils/messages'
 
 import type {
   GeocoderBoundary,
   InputEvent,
   LatLng,
-  Option,
+  Location,
   PointFeature,
   PointsOfInterest
 } from '../types'
 
 type Props = {
   boundary: GeocoderBoundary,
-  end: null | Option,
+  end: null | Location,
   focusLatlng: LatLng,
   onChangeEnd: (PointFeature) => void,
   onChangeStart: (PointFeature) => void,
   onTimeCutoffChange: (InputEvent) => void,
   pointsOfInterest: PointsOfInterest,
   selectedTimeCutoff: number,
-  start: null | Option
+  start: null | Location
 }
 
-const setGeocoderOptionsToPois = (
-  pointsOfInterest,
-  currentValue
-) => geocoder => {
-  if (
-    geocoder &&
-    (!currentValue || !currentValue.value || currentValue.value.length === 0)
-  ) {
-    pointsOfInterest.forEach(poi => {
-      geocoder.options[poi.value] = poi.feature
-    })
+const EMPTY_ARRAY = []
+
+export default class Form extends React.PureComponent {
+  props: Props
+
+  /**
+   * Pass this as the `ref` function in the Geocoder so that when it is rendered
+   * it gets called. If there is no search term in the Geocoder it autopopulates
+   * the results with the pointsOfInterest data.
+   */
+  _setGeocoderOptionsToPois = (geocoder: any) => {
+    if (geocoder && !geocoder.value) {
+      this.props.pointsOfInterest.forEach(poi => {
+        geocoder.options[poi.value] = poi.feature
+      })
+    }
   }
-}
 
-export default ({
-  boundary,
-  end,
-  focusLatlng,
-  onChangeEnd,
-  onChangeStart,
-  onTimeCutoffChange,
-  pointsOfInterest,
-  selectedTimeCutoff,
-  start
-}: Props) => (
-  <div>
-    <div className='heading'>
-      {messages.Geocoding.StartTitle}
-    </div>
-    <div className='Geocoder'>
-      <Geocoder
-        apiKey={process.env.MAPZEN_SEARCH_KEY}
-        boundary={boundary}
-        focusLatlng={focusLatlng}
-        name='start-address'
-        onChange={onChangeStart}
-        options={
-          start && start.value && start.value.length > 0 ? [] : pointsOfInterest
-        }
-        ref={setGeocoderOptionsToPois(pointsOfInterest, start)}
-        placeholder={messages.Geocoding.StartPlaceholder}
-        searchPromptText={messages.Geocoding.PromptText}
-        value={start}
-      />
-    </div>
-    {start &&
+  render () {
+    const {
+      boundary,
+      end,
+      focusLatlng,
+      onChangeEnd,
+      onChangeStart,
+      onTimeCutoffChange,
+      pointsOfInterest,
+      selectedTimeCutoff,
+      start
+    } = this.props
+    return (
       <div>
         <div className='heading'>
-          {messages.Geocoding.EndTitle}
+          {message('Geocoding.StartTitle')}
         </div>
         <div className='Geocoder'>
           <Geocoder
             apiKey={process.env.MAPZEN_SEARCH_KEY}
             boundary={boundary}
             focusLatlng={focusLatlng}
-            name='end-address'
-            onChange={onChangeEnd}
+            name='start-address'
+            onChange={onChangeStart}
             options={
-              end && end.value && end.value.length > 0 ? [] : pointsOfInterest
+              start && start.label && start.label.length > 0 ? EMPTY_ARRAY : pointsOfInterest
             }
-            placeholder={messages.Geocoding.EndPlaceholder}
-            ref={setGeocoderOptionsToPois(pointsOfInterest, end)}
-            searchPromptText={messages.Geocoding.PromptText}
-            value={end}
+            ref={this._setGeocoderOptionsToPois}
+            placeholder={message('Geocoding.StartPlaceholder')}
+            searchPromptText={message('Geocoding.PromptText')}
+            value={start}
           />
         </div>
-        <div className='heading'>
-          {messages.Strings.HighlightAreaAccessibleWithin}
-        </div>
-        <div className='TimeCutoff'>
-          <div className='Time'>
-            {selectedTimeCutoff} {messages.Units.Minutes}
-          </div>
-          <input
-            defaultValue={selectedTimeCutoff}
-            onChange={onTimeCutoffChange}
-            type='range'
-            min={10}
-            max={120}
-            step={5}
-          />
-        </div>
-      </div>}
-  </div>
-)
+        {start &&
+          <div>
+            <div className='heading'>
+              {message('Geocoding.EndTitle')}
+            </div>
+            <div className='Geocoder'>
+              <Geocoder
+                apiKey={process.env.MAPZEN_SEARCH_KEY}
+                boundary={boundary}
+                focusLatlng={focusLatlng}
+                name='end-address'
+                onChange={onChangeEnd}
+                options={
+                  end && end.label && end.label.length > 0 ? EMPTY_ARRAY : pointsOfInterest
+                }
+                placeholder={message('Geocoding.EndPlaceholder')}
+                ref={this._setGeocoderOptionsToPois}
+                searchPromptText={message('Geocoding.PromptText')}
+                value={end}
+              />
+            </div>
+            <div className='heading'>
+              {message('Strings.HighlightAreaAccessibleWithin')}
+            </div>
+            <div className='TimeCutoff'>
+              <div className='Time'>
+                {selectedTimeCutoff} {message('Units.Minutes')}
+              </div>
+              <input
+                defaultValue={selectedTimeCutoff}
+                onChange={onTimeCutoffChange}
+                type='range'
+                min={10}
+                max={120}
+                step={5}
+              />
+            </div>
+          </div>}
+      </div>
+    )
+  }
+}

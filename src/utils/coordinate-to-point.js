@@ -22,5 +22,14 @@ export default function coordinateToPoint (coordinate: LonLat, currentZoom: numb
   return {x, y}
 }
 
+/**
+ * Get the index of a point based off the query width
+ */
 export const pointToOriginIndex = (point: Point, width: number) =>
   point.x + point.y * width
+
+/**
+ * Convert a coordinate to an index
+ */
+export const coordinateToIndex = (c: LonLat, z: number, q: Query): number =>
+  pointToOriginIndex(coordinateToPoint(c, z, q), q.width)

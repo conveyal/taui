@@ -1,7 +1,9 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
+import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
-import {Browser} from 'leaflet'
+import Leaflet from 'leaflet'
+import memoize from 'lodash/memoize'
 import React, {PureComponent} from 'react'
 import {
   GeoJson,
@@ -12,16 +14,20 @@ import {
   ZoomControl
 } from 'react-leaflet'
 
-import Icon from './icon'
 import leafletIcon from '../utils/leaflet-icons'
 import TransitiveLayer from './transitive-map-layer'
-import transitiveStyle from '../transitive-style'
 
-import type {Coordinate, Feature, LonLat, MapEvent, PointsOfInterest} from '../types'
+import type {Coordinate, Feature, Location, LonLat, MapEvent, PointsOfInterest} from '../types'
 
-const TILE_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
+const TILE_URL = Leaflet.Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
   : process.env.LEAFLET_TILE_URL
+
+const TILE_LAYER_PROPS = {}
+if (Leaflet.Browser.retina) {
+  TILE_LAYER_PROPS.tileSize = 512
+  TILE_LAYER_PROPS.zoomOffset = -1
+}
 
 const startIcon = leafletIcon({
   icon: 'play',
@@ -37,11 +43,12 @@ type Props = {
   activeNetworkIndex: number,
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
+  end: null | Location,
   isochrones: any[],
-  markers: any[],
   pointsOfInterest: PointsOfInterest,
   setEndPosition: (LonLat) => void,
   setStartPosition: (LonLat) => void,
+  start: null | Location,
   transitive: any,
   updateMap: (any) => void,
   zoom: number
@@ -49,9 +56,11 @@ type Props = {
 
 type State = {
   showSelectStartOrEnd: boolean,
-  lastClickedLabel: null,
-  lastClickedPosition: null | LonLat
+  lastClickedLabel: null | string,
+  lastClickedPosition: null | Coordinate
 }
+
+const poiToFeatures = memoize(poi => poi.map(p => p.feature))
 
 export default class Map extends PureComponent {
   props: Props
@@ -76,20 +85,28 @@ export default class Map extends PureComponent {
     this._clearState()
   }
 
-  _onMapClick = (e: MapEvent): void => {
+  _setEndWithEvent = (event: MapEvent) => {
+    this.props.setEndPosition(lonlat(event.latlng || event.target._latlng))
+  }
+
+  _setStartWithEvent = (event: MapEvent) => {
+    this.props.setStartPosition(lonlat(event.latlng || event.target._latlng))
+  }
+
+  _onMapClick = (e: any): void => {
     this.setState({
       showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
-      lastClickedPosition: lonlat(e.latlng)
+      lastClickedPosition: e.latlng || e.target._latlng
     })
   }
 
   _setEnd = (): void => {
-    if (this.state.lastClickedPosition) { this.props.setEndPosition(this.state.lastClickedPosition) }
+    if (this.state.lastClickedPosition) { this.props.setEndPosition(lonlat(this.state.lastClickedPosition)) }
     this._clearState()
   }
 
   _setStart = (): void => {
-    if (this.state.lastClickedPosition) { this.props.setStartPosition(this.state.lastClickedPosition) }
+    if (this.state.lastClickedPosition) { this.props.setStartPosition(lonlat(this.state.lastClickedPosition)) }
     this._clearState()
   }
 
@@ -102,7 +119,7 @@ export default class Map extends PureComponent {
     const {coordinates} = feature.geometry
     this.setState({
       lastClickedLabel: feature.properties.label,
-      lastClickedPosition: lonlat(coordinates),
+      lastClickedPosition: lonlat.toLeaflet(coordinates),
       showSelectStartOrEnd: true
     })
   }
@@ -116,9 +133,10 @@ export default class Map extends PureComponent {
     const {
       activeNetworkIndex,
       centerCoordinates,
+      end,
       isochrones,
-      markers,
       pointsOfInterest,
+      start,
       transitive,
       zoom
     } = this.props
@@ -127,13 +145,6 @@ export default class Map extends PureComponent {
       lastClickedPosition,
       showSelectStartOrEnd
     } = this.state
-    const tileLayerProps = {}
-
-    if (Browser.retina) {
-      tileLayerProps.tileSize = 512
-      tileLayerProps.zoomOffset = -1
-    }
-
     const baseIsochrone = isochrones[0]
     const comparisonIsochrone = activeNetworkIndex > 0 ? isochrones[activeNetworkIndex] : null
 
@@ -141,7 +152,6 @@ export default class Map extends PureComponent {
       <LeafletMap
         center={centerCoordinates}
         className='Taui-Map'
-        ref='map'
         onZoomend={this._setZoom}
         zoom={zoom}
         onClick={this._onMapClick}
@@ -152,30 +162,37 @@ export default class Map extends PureComponent {
         <TileLayer
           url={TILE_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
-          {...tileLayerProps}
+          {...TILE_LAYER_PROPS}
         />
-        {markers.length < 2 &&
+        {(!start || !end) && pointsOfInterest.length > 0 &&
           <MapboxGeoJson
-            data={pointsOfInterest.map(poi => poi.feature)}
+            data={poiToFeatures(pointsOfInterest)}
             onClick={this._clickPoi}
           />}
 
-        {markers.map((m, index) => (
+        {start &&
           <Marker
             draggable
-            icon={index === 0 ? startIcon : endIcon}
-            key={`marker-${index}`}
-            onDragEnd={m.onDragEnd}
-            position={lonlat.toLeaflet(m.position)}
+            icon={startIcon}
+            onDragEnd={this._setStartWithEvent}
+            position={start.position}
           >
-            {m.label &&
-              <Popup>
-                <span>
-                  {m.label}
-                </span>
-              </Popup>}
-          </Marker>
-        ))}
+            <Popup>
+              <span>{start.label}</span>
+            </Popup>
+          </Marker>}
+
+        {end &&
+          <Marker
+            draggable
+            icon={endIcon}
+            onDragEnd={this._setEndWithEvent}
+            position={end.position}
+          >
+            <Popup>
+              <span>{end.label}</span>
+            </Popup>
+          </Marker>}
 
         {baseIsochrone &&
           <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
@@ -184,10 +201,10 @@ export default class Map extends PureComponent {
           <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
 
         {transitive &&
-          <TransitiveLayer data={transitive} styles={transitiveStyle} />}
+          <TransitiveLayer data={transitive} />}
 
         {showSelectStartOrEnd &&
-          <Popup closeButton={false} position={lonlat.toLeaflet(lastClickedPosition)}>
+          <Popup closeButton={false} position={lastClickedPosition}>
             <div className='Popup'>
               {lastClickedLabel &&
                 <h3>
@@ -197,12 +214,12 @@ export default class Map extends PureComponent {
                 <Icon type='map-marker' />{' '}
                 {message('Map.SetLocationPopup.SetStart')}
               </button>
-              {markers.length > 0 &&
+              {start &&
                 <button onClick={this._setEnd}>
                   <Icon type='map-marker' />{' '}
                   {message('Map.SetLocationPopup.SetEnd')}
                 </button>}
-              {markers.length > 0 &&
+              {(start || end) &&
                 <button onClick={this._clearStartAndEnd}>
                   <Icon type='times' />{' '}
                   {message('Map.SetLocationPopup.ClearMarkers')}
@@ -214,25 +231,27 @@ export default class Map extends PureComponent {
   }
 }
 
+const getStyle = memoize((color) => ({
+  fillColor: color,
+  pointerEvents: 'none',
+  stroke: color,
+  weight: 1
+}))
+
 function Isochrone ({isochrone, color}) {
   return (
     <GeoJson
       key={`${isochrone.key}`}
       data={isochrone}
-      style={{
-        fillColor: color,
-        pointerEvents: 'none',
-        stroke: color,
-        weight: 1
-      }}
+      style={getStyle(color)}
     />
   )
 }
 
 class MapboxGeoJson extends GeoJson {
-  componentWillMount () {
+  componentDidMount () {
     const {mapbox} = require('mapbox.js')
-    super.componentWillMount()
+    super.componentDidMount()
     const {data} = this.props
     mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
     this.leafletElement = mapbox.featureLayer(data)

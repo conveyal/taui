@@ -1,9 +1,8 @@
 // @flow
+import Icon from '@conveyal/woonerf/components/icon'
+import message from '@conveyal/woonerf/message'
 import React from 'react'
 import toSpaceCase from 'lodash/lowerCase'
-
-import Icon from './icon'
-import messages from '../utils/messages'
 
 type Props = {
   active: boolean,
@@ -21,64 +20,71 @@ type Props = {
   travelTime: number
 }
 
-export default ({
-  active,
-  alternate,
-  accessibility,
-  children,
-  grids,
-  hasEnd,
-  hasStart,
-  oldAccessibility,
-  oldTravelTime,
-  onClick,
-  routeSegments,
-  showComparison,
-  travelTime
-}: Props) => (
-  <div
-    className={
-      'Card' +
-        (alternate ? ' Card-alternate' : '') +
-        (active ? ' Card-active' : '')
-    }
-  >
-    <a
-      className='CardTitle'
-      onClick={onClick}
-      tabIndex={0}
-      title='Set network active'
-    >
-      {children}
-      <span className='pull-right'>
-        {active && <Icon type='map' />}
-        {!active && messages.Systems.Show}
-      </span>
-    </a>
-    <div className='CardContent'>
-      <div className='CardAccess'>
-        <div className='heading'>
-          {messages.Systems.AccessTitle}
+export default class RouteCard extends React.PureComponent {
+  props: Props
+
+  render () {
+    const {
+      active,
+      alternate,
+      accessibility,
+      children,
+      grids,
+      hasEnd,
+      hasStart,
+      oldAccessibility,
+      oldTravelTime,
+      onClick,
+      routeSegments,
+      showComparison,
+      travelTime
+    } = this.props
+    return (
+      <div
+        className={
+          'Card' +
+            (alternate ? ' Card-alternate' : '') +
+            (active ? ' Card-active' : '')
+        }
+      >
+        <a
+          className='CardTitle'
+          onClick={onClick}
+          tabIndex={0}
+          title='Set network active'
+        >
+          {children}
+          <span className='pull-right'>
+            {active && <Icon type='map' />}
+            {!active && message('Systems.Show')}
+          </span>
+        </a>
+        <div className='CardContent'>
+          <div className='CardAccess'>
+            <div className='heading'>
+              {message('Systems.AccessTitle')}
+            </div>
+            {hasStart
+              ? showComparison
+                ? <ShowDiff
+                  accessibility={accessibility}
+                  comparison={oldAccessibility}
+                  grids={grids}
+                  />
+                : <ShowAccess accessibility={accessibility} grids={grids} />
+              : <span>{message('Systems.SelectStart')}</span>}
+          </div>
+          {hasStart && hasEnd &&
+            <RouteSegments
+              routeSegments={routeSegments}
+              oldTravelTime={oldTravelTime}
+              travelTime={travelTime}
+            />}
         </div>
-        {hasStart
-          ? showComparison
-            ? <ShowDiff
-              accessibility={accessibility}
-              comparison={oldAccessibility}
-              grids={grids}
-              />
-            : <ShowAccess accessibility={accessibility} grids={grids} />
-          : <span>{messages.Systems.SelectStart}</span>}
       </div>
-      {hasStart && hasEnd &&
-        <RouteSegments
-          routeSegments={routeSegments}
-          oldTravelTime={oldTravelTime}
-          travelTime={travelTime}
-        />}
-    </div>
-  </div>
-)
+    )
+  }
+}
 
 function TripDiff ({oldTravelTime, travelTime}) {
   const actualDiff = travelTime - oldTravelTime
@@ -90,7 +96,7 @@ function TripDiff ({oldTravelTime, travelTime}) {
   if (oldTravelTime === 255) {
     return (
       <span className='increase'>
-        {messages.NewTrip} <Icon type='star' />
+        {message('NewTrip')} <Icon type='star' />
         <br />
       </span>
     )
@@ -118,10 +124,10 @@ function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
     return (
       <div className='CardJourneys'>
         <div className='heading'>
-          {messages.Systems.TripsTitle}
+          {message('Systems.TripsTitle')}
         </div>
         <div>
-          {messages.Systems.SelectEnd}
+          {message('Systems.SelectEnd')}
         </div>
       </div>
     )
@@ -131,10 +137,10 @@ function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
     return (
       <div className='CardJourneys'>
         <div className='heading'>
-          {messages.Systems.TripsTitle}
+          {message('Systems.TripsTitle')}
         </div>
         <div>
-          {messages.Systems.TripsEmpty}
+          {message('Systems.TripsEmpty')}
         </div>
       </div>
     )
@@ -145,11 +151,11 @@ function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
   return (
     <div>
       <div className='heading'>
-        {messages.Systems.BestTripTitle}
+        {message('Systems.BestTripTitle')}
       </div>
       <div className='BestTrip'>
         <div>
-          <strong> {travelTime}</strong> {messages.Units.Mins}
+          <strong> {travelTime}</strong> {message('Units.Mins')}
         </div>
         <div>
           {oldTravelTime &&
@@ -165,7 +171,7 @@ function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
       {routeSegments.length > 1 &&
         <div>
           <div className='heading'>
-            {messages.Systems.AlternateTripsTitle}
+            {message('Systems.AlternateTripsTitle')}
           </div>
           <div className='Trips'>
             {alternateJourneys.map((segments, jindex) => (

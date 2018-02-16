@@ -1,15 +1,15 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
+import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
-import isEqual from 'lodash/isEqual'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
 
 import Form from './form'
-import Icon from './icon'
 import Log from './log'
 import Map from './map'
 import RouteCard from './route-card'
+import {getAsObject} from '../utils/hash'
 
 import type {
   Coordinate,
@@ -46,7 +46,6 @@ type Props = {
   },
   geocoder: GeocoderStore,
   isochrones: any[],
-  mapMarkers: any,
   map: MapState,
   pointsOfInterest: PointsOfInterest,
   showComparison: boolean,
@@ -55,6 +54,7 @@ type Props = {
   ui: UIStore,
 
   clearIsochrone: () => void,
+  initialize: (Function) => void,
   setActiveNetwork: (name: string) => void,
   setEnd: (any) => void,
   setSelectedTimeCutoff: (any) => void,
@@ -66,28 +66,35 @@ type Props = {
   updateStartPosition: (LonLat) => void
 }
 
-type Marker = {
-  position: Coordinate,
-  label: string,
-  onDragEnd: (MapEvent) => void
-}
-
-type State = {
-  markers: Marker[]
-}
-
 export default class Application extends Component {
   props: Props
-  state: State
 
-  state = {
-    markers: this._createMarkersFromProps(this.props)
-  }
+  componentDidMount () {
+    this.props.initialize(() => {
+      const qs = getAsObject()
 
-  componentWillReceiveProps (nextProps: Props) {
-    if (!isEqual(this.props.mapMarkers, nextProps.mapMarkers)) {
-      this.setState({markers: this._createMarkersFromProps(nextProps)})
-    }
+      if (qs.start && qs.startCoordinate) {
+        this.props.updateStart({
+          label: qs.start,
+          position: lonlat.fromString(qs.startCoordinate)
+        })
+      }
+
+      if (qs.end && qs.endCoordinate) {
+        this.props.updateEnd({
+          label: qs.end,
+          position: lonlat.fromString(qs.endCoordinate)
+        })
+      }
+
+      if (qs.zoom) {
+        this.props.updateMap({zoom: parseInt(qs.zoom, 10)})
+      }
+
+      if (qs.centerCoordinates) {
+        this.props.updateMap({centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)})
+      }
+    })
   }
 
   _clearStartAndEnd = () => {
@@ -95,28 +102,6 @@ export default class Application extends Component {
     setStart(null)
     clearIsochrone()
     setEnd(null)
-  }
-
-  _createMarkersFromProps (props: Props): Marker[] {
-    const {mapMarkers} = props
-    const markers = []
-    if (mapMarkers.start && mapMarkers.start.position) {
-      markers.push({
-        position: mapMarkers.start.position,
-        label: mapMarkers.start.label || '',
-        onDragEnd: this._setStartWithEvent
-      })
-    }
-
-    if (mapMarkers.end && mapMarkers.end.position) {
-      markers.push({
-        position: mapMarkers.end.position,
-        label: mapMarkers.end.label || '',
-        onDragEnd: this._setEndWithEvent
-      })
-    }
-
-    return markers
   }
 
   _setStartWithEvent = (event: MapEvent) => {
@@ -179,7 +164,6 @@ export default class Application extends Component {
       updateMap,
       updateStartPosition
     } = this.props
-    const {markers} = this.state
 
     return (
       <div>
@@ -189,11 +173,12 @@ export default class Application extends Component {
             activeNetworkIndex={activeNetworkIndex}
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
+            end={geocoder.end}
             isochrones={isochrones}
-            markers={markers}
             pointsOfInterest={pointsOfInterest}
             setEndPosition={updateEndPosition}
             setStartPosition={updateStartPosition}
+            start={geocoder.start}
             transitive={activeTransitive}
             updateMap={updateMap}
             zoom={map.zoom}

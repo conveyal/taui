@@ -14,6 +14,10 @@ function fnd (a, fn) {
   return ret
 }
 
+/**
+ * Take a transitive journey and extract the route segments. Used to render
+ * the transit steps of a journey.
+ */
 export default function getRouteSegmentsFromJourney (journey: any, fullPatternIndex: any[], fullRouteIndex: any[]) {
   return journey.segments.filter(s => !!s.pattern_id || !!s.patterns).map(s => {
     const pid = s.pattern_id || s.patterns[0].pattern_id

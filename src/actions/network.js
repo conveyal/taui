@@ -19,7 +19,11 @@ export const setNetworksAccessibilityTo = (value: string) =>
     const state = getState()
     dispatch(state.data.networks.map(network => setNetwork({
       ...network,
-      accessibility: value
+      accessibility: value,
+      originPoint: null,
+      paths: null,
+      targets: null,
+      travelTimeSurface: null
     })))
   }
 export const setNetworksToLoading = () =>

@@ -1,19 +1,19 @@
 // @flow
-import {Map} from 'leaflet'
-import isEqual from 'lodash/isEqual'
 import {MapLayer} from 'react-leaflet'
 import Transitive from 'transitive-js'
 import LeafletTransitiveLayer from 'leaflet-transitivelayer'
 
+import styles from './style'
+
 type Props = {
-  data: any,
-  map: Map,
-  styles: any
+  data: any
 }
 
-export default class TransitiveMapLayer extends MapLayer<void, Props, void> {
+export default class TransitiveMapLayer extends MapLayer {
+  props: Props
+
   shouldComponentUpdate (newProps: Props) {
-    return !isEqual(newProps, this.props)
+    return this.props.data !== newProps.data
   }
 
   componentWillMount () {
@@ -22,7 +22,7 @@ export default class TransitiveMapLayer extends MapLayer<void, Props, void> {
       data: this.props.data,
       gridCellSize: 200,
       useDynamicRendering: true,
-      styles: this.props.styles,
+      styles,
       // see https://github.com/conveyal/transitive.js/wiki/Zoom-Factors
       zoomFactors: [
         {
@@ -49,12 +49,8 @@ export default class TransitiveMapLayer extends MapLayer<void, Props, void> {
     this.leafletElement._refresh()
   }
 
-  componentWillReceiveProps (props: Props) {
-    super.componentWillReceiveProps(props)
-    this.transitive.updateData(props.data)
-  }
-
   componentDidUpdate () {
+    this.transitive.updateData(this.props.data)
     this.leafletElement._refresh()
   }
 
