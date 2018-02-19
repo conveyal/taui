@@ -13,7 +13,7 @@ export default function createGrid (data: ArrayBuffer): Grid {
 
   // de-delta code
   for (let i = 0, prev = 0; i < array.length; i++) {
-    array[i] = (prev += array[i])
+    array[i] = prev += array[i]
     if (prev < min) min = prev
     if (prev > max) max = prev
   }

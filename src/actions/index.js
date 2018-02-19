@@ -8,8 +8,10 @@ import * as log from './log'
 import * as network from './network'
 import {setKeyTo} from '../utils/hash'
 
-const setSelectedTimeCutoff = (payload: number) =>
-  ({type: 'set selected time cutoff', payload})
+const setSelectedTimeCutoff = (payload: number) => ({
+  type: 'set selected time cutoff',
+  payload
+})
 
 /**
  * Update the map and store the settings as query parameters in the URL
@@ -20,7 +22,10 @@ const updateMap = (payload: any) => {
   }
 
   if (payload.centerCoordinates) {
-    setKeyTo('centerCoordinates', lonlat.toLatFirstString(payload.centerCoordinates))
+    setKeyTo(
+      'centerCoordinates',
+      lonlat.toLatFirstString(payload.centerCoordinates)
+    )
   }
 
   return {

@@ -16,9 +16,9 @@ type Props = {
   boundary: GeocoderBoundary,
   end: null | Location,
   focusLatlng: LatLng,
-  onChangeEnd: (PointFeature) => void,
-  onChangeStart: (PointFeature) => void,
-  onTimeCutoffChange: (InputEvent) => void,
+  onChangeEnd: PointFeature => void,
+  onChangeStart: PointFeature => void,
+  onTimeCutoffChange: InputEvent => void,
   pointsOfInterest: PointsOfInterest,
   selectedTimeCutoff: number,
   start: null | Location
@@ -67,7 +67,9 @@ export default class Form extends React.PureComponent {
             name='start-address'
             onChange={onChangeStart}
             options={
-              start && start.label && start.label.length > 0 ? EMPTY_ARRAY : pointsOfInterest
+              start && start.label && start.label.length > 0
+                ? EMPTY_ARRAY
+                : pointsOfInterest
             }
             ref={this._setGeocoderOptionsToPois}
             placeholder={message('Geocoding.StartPlaceholder')}
@@ -88,7 +90,9 @@ export default class Form extends React.PureComponent {
                 name='end-address'
                 onChange={onChangeEnd}
                 options={
-                  end && end.label && end.label.length > 0 ? EMPTY_ARRAY : pointsOfInterest
+                  end && end.label && end.label.length > 0
+                    ? EMPTY_ARRAY
+                    : pointsOfInterest
                 }
                 placeholder={message('Geocoding.EndPlaceholder')}
                 ref={this._setGeocoderOptionsToPois}

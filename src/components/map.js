@@ -17,7 +17,14 @@ import {
 import leafletIcon from '../utils/leaflet-icons'
 import TransitiveLayer from './transitive-map-layer'
 
-import type {Coordinate, Feature, Location, LonLat, MapEvent, PointsOfInterest} from '../types'
+import type {
+  Coordinate,
+  Feature,
+  Location,
+  LonLat,
+  MapEvent,
+  PointsOfInterest
+} from '../types'
 
 const TILE_URL = Leaflet.Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
@@ -46,11 +53,11 @@ type Props = {
   end: null | Location,
   isochrones: any[],
   pointsOfInterest: PointsOfInterest,
-  setEndPosition: (LonLat) => void,
-  setStartPosition: (LonLat) => void,
+  setEndPosition: LonLat => void,
+  setStartPosition: LonLat => void,
   start: null | Location,
   transitive: any,
-  updateMap: (any) => void,
+  updateMap: any => void,
   zoom: number
 }
 
@@ -101,12 +108,16 @@ export default class Map extends PureComponent {
   }
 
   _setEnd = (): void => {
-    if (this.state.lastClickedPosition) { this.props.setEndPosition(lonlat(this.state.lastClickedPosition)) }
+    if (this.state.lastClickedPosition) {
+      this.props.setEndPosition(lonlat(this.state.lastClickedPosition))
+    }
     this._clearState()
   }
 
   _setStart = (): void => {
-    if (this.state.lastClickedPosition) { this.props.setStartPosition(lonlat(this.state.lastClickedPosition)) }
+    if (this.state.lastClickedPosition) {
+      this.props.setStartPosition(lonlat(this.state.lastClickedPosition))
+    }
     this._clearState()
   }
 
@@ -146,7 +157,9 @@ export default class Map extends PureComponent {
       showSelectStartOrEnd
     } = this.state
     const baseIsochrone = isochrones[0]
-    const comparisonIsochrone = activeNetworkIndex > 0 ? isochrones[activeNetworkIndex] : null
+    const comparisonIsochrone = activeNetworkIndex > 0
+      ? isochrones[activeNetworkIndex]
+      : null
 
     return (
       <LeafletMap
@@ -164,7 +177,8 @@ export default class Map extends PureComponent {
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...TILE_LAYER_PROPS}
         />
-        {(!start || !end) && pointsOfInterest.length > 0 &&
+        {(!start || !end) &&
+          pointsOfInterest.length > 0 &&
           <MapboxGeoJson
             data={poiToFeatures(pointsOfInterest)}
             onClick={this._clickPoi}
@@ -200,8 +214,7 @@ export default class Map extends PureComponent {
         {comparisonIsochrone &&
           <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
 
-        {transitive &&
-          <TransitiveLayer data={transitive} />}
+        {transitive && <TransitiveLayer data={transitive} />}
 
         {showSelectStartOrEnd &&
           <Popup closeButton={false} position={lastClickedPosition}>
@@ -231,7 +244,7 @@ export default class Map extends PureComponent {
   }
 }
 
-const getStyle = memoize((color) => ({
+const getStyle = memoize(color => ({
   fillColor: color,
   pointerEvents: 'none',
   stroke: color,

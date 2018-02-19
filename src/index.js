@@ -38,7 +38,8 @@ function InitializationWrapper ({history, store}) {
     }
 
     Object.keys(actions).forEach(key => {
-      window.app.action[key] = (...args) => store.dispatch(actions[key](...args))
+      window.app.action[key] = (...args) =>
+        store.dispatch(actions[key](...args))
     })
 
     Object.keys(select).forEach(key => {

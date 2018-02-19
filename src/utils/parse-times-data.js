@@ -19,7 +19,9 @@ export function parseTimesData (ab: ArrayBuffer): TimesData {
   const headerData = new Int8Array(ab.slice(0, TIMES_GRID_TYPE.length))
   const headerType = String.fromCharCode(...headerData)
   if (headerType !== TIMES_GRID_TYPE) {
-    throw new Error(`Retrieved grid header ${headerType} !== ${TIMES_GRID_TYPE}. Please check your data.`)
+    throw new Error(
+      `Retrieved grid header ${headerType} !== ${TIMES_GRID_TYPE}. Please check your data.`
+    )
   }
 
   const data = new Int32Array(ab.slice(TIMES_GRID_TYPE.length))

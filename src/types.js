@@ -48,23 +48,23 @@ export type Path = Leg[]
 export type Targets = any
 
 export type PathsData = {
- paths: Path[],
- targets: Targets
+  paths: Path[],
+  targets: Targets
 }
 
 export type TransitiveStop = {
- stop_id: string,
- geometry: string,
- stop_lat: number,
- stop_lon: number,
- stopIndex: number
+  stop_id: string,
+  geometry: string,
+  stop_lat: number,
+  stop_lon: number,
+  stopIndex: number
 }
 
 export type TransitivePattern = {
- pattern_id: string,
- patterns?: TransitivePattern[],
- route_id: string,
- stops: TransitiveStop[]
+  pattern_id: string,
+  patterns?: TransitivePattern[],
+  route_id: string,
+  stops: TransitiveStop[]
 }
 
 export type TransitiveRoute = {
@@ -73,9 +73,9 @@ export type TransitiveRoute = {
 }
 
 export type TransitiveData = {
- patterns: TransitivePattern[],
- stops: TransitiveStop[],
- routes: TransitiveRoute[]
+  patterns: TransitivePattern[],
+  stops: TransitiveStop[],
+  routes: TransitiveRoute[]
 }
 
 export type QualifiedLeg = [TransitiveStop, TransitivePattern, TransitiveStop] // [boardStopId, Pattern, alightStopId]
@@ -122,7 +122,8 @@ export type LogItem = {
 
 export type LogItems = LogItem[]
 
-export type Accessibility = 'accessibility-is-empty'
+export type Accessibility =
+  | 'accessibility-is-empty'
   | 'accessibility-is-loading'
   | {
       [key: string]: number

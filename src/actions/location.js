@@ -51,8 +51,9 @@ export const updateStart = (value: Location) => [
 ]
 
 export const updateStartPosition = (position: LonLat) => [
-  reverseGeocode(position, (feature) =>
-    setStart({position, label: feature.place_name})),
+  reverseGeocode(position, feature =>
+    setStart({position, label: feature.place_name})
+  ),
   fetchDataForCoordinate(position)
 ]
 
@@ -65,5 +66,6 @@ export const updateEnd = (value: Location) => [
 ]
 
 export const updateEndPosition = (position: LonLat) =>
-  reverseGeocode(position, (feature) =>
-    setEnd({position, label: feature.place_name}))
+  reverseGeocode(position, feature =>
+    setEnd({position, label: feature.place_name})
+  )

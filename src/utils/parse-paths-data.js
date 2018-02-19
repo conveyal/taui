@@ -12,7 +12,9 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
   const headerData = new Int8Array(ab.slice(0, PATHS_GRID_TYPE.length))
   const headerType = String.fromCharCode(...headerData)
   if (headerType !== PATHS_GRID_TYPE) {
-    throw new Error(`Retrieved grid header ${headerType} !== ${PATHS_GRID_TYPE}. Please check your data.`)
+    throw new Error(
+      `Retrieved grid header ${headerType} !== ${PATHS_GRID_TYPE}. Please check your data.`
+    )
   }
 
   const data = new Int32Array(ab.slice(PATHS_GRID_TYPE.length))
@@ -52,7 +54,7 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
  * stops in the leg are in the pattern.
  */
 export function warnForInvalidPaths (paths: Leg[][], td: TransitiveData) {
-  const stopInAllData = (id) => hasStop(id, td.stops)
+  const stopInAllData = id => hasStop(id, td.stops)
   paths.forEach(path => {
     path.forEach(leg => {
       const [boardStopId, patternId, alightStopId] = leg
@@ -62,7 +64,7 @@ export function warnForInvalidPaths (paths: Leg[][], td: TransitiveData) {
         return
       }
 
-      const stopInPattern = (id) => hasStop(id, pattern.stops)
+      const stopInPattern = id => hasStop(id, pattern.stops)
       if (!stopInPattern(boardStopId)) {
         console.error(`Board stop ${boardStopId} not found in pattern`)
         if (!stopInAllData(boardStopId)) {

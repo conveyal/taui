@@ -7,13 +7,14 @@ import {createSelector} from 'reselect'
 import uuid from 'uuid'
 
 export default createSelector(
-  (state) => get(state, 'data.networks'),
-  (state) => get(state, 'timeCutoff.selected'),
-  (networks = [], timeCutoff) => networks.map((network, index) => {
-    if (network.travelTimeSurface && network.travelTimeSurface.data) {
-      return getIsochrone(network, index, timeCutoff)
-    }
-  })
+  state => get(state, 'data.networks'),
+  state => get(state, 'timeCutoff.selected'),
+  (networks = [], timeCutoff) =>
+    networks.map((network, index) => {
+      if (network.travelTimeSurface && network.travelTimeSurface.data) {
+        return getIsochrone(network, index, timeCutoff)
+      }
+    })
 )
 
 /**

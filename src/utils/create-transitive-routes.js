@@ -10,7 +10,7 @@ import type {
   Location,
   QualifiedLeg,
   QualifiedPath
- } from '../types'
+} from '../types'
 
 type Network = {
   query: any,
@@ -34,40 +34,54 @@ const STOP = 'STOP'
 const TRANSIT = 'TRANSIT'
 const WALK = 'WALK'
 
-export default function createTransitiveRoutesForNetwork (network: Network, start: Location, end: Location, zoom: number) {
+export default function createTransitiveRoutesForNetwork (
+  network: Network,
+  start: Location,
+  end: Location,
+  zoom: number
+) {
   const td = network.query.transitiveData
-  const places = [{
-    place_id: 'from',
-    place_name: start.label,
-    place_lon: start.position.lon,
-    place_lat: start.position.lat
-  }, {
-    place_id: 'to',
-    place_name: end.label,
-    place_lon: end.position.lon,
-    place_lat: end.position.lat
-  }]
+  const places = [
+    {
+      place_id: 'from',
+      place_name: start.label,
+      place_lon: start.position.lon,
+      place_lat: start.position.lat
+    },
+    {
+      place_id: 'to',
+      place_name: end.label,
+      place_lon: end.position.lon,
+      place_lat: end.position.lat
+    }
+  ]
 
   // Get the set of unique path indexes for a start/end pair
-  const targetPathIndexes = uniq(network.targets[coordinateToIndex(end.position, zoom, network.query)])
+  const targetPathIndexes = uniq(
+    network.targets[coordinateToIndex(end.position, zoom, network.query)]
+  )
   const paths = targetPathIndexes
     // map the pathIndex to the actual path sequence
     .map(i => network.paths[i])
     // map the pattern ids in each path leg to the actual patterns they contain
-    .map(path => path.map(leg => [
-      leg[0],
-      fot(td.patterns, p => p.pattern_id === leg[1]), // ensure that we are comparing strings
-      leg[2]
-    ]))
+    .map(path =>
+      path.map(leg => [
+        leg[0],
+        fot(td.patterns, p => p.pattern_id === leg[1]), // ensure that we are comparing strings
+        leg[2]
+      ])
+    )
     // map the stop ids to actual stops including their stop index
-    .map(path => path.map(([boardStopId, pattern, alightStopId]) => {
-      const findStop = id => ({
-        ...fot(td.stops, s => s.stop_id === id),
-        stopIndex: pattern.stops.findIndex(s => s.stop_id === id)
-      })
+    .map(path =>
+      path.map(([boardStopId, pattern, alightStopId]) => {
+        const findStop = id => ({
+          ...fot(td.stops, s => s.stop_id === id),
+          stopIndex: pattern.stops.findIndex(s => s.stop_id === id)
+        })
 
-      return [findStop(boardStopId), pattern, findStop(alightStopId)]
-    }))
+        return [findStop(boardStopId), pattern, findStop(alightStopId)]
+      })
+    )
 
   console.log('Path count before finding common paths', paths.length)
   const uniqueRouteSequences = new Set()
@@ -96,8 +110,8 @@ export default function createTransitiveRoutesForNetwork (network: Network, star
     ...td,
     journeys,
     places,
-    routeSegments: clusteredPaths
-      .map(path => path.map(leg => {
+    routeSegments: clusteredPaths.map(path =>
+      path.map(leg => {
         const route = fot(td.routes, r => r.route_id === leg[1].route_id)
         const seg = {}
         const color = route.route_color
@@ -117,7 +131,8 @@ export default function createTransitiveRoutesForNetwork (network: Network, star
         seg.type = TYPE_TO_ICON[route.route_type]
 
         return seg
-      }))
+      })
+    )
   }
 }
 
@@ -170,13 +185,17 @@ function clusterPaths (paths: QualifiedPath[]): QualifiedPath[] {
 
         return leg
       })
-    ))
+    )
+  )
 }
 
 /**
  * How similar are the paths in each of these clusters?
  */
-function getClusterDissimilarity (c1: QualifiedPath[], c2: QualifiedPath[]): number {
+function getClusterDissimilarity (
+  c1: QualifiedPath[],
+  c2: QualifiedPath[]
+): number {
   let dissimilarity = 0
 
   for (const p1 of c1) {
@@ -209,21 +228,26 @@ function legDissimilarity (l1: QualifiedLeg, l2: QualifiedLeg): number {
  */
 function stopDistance (s1: TransitiveStop, s2: TransitiveStop): number {
   const cosLat = Math.cos(s1.stop_lat * Math.PI / 180)
-  return Math.pow(s1.stop_lat - s2.stop_lat, 2) + Math.pow(s1.stop_lon * cosLat - s2.stop_lon * cosLat, 2)
+  return (
+    Math.pow(s1.stop_lat - s2.stop_lat, 2) +
+    Math.pow(s1.stop_lon * cosLat - s2.stop_lon * cosLat, 2)
+  )
 }
 
 function createWalkOnlyJourney () {
-  return [{
-    type: WALK,
-    from: {
-      type: PLACE,
-      place_id: 'from'
-    },
-    to: {
-      type: PLACE,
-      place_id: 'to'
+  return [
+    {
+      type: WALK,
+      from: {
+        type: PLACE,
+        place_id: 'from'
+      },
+      to: {
+        type: PLACE,
+        place_id: 'to'
+      }
     }
-  }]
+  ]
 }
 
 /**
@@ -264,25 +288,29 @@ function getTransitiveSegmentsFromPath (path: QualifiedPath) {
     previousStopId = alightStop.stop_id
   }
 
-  return [{
-    type: WALK,
-    from: {
-      type: PLACE,
-      place_id: 'from'
+  return [
+    {
+      type: WALK,
+      from: {
+        type: PLACE,
+        place_id: 'from'
+      },
+      to: {
+        type: STOP,
+        stop_id: initialStopId
+      }
     },
-    to: {
-      type: STOP,
-      stop_id: initialStopId
+    ...segments,
+    {
+      type: WALK,
+      from: {
+        type: STOP,
+        stop_id: previousStopId
+      },
+      to: {
+        type: PLACE,
+        place_id: 'to'
+      }
     }
-  }, ...segments, {
-    type: WALK,
-    from: {
-      type: STOP,
-      stop_id: previousStopId
-    },
-    to: {
-      type: PLACE,
-      place_id: 'to'
-    }
-  }]
+  ]
 }

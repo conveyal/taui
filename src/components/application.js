@@ -54,16 +54,16 @@ type Props = {
   ui: UIStore,
 
   clearIsochrone: () => void,
-  initialize: (Function) => void,
+  initialize: Function => void,
   setActiveNetwork: (name: string) => void,
-  setEnd: (any) => void,
-  setSelectedTimeCutoff: (any) => void,
-  setStart: (any) => void,
-  updateEnd: (any) => void,
-  updateEndPosition: (LonLat) => void,
-  updateMap: (any) => void,
-  updateStart: (any) => void,
-  updateStartPosition: (LonLat) => void
+  setEnd: any => void,
+  setSelectedTimeCutoff: any => void,
+  setStart: any => void,
+  updateEnd: any => void,
+  updateEndPosition: LonLat => void,
+  updateMap: any => void,
+  updateStart: any => void,
+  updateStartPosition: LonLat => void
 }
 
 export default class Application extends Component {
@@ -92,7 +92,9 @@ export default class Application extends Component {
       }
 
       if (qs.centerCoordinates) {
-        this.props.updateMap({centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)})
+        this.props.updateMap({
+          centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)
+        })
       }
     })
   }
@@ -140,8 +142,7 @@ export default class Application extends Component {
     this.props.setSelectedTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
 
-  _setActiveNetwork = memoize(name => () =>
-    this.props.setActiveNetwork(name))
+  _setActiveNetwork = memoize(name => () => this.props.setActiveNetwork(name))
 
   count = 0
   render () {

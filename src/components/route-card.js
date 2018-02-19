@@ -66,15 +66,16 @@ export default class RouteCard extends React.PureComponent {
             </div>
             {hasStart
               ? showComparison
-                ? <ShowDiff
-                  accessibility={accessibility}
-                  comparison={oldAccessibility}
-                  grids={grids}
-                  />
-                : <ShowAccess accessibility={accessibility} grids={grids} />
+                  ? <ShowDiff
+                    accessibility={accessibility}
+                    comparison={oldAccessibility}
+                    grids={grids}
+                    />
+                  : <ShowAccess accessibility={accessibility} grids={grids} />
               : <span>{message('Systems.SelectStart')}</span>}
           </div>
-          {hasStart && hasEnd &&
+          {hasStart &&
+            hasEnd &&
             <RouteSegments
               routeSegments={routeSegments}
               oldTravelTime={oldTravelTime}
@@ -221,15 +222,19 @@ function ShowAccess ({
   grids
 }: {
   accessibility: number[],
-  grids: any[],
+  grids: any[]
 }) {
-  return <div>{grids.map((grid, i) => (
-    <div className='Metric' key={grid.name}>
-      <MetricIcon name={grid.name} />
-      <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
-      {toSpaceCase(grid.name)}
+  return (
+    <div>
+      {grids.map((grid, i) => (
+        <div className='Metric' key={grid.name}>
+          <MetricIcon name={grid.name} />
+          <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
+          {toSpaceCase(grid.name)}
+        </div>
+      ))}
     </div>
-  ))}</div>
+  )
 }
 
 function AccessDiffPercentage ({newAccess, originalAccess}) {
@@ -257,15 +262,19 @@ function AccessDiffPercentage ({newAccess, originalAccess}) {
 }
 
 function ShowDiff ({accessibility, comparison, grids}) {
-  return <div>{grids.map((grid, i) => (
-    <div className='Metric' key={grid.name}>
-      <MetricIcon name={grid.name} />
-      <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
-      {toSpaceCase(grid.name)}
-      <AccessDiffPercentage
-        newAccess={accessibility[i]}
-        originalAccess={comparison[i]}
-        />
+  return (
+    <div>
+      {grids.map((grid, i) => (
+        <div className='Metric' key={grid.name}>
+          <MetricIcon name={grid.name} />
+          <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
+          {toSpaceCase(grid.name)}
+          <AccessDiffPercentage
+            newAccess={accessibility[i]}
+            originalAccess={comparison[i]}
+          />
+        </div>
+      ))}
     </div>
-  ))}</div>
+  )
 }

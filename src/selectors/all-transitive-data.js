@@ -11,7 +11,8 @@ import createTransitiveRoutes from '../utils/create-transitive-routes'
  */
 const memoizedTransitiveRoutes = memoize(
   (n, i, s, e, z) => createTransitiveRoutes(n, s, e, z),
-  (n, i, s, e, z) => `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${lonlat.toString(e.position)}-${z}`
+  (n, i, s, e, z) =>
+    `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${lonlat.toString(e.position)}-${z}`
 )
 
 export default createSelector(
@@ -22,7 +23,15 @@ export default createSelector(
   (networks, start, end, zoom) =>
     networks.map((network, nIndex) => {
       const td = get(network, 'query.transitiveData')
-      if (start && start.position && end && end.position && network.paths && network.targets && td.patterns) {
+      if (
+        start &&
+        start.position &&
+        end &&
+        end.position &&
+        network.paths &&
+        network.targets &&
+        td.patterns
+      ) {
         return memoizedTransitiveRoutes(network, nIndex, start, end, zoom)
       } else {
         return td
