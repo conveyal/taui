@@ -1,50 +1,25 @@
-browsochrones:
+data:
   active: 0
   instances: []
-  gridsUrl: https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-z9/intgrids
+  gridsUrl: /data # https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-z9/intgrids
   grids:
-    - Jobs_total
-    - Workers_total
-  origins:
+    - name: people_portlandia
+  networks:
     - name: Baseline
-      url: https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-v6
-    - name: Marion
-      url: https://dz69bcpxxuhn6.cloudfront.net/indyconnect-marion-v6
-destinations: []
-geocoder:
-  focusLatlng:
-    lat: 39.7691
-    lng: -86.1570
-  boundary:
-    country: us
-    rect:
-      maxLat: 40.271143686084194
-      maxLon: -85.462646484375
-      minLat: 39.35978526869001
-      minLon: -86.8524169921875
+      url: https://d2z7d5345ccuw9.cloudfront.net/5a8328d8e8436e5f2b5c5f25
   pointsOfInterest:
     - name: Location 1
-      coordinates: [-86.1570, 39.7691]
+      coordinates: [-122.66647338867188, 45.524630364755225]
     - name: Location 2
-      coordinates: [-86.1580, 39.7681]
+      coordinates: [-122.66647338867188, 39.7681]
+geocoder:
+  proximity: -122.66647338867188,45.524630364755225 # longitude,latitude
+  country: us
+  types: country,region,postcode,district,place,locality,neighborhood,address,poi # https://www.mapbox.com/api-documentation/?language=cURL#request-format
+  bbox: -123.40393066406249,45.09485258791474,-121.90979003906249,45.93587062119052 # minX,minY,maxX,maxY
 map:
-  active: 0
-  centerCoordinates: [39.7691, -86.1570]
-  geojson: []
+  centerCoordinates: [45.524630364755225, -122.66647338867188] # Leaflet style
   zoom: 11
-  transitive: null
-  isochrones: []
-  transitives: []
-  travelTimes: []
-  inVehicleTravelTimes: []
-  waitTimes: []
-  zoom: 11
-mapMarkers:
-  start: {}
-  end: {}
-timeCutoff:
-  selected: 60
-  times: []
 ui:
   fetches: 0
   showLog: true
