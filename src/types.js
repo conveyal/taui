@@ -40,6 +40,48 @@ export type Query = {
 }
 
 /**
+ * Path data
+ */
+
+export type Leg = [string, string, string] // boardStopId, patternId, alightStopId
+export type Path = Leg[]
+export type Targets = any
+
+export type PathsData = {
+ paths: Path[],
+ targets: Targets
+}
+
+export type TransitiveStop = {
+ stop_id: string,
+ geometry: string,
+ stop_lat: number,
+ stop_lon: number,
+ stopIndex: number
+}
+
+export type TransitivePattern = {
+ pattern_id: string,
+ patterns?: TransitivePattern[],
+ route_id: string,
+ stops: TransitiveStop[]
+}
+
+export type TransitiveRoute = {
+  route_id: string,
+  route_short_name: string
+}
+
+export type TransitiveData = {
+ patterns: TransitivePattern[],
+ stops: TransitiveStop[],
+ routes: TransitiveRoute[]
+}
+
+export type QualifiedLeg = [TransitiveStop, TransitivePattern, TransitiveStop] // [boardStopId, Pattern, alightStopId]
+export type QualifiedPath = QualifiedLeg[]
+
+/**
  * GeoJSON
  */
 export type GeometryType =

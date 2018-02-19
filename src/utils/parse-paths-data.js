@@ -1,28 +1,9 @@
 // @flow
+import find from 'lodash/find'
+
+import type {Leg, PathsData, TransitiveData} from '../types'
+
 const PATHS_GRID_TYPE = 'PATHGRID'
-
-type Leg = [number, number, number] // boardStopId, patternId, alightStopId
-type Path = Leg[]
-type Targets = any
-
-type PathsData = {
-  paths: Path[],
-  targets: Targets
-}
-
-type TransitiveStop = {
-  stop_id: string
-}
-
-type TransitivePattern = {
-  pattern_id: string,
-  stops: TransitiveStop[]
-}
-
-type TransitiveData = {
-  patterns: TransitivePattern[],
-  stops: TransitiveStop[]
-}
 
 /**
  * Parse the ArrayBuffer of a `*_paths.dat` file for a point in a network.
@@ -45,7 +26,7 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
     const nLegs = next()
     const legList = []
     for (let j = 0; j < nLegs; j++) {
-      legList.push([next(), next(), next()]) // boardStopId, patternId, alightStopId
+      legList.push([next().toString(), next().toString(), next().toString()]) // boardStopId, patternId, alightStopId
     }
     paths.push(legList)
   }
@@ -70,19 +51,18 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
  * Checks each leg of a path ensuring that the pattern exists and the
  * stops in the leg are in the pattern.
  */
-export function warnForInvalidPaths (paths: Path[], td: TransitiveData) {
+export function warnForInvalidPaths (paths: Leg[][], td: TransitiveData) {
   const stopInAllData = (id) => hasStop(id, td.stops)
   paths.forEach(path => {
     path.forEach(leg => {
       const [boardStopId, patternId, alightStopId] = leg
-      const pattern = td.patterns.find(p => p.pattern_id === `${patternId}`)
+      const pattern = find(td.patterns, ['pattern_id', patternId])
       if (!pattern) {
         console.error(`Pattern ${patternId} not in transitive data.`)
         return
       }
 
       const stopInPattern = (id) => hasStop(id, pattern.stops)
-
       if (!stopInPattern(boardStopId)) {
         console.error(`Board stop ${boardStopId} not found in pattern`)
         if (!stopInAllData(boardStopId)) {
@@ -100,4 +80,8 @@ export function warnForInvalidPaths (paths: Path[], td: TransitiveData) {
   })
 }
 
-const hasStop = (stopId, stops) => !!stops.find(s => s.stop_id === `${stopId}`)
+const hasStop = (stopId, stops) => {
+  for (let i = 0; i < stops.length; i++) {
+    if (stops[i].stop_id === stopId) return true
+  }
+}

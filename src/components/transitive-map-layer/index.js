@@ -9,6 +9,29 @@ type Props = {
   data: any
 }
 
+const TRANSITIVE_SETTINGS = {
+  gridCellSize: 200,
+  useDynamicRendering: true,
+  styles,
+  // see https://github.com/conveyal/transitive.js/wiki/Zoom-Factors
+  zoomFactors: [
+    {
+      minScale: 0,
+      gridCellSize: 25,
+      internalVertexFactor: 1000000,
+      angleConstraint: 45,
+      mergeVertexThreshold: 200
+    },
+    {
+      minScale: 0.5,
+      gridCellSize: 0,
+      internalVertexFactor: 0,
+      angleConstraint: 5,
+      mergeVertexThreshold: 0
+    }
+  ]
+}
+
 export default class TransitiveMapLayer extends MapLayer {
   props: Props
 
@@ -19,27 +42,8 @@ export default class TransitiveMapLayer extends MapLayer {
   componentWillMount () {
     super.componentWillMount()
     this.transitive = new Transitive({
-      data: this.props.data,
-      gridCellSize: 200,
-      useDynamicRendering: true,
-      styles,
-      // see https://github.com/conveyal/transitive.js/wiki/Zoom-Factors
-      zoomFactors: [
-        {
-          minScale: 0,
-          gridCellSize: 25,
-          internalVertexFactor: 1000000,
-          angleConstraint: 45,
-          mergeVertexThreshold: 200
-        },
-        {
-          minScale: 0.5,
-          gridCellSize: 0,
-          internalVertexFactor: 0,
-          angleConstraint: 5,
-          mergeVertexThreshold: 0
-        }
-      ]
+      ...TRANSITIVE_SETTINGS,
+      data: this.props.data
     })
     this.leafletElement = new LeafletTransitiveLayer(this.transitive)
   }
