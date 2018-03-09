@@ -17,8 +17,8 @@ import type {
   LogItems,
   LonLat,
   InputEvent,
+  MapboxFeature,
   MapEvent,
-  PointFeature,
   PointsOfInterest,
   UIStore
 } from '../types'
@@ -54,6 +54,8 @@ type Props = {
   ui: UIStore,
 
   clearIsochrone: () => void,
+  geocode: (string, Function) => void,
+  reverseGeocode: (string, Function) => void,
   initialize: Function => void,
   setActiveNetwork: (name: string) => void,
   setEnd: any => void,
@@ -110,12 +112,12 @@ export default class Application extends Component {
     this.props.updateStartPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _setStartWithFeature = (feature?: PointFeature) => {
+  _setStartWithFeature = (feature?: MapboxFeature) => {
     if (!feature) {
       this._clearStartAndEnd()
     } else {
       this.props.updateStart({
-        label: feature.properties.label,
+        label: feature.place_name,
         position: lonlat(feature.geometry.coordinates)
       })
     }
@@ -125,15 +127,13 @@ export default class Application extends Component {
     this.props.updateEndPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _setEndWithFeature = (feature: PointFeature) => {
+  _setEndWithFeature = (feature?: MapboxFeature) => {
     if (!feature) {
       this.props.setEnd(null)
     } else {
-      const {geometry} = feature
-
       this.props.updateEnd({
-        label: feature.properties.label,
-        position: lonlat(geometry.coordinates)
+        label: feature.place_name,
+        position: lonlat(feature.geometry.coordinates)
       })
     }
   }
@@ -154,9 +154,11 @@ export default class Application extends Component {
       allTransitiveData,
       data,
       geocoder,
+      geocode,
       isochrones,
       map,
       pointsOfInterest,
+      reverseGeocode,
       showComparison,
       timeCutoff,
       travelTimes,
@@ -198,10 +200,12 @@ export default class Application extends Component {
               boundary={geocoder.boundary}
               end={geocoder.end}
               focusLatlng={geocoder.focusLatlng}
+              geocode={geocode}
               onTimeCutoffChange={this._onTimeCutoffChange}
               onChangeEnd={this._setEndWithFeature}
               onChangeStart={this._setStartWithFeature}
               pointsOfInterest={pointsOfInterest}
+              reverseGeocode={reverseGeocode}
               selectedTimeCutoff={timeCutoff.selected}
               start={geocoder.start}
             />
@@ -232,6 +236,12 @@ export default class Application extends Component {
                   {message('Log.Title')}
                 </div>
                 <Log items={actionLog} />
+              </div>}
+            {ui.showLink &&
+              <div className='Card'>
+                <div className='CardContent Attribution'>
+                  site made by <a href='https://www.conveyal.com' target='_blank'>conveyal</a>
+                </div>
               </div>}
           </div>
         </div>

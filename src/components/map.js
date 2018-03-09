@@ -177,6 +177,15 @@ export default class Map extends PureComponent {
           attribution={process.env.LEAFLET_ATTRIBUTION}
           {...TILE_LAYER_PROPS}
         />
+
+        {baseIsochrone &&
+          <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
+
+        {comparisonIsochrone &&
+          <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
+
+        {transitive && <TransitiveLayer data={transitive} />}
+
         {(!start || !end) &&
           pointsOfInterest.length > 0 &&
           <MapboxGeoJson
@@ -207,14 +216,6 @@ export default class Map extends PureComponent {
               <span>{end.label}</span>
             </Popup>
           </Marker>}
-
-        {baseIsochrone &&
-          <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
-
-        {comparisonIsochrone &&
-          <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
-
-        {transitive && <TransitiveLayer data={transitive} />}
 
         {showSelectStartOrEnd &&
           <Popup closeButton={false} position={lastClickedPosition}>

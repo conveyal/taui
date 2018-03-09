@@ -11,17 +11,19 @@ import type {LonLat, Point, Query} from '../types'
 export default function coordinateToPoint (
   coordinate: LonLat,
   currentZoom: number,
-  query: Query
+  queryZoom: number,
+  west: number,
+  north: number
 ): Point {
   const pixel = Leaflet.CRS.EPSG3857.latLngToPoint(
     lonlat.toLeaflet(coordinate),
     currentZoom
   )
-  const scale = Math.pow(2, query.zoom - currentZoom)
+  const scale = Math.pow(2, queryZoom - currentZoom)
 
   let {x, y} = pixel
-  x = (x * scale - query.west) | 0
-  y = (y * scale - query.north) | 0
+  x = (x * scale - west) | 0
+  y = (y * scale - north) | 0
 
   return {x, y}
 }
@@ -29,11 +31,11 @@ export default function coordinateToPoint (
 /**
  * Get the index of a point based off the query width
  */
-export const pointToOriginIndex = (point: Point, width: number) =>
+const pointToOriginIndex = (point: Point, width: number) =>
   point.x + point.y * width
 
 /**
  * Convert a coordinate to an index
  */
 export const coordinateToIndex = (c: LonLat, z: number, q: Query): number =>
-  pointToOriginIndex(coordinateToPoint(c, z, q), q.width)
+  pointToOriginIndex(coordinateToPoint(c, z, q.zoom, q.west, q.north), q.width)

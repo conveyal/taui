@@ -18,17 +18,17 @@ function formatURL (text: string, opts) {
 /**
  * Create an action that dispatches the given action on success.
  */
-export default function geocode (text: string, nextAction: any) {
+export function geocode (text: string, nextAction: any) {
   return function (dispatch: Dispatch, getState: any) {
     const state = getState()
     const {geocoder} = state
 
     dispatch(fetch({
       url: formatURL(text, geocoder),
-      next: (response) => nextAction(JSON.parse(response.value).features[0]) // Content-Type is application/vnd.geo+json so woonerf/fetch parses as text
+      next: (response) => nextAction(JSON.parse(response.value).features) // Content-Type is application/vnd.geo+json so woonerf/fetch parses as text
     }))
   }
 }
 
-export const reverse = (position: LonLat, nextAction: any) =>
+export const reverseGeocode = (position: LonLat, nextAction: any) =>
   geocode(lonlat.toString(position), nextAction)

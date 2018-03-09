@@ -67,10 +67,10 @@ export function initialize (done: any => void) {
                 ...network,
                 query: {
                   ...responses[index].value,
-                  west: 20865, // TODO remove defaults
-                  north: 46876,
-                  width: 14,
-                  height: 9
+                  west: 116121, // TODO remove defaults
+                  north: 51392,
+                  width: 639,
+                  height: 466
                 }
               })
             )
@@ -97,7 +97,7 @@ export const fetchDataForCoordinate = (coordinate: LonLat) => (
 }
 
 const fetchDataForNetwork = (network, coordinate, currentZoom) => {
-  const originPoint = coordinateToPoint(coordinate, currentZoom, network.query)
+  const originPoint = coordinateToPoint(coordinate, currentZoom, network.query.zoom, network.query.west, network.query.north)
   const index = originPoint.x + originPoint.y * network.query.width
   return fetchMultiple({
     fetches: [
@@ -110,12 +110,7 @@ const fetchDataForNetwork = (network, coordinate, currentZoom) => {
     ],
     next: ([timesResponse, pathsResponse]) => {
       const travelTimeSurface = parseTimesData(timesResponse.value)
-      const nTargets = travelTimeSurface.width * travelTimeSurface.height
-      const {paths, targets} = parsePathsData(
-        pathsResponse.value,
-        nTargets,
-        120
-      )
+      const {paths, targets} = parsePathsData(pathsResponse.value)
 
       warnForInvalidPaths(paths, network.query.transitiveData)
 

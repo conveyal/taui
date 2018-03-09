@@ -21,7 +21,7 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
   let offset = 0
   const next = () => data[offset++]
   const nDestinations = next()
-  const nIterations = next()
+  offset++ // const nIterations = next(); unused at the moment
   const nPaths = next()
   const paths = []
   for (let i = 0; i < nPaths; i++) {
@@ -34,16 +34,12 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
   }
 
   const targets = []
+  let previousValue = 0
   for (let i = 0; i < nDestinations; i++) {
-    const pathIndexes = []
-    let previousValue = 0
-    for (let j = 0; j < nIterations; j++) {
-      const delta = next()
-      const pathIndex = delta + previousValue
-      pathIndexes.push(pathIndex)
-      previousValue = pathIndex
-    }
-    targets.push(pathIndexes)
+    const delta = next()
+    const pathIndex = delta + previousValue
+    targets.push(pathIndex)
+    previousValue = pathIndex
   }
 
   return {paths, targets}

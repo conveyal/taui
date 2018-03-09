@@ -45,11 +45,10 @@ export type Query = {
 
 export type Leg = [string, string, string] // boardStopId, patternId, alightStopId
 export type Path = Leg[]
-export type Targets = any
 
 export type PathsData = {
   paths: Path[],
-  targets: Targets
+  targets: number[] // path index
 }
 
 export type TransitiveStop = {
@@ -110,6 +109,11 @@ export type PointFeature = {
     coordinates: Coordinate
   }
 }
+
+export type MapboxFeature = {
+  id: string,
+  place_name: string
+} & PointFeature
 
 /**
  * Store

@@ -1,56 +1,40 @@
 // @flow
 import message from '@conveyal/woonerf/message'
 import React from 'react'
-import Geocoder from 'react-select-geocoder'
+
+import Geocoder from './geocoder'
 
 import type {
-  GeocoderBoundary,
   InputEvent,
-  LatLng,
   Location,
-  PointFeature,
+  MapboxFeature,
   PointsOfInterest
 } from '../types'
 
 type Props = {
-  boundary: GeocoderBoundary,
   end: null | Location,
-  focusLatlng: LatLng,
-  onChangeEnd: PointFeature => void,
-  onChangeStart: PointFeature => void,
+  geocode: (string, Function) => void,
+  onChangeEnd: MapboxFeature => void,
+  onChangeStart: MapboxFeature => void,
   onTimeCutoffChange: InputEvent => void,
   pointsOfInterest: PointsOfInterest,
+  reverseGeocode: (string, Function) => void,
   selectedTimeCutoff: number,
   start: null | Location
 }
 
-const EMPTY_ARRAY = []
-
 export default class Form extends React.PureComponent {
   props: Props
 
-  /**
-   * Pass this as the `ref` function in the Geocoder so that when it is rendered
-   * it gets called. If there is no search term in the Geocoder it autopopulates
-   * the results with the pointsOfInterest data.
-   */
-  _setGeocoderOptionsToPois = (geocoder: any) => {
-    if (geocoder && !geocoder.value) {
-      this.props.pointsOfInterest.forEach(poi => {
-        geocoder.options[poi.value] = poi.feature
-      })
-    }
-  }
-
   render () {
     const {
-      boundary,
       end,
-      focusLatlng,
+      geocode,
       onChangeEnd,
       onChangeStart,
       onTimeCutoffChange,
       pointsOfInterest,
+      reverseGeocode,
       selectedTimeCutoff,
       start
     } = this.props
@@ -61,19 +45,11 @@ export default class Form extends React.PureComponent {
         </div>
         <div className='Geocoder'>
           <Geocoder
-            apiKey={process.env.MAPZEN_SEARCH_KEY}
-            boundary={boundary}
-            focusLatlng={focusLatlng}
-            name='start-address'
+            geocode={geocode}
             onChange={onChangeStart}
-            options={
-              start && start.label && start.label.length > 0
-                ? EMPTY_ARRAY
-                : pointsOfInterest
-            }
-            ref={this._setGeocoderOptionsToPois}
             placeholder={message('Geocoding.StartPlaceholder')}
-            searchPromptText={message('Geocoding.PromptText')}
+            pointsOfInterest={pointsOfInterest}
+            reverseGeocode={reverseGeocode}
             value={start}
           />
         </div>
@@ -84,19 +60,11 @@ export default class Form extends React.PureComponent {
             </div>
             <div className='Geocoder'>
               <Geocoder
-                apiKey={process.env.MAPZEN_SEARCH_KEY}
-                boundary={boundary}
-                focusLatlng={focusLatlng}
-                name='end-address'
+                geocode={geocode}
                 onChange={onChangeEnd}
-                options={
-                  end && end.label && end.label.length > 0
-                    ? EMPTY_ARRAY
-                    : pointsOfInterest
-                }
                 placeholder={message('Geocoding.EndPlaceholder')}
-                ref={this._setGeocoderOptionsToPois}
-                searchPromptText={message('Geocoding.PromptText')}
+                pointsOfInterest={pointsOfInterest}
+                reverseGeocode={reverseGeocode}
                 value={end}
               />
             </div>

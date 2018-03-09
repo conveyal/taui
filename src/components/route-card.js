@@ -155,15 +155,15 @@ function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
         {message('Systems.BestTripTitle')}
       </div>
       <div className='BestTrip'>
-        <div>
+        <div className='time'>
           <strong> {travelTime}</strong> {message('Units.Mins')}
         </div>
-        <div>
+        <div className='timeDiff'>
           {oldTravelTime &&
             oldTravelTime !== travelTime &&
             <TripDiff oldTravelTime={oldTravelTime} travelTime={travelTime} />}
         </div>
-        <div>
+        <div className='CardSegments'>
           {bestJourney.map((segment, index) => (
             <Segment key={index} segment={segment} />
           ))}

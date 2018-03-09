@@ -3,7 +3,7 @@ import lonlat from '@conveyal/lonlat'
 
 import {addActionLogItem} from './log'
 import {fetchDataForCoordinate, setNetworksToLoading} from './network'
-import {reverse as reverseGeocode} from './geocode'
+import {reverseGeocode} from './geocode'
 import {setValues} from '../utils/hash'
 
 import type {Location, LonLat} from '../types'
@@ -51,8 +51,8 @@ export const updateStart = (value: Location) => [
 ]
 
 export const updateStartPosition = (position: LonLat) => [
-  reverseGeocode(position, feature =>
-    setStart({position, label: feature.place_name})
+  reverseGeocode(position, features =>
+    setStart({position, label: features[0].place_name})
   ),
   fetchDataForCoordinate(position)
 ]
@@ -66,6 +66,6 @@ export const updateEnd = (value: Location) => [
 ]
 
 export const updateEndPosition = (position: LonLat) =>
-  reverseGeocode(position, feature =>
-    setEnd({position, label: feature.place_name})
+  reverseGeocode(position, features =>
+    setEnd({position, label: features[0].place_name})
   )

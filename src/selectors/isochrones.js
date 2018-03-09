@@ -35,6 +35,6 @@ const getIsochrone = memoize((network, index, timeCutoff) => {
     }
   })
 
-  // create the uuid here so that if
+  // create the uuid for react-leaflet/GeoJSON here
   return {...isochrone, key: uuid.v4()}
 }, (n, i, c) => `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${c}`)

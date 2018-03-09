@@ -169,11 +169,34 @@ body {
   padding: 0 1rem 1rem;
 }
 
+.CardContent.Attribution {
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.CardContent.Attribution a {
+  background: url(https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png) no-repeat;
+  padding-left: 1.1rem;
+  display: inline-block;
+  background-size: 1rem;
+  background-position: left;
+  background-position-x: left;
+  background-position-y: center;
+}
+
+.CardSegments {
+  display: flex;
+}
+
 .CardSegment {
   padding: 0.25rem;
   border-radius: 0.25rem;
   margin-right: 0.25rem;
   display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .CardAccess .CardSegment {
@@ -204,7 +227,7 @@ body {
   width: inherit;
 }
 
-.Card .BestTrip > div {
+.Card .BestTrip .time, .Card .BestTrip .timeDiff {
   width: 50%;
   display: inline-block;
   padding-bottom: 0.25rem;

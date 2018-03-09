@@ -9,7 +9,7 @@ type TimesData = {
   width: number,
   height: number,
   nSamples: number,
-  data: Int32Array
+  data: number[]
 }
 
 /**
@@ -34,6 +34,17 @@ export function parseTimesData (ab: ArrayBuffer): TimesData {
   const height = data[offset++]
   const nSamples = data[offset++]
 
+  const times = []
+  for (let i = 0; i < nSamples; i++) {
+    let previous = 0
+    for (let j = 0; j < width * height; j++) {
+      const stored = data[offset++]
+      const current = stored + previous
+      times.push(current)
+      previous = current
+    }
+  }
+
   return {
     version,
     zoom,
@@ -42,6 +53,6 @@ export function parseTimesData (ab: ArrayBuffer): TimesData {
     width,
     height,
     nSamples,
-    data: data.slice(TIMES_GRID_TYPE.length)
+    data: times
   }
 }
