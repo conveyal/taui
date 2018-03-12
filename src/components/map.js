@@ -51,6 +51,7 @@ type Props = {
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
   end: null | Location,
+  isLoading: boolean,
   isochrones: any[],
   pointsOfInterest: PointsOfInterest,
   setEndPosition: LonLat => void,
@@ -108,17 +109,19 @@ export default class Map extends PureComponent {
   }
 
   _setEnd = (): void => {
-    if (this.state.lastClickedPosition) {
-      this.props.setEndPosition(lonlat(this.state.lastClickedPosition))
-    }
+    const {lastClickedPosition} = this.state
     this._clearState()
+    if (lastClickedPosition) {
+      this.props.setEndPosition(lonlat(lastClickedPosition))
+    }
   }
 
   _setStart = (): void => {
-    if (this.state.lastClickedPosition) {
-      this.props.setStartPosition(lonlat(this.state.lastClickedPosition))
-    }
+    const {lastClickedPosition} = this.state
     this._clearState()
+    if (lastClickedPosition) {
+      this.props.setStartPosition(lonlat(lastClickedPosition))
+    }
   }
 
   _clickPoi = (event: Event & {layer: {feature: Feature}}): void => {
@@ -145,6 +148,7 @@ export default class Map extends PureComponent {
       activeNetworkIndex,
       centerCoordinates,
       end,
+      isLoading,
       isochrones,
       pointsOfInterest,
       start,
@@ -178,13 +182,13 @@ export default class Map extends PureComponent {
           {...TILE_LAYER_PROPS}
         />
 
-        {baseIsochrone &&
+        {!isLoading && baseIsochrone &&
           <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
 
-        {comparisonIsochrone &&
+        {!isLoading && comparisonIsochrone &&
           <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
 
-        {transitive && <TransitiveLayer data={transitive} />}
+        {!isLoading && transitive && <TransitiveLayer data={transitive} />}
 
         {(!start || !end) &&
           pointsOfInterest.length > 0 &&

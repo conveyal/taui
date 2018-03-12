@@ -43,7 +43,7 @@ export const setNetworksToEmpty = () =>
  * and parse the query parameters. If there is a `start`, set the networks to
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
-export function initialize (done: any => void) {
+export function initialize (startCoordinate?: LonLat) {
   return (dispatch: Dispatch, getState: any) => {
     const state = getState()
     const networks = state.data.networks
@@ -76,7 +76,7 @@ export function initialize (done: any => void) {
             )
           )
 
-          done()
+          if (startCoordinate) dispatch(fetchDataForCoordinate(startCoordinate))
         }
       })
     )

@@ -20,6 +20,7 @@ function mapStateToProps (state, ownProps) {
     activeTransitive: select.activeTransitive(state, ownProps),
     allTransitiveData: select.allTransitiveData(state, ownProps),
     isochrones: select.isochrones(state, ownProps),
+    isLoading: select.loading(state, ownProps),
     pointsOfInterest: select.pointsOfInterest(state, ownProps),
     showComparison: select.showComparison(state, ownProps),
     travelTimes: select.travelTimes(state, ownProps)

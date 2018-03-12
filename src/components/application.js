@@ -45,6 +45,7 @@ type Props = {
     networks: Network[]
   },
   geocoder: GeocoderStore,
+  isLoading: boolean,
   isochrones: any[],
   map: MapState,
   pointsOfInterest: PointsOfInterest,
@@ -53,7 +54,6 @@ type Props = {
   travelTimes: number[],
   ui: UIStore,
 
-  clearIsochrone: () => void,
   geocode: (string, Function) => void,
   reverseGeocode: (string, Function) => void,
   initialize: Function => void,
@@ -72,39 +72,38 @@ export default class Application extends Component {
   props: Props
 
   componentDidMount () {
-    this.props.initialize(() => {
-      const qs = getAsObject()
+    const qs = getAsObject()
 
-      if (qs.start && qs.startCoordinate) {
-        this.props.updateStart({
-          label: qs.start,
-          position: lonlat.fromString(qs.startCoordinate)
-        })
-      }
+    if (qs.startCoordinate) {
+      this.props.setStart({
+        label: qs.start,
+        position: lonlat.fromString(qs.startCoordinate)
+      })
+    }
 
-      if (qs.end && qs.endCoordinate) {
-        this.props.updateEnd({
-          label: qs.end,
-          position: lonlat.fromString(qs.endCoordinate)
-        })
-      }
+    if (qs.endCoordinate) {
+      this.props.setEnd({
+        label: qs.end,
+        position: lonlat.fromString(qs.endCoordinate)
+      })
+    }
 
-      if (qs.zoom) {
-        this.props.updateMap({zoom: parseInt(qs.zoom, 10)})
-      }
+    if (qs.zoom) {
+      this.props.updateMap({zoom: parseInt(qs.zoom, 10)})
+    }
 
-      if (qs.centerCoordinates) {
-        this.props.updateMap({
-          centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)
-        })
-      }
-    })
+    if (qs.centerCoordinates) {
+      this.props.updateMap({
+        centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)
+      })
+    }
+
+    this.props.initialize(qs.startCoordinate ? lonlat.fromString(qs.startCoordinate) : undefined)
   }
 
   _clearStartAndEnd = () => {
-    const {clearIsochrone, setEnd, setStart} = this.props
+    const {setEnd, setStart} = this.props
     setStart(null)
-    clearIsochrone()
     setEnd(null)
   }
 
@@ -156,6 +155,7 @@ export default class Application extends Component {
       geocoder,
       geocode,
       isochrones,
+      isLoading,
       map,
       pointsOfInterest,
       reverseGeocode,
@@ -177,6 +177,7 @@ export default class Application extends Component {
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
             end={geocoder.end}
+            isLoading={isLoading}
             isochrones={isochrones}
             pointsOfInterest={pointsOfInterest}
             setEndPosition={updateEndPosition}
@@ -217,6 +218,7 @@ export default class Application extends Component {
                 grids={data.grids}
                 hasEnd={!!geocoder.end}
                 hasStart={!!geocoder.start}
+                isLoading={isLoading}
                 key={`${index}-route-card`}
                 oldAccessibility={accessibility[0]}
                 oldTravelTime={travelTimes[0]}

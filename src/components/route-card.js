@@ -12,6 +12,7 @@ type Props = {
   grids: any[],
   hasEnd: boolean,
   hasStart: boolean,
+  isLoading: boolean,
   oldAccessibility: any,
   oldTravelTime: number,
   onClick(): void,
@@ -32,6 +33,7 @@ export default class RouteCard extends React.PureComponent {
       grids,
       hasEnd,
       hasStart,
+      isLoading,
       oldAccessibility,
       oldTravelTime,
       onClick,
@@ -64,7 +66,7 @@ export default class RouteCard extends React.PureComponent {
             <div className='heading'>
               {message('Systems.AccessTitle')}
             </div>
-            {hasStart
+            {!isLoading && hasStart
               ? showComparison
                   ? <ShowDiff
                     accessibility={accessibility}
@@ -74,7 +76,7 @@ export default class RouteCard extends React.PureComponent {
                   : <ShowAccess accessibility={accessibility} grids={grids} />
               : <span>{message('Systems.SelectStart')}</span>}
           </div>
-          {hasStart &&
+          {!isLoading && hasStart &&
             hasEnd &&
             <RouteSegments
               routeSegments={routeSegments}
@@ -103,14 +105,14 @@ function TripDiff ({oldTravelTime, travelTime}) {
     )
   } else if (actualDiff > 0) {
     return (
-      <span className='pull-right decrease'>
+      <span className='decrease'>
         <strong>{diff}</strong>%<Icon type='level-up' />
         <br />
       </span>
     )
   } else {
     return (
-      <span className='pull-right increase'>
+      <span className='increase'>
         <strong>{diff * -1}</strong>
         %
         <Icon className='fa-rotate-180' type='level-up' />
@@ -155,13 +157,15 @@ function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
         {message('Systems.BestTripTitle')}
       </div>
       <div className='BestTrip'>
-        <div className='time'>
-          <strong> {travelTime}</strong> {message('Units.Mins')}
-        </div>
-        <div className='timeDiff'>
-          {oldTravelTime &&
-            oldTravelTime !== travelTime &&
-            <TripDiff oldTravelTime={oldTravelTime} travelTime={travelTime} />}
+        <div className='Metric'>
+          <div className='time'>
+            <strong> {travelTime > 120 ? '> 120' : travelTime}</strong> {message('Units.Mins')}
+          </div>
+          <div className='timeDiff'>
+            {oldTravelTime &&
+              oldTravelTime !== travelTime &&
+              <TripDiff oldTravelTime={oldTravelTime} travelTime={travelTime} />}
+          </div>
         </div>
         <div className='CardSegments'>
           {bestJourney.map((segment, index) => (
@@ -203,20 +207,6 @@ const Segment = ({segment}) => (
   </span>
 )
 
-function MetricIcon ({name}) {
-  switch (name.toLowerCase()) {
-    case 'banen': // Dutch for job
-    case 'job':
-      return <Icon type='building' />
-    case 'worker':
-    case 'population':
-    case 'bewoners': // Dutch for residents
-      return <Icon type='child' />
-    default:
-      return <span />
-  }
-}
-
 function ShowAccess ({
   accessibility,
   grids
@@ -228,9 +218,11 @@ function ShowAccess ({
     <div>
       {grids.map((grid, i) => (
         <div className='Metric' key={grid.name}>
-          <MetricIcon name={grid.name} />
-          <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
-          {toSpaceCase(grid.name)}
+          <div>
+            <Icon type={grid.icon} />
+            <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
+            {toSpaceCase(grid.name)}
+          </div>
         </div>
       ))}
     </div>
@@ -246,17 +238,17 @@ function AccessDiffPercentage ({newAccess, originalAccess}) {
   if (diff === 0 || isNaN(diff)) return <span />
   else if (actualDiff > 0) {
     return (
-      <span className='pull-right increase'>
+      <div className='increase'>
         <strong>{diff}</strong>%<Icon type='level-up' />
-      </span>
+      </div>
     )
   } else {
     return (
-      <span className='pull-right decrease'>
+      <div className='decrease'>
         <strong>{diff * -1}</strong>
         %
         <Icon className='fa-rotate-180' type='level-up' />
-      </span>
+      </div>
     )
   }
 }
@@ -266,9 +258,11 @@ function ShowDiff ({accessibility, comparison, grids}) {
     <div>
       {grids.map((grid, i) => (
         <div className='Metric' key={grid.name}>
-          <MetricIcon name={grid.name} />
-          <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
-          {toSpaceCase(grid.name)}
+          <div>
+            <Icon type={grid.icon} />
+            <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
+            {toSpaceCase(grid.name)}
+          </div>
           <AccessDiffPercentage
             newAccess={accessibility[i]}
             originalAccess={comparison[i]}

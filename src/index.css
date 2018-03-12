@@ -223,22 +223,18 @@ body {
   height: 1.5rem;
 }
 
-.Card .Metric > .fa-fw {
-  width: inherit;
-}
-
-.Card .BestTrip .time, .Card .BestTrip .timeDiff {
+.Card .Metric > div {
   width: 50%;
   display: inline-block;
   padding-bottom: 0.25rem;
 }
 
-.Card .BestTrip > div:nth-child(even) {
-  text-align: right;
+.Card .Metric > .fa-fw {
+  width: inherit;
 }
 
-.Card .Metric > .pull-right {
-  margin-top: 0.25rem;
+.Card .Metric > div:nth-child(even) {
+  text-align: right;
 }
 
 .CardIndex {

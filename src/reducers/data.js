@@ -51,6 +51,7 @@ export default handleActions(
   },
   {
     grids: [],
-    networks: []
+    networks: [],
+    pointsOfInterest: []
   }
 )

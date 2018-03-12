@@ -46,6 +46,13 @@ export default class Geocoder extends Component {
     value: this.props.value || null
   }
 
+  constructor (props, context) {
+    super(props, context)
+    if (props.pointsOfInterest) {
+      this.cacheOptions(props.pointsOfInterest)
+    }
+  }
+
   cacheOptions (options: ReactSelectOption[]) {
     options.forEach((o) => {
       this.options[o.value] = o.feature
@@ -85,15 +92,15 @@ export default class Geocoder extends Component {
       }
     } else {
       // check if autocomplete query has been made before
-      const cacheValue = this.autocompleteCache[input]
-      if (cacheValue) {
-        return callback(null, cacheValue)
+      const cachedOptions = this.autocompleteCache[input]
+      if (cachedOptions) {
+        return callback(null, {options: cachedOptions})
       }
 
       geocode(input, (features) => {
         const options = features.map(this.featureToOption)
         this.cacheOptions(options)
-        this.autocompleteCache[input] = {options}
+        this.autocompleteCache[input] = options
         callback(null, {options})
       })
     }

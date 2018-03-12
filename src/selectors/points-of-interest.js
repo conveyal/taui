@@ -1,7 +1,7 @@
 import {createSelector} from 'reselect'
 
 export default createSelector(
-  state => state.geocoder.pointsOfInterest,
+  state => state.data.pointsOfInterest,
   (poi = []) =>
     poi.map(({coordinates, name}) => ({
       label: name,
