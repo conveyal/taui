@@ -1,11 +1,12 @@
 // @flow
-import {fetchMultiple} from '@conveyal/woonerf/fetch'
+import fetch, {fetchMultiple} from '@conveyal/woonerf/fetch'
 
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
 import coordinateToPoint from '../utils/coordinate-to-point'
 import {parsePathsData, warnForInvalidPaths} from '../utils/parse-paths-data'
 import {parseTimesData} from '../utils/parse-times-data'
 
+import {loadPointsOfInterest} from './points-of-interest'
 import {loadGrid} from './grid'
 
 import type {LonLat} from '../types'
@@ -44,43 +45,55 @@ export const setNetworksToEmpty = () =>
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
 export function initialize (startCoordinate?: LonLat) {
-  return (dispatch: Dispatch, getState: any) => {
-    const state = getState()
-    const networks = state.data.networks
+  return fetch({
+    url: 'config.json',
+    next (response) {
+      const config = response.value
+      return loadDatasetFromJSON({...config, startCoordinate})
+    }
+  })
+}
 
-    dispatch(setNetworksToEmpty())
+export function loadDatasetFromJSON (jsonConfig: any) {
+  if (!jsonConfig.networks) window.alert('Invalid JSON config! A networks array is required.')
+  if (window.localStorage) window.localStorage.setItem('taui-config', JSON.stringify(jsonConfig, null, '  '))
+  return loadDataset(jsonConfig.networks, jsonConfig.grids, jsonConfig.pointsOfInterestUrl, jsonConfig.startCoordinate)
+}
 
-    state.data.grids.map(grid => {
-      dispatch(loadGrid(grid.name, state.data.gridsUrl))
+export function loadDataset (networks: {name: string, url: string},
+  grids: {name: string, url: string, icon: string},
+  pointsOfInterestUrl?: string,
+  startCoordinate?: LonLat
+) {
+  return [
+    setNetworksToEmpty(),
+    loadPointsOfInterest(pointsOfInterestUrl),
+    ...grids.map(grid => loadGrid(grid)),
+    fetchMultiple({
+      fetches: networks.map(network => ({
+        url: `${network.url}/query.json`
+      })),
+      next: (responses) => {
+        const actions = networks.map((network, index) =>
+          setNetwork({
+            ...network,
+            query: {
+              ...responses[index].value,
+              west: 116121, // TODO remove defaults
+              north: 51392,
+              width: 639,
+              height: 466
+            }
+          })
+        )
+
+        if (startCoordinate) actions.push(fetchDataForCoordinate(startCoordinate))
+        // else TODO set map.centerCoordinates from the query.json
+
+        return actions
+      }
     })
-
-    // load and set the queries
-    dispatch(
-      fetchMultiple({
-        fetches: networks.map(network => ({
-          url: `${network.url}/query.json`
-        })),
-        next (responses) {
-          dispatch(
-            networks.map((network, index) =>
-              setNetwork({
-                ...network,
-                query: {
-                  ...responses[index].value,
-                  west: 116121, // TODO remove defaults
-                  north: 51392,
-                  width: 639,
-                  height: 466
-                }
-              })
-            )
-          )
-
-          if (startCoordinate) dispatch(fetchDataForCoordinate(startCoordinate))
-        }
-      })
-    )
-  }
+  ]
 }
 
 export const fetchDataForCoordinate = (coordinate: LonLat) => (

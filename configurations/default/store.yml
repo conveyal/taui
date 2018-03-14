@@ -1,25 +1,16 @@
 data:
-  active: 0
-  instances: []
-  gridsUrl: /data # https://dz69bcpxxuhn6.cloudfront.net/indy-baseline-z9/intgrids
-  grids:
-    - name: people_portlandia
-  networks:
-    - name: Baseline
-      url: https://d2z7d5345ccuw9.cloudfront.net/5a8328d8e8436e5f2b5c5f25
-  pointsOfInterest:
-    - name: Location 1
-      coordinates: [-122.66647338867188, 45.524630364755225]
-    - name: Location 2
-      coordinates: [-122.66647338867188, 39.7681]
+  grids: []
+  networks: []
 geocoder:
-  proximity: -122.66647338867188,45.524630364755225 # longitude,latitude
-  country: us
+  proximity: 139.75673675537107,35.655483013543204 # longitude,latitude
+  country: jp
   types: country,region,postcode,district,place,locality,neighborhood,address,poi # https://www.mapbox.com/api-documentation/?language=cURL#request-format
-  bbox: -123.40393066406249,45.09485258791474,-121.90979003906249,45.93587062119052 # minX,minY,maxX,maxY
+  bbox: 136.93722534179688,34.17224835899679,140.937225341796889,38.17224835899679 # minX,minY,maxX,maxY
 map:
-  centerCoordinates: [45.524630364755225, -122.66647338867188] # Leaflet style
+  centerCoordinates: [35.655483013543204, 139.75673675537107] # Leaflet style
   zoom: 11
 ui:
   fetches: 0
+  showLink: true
   showLog: true
+  allowChangeConfig: true

@@ -47,11 +47,16 @@ export default handleActions(
               : {...n, active: false})
         )
       }
+    },
+    'set points of interest' (state, action) {
+      return {
+        ...state,
+        pointsOfInterest: action.payload
+      }
     }
   },
   {
     grids: [],
-    networks: [],
-    pointsOfInterest: []
+    networks: []
   }
 )

@@ -73,11 +73,12 @@ export default class Application extends Component {
 
   componentDidMount () {
     const qs = getAsObject()
+    const startCoordinate = qs.startCoordinate ? lonlat.fromString(qs.startCoordinate) : undefined
 
-    if (qs.startCoordinate) {
+    if (startCoordinate) {
       this.props.setStart({
         label: qs.start,
-        position: lonlat.fromString(qs.startCoordinate)
+        position: startCoordinate
       })
     }
 
@@ -98,7 +99,19 @@ export default class Application extends Component {
       })
     }
 
-    this.props.initialize(qs.startCoordinate ? lonlat.fromString(qs.startCoordinate) : undefined)
+    try {
+      const json = JSON.parse(window.localStorage.getItem('taui-config'))
+      return this.props.loadDatasetFromJSON({...json, startCoordinate})
+    } catch (e) {
+      console.log('Error parsing taui-config', e)
+    }
+
+    this.props.initialize(startCoordinate)
+  }
+
+  _changeConfig = (e) => {
+    const str = window.prompt('Paste in a valid JSON configuration.', '{}')
+    this.props.loadDatasetFromJSON(JSON.parse(str))
   }
 
   _clearStartAndEnd = () => {
@@ -230,6 +243,13 @@ export default class Application extends Component {
                 {network.name}
               </RouteCard>
             ))}
+            {ui.allowChangeConfig &&
+              <div className='Card'>
+                <a className='CardTitle' tabIndex={0} onClick={this._changeConfig}>config <span className='pull-right'>change</span></a>
+                <div className='CardContent'>
+                  <pre>{window.localStorage.getItem('taui-config')}</pre>
+                </div>
+              </div>}
             {ui.showLog &&
               actionLog &&
               actionLog.length > 0 &&

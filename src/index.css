@@ -133,6 +133,10 @@ body {
   margin-bottom: 1rem;
 }
 
+.Card pre {
+  overflow-x: scroll;
+}
+
 .Card-alternate .CardTitle {
   background-color: orange;
 }
