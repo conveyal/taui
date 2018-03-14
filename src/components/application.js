@@ -99,13 +99,6 @@ export default class Application extends Component {
       })
     }
 
-    try {
-      const json = JSON.parse(window.localStorage.getItem('taui-config'))
-      return this.props.loadDatasetFromJSON({...json, startCoordinate})
-    } catch (e) {
-      console.log('Error parsing taui-config', e)
-    }
-
     this.props.initialize(startCoordinate)
   }
 
@@ -243,13 +236,6 @@ export default class Application extends Component {
                 {network.name}
               </RouteCard>
             ))}
-            {ui.allowChangeConfig &&
-              <div className='Card'>
-                <a className='CardTitle' tabIndex={0} onClick={this._changeConfig}>config <span className='pull-right'>change</span></a>
-                <div className='CardContent'>
-                  <pre>{window.localStorage.getItem('taui-config')}</pre>
-                </div>
-              </div>}
             {ui.showLog &&
               actionLog &&
               actionLog.length > 0 &&
@@ -263,6 +249,13 @@ export default class Application extends Component {
               <div className='Card'>
                 <div className='CardContent Attribution'>
                   site made by <a href='https://www.conveyal.com' target='_blank'>conveyal</a>
+                </div>
+              </div>}
+            {ui.allowChangeConfig &&
+              <div className='Card'>
+                <a className='CardTitle' tabIndex={0} onClick={this._changeConfig}>config <span className='pull-right'>change</span></a>
+                <div className='CardContent'>
+                  <pre>{window.localStorage.getItem('taui-config')}</pre>
                 </div>
               </div>}
           </div>

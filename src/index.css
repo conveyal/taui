@@ -135,6 +135,7 @@ body {
 
 .Card pre {
   overflow-x: scroll;
+  font-size: 0.8rem;
 }
 
 .Card-alternate .CardTitle {
@@ -294,4 +295,60 @@ body {
   right: 0;
   left: 414px;
   overflow: hidden;
+}
+
+/* Leaflet Markers */
+.LeafletIcon {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.5));
+}
+
+.LeafletIcon:before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  margin-left: -10px;
+}
+
+.LeafletIcon.Start {
+  background-color: #0b2b40;
+}
+
+.LeafletIcon.Start:before {
+  border-top: 20px solid #0b2b40;
+}
+
+.LeafletIcon.Start:after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  border-left: solid 8px #fff;
+  border-bottom: solid 6px transparent;
+  border-top: solid 6px transparent;
+}
+
+.LeafletIcon.End {
+  background-color: orange;
+}
+
+.LeafletIcon.End:before {
+  border-top: 20px solid orange;
+}
+
+.LeafletIcon.End:after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 5px;
+  border: solid 5px #fff;
 }

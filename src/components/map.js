@@ -14,7 +14,6 @@ import {
   ZoomControl
 } from 'react-leaflet'
 
-import leafletIcon from '../utils/leaflet-icons'
 import TransitiveLayer from './transitive-map-layer'
 
 import type {
@@ -36,14 +35,16 @@ if (Leaflet.Browser.retina) {
   TILE_LAYER_PROPS.zoomOffset = -1
 }
 
-const startIcon = leafletIcon({
-  icon: 'play',
-  markerColor: 'darkblue'
+const startIcon = Leaflet.divIcon({
+  iconSize: [20, 26],
+  className: 'LeafletIcon Start',
+  html: '<div className="innerMarker"></div>'
 })
 
-const endIcon = leafletIcon({
-  icon: 'stop',
-  markerColor: 'orange'
+const endIcon = Leaflet.divIcon({
+  iconSize: [20, 26],
+  className: 'LeafletIcon End',
+  html: '<div className="innerMarker"></div>'
 })
 
 type Props = {

@@ -1,6 +1,7 @@
 // @flow
 import fetch, {fetchMultiple} from '@conveyal/woonerf/fetch'
 
+import {retrieveConfig, storeConfig} from '../config'
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
 import coordinateToPoint from '../utils/coordinate-to-point'
 import {parsePathsData, warnForInvalidPaths} from '../utils/parse-paths-data'
@@ -45,18 +46,29 @@ export const setNetworksToEmpty = () =>
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
 export function initialize (startCoordinate?: LonLat) {
+  try {
+    const json = retrieveConfig()
+    if (!json || !json.networks) {
+      console.error('Invalid JSON config! A networks array is required.')
+    } else {
+      return loadDataset(json.networks, json.grids, json.pointsOfInterestUrl, startCoordinate || json.startCoordinate)
+    }
+  } catch (e) {
+    console.log('Error parsing taui-config', e)
+  }
+
   return fetch({
     url: 'config.json',
-    next (response) {
-      const config = response.value
-      return loadDatasetFromJSON({...config, startCoordinate})
+    next: (response) => {
+      const c = response.value
+      storeConfig(c)
+      return loadDatasetFromJSON(c.networks, c.grids, c.pointsOfInterestUrl, startCoordinate || c.startCoordinate)
     }
   })
 }
 
 export function loadDatasetFromJSON (jsonConfig: any) {
-  if (!jsonConfig.networks) window.alert('Invalid JSON config! A networks array is required.')
-  if (window.localStorage) window.localStorage.setItem('taui-config', JSON.stringify(jsonConfig, null, '  '))
+  storeConfig(jsonConfig)
   return loadDataset(jsonConfig.networks, jsonConfig.grids, jsonConfig.pointsOfInterestUrl, jsonConfig.startCoordinate)
 }
 
