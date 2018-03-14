@@ -183,10 +183,12 @@ export default class Map extends PureComponent {
           {...TILE_LAYER_PROPS}
         />
 
-        {!isLoading && baseIsochrone &&
+        {!isLoading &&
+          baseIsochrone &&
           <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
 
-        {!isLoading && comparisonIsochrone &&
+        {!isLoading &&
+          comparisonIsochrone &&
           <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
 
         {!isLoading && transitive && <TransitiveLayer data={transitive} />}

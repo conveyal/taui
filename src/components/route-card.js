@@ -76,7 +76,8 @@ export default class RouteCard extends React.PureComponent {
                   : <ShowAccess accessibility={accessibility} grids={grids} />
               : <span>{message('Systems.SelectStart')}</span>}
           </div>
-          {!isLoading && hasStart &&
+          {!isLoading &&
+            hasStart &&
             hasEnd &&
             <RouteSegments
               routeSegments={routeSegments}
@@ -159,12 +160,17 @@ function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
       <div className='BestTrip'>
         <div className='Metric'>
           <div className='time'>
-            <strong> {travelTime > 120 ? '> 120' : travelTime}</strong> {message('Units.Mins')}
+            <strong> {travelTime > 120 ? '> 120' : travelTime}</strong>
+            {' '}
+            {message('Units.Mins')}
           </div>
           <div className='timeDiff'>
             {oldTravelTime &&
               oldTravelTime !== travelTime &&
-              <TripDiff oldTravelTime={oldTravelTime} travelTime={travelTime} />}
+              <TripDiff
+                oldTravelTime={oldTravelTime}
+                travelTime={travelTime}
+              />}
           </div>
         </div>
         <div className='CardSegments'>

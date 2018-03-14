@@ -15,7 +15,9 @@ export default class Log extends React.PureComponent {
   render () {
     return (
       <div className='Log'>
-        {this.props.items.map((item, index) => <LogItem {...item} key={index} />)}
+        {this.props.items.map((item, index) => (
+          <LogItem {...item} key={index} />
+        ))}
       </div>
     )
   }

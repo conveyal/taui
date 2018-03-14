@@ -51,7 +51,12 @@ export function initialize (startCoordinate?: LonLat) {
     if (!json || !json.networks) {
       console.error('Invalid JSON config! A networks array is required.')
     } else {
-      return loadDataset(json.networks, json.grids, json.pointsOfInterestUrl, startCoordinate || json.startCoordinate)
+      return loadDataset(
+        json.networks,
+        json.grids,
+        json.pointsOfInterestUrl,
+        startCoordinate || json.startCoordinate
+      )
     }
   } catch (e) {
     console.log('Error parsing taui-config', e)
@@ -59,20 +64,31 @@ export function initialize (startCoordinate?: LonLat) {
 
   return fetch({
     url: 'config.json',
-    next: (response) => {
+    next: response => {
       const c = response.value
       storeConfig(c)
-      return loadDatasetFromJSON(c.networks, c.grids, c.pointsOfInterestUrl, startCoordinate || c.startCoordinate)
+      return loadDatasetFromJSON(
+        c.networks,
+        c.grids,
+        c.pointsOfInterestUrl,
+        startCoordinate || c.startCoordinate
+      )
     }
   })
 }
 
 export function loadDatasetFromJSON (jsonConfig: any) {
   storeConfig(jsonConfig)
-  return loadDataset(jsonConfig.networks, jsonConfig.grids, jsonConfig.pointsOfInterestUrl, jsonConfig.startCoordinate)
+  return loadDataset(
+    jsonConfig.networks,
+    jsonConfig.grids,
+    jsonConfig.pointsOfInterestUrl,
+    jsonConfig.startCoordinate
+  )
 }
 
-export function loadDataset (networks: {name: string, url: string},
+export function loadDataset (
+  networks: {name: string, url: string},
   grids: {name: string, url: string, icon: string},
   pointsOfInterestUrl?: string,
   startCoordinate?: LonLat
@@ -85,7 +101,7 @@ export function loadDataset (networks: {name: string, url: string},
       fetches: networks.map(network => ({
         url: `${network.url}/query.json`
       })),
-      next: (responses) => {
+      next: responses => {
         const actions = networks.map((network, index) =>
           setNetwork({
             ...network,
@@ -99,7 +115,7 @@ export function loadDataset (networks: {name: string, url: string},
           })
         )
 
-        if (startCoordinate) actions.push(fetchDataForCoordinate(startCoordinate))
+        if (startCoordinate) { actions.push(fetchDataForCoordinate(startCoordinate)) }
         // else TODO set map.centerCoordinates from the query.json
 
         return actions
@@ -122,7 +138,13 @@ export const fetchDataForCoordinate = (coordinate: LonLat) => (
 }
 
 const fetchDataForNetwork = (network, coordinate, currentZoom) => {
-  const originPoint = coordinateToPoint(coordinate, currentZoom, network.query.zoom, network.query.west, network.query.north)
+  const originPoint = coordinateToPoint(
+    coordinate,
+    currentZoom,
+    network.query.zoom,
+    network.query.west,
+    network.query.north
+  )
   const index = originPoint.x + originPoint.y * network.query.width
   return fetchMultiple({
     fetches: [

@@ -23,7 +23,7 @@ type Props = {
   value: null | Location,
 
   geocode: (string, Function) => void,
-  onChange: (any) => void,
+  onChange: any => void,
   reverseGeocode: (string, Function) => void
 }
 
@@ -54,7 +54,7 @@ export default class Geocoder extends Component {
   }
 
   cacheOptions (options: ReactSelectOption[]) {
-    options.forEach((o) => {
+    options.forEach(o => {
       this.options[o.value] = o.feature
     })
   }
@@ -67,7 +67,15 @@ export default class Geocoder extends Component {
 
   defaultOptions () {
     const geolocateOptions = this.props.geolocate && 'geolocation' in navigator
-      ? [{label: message('Geocoding.UseCurrentLocation', 'Use Current Location'), value: GEOLOCATE_VALUE}]
+      ? [
+        {
+          label: message(
+              'Geocoding.UseCurrentLocation',
+              'Use Current Location'
+            ),
+          value: GEOLOCATE_VALUE
+        }
+      ]
       : []
     return [...geolocateOptions, ...this.props.pointsOfInterest]
   }
@@ -97,7 +105,7 @@ export default class Geocoder extends Component {
         return callback(null, {options: cachedOptions})
       }
 
-      geocode(input, (features) => {
+      geocode(input, features => {
         const options = features.map(this.featureToOption)
         this.cacheOptions(options)
         this.autocompleteCache[input] = options
@@ -115,8 +123,8 @@ export default class Geocoder extends Component {
           label: message('Geocoding.FindingLocation', 'Locating you...')
         }
       })
-      window.navigator.geolocation.getCurrentPosition((position) => {
-        reverseGeocode(position.coords, (feature) => {
+      window.navigator.geolocation.getCurrentPosition(position => {
+        reverseGeocode(position.coords, feature => {
           const value = this.featureToOption(feature)
           this.setState({
             ...this.state,
@@ -134,7 +142,8 @@ export default class Geocoder extends Component {
       } else {
         this.setState({value})
       }
-      this.props.onChange && this.props.onChange(value && this.options[value.value])
+      this.props.onChange &&
+        this.props.onChange(value && this.options[value.value])
     }
   }
 
@@ -155,7 +164,7 @@ export default class Geocoder extends Component {
         placeholder={this.props.placeholder}
         searchPromptText={message('Geocoding.PromptText')}
         value={this.state.value}
-        />
+      />
     )
   }
 }

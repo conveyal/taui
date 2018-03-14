@@ -5,11 +5,7 @@ import uniq from 'lodash/uniq'
 
 import {coordinateToIndex} from './coordinate-to-point'
 
-import type {
-  Location,
-  Path,
-  QualifiedPath
-} from '../types'
+import type {Location, Path, QualifiedPath} from '../types'
 
 type Network = {
   query: any,
@@ -55,7 +51,8 @@ export default function createTransitiveRoutesForNetwork (
   ]
 
   // Get the targetPathIndex
-  const targetPathIndex = network.targets[coordinateToIndex(end.position, zoom, network.query)]
+  const targetPathIndex =
+    network.targets[coordinateToIndex(end.position, zoom, network.query)]
 
   // Cannot reach the destination
   if (targetPathIndex === -1) {
@@ -85,39 +82,43 @@ export default function createTransitiveRoutesForNetwork (
     })
 
   // Map the paths to transitive journeys
-  const journeys = [{
-    journey_id: 0,
-    journey_name: 0,
-    segments: path.length === 0
-      ? createWalkOnlyJourney()
-      : getTransitiveSegmentsFromPath(path)
-  }]
+  const journeys = [
+    {
+      journey_id: 0,
+      journey_name: 0,
+      segments: path.length === 0
+        ? createWalkOnlyJourney()
+        : getTransitiveSegmentsFromPath(path)
+    }
+  ]
 
   return {
     ...td,
     journeys,
     places,
-    routeSegments: [path.map(leg => {
-      const route = fot(td.routes, r => r.route_id === leg[1].route_id)
-      const seg = {}
-      const color = route.route_color
-        ? Color(`#${route.route_color}`)
-        : Color('#0b2b40')
-      seg.name = toCapitalCase(route.route_short_name)
+    routeSegments: [
+      path.map(leg => {
+        const route = fot(td.routes, r => r.route_id === leg[1].route_id)
+        const seg = {}
+        const color = route.route_color
+          ? Color(`#${route.route_color}`)
+          : Color('#0b2b40')
+        seg.name = toCapitalCase(route.route_short_name)
 
-      if (leg[1].patterns && leg[1].patterns.length > 0) {
-        const patternNames = leg[1].patterns
-          .map(p => fot(td.routes, r => r.route_id === p.route_id))
-          .map(r => toCapitalCase(r.route_short_name))
-        seg.name = uniq(patternNames).join(' / ')
-      }
+        if (leg[1].patterns && leg[1].patterns.length > 0) {
+          const patternNames = leg[1].patterns
+            .map(p => fot(td.routes, r => r.route_id === p.route_id))
+            .map(r => toCapitalCase(r.route_short_name))
+          seg.name = uniq(patternNames).join(' / ')
+        }
 
-      seg.backgroundColor = color.string()
-      seg.color = color.light() ? '#000' : '#fff'
-      seg.type = TYPE_TO_ICON[route.route_type]
+        seg.backgroundColor = color.string()
+        seg.color = color.light() ? '#000' : '#fff'
+        seg.type = TYPE_TO_ICON[route.route_type]
 
-      return seg
-    })]
+        return seg
+      })
+    ]
   }
 }
 

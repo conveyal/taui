@@ -73,7 +73,9 @@ export default class Application extends Component {
 
   componentDidMount () {
     const qs = getAsObject()
-    const startCoordinate = qs.startCoordinate ? lonlat.fromString(qs.startCoordinate) : undefined
+    const startCoordinate = qs.startCoordinate
+      ? lonlat.fromString(qs.startCoordinate)
+      : undefined
 
     if (startCoordinate) {
       this.props.setStart({
@@ -102,7 +104,7 @@ export default class Application extends Component {
     this.props.initialize(startCoordinate)
   }
 
-  _changeConfig = (e) => {
+  _changeConfig = e => {
     const str = window.prompt('Paste in a valid JSON configuration.', '{}')
     this.props.loadDatasetFromJSON(JSON.parse(str))
   }
@@ -248,12 +250,22 @@ export default class Application extends Component {
             {ui.showLink &&
               <div className='Card'>
                 <div className='CardContent Attribution'>
-                  site made by <a href='https://www.conveyal.com' target='_blank'>conveyal</a>
+                  site made by
+                  {' '}
+                  <a href='https://www.conveyal.com' target='_blank'>
+                    conveyal
+                  </a>
                 </div>
               </div>}
             {ui.allowChangeConfig &&
               <div className='Card'>
-                <a className='CardTitle' tabIndex={0} onClick={this._changeConfig}>config <span className='pull-right'>change</span></a>
+                <a
+                  className='CardTitle'
+                  tabIndex={0}
+                  onClick={this._changeConfig}
+                >
+                  config <span className='pull-right'>change</span>
+                </a>
                 <div className='CardContent'>
                   <pre>{window.localStorage.getItem('taui-config')}</pre>
                 </div>

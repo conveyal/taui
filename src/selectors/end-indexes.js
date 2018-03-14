@@ -11,8 +11,6 @@ export default createSelector(
   (position, zoom, networks) =>
     networks.map(
       n =>
-        (position && n.query
-          ? coordinateToIndex(position, zoom, n.query)
-          : -1)
+        (position && n.query ? coordinateToIndex(position, zoom, n.query) : -1)
     )
 )

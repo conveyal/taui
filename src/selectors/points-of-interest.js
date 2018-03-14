@@ -3,8 +3,8 @@ import {createSelector} from 'reselect'
 
 export default createSelector(
   state => state.data.pointsOfInterest,
-  (featureCollection) =>
-    featureCollection
+  featureCollection =>
+    (featureCollection
       ? featureCollection.features.map(feature => ({
         label: feature.properties.name,
         value: `poi-${feature.properties.name}-${feature.geometry.coordinates.join(',')}`,
@@ -18,5 +18,5 @@ export default createSelector(
           }
         }
       }))
-    : []
+      : [])
 )
