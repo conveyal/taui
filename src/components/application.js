@@ -4,12 +4,7 @@ import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
-
-import Form from './form'
-import Log from './log'
-import Map from './map'
-import RouteCard from './route-card'
-import {getAsObject} from '../utils/hash'
+import {GeoJSON} from 'react-leaflet'
 
 import type {
   Coordinate,
@@ -22,6 +17,15 @@ import type {
   PointsOfInterest,
   UIStore
 } from '../types'
+import {getAsObject} from '../utils/hash'
+
+import Form from './form'
+import Log from './log'
+import Map from './map'
+import RouteAccess from './route-access'
+import RouteCard from './route-card'
+import RouteSegments from './route-segments'
+import TransitiveLayer from './transitive-map-layer'
 
 type Network = {
   name: string,
@@ -30,7 +34,6 @@ type Network = {
 
 type MapState = {
   centerCoordinates: Coordinate,
-  tileUrl: string,
   zoom: number
 }
 
@@ -68,9 +71,42 @@ type Props = {
   updateStartPosition: LonLat => void
 }
 
-export default class Application extends Component {
-  props: Props
+type State = {
+  componentError: any
+}
 
+const getStyle = memoize(color => ({
+  fillColor: color,
+  pointerEvents: 'none',
+  stroke: color,
+  weight: 1
+}))
+
+const BASE_ISOCHRONE_STYLE = getStyle('#4269a4')
+const COMP_ISOCHRONE_STYLE = getStyle('darkorange')
+
+/**
+ *
+ */
+export default class Application extends Component<Props, State> {
+  state = {
+    componentError: null
+  }
+
+  /**
+   * Top level component error catch
+   */
+  componentDidCatch (error, info) {
+    this.setState({
+      componentError: {
+        error, info
+      }
+    })
+  }
+
+  /**
+   * Initialize the application.
+   */
   componentDidMount () {
     const qs = getAsObject()
     const startCoordinate = qs.startCoordinate
@@ -151,7 +187,9 @@ export default class Application extends Component {
 
   _setActiveNetwork = memoize(name => () => this.props.setActiveNetwork(name))
 
-  count = 0
+  /**
+   *
+   */
   render () {
     const {
       accessibility,
@@ -175,104 +213,129 @@ export default class Application extends Component {
       updateMap,
       updateStartPosition
     } = this.props
-
+    const {componentError} = this.state
+    const comparisonIsochrone = activeNetworkIndex > 0
+      ? isochrones[activeNetworkIndex]
+      : null
     return (
       <div>
         <div className='Fullscreen'>
           <Map
             {...map}
-            activeNetworkIndex={activeNetworkIndex}
             centerCoordinates={map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
             end={geocoder.end}
-            isLoading={isLoading}
-            isochrones={isochrones}
             pointsOfInterest={pointsOfInterest}
             setEndPosition={updateEndPosition}
             setStartPosition={updateStartPosition}
             start={geocoder.start}
-            transitive={activeTransitive}
             updateMap={updateMap}
             zoom={map.zoom}
+          >
+            {!isLoading &&
+              <div>
+                {isochrones[0] &&
+                  <GeoJSON data={isochrones[0]} key={isochrones[0].key} style={BASE_ISOCHRONE_STYLE} />}
+
+                {comparisonIsochrone &&
+                  <GeoJSON data={comparisonIsochrone} key={comparisonIsochrone.key} style={COMP_ISOCHRONE_STYLE} />}
+
+                {activeTransitive && activeTransitive.journeys && activeTransitive.journeys.length > 0 &&
+                  <TransitiveLayer data={activeTransitive} />}
+              </div>}
+          </Map>
+        </div>
+        <Dock showSpinner={ui.fetches > 0} componentError={componentError}>
+          <Form
+            boundary={geocoder.boundary}
+            end={geocoder.end}
+            focusLatlng={geocoder.focusLatlng}
+            geocode={geocode}
+            onTimeCutoffChange={this._onTimeCutoffChange}
+            onChangeEnd={this._setEndWithFeature}
+            onChangeStart={this._setStartWithFeature}
+            pointsOfInterest={pointsOfInterest}
+            reverseGeocode={reverseGeocode}
+            selectedTimeCutoff={timeCutoff.selected}
+            start={geocoder.start}
           />
-        </div>
-        <div className='Taui-Dock'>
-          <div className='Taui-Dock-content'>
-            <div className='title'>
-              {ui.fetches > 0
-                ? <Icon type='spinner' className='fa-spin' />
-                : <Icon type='map' />}
-              {' '}
-              {message('Title')}
-            </div>
-            <Form
-              boundary={geocoder.boundary}
-              end={geocoder.end}
-              focusLatlng={geocoder.focusLatlng}
-              geocode={geocode}
-              onTimeCutoffChange={this._onTimeCutoffChange}
-              onChangeEnd={this._setEndWithFeature}
-              onChangeStart={this._setStartWithFeature}
-              pointsOfInterest={pointsOfInterest}
-              reverseGeocode={reverseGeocode}
-              selectedTimeCutoff={timeCutoff.selected}
-              start={geocoder.start}
-            />
-            {data.networks.map((network, index) => (
-              <RouteCard
-                accessibility={accessibility[index]}
-                active={network.active}
-                alternate={index !== 0}
-                grids={data.grids}
-                hasEnd={!!geocoder.end}
-                hasStart={!!geocoder.start}
-                isLoading={isLoading}
-                key={`${index}-route-card`}
-                oldAccessibility={accessibility[0]}
-                oldTravelTime={travelTimes[0]}
-                onClick={this._setActiveNetwork(network.name)}
-                routeSegments={(allTransitiveData[index] || {}).routeSegments}
-                showComparison={showComparison}
-                travelTime={travelTimes[index]}
-              >
-                {network.name}
-              </RouteCard>
-            ))}
-            {ui.showLog &&
-              actionLog &&
-              actionLog.length > 0 &&
-              <div className='Card'>
-                <div className='CardTitle'>
-                  {message('Log.Title')}
-                </div>
-                <Log items={actionLog} />
-              </div>}
-            {ui.showLink &&
-              <div className='Card'>
-                <div className='CardContent Attribution'>
-                  site made by
-                  {' '}
-                  <a href='https://www.conveyal.com' target='_blank'>
-                    conveyal
-                  </a>
-                </div>
-              </div>}
-            {ui.allowChangeConfig &&
-              <div className='Card'>
-                <a
-                  className='CardTitle'
-                  tabIndex={0}
-                  onClick={this._changeConfig}
-                >
-                  config <span className='pull-right'>change</span>
+          {data.networks.map((network, index) => (
+            <RouteCard
+              active={network.active}
+              alternate={index !== 0}
+              isLoading={isLoading}
+              key={`${index}-route-card`}
+              onClick={this._setActiveNetwork(network.name)}
+              title={network.name}
+            >
+              {!isLoading &&
+                <RouteAccess
+                  accessibility={accessibility[index]}
+                  grids={data.grids}
+                  hasStart={!!geocoder.start}
+                  oldAccessibility={accessibility[0]}
+                  showComparison={showComparison}
+                />}
+              {!isLoading && !!geocoder.end && !!geocoder.start &&
+                <RouteSegments
+                  oldTravelTime={travelTimes[0]}
+                  routeSegments={(allTransitiveData[index] || {}).routeSegments}
+                  travelTime={travelTimes[index]}
+                />}
+            </RouteCard>
+          ))}
+          {ui.showLog &&
+            <div className='Card'>
+              <div className='CardTitle'>
+                {message('Log.Title')}
+              </div>
+              <Log items={actionLog} />
+            </div>}
+          {ui.showLink &&
+            <div className='Card'>
+              <div className='CardContent Attribution'>
+                site made by
+                {' '}
+                <a href='https://www.conveyal.com' target='_blank'>
+                  conveyal
                 </a>
-                <div className='CardContent'>
-                  <pre>{window.localStorage.getItem('taui-config')}</pre>
-                </div>
-              </div>}
-          </div>
-        </div>
+              </div>
+            </div>}
+          {ui.allowChangeConfig &&
+            <div className='Card'>
+              <a
+                className='CardTitle'
+                tabIndex={0}
+                onClick={this._changeConfig}
+              >
+                config <span className='pull-right'>change</span>
+              </a>
+              <div className='CardContent'>
+                <pre>{window.localStorage.getItem('taui-config')}</pre>
+              </div>
+            </div>}
+        </Dock>
       </div>
     )
   }
+}
+
+function Dock (props) {
+  return <div className='Taui-Dock'>
+    <div className='Taui-Dock-content'>
+      <div className='title'>
+        {props.showSpinner
+          ? <Icon type='spinner' className='fa-spin' />
+          : <Icon type='map' />}
+        {' '}
+        {message('Title')}
+      </div>
+      {props.componentError &&
+        <div>
+          <h1>Error</h1>
+          <p>{props.componentError.info}</p>
+        </div>}
+      {props.children}
+    </div>
+  </div>
 }

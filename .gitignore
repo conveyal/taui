@@ -5,3 +5,4 @@ configurations/*
 !configurations/default
 !configurations/messages
 tmp
+config.json

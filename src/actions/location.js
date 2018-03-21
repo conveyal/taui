@@ -1,12 +1,12 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
 
+import type {Location, LonLat} from '../types'
+import {setValues} from '../utils/hash'
+
 import {addActionLogItem} from './log'
 import {fetchDataForCoordinate, setNetworksToLoading} from './network'
 import {reverseGeocode} from './geocode'
-import {setValues} from '../utils/hash'
-
-import type {Location, LonLat} from '../types'
 
 const setLocation = (which: 'end' | 'start', location?: Location) => {
   if (location) {

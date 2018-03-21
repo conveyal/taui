@@ -3,14 +3,13 @@ import fetch, {fetchMultiple} from '@conveyal/woonerf/fetch'
 
 import {retrieveConfig, storeConfig} from '../config'
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
+import type {LonLat} from '../types'
 import coordinateToPoint from '../utils/coordinate-to-point'
 import {parsePathsData, warnForInvalidPaths} from '../utils/parse-paths-data'
 import {parseTimesData} from '../utils/parse-times-data'
 
 import {loadPointsOfInterest} from './points-of-interest'
 import {loadGrid} from './grid'
-
-import type {LonLat} from '../types'
 
 export const setNetwork = (payload: any) => ({type: 'set network', payload})
 export const setActiveNetwork = (payload: string) => ({

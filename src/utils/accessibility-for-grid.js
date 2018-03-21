@@ -45,7 +45,7 @@ export default function accessibilityForGrid ({
   surface: Uint8Array
 }): number {
   let accessibility = 0
-  for (let y = 0, pixel = 0; y < query.height; y++) {
+  for (let pixel = 0, y = 0; y < query.height; y++) {
     for (let x = 0; x < query.width; x++, pixel++) {
       const travelTime = surface[pixel]
 

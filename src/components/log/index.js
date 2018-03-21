@@ -1,9 +1,9 @@
 // @flow
 import React from 'react'
 
-import LogItem from './item'
-
 import type {LogItems} from '../../types'
+
+import LogItem from './item'
 
 type Props = {
   items: LogItems

@@ -27,14 +27,9 @@ type Props = {
   reverseGeocode: (string, Function) => void
 }
 
-function featureToLabel (feature: MapboxFeature) {
-  return feature.place_name
-}
-
-function featureToValue (feature: MapboxFeature) {
-  return feature.id
-}
-
+/**
+ *
+ */
 export default class Geocoder extends Component {
   props: Props
 
@@ -67,15 +62,13 @@ export default class Geocoder extends Component {
 
   defaultOptions () {
     const geolocateOptions = this.props.geolocate && 'geolocation' in navigator
-      ? [
-        {
-          label: message(
-              'Geocoding.UseCurrentLocation',
-              'Use Current Location'
-            ),
-          value: GEOLOCATE_VALUE
-        }
-      ]
+      ? [{
+        label: message(
+          'Geocoding.UseCurrentLocation',
+          'Use Current Location'
+        ),
+        value: GEOLOCATE_VALUE
+      }]
       : []
     return [...geolocateOptions, ...this.props.pointsOfInterest]
   }
@@ -83,8 +76,8 @@ export default class Geocoder extends Component {
   featureToOption = (feature: MapboxFeature) => {
     return {
       feature,
-      label: featureToLabel(feature),
-      value: featureToValue(feature)
+      label: feature.place_name,
+      value: feature.id
     }
   }
 
@@ -118,7 +111,6 @@ export default class Geocoder extends Component {
     const {onChange, reverseGeocode} = this.props
     if (value && value.value === GEOLOCATE_VALUE) {
       this.setState({
-        ...this.state,
         value: {
           label: message('Geocoding.FindingLocation', 'Locating you...')
         }
@@ -127,7 +119,6 @@ export default class Geocoder extends Component {
         reverseGeocode(position.coords, feature => {
           const value = this.featureToOption(feature)
           this.setState({
-            ...this.state,
             value
           })
           onChange && onChange(value)

@@ -4,7 +4,6 @@ import {Map as LeafletMap} from 'leaflet'
 import get from 'lodash/get'
 import memoize from 'lodash/memoize'
 import {createSelector} from 'reselect'
-import uuid from 'uuid'
 
 export default createSelector(
   state => get(state, 'data.networks'),
@@ -16,6 +15,13 @@ export default createSelector(
       }
     })
 )
+
+/**
+ * Inputs to key for memoization
+ */
+function toKey (n, i, c) {
+  return `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${c}`
+}
 
 /**
  * Create an isochrone. Save results based on the network and timecutoff.
@@ -35,6 +41,6 @@ const getIsochrone = memoize((network, index, timeCutoff) => {
     }
   })
 
-  // create the uuid for react-leaflet/GeoJSON here
-  return {...isochrone, key: uuid.v4()}
-}, (n, i, c) => `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${c}`)
+  // create the key for react-leaflet/GeoJSON here
+  return {...isochrone, key: toKey(network, index, timeCutoff)}
+}, toKey)

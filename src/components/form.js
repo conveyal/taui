@@ -2,14 +2,14 @@
 import message from '@conveyal/woonerf/message'
 import React from 'react'
 
-import Geocoder from './geocoder'
-
 import type {
   InputEvent,
   Location,
   MapboxFeature,
   PointsOfInterest
 } from '../types'
+
+import Geocoder from './geocoder'
 
 type Props = {
   end: null | Location,

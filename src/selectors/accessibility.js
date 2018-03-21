@@ -2,8 +2,9 @@
 import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
-import selectTravelTimeSurfaces from './travel-time-surfaces'
 import accessibilityForGrid from '../utils/accessibility-for-grid'
+
+import selectTravelTimeSurfaces from './travel-time-surfaces'
 
 export default createSelector(
   selectTravelTimeSurfaces,

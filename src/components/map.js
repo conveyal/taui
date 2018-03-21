@@ -6,15 +6,13 @@ import Leaflet from 'leaflet'
 import memoize from 'lodash/memoize'
 import React, {PureComponent} from 'react'
 import {
-  GeoJson,
+  GeoJSON,
   Map as LeafletMap,
   Marker,
   Popup,
   TileLayer,
   ZoomControl
 } from 'react-leaflet'
-
-import TransitiveLayer from './transitive-map-layer'
 
 import type {
   Coordinate,
@@ -35,30 +33,29 @@ if (Leaflet.Browser.retina) {
   TILE_LAYER_PROPS.zoomOffset = -1
 }
 
+const iconWidth = 20
+const iconHeight = 26
+
 const startIcon = Leaflet.divIcon({
-  iconSize: [20, 26],
   className: 'LeafletIcon Start',
-  html: '<div className="innerMarker"></div>'
+  html: '<div className="innerMarker"></div>',
+  iconSize: [iconWidth, iconHeight]
 })
 
 const endIcon = Leaflet.divIcon({
-  iconSize: [20, 26],
   className: 'LeafletIcon End',
-  html: '<div className="innerMarker"></div>'
+  html: '<div className="innerMarker"></div>',
+  iconSize: [iconWidth, iconHeight]
 })
 
 type Props = {
-  activeNetworkIndex: number,
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
   end: null | Location,
-  isLoading: boolean,
-  isochrones: any[],
   pointsOfInterest: PointsOfInterest,
   setEndPosition: LonLat => void,
   setStartPosition: LonLat => void,
   start: null | Location,
-  transitive: any,
   updateMap: any => void,
   zoom: number
 }
@@ -71,21 +68,24 @@ type State = {
 
 const poiToFeatures = memoize(poi => poi.map(p => p.feature))
 
-export default class Map extends PureComponent {
-  props: Props
-  state: State
-
+/**
+ *
+ */
+export default class Map extends PureComponent<Props, State> {
   state = {
-    showSelectStartOrEnd: false,
     lastClickedLabel: null,
-    lastClickedPosition: null
+    lastClickedPosition: null,
+    showSelectStartOrEnd: false
   }
 
-  _clearState (): void {
+  /**
+   * Reset state
+   */
+  _clearState () {
     this.setState({
-      showSelectStartOrEnd: false,
       lastClickedLabel: null,
-      lastClickedPosition: null
+      lastClickedPosition: null,
+      showSelectStartOrEnd: false
     })
   }
 
@@ -102,11 +102,11 @@ export default class Map extends PureComponent {
     this.props.setStartPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _onMapClick = (e: any): void => {
-    this.setState({
-      showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
-      lastClickedPosition: e.latlng || e.target._latlng
-    })
+  _onMapClick = (e: Leaflet.MouseEvent): void => {
+    this.setState((previousState) => ({
+      lastClickedPosition: e.latlng || e.target._latlng,
+      showSelectStartOrEnd: !previousState.showSelectStartOrEnd
+    }))
   }
 
   _setEnd = (): void => {
@@ -144,16 +144,16 @@ export default class Map extends PureComponent {
     this.props.updateMap({zoom})
   }
 
-  render (): React$Element<LeafletMap> {
+  /**
+   * Render
+   */
+  render () {
     const {
-      activeNetworkIndex,
       centerCoordinates,
+      children,
       end,
-      isLoading,
-      isochrones,
       pointsOfInterest,
       start,
-      transitive,
       zoom
     } = this.props
     const {
@@ -161,11 +161,6 @@ export default class Map extends PureComponent {
       lastClickedPosition,
       showSelectStartOrEnd
     } = this.state
-    const baseIsochrone = isochrones[0]
-    const comparisonIsochrone = activeNetworkIndex > 0
-      ? isochrones[activeNetworkIndex]
-      : null
-
     return (
       <LeafletMap
         center={centerCoordinates}
@@ -183,19 +178,11 @@ export default class Map extends PureComponent {
           {...TILE_LAYER_PROPS}
         />
 
-        {!isLoading &&
-          baseIsochrone &&
-          <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
-
-        {!isLoading &&
-          comparisonIsochrone &&
-          <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
-
-        {!isLoading && transitive && <TransitiveLayer data={transitive} />}
+        {children}
 
         {(!start || !end) &&
           pointsOfInterest.length > 0 &&
-          <MapboxGeoJson
+          <GeoJSON
             data={poiToFeatures(pointsOfInterest)}
             onClick={this._clickPoi}
           />}
@@ -249,32 +236,5 @@ export default class Map extends PureComponent {
           </Popup>}
       </LeafletMap>
     )
-  }
-}
-
-const getStyle = memoize(color => ({
-  fillColor: color,
-  pointerEvents: 'none',
-  stroke: color,
-  weight: 1
-}))
-
-function Isochrone ({isochrone, color}) {
-  return (
-    <GeoJson
-      key={`${isochrone.key}`}
-      data={isochrone}
-      style={getStyle(color)}
-    />
-  )
-}
-
-class MapboxGeoJson extends GeoJson {
-  componentDidMount () {
-    const {mapbox} = require('mapbox.js')
-    super.componentDidMount()
-    const {data} = this.props
-    mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
-    this.leafletElement = mapbox.featureLayer(data)
   }
 }

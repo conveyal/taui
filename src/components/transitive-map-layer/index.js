@@ -32,29 +32,25 @@ const TRANSITIVE_SETTINGS = {
   ]
 }
 
-export default class TransitiveMapLayer extends MapLayer {
-  props: Props
-
+export default class TransitiveMapLayer extends MapLayer<LeafletTransitiveLayer, Props> {
   shouldComponentUpdate (newProps: Props) {
     return this.props.data !== newProps.data
   }
 
-  componentWillMount () {
-    super.componentWillMount()
-    this.transitive = new Transitive({
+  createLeafletElement (props: Props) {
+    return new LeafletTransitiveLayer(new Transitive({
       ...TRANSITIVE_SETTINGS,
-      data: this.props.data
-    })
-    this.leafletElement = new LeafletTransitiveLayer(this.transitive)
+      data: props.data
+    }))
+  }
+
+  updateLeafletElement (prevProps: Props, currentProps: Props) {
+    this.leafletElement._transitive.updateData(currentProps.data)
+    this.leafletElement._refresh()
   }
 
   componentDidMount () {
     super.componentDidMount()
-    this.leafletElement._refresh()
-  }
-
-  componentDidUpdate () {
-    this.transitive.updateData(this.props.data)
     this.leafletElement._refresh()
   }
 

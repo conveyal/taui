@@ -3,7 +3,6 @@ import lonlat from '@conveyal/lonlat'
 import fetch from '@conveyal/woonerf/fetch'
 
 import {MAPBOX_GEOCODING_URL} from '../constants'
-
 import type {LonLat} from '../types'
 
 /**
@@ -17,6 +16,8 @@ function formatURL (text: string, opts) {
 
 /**
  * Create an action that dispatches the given action on success.
+ *
+ * NB Content-Type is application/vnd.geo+json so woonerf/fetch parses as text
  */
 export function geocode (text: string, nextAction: any) {
   return function (dispatch: Dispatch, getState: any) {
@@ -24,8 +25,8 @@ export function geocode (text: string, nextAction: any) {
     const {geocoder} = state
 
     dispatch(fetch({
-      url: formatURL(text, geocoder),
-      next: (response) => nextAction(JSON.parse(response.value).features) // Content-Type is application/vnd.geo+json so woonerf/fetch parses as text
+      next: (response) => nextAction(JSON.parse(response.value).features),
+      url: formatURL(text, geocoder)
     }))
   }
 }

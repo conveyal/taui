@@ -1,11 +1,11 @@
 // @flow
-import Color from 'color'
 import toCapitalCase from 'lodash/capitalize'
 import uniq from 'lodash/uniq'
 
-import {coordinateToIndex} from './coordinate-to-point'
-
 import type {Location, Path, QualifiedPath} from '../types'
+
+import {coordinateToIndex} from './coordinate-to-point'
+import {isLight} from './hex-color-contrast'
 
 type Network = {
   query: any,
@@ -101,8 +101,8 @@ export default function createTransitiveRoutesForNetwork (
         const route = fot(td.routes, r => r.route_id === leg[1].route_id)
         const seg = {}
         const color = route.route_color
-          ? Color(`#${route.route_color}`)
-          : Color('#0b2b40')
+          ? `#${route.route_color}`
+          : '#0b2b40'
         seg.name = toCapitalCase(route.route_short_name)
 
         if (leg[1].patterns && leg[1].patterns.length > 0) {
@@ -112,8 +112,8 @@ export default function createTransitiveRoutesForNetwork (
           seg.name = uniq(patternNames).join(' / ')
         }
 
-        seg.backgroundColor = color.string()
-        seg.color = color.light() ? '#000' : '#fff'
+        seg.backgroundColor = color
+        seg.color = isLight(color) ? '#000' : '#fff'
         seg.type = TYPE_TO_ICON[route.route_type]
 
         return seg
