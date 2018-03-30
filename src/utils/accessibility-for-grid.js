@@ -36,23 +36,23 @@ import type {Grid, Query} from '../types'
 export default function accessibilityForGrid ({
   cutoff = 60,
   grid,
-  query,
+  network,
   surface
 }: {
   cutoff: number,
   grid: Grid,
-  query: Query,
+  network: Query,
   surface: Uint8Array
 }): number {
   let accessibility = 0
-  for (let pixel = 0, y = 0; y < query.height; y++) {
-    for (let x = 0; x < query.width; x++, pixel++) {
+  for (let pixel = 0, y = 0; y < network.height; y++) {
+    for (let x = 0; x < network.width; x++, pixel++) {
       const travelTime = surface[pixel]
 
       // ignore unreached locations
       if (travelTime <= cutoff) {
-        const gridx = x + query.west - grid.west
-        const gridy = y + query.north - grid.north
+        const gridx = x + network.west - grid.west
+        const gridy = y + network.north - grid.north
         accessibility += grid.valueAtPoint(gridx, gridy)
       }
     }

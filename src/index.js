@@ -30,25 +30,34 @@ function mapStateToProps (state, ownProps) {
 const ConnectedApplication = connect(mapStateToProps, actions)(Application)
 
 // Create an Application wrapper
-function InitializationWrapper ({history, store}) {
-  if (window) {
-    window.app = {
-      action: {},
-      select: {},
-      store
+class InitializationWrapper extends React.Component {
+  constructor (props) {
+    super(props)
+
+    if (window) {
+      window.app = {
+        action: {},
+        select: {},
+        store: props.store
+      }
+
+      Object.keys(actions).forEach(key => {
+        window.app.action[key] = (...args) =>
+          props.store.dispatch(actions[key](...args))
+      })
+
+      Object.keys(select).forEach(key => {
+        window.app.select[key] = () => select[key](props.store.getState())
+      })
     }
-
-    Object.keys(actions).forEach(key => {
-      window.app.action[key] = (...args) =>
-        store.dispatch(actions[key](...args))
-    })
-
-    Object.keys(select).forEach(key => {
-      window.app.select[key] = () => select[key](store.getState())
-    })
   }
 
-  return <ConnectedApplication history={history} store={store} />
+  render () {
+    return <ConnectedApplication
+      history={this.props.history}
+      store={this.props.store}
+    />
+  }
 }
 
 // Mount the app

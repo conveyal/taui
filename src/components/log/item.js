@@ -8,10 +8,10 @@ const FORMAT = 'HH:mm:ss'
 
 export default function Item (props: LogItem) {
   return (
-    <div className='LogItem'>
-      <small className='LogItem-createdAt'>
+    <div className={`LogItem ${props.level}`}>
+      <span className='LogItem-createdAt'>
         {formatDate(props.createdAt, FORMAT)}
-      </small>
+      </span>
       <span className='LogItem-text'>
         {props.text}
       </span>

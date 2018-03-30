@@ -9,7 +9,7 @@ const PATHS_GRID_TYPE = 'PATHGRID'
  * Parse the ArrayBuffer of a `*_paths.dat` file for a point in a network.
  */
 export function parsePathsData (ab: ArrayBuffer): PathsData {
-  const headerData = new Int8Array(ab.slice(0, PATHS_GRID_TYPE.length))
+  const headerData = new Int8Array(ab, 0, PATHS_GRID_TYPE.length)
   const headerType = String.fromCharCode(...headerData)
   if (headerType !== PATHS_GRID_TYPE) {
     throw new Error(
@@ -18,31 +18,36 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
   }
 
   const data = new Int32Array(ab.slice(PATHS_GRID_TYPE.length))
-  let offset = 0
+  const nTargets = data[0]
+  const pathsPerTarget = data[1]
+  const nDistinctPaths = data[2]
+
+  let offset = 3
   const next = () => data[offset++]
-  const nDestinations = next()
-  offset++ // const nIterations = next(); unused at the moment
-  const nPaths = next()
-  const paths = []
-  for (let i = 0; i < nPaths; i++) {
+  const distinctPaths = []
+  for (let i = 0; i < nDistinctPaths; i++) {
     const nLegs = next()
     const legList = []
     for (let j = 0; j < nLegs; j++) {
       legList.push([next().toString(), next().toString(), next().toString()]) // boardStopId, patternId, alightStopId
     }
-    paths.push(legList)
+    distinctPaths.push(legList)
   }
 
-  const targets = []
+  const targetPathIndexes = new Int32Array(ab, (2 + offset) * Int32Array.BYTES_PER_ELEMENT)
   let previousValue = 0
-  for (let i = 0; i < nDestinations; i++) {
-    const delta = next()
-    const pathIndex = delta + previousValue
-    targets.push(pathIndex)
-    previousValue = pathIndex
+  for (let i = 0, position = 0; i < nTargets; i++) {
+    for (let j = 0; j < pathsPerTarget; j++, position++) {
+      targetPathIndexes[position] = targetPathIndexes[position] + previousValue
+      previousValue = targetPathIndexes[position]
+    }
   }
 
-  return {paths, targets}
+  return {
+    paths: distinctPaths,
+    pathsPerTarget,
+    targets: targetPathIndexes
+  }
 }
 
 /**

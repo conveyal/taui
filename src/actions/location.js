@@ -5,7 +5,10 @@ import type {Location, LonLat} from '../types'
 import {setValues} from '../utils/hash'
 
 import {addActionLogItem} from './log'
-import {fetchDataForCoordinate, setNetworksToLoading} from './network'
+import {
+  fetchAllTimesAndPathsForCoordinate,
+  setNetworksToLoading
+} from './network'
 import {reverseGeocode} from './geocode'
 
 const setLocation = (which: 'end' | 'start', location?: Location) => {
@@ -47,14 +50,14 @@ export const updateStart = (value: Location) => [
   setNetworksToLoading(),
   addActionLogItem(`Updating start to ${value.label}`),
   setStart(value),
-  fetchDataForCoordinate(value.position)
+  fetchAllTimesAndPathsForCoordinate(value.position)
 ]
 
 export const updateStartPosition = (position: LonLat) => [
   reverseGeocode(position, features =>
     setStart({position, label: features[0].place_name})
   ),
-  fetchDataForCoordinate(position)
+  fetchAllTimesAndPathsForCoordinate(position)
 ]
 
 /**

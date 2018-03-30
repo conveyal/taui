@@ -1,4 +1,6 @@
 // @flow
+const HEADER_ENTRIES = 7
+const HEADER_LENGTH = 9
 const TIMES_GRID_TYPE = 'ACCESSGR'
 
 type TimesData = {
@@ -8,15 +10,15 @@ type TimesData = {
   north: number,
   width: number,
   height: number,
-  nSamples: number,
-  data: number[]
+  depth: number,
+  data: Int32Array
 }
 
 /**
  * Parse the ArrayBuffer from a `*_times.dat` file for a point in a network.
  */
 export function parseTimesData (ab: ArrayBuffer): TimesData {
-  const headerData = new Int8Array(ab.slice(0, TIMES_GRID_TYPE.length))
+  const headerData = new Int8Array(ab, 0, TIMES_GRID_TYPE.length)
   const headerType = String.fromCharCode(...headerData)
   if (headerType !== TIMES_GRID_TYPE) {
     throw new Error(
@@ -24,24 +26,30 @@ export function parseTimesData (ab: ArrayBuffer): TimesData {
     )
   }
 
-  const data = new Int32Array(ab.slice(TIMES_GRID_TYPE.length))
-  let offset = 0
-  const version = data[offset++]
-  const zoom = data[offset++]
-  const west = data[offset++]
-  const north = data[offset++]
-  const width = data[offset++]
-  const height = data[offset++]
-  const nSamples = data[offset++]
+  const header = new Int32Array(
+    ab,
+    2 * Int32Array.BYTES_PER_ELEMENT,
+    HEADER_ENTRIES
+  )
+  const version = header[0]
+  const zoom = header[1]
+  const west = header[2]
+  const north = header[3]
+  const width = header[4]
+  const height = header[5]
+  const depth = header[6]
+  const gridSize = width * height
 
-  const times = []
-  for (let i = 0; i < nSamples; i++) {
+  const data = new Int32Array(
+    ab,
+    HEADER_LENGTH * Int32Array.BYTES_PER_ELEMENT,
+    gridSize * depth
+  )
+  for (let i = 0, position = 0; i < depth; i++) {
     let previous = 0
-    for (let j = 0; j < width * height; j++) {
-      const stored = data[offset++]
-      const current = stored + previous
-      times.push(current)
-      previous = current
+    for (let j = 0; j < width * height; j++, position++) {
+      data[position] = data[position] + previous
+      previous = data[position]
     }
   }
 
@@ -52,7 +60,7 @@ export function parseTimesData (ab: ArrayBuffer): TimesData {
     north,
     width,
     height,
-    nSamples,
-    data: times
+    depth,
+    data
   }
 }

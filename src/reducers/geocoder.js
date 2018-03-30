@@ -14,6 +14,12 @@ export default handleActions(
         ...state,
         end: payload
       }
+    },
+    'set geocoder' (state, {payload}) {
+      return {
+        ...state,
+        ...payload
+      }
     }
   },
   {

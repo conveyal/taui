@@ -22,7 +22,7 @@ export default createSelector(
   state => get(state, 'map.zoom'),
   (networks, start, end, zoom) =>
     networks.map((network, nIndex) => {
-      const td = get(network, 'query.transitiveData')
+      const td = network.transitive
       if (
         start &&
         start.position &&

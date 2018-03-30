@@ -14,7 +14,7 @@ export function updateMap (payload: any) {
   if (payload.centerCoordinates) {
     setKeyTo(
       'centerCoordinates',
-      lonlat.toLatFirstString(payload.centerCoordinates)
+      lonlat.toString(payload.centerCoordinates)
     )
   }
 

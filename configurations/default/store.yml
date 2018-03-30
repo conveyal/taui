@@ -3,9 +3,7 @@ data:
   networks: []
 geocoder:
   proximity: 139.75673675537107,35.655483013543204 # longitude,latitude
-  country: jp
   types: country,region,postcode,district,place,locality,neighborhood,address,poi # https://www.mapbox.com/api-documentation/?language=cURL#request-format
-  bbox: 136.93722534179688,34.17224835899679,140.937225341796889,38.17224835899679 # minX,minY,maxX,maxY
 map:
   centerCoordinates: [35.655483013543204, 139.75673675537107] # Leaflet style
   zoom: 11

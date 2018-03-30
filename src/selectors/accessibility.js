@@ -19,11 +19,11 @@ export default createSelector(
             surface.data &&
             grid.data &&
             networks[index] &&
-            networks[index].query
+            networks[index].ready
             ? accessibilityForGrid({
               surface: surface.data,
               grid,
-              query: networks[index].query,
+              network: networks[index],
               cutoff
             })
             : -1)

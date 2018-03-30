@@ -3,6 +3,12 @@ import {handleActions} from 'redux-actions'
 
 export default handleActions(
   {
+    'clear data' (state) {
+      return {
+        grids: [],
+        networks: []
+      }
+    },
     'set grid' (state, action) {
       const grids = [...state.grids]
       const gridIndex = grids.findIndex(g => g.name === action.payload.name)

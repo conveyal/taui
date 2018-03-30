@@ -25,7 +25,16 @@ export function geocode (text: string, nextAction: any) {
     const {geocoder} = state
 
     dispatch(fetch({
-      next: (response) => nextAction(JSON.parse(response.value).features),
+      next: (response) => {
+        try {
+          const features = JSON.parse(response.value).features
+          return nextAction(features)
+        } catch (e) {
+          console.error('Error parsing geocoder response.')
+          console.error(e)
+          throw e
+        }
+      },
       url: formatURL(text, geocoder)
     }))
   }

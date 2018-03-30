@@ -78,6 +78,10 @@ export default class Map extends PureComponent<Props, State> {
     showSelectStartOrEnd: false
   }
 
+  componentDidCatch (error) {
+    console.error(error)
+  }
+
   /**
    * Reset state
    */

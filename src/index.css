@@ -133,6 +133,17 @@ body {
   font-size: 0.8rem;
 }
 
+.Card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  min-height: 200px;
+  border: none;
+  border-radius: 1rem;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
 .Card-alternate .CardTitle {
   background-color: orange;
 }

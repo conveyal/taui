@@ -1,5 +1,6 @@
 // @flow
 import toCapitalCase from 'lodash/capitalize'
+import slice from 'lodash/slice'
 import uniq from 'lodash/uniq'
 
 import type {Location, Path, QualifiedPath} from '../types'
@@ -8,7 +9,6 @@ import {coordinateToIndex} from './coordinate-to-point'
 import {isLight} from './hex-color-contrast'
 
 type Network = {
-  query: any,
   targets: number[],
   paths: Path[]
 }
@@ -34,7 +34,7 @@ export default function createTransitiveRoutesForNetwork (
   end: Location,
   zoom: number
 ) {
-  const td = network.query.transitiveData
+  const td = network.transitive
   const places = [
     {
       place_id: 'from',
@@ -50,12 +50,14 @@ export default function createTransitiveRoutesForNetwork (
     }
   ]
 
-  // Get the targetPathIndex
-  const targetPathIndex =
-    network.targets[coordinateToIndex(end.position, zoom, network.query)]
+  // Get the targetPathIndexes
+  const baseIndex = network.pathsPerTarget * coordinateToIndex(end.position, network)
+
+  // Don't use native slice here as `targets` is a TypedArray and that will force conversion to TypedArray values
+  const targetPathIndexes = uniq(slice(network.targets, baseIndex, baseIndex + network.pathsPerTarget))
 
   // Cannot reach the destination
-  if (targetPathIndex === -1) {
+  if (targetPathIndexes.findIndex(p => p !== -1) === -1) {
     return {
       ...td,
       places,
@@ -64,7 +66,7 @@ export default function createTransitiveRoutesForNetwork (
     }
   }
 
-  const path = network.paths[targetPathIndex]
+  const paths = targetPathIndexes.map(tpi => network.paths[tpi]
     // map the pattern ids in each path leg to the actual patterns they contain
     .map(leg => [
       leg[0],
@@ -79,46 +81,42 @@ export default function createTransitiveRoutesForNetwork (
       })
 
       return [findStop(boardStopId), pattern, findStop(alightStopId)]
-    })
+    }))
 
   // Map the paths to transitive journeys
-  const journeys = [
-    {
-      journey_id: 0,
-      journey_name: 0,
-      segments: path.length === 0
-        ? createWalkOnlyJourney()
-        : getTransitiveSegmentsFromPath(path)
-    }
-  ]
+  const journeys = paths.map(path => ({
+    journey_id: 0,
+    journey_name: 0,
+    segments: path.length === 0
+      ? createWalkOnlyJourney()
+      : getTransitiveSegmentsFromPath(path)
+  }))
 
   return {
     ...td,
     journeys,
     places,
-    routeSegments: [
-      path.map(leg => {
-        const route = fot(td.routes, r => r.route_id === leg[1].route_id)
-        const seg = {}
-        const color = route.route_color
-          ? `#${route.route_color}`
-          : '#0b2b40'
-        seg.name = toCapitalCase(route.route_short_name)
+    routeSegments: paths.map(path => path.map(leg => {
+      const route = fot(td.routes, r => r.route_id === leg[1].route_id)
+      const seg = {}
+      const color = route.route_color
+        ? `#${route.route_color}`
+        : '#0b2b40'
+      seg.name = toCapitalCase(route.route_short_name)
 
-        if (leg[1].patterns && leg[1].patterns.length > 0) {
-          const patternNames = leg[1].patterns
-            .map(p => fot(td.routes, r => r.route_id === p.route_id))
-            .map(r => toCapitalCase(r.route_short_name))
-          seg.name = uniq(patternNames).join(' / ')
-        }
+      if (leg[1].patterns && leg[1].patterns.length > 0) {
+        const patternNames = leg[1].patterns
+          .map(p => fot(td.routes, r => r.route_id === p.route_id))
+          .map(r => toCapitalCase(r.route_short_name))
+        seg.name = uniq(patternNames).join(' / ')
+      }
 
-        seg.backgroundColor = color
-        seg.color = isLight(color) ? '#000' : '#fff'
-        seg.type = TYPE_TO_ICON[route.route_type]
+      seg.backgroundColor = color
+      seg.color = isLight(color.substr(1)) ? '#000' : '#fff'
+      seg.type = TYPE_TO_ICON[route.route_type]
 
-        return seg
-      })
-    ]
+      return seg
+    }))
   }
 }
 

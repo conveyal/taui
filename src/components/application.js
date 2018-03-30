@@ -140,9 +140,18 @@ export default class Application extends Component<Props, State> {
     this.props.initialize(startCoordinate)
   }
 
-  _changeConfig = e => {
-    const str = window.prompt('Paste in a valid JSON configuration.', '{}')
-    this.props.loadDatasetFromJSON(JSON.parse(str))
+  _saveRefToConfig = (ref) => {
+    this._refToConfig = ref
+  }
+
+  _updateConfig = () => {
+    try {
+      const json = JSON.parse(this._refToConfig.value)
+      this.props.loadDatasetFromJSON(json)
+    } catch (e) {
+      console.error(e)
+      window.alert('Invalid JSON!')
+    }
   }
 
   _clearStartAndEnd = () => {
@@ -306,13 +315,11 @@ export default class Application extends Component<Props, State> {
               <a
                 className='CardTitle'
                 tabIndex={0}
-                onClick={this._changeConfig}
+                onClick={this._updateConfig}
               >
-                config <span className='pull-right'>change</span>
+                config <span className='pull-right'>save changes</span>
               </a>
-              <div className='CardContent'>
-                <pre>{window.localStorage.getItem('taui-config')}</pre>
-              </div>
+              <textarea ref={this._saveRefToConfig} defaultValue={window.localStorage.getItem('taui-config')} />
             </div>}
         </Dock>
       </div>

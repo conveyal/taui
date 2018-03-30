@@ -1,13 +1,17 @@
 // @flow
+import lonlat from '@conveyal/lonlat'
 import fetch, {fetchMultiple} from '@conveyal/woonerf/fetch'
 
 import {retrieveConfig, storeConfig} from '../config'
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
 import type {LonLat} from '../types'
-import coordinateToPoint from '../utils/coordinate-to-point'
+import coordinateToPoint, {pointToCoordinate} from '../utils/coordinate-to-point'
 import {parsePathsData, warnForInvalidPaths} from '../utils/parse-paths-data'
 import {parseTimesData} from '../utils/parse-times-data'
 
+import {updateStartPosition} from './location'
+import {addActionLogItem as logItem, logError} from './log'
+import {updateMap} from './map'
 import {loadPointsOfInterest} from './points-of-interest'
 import {loadGrid} from './grid'
 
@@ -86,44 +90,78 @@ export function loadDatasetFromJSON (jsonConfig: any) {
   )
 }
 
-export function loadDataset (
+export const loadDataset = (
   networks: {name: string, url: string},
   grids: {name: string, url: string, icon: string},
   pointsOfInterestUrl?: string,
   startCoordinate?: LonLat
-) {
-  return [
-    setNetworksToEmpty(),
-    loadPointsOfInterest(pointsOfInterestUrl),
-    ...grids.map(grid => loadGrid(grid)),
-    fetchMultiple({
-      fetches: networks.map(network => ({
-        url: `${network.url}/query.json`
-      })),
-      next: responses => {
-        const actions = networks.map((network, index) =>
-          setNetwork({
-            ...network,
-            query: {
-              ...responses[index].value,
-              west: 116121, // TODO remove defaults
-              north: 51392,
-              width: 639,
-              height: 466
-            }
-          })
-        )
+) => (dispatch: Dispatch, getState: any) => {
+  dispatch({type: 'clear data'})
 
-        if (startCoordinate) { actions.push(fetchDataForCoordinate(startCoordinate)) }
-        // else TODO set map.centerCoordinates from the query.json
+  // Try to load points of interest
+  if (pointsOfInterestUrl) dispatch(loadPointsOfInterest(pointsOfInterestUrl))
 
-        return actions
+  // Load all opportunity grids
+  grids.forEach(grid => dispatch(loadGrid(grid)))
+
+  // Log loading networks
+  dispatch(logItem(`Fetching network data for ${networks.map(n => n.url).join(', ')}`))
+
+  // Load all networks
+  dispatch(fetchMultiple({
+    fetches: networks.reduce((urls, n) =>
+      [...urls, {url: `${n.url}/request.json`}, {url: `${n.url}/transitive.json`}]
+      , []),
+    next: responses => {
+      let offset = 0
+      const fullNetworks = networks.map((network, index) => {
+        const requestValue = responses[offset++].value
+        const request = (requestValue.request ? requestValue.request : requestValue) // TODO remove when request data is moved to top level
+        const transitive = responses[offset++].value
+        return {
+          ...network,
+          ...request,
+          ready: true,
+          transitive
+        }
+      })
+
+      // Set all the networks
+      fullNetworks.forEach(n => dispatch(setNetwork(n)))
+
+      // Load the config start coordinate or the center
+      if (startCoordinate) {
+        dispatch(fetchAllTimesAndPathsForCoordinate(startCoordinate))
+      } else {
+        // Center x / y of the first network
+        dispatch(logItem(`No starting coordinate set, fetching data for the middle of the network...`))
+        const x = fullNetworks[0].west + fullNetworks[0].width / 2
+        const y = fullNetworks[0].north + fullNetworks[0].height / 2
+        const centerCoordinates = pointToCoordinate(x, y, fullNetworks[0].zoom)
+        dispatch(updateMap({centerCoordinates}))
+        dispatch({type: 'set geocoder', payload: {proximity: lonlat.toString(centerCoordinates)}})
+        dispatch(updateStartPosition(centerCoordinates))
       }
-    })
-  ]
+    }
+  }))
 }
 
-export const fetchDataForCoordinate = (coordinate: LonLat) => (
+export const fetchAllTimesAndPathsForIndex = (index: number) => (
+  dispatch: Dispatch,
+  getState: any
+) => {
+  const state = getState()
+  const n = state.data.networks[0]
+  const x = index % n.width
+  const y = Math.floor(index / n.width)
+  const centerCoordinates = pointToCoordinate(n.west + x, n.north + y, n.zoom)
+
+  dispatch(updateMap({centerCoordinates}))
+  dispatch({type: 'set geocoder', payload: {proximity: lonlat.toString(centerCoordinates)}})
+  dispatch(updateStartPosition(centerCoordinates))
+}
+
+export const fetchAllTimesAndPathsForCoordinate = (coordinate: LonLat) => (
   dispatch: Dispatch,
   getState: any
 ) => {
@@ -131,21 +169,27 @@ export const fetchDataForCoordinate = (coordinate: LonLat) => (
   const currentZoom = state.map.zoom
   dispatch(
     state.data.networks.map(network =>
-      fetchDataForNetwork(network, coordinate, currentZoom)
+      fetchTimesAndPathsForNetworkAtCoordinate(network, coordinate, currentZoom)
     )
   )
 }
 
-const fetchDataForNetwork = (network, coordinate, currentZoom) => {
+const fetchTimesAndPathsForNetworkAtCoordinate = (network, coordinate, currentZoom) => {
   const originPoint = coordinateToPoint(
     coordinate,
-    currentZoom,
-    network.query.zoom,
-    network.query.west,
-    network.query.north
+    network.zoom,
+    network.west,
+    network.north
   )
-  const index = originPoint.x + originPoint.y * network.query.width
-  return fetchMultiple({
+  const index = originPoint.x + originPoint.y * network.width
+  return [
+    logItem(`Fetching data for index ${index} (x: ${originPoint.x}, y: ${originPoint.y})...`),
+    fetchTimesAndPathsForNetworkAtIndex(network, originPoint, index)
+  ]
+}
+
+const fetchTimesAndPathsForNetworkAtIndex = (network, originPoint, index) =>
+  fetchMultiple({
     fetches: [
       {
         url: `${network.url}/${index}_times.dat`
@@ -154,19 +198,29 @@ const fetchDataForNetwork = (network, coordinate, currentZoom) => {
         url: `${network.url}/${index}_paths.dat`
       }
     ],
-    next: ([timesResponse, pathsResponse]) => {
+    next: (error, responses) => {
+      if (error) {
+        console.error(error)
+        if (error.status === 404) return logError('Data not available for these coordinates.')
+        return logError('Error while retrieving data for these coordinates.')
+      }
+
+      const [timesResponse, pathsResponse] = responses
       const travelTimeSurface = parseTimesData(timesResponse.value)
-      const {paths, targets} = parsePathsData(pathsResponse.value)
+      const {paths, pathsPerTarget, targets} = parsePathsData(pathsResponse.value)
 
-      warnForInvalidPaths(paths, network.query.transitiveData)
+      warnForInvalidPaths(paths, network.transitive)
 
-      return setNetwork({
-        ...network,
-        originPoint,
-        paths,
-        targets,
-        travelTimeSurface
-      })
+      return [
+        logItem(`Found times and paths for ${index}...`),
+        setNetwork({
+          ...network,
+          originPoint,
+          paths,
+          pathsPerTarget,
+          targets,
+          travelTimeSurface
+        })
+      ]
     }
   })
-}
