@@ -1,4 +1,5 @@
 // @flow
+import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import React from 'react'
 
@@ -25,6 +26,20 @@ type Props = {
 
 export default class Form extends React.PureComponent {
   props: Props
+
+  state = {
+    animating: false
+  }
+
+  _animateTimeCutoff = () => {
+    this.setState({animating: true})
+    this._animateTo(0)
+  }
+
+  _animateTo (cutoff: number) {
+    this.props.onTimeCutoffChange({currentTarget: {value: cutoff}})
+    if (cutoff < 120) setTimeout(() => this._animateTo(cutoff + 1), 50)
+  }
 
   render () {
     const {
@@ -70,18 +85,22 @@ export default class Form extends React.PureComponent {
             </div>
             <div className='heading'>
               {message('Strings.HighlightAreaAccessibleWithin')}
+              <a className='pull-right' onClick={this._animateTimeCutoff}>
+                <Icon type='play' />
+              </a>
             </div>
             <div className='TimeCutoff'>
               <div className='Time'>
                 {selectedTimeCutoff} {message('Units.Minutes')}
               </div>
               <input
-                defaultValue={selectedTimeCutoff}
+                disabled={this.state.animating}
                 onChange={onTimeCutoffChange}
                 type='range'
                 min={10}
                 max={120}
-                step={5}
+                step={1}
+                value={selectedTimeCutoff}
               />
             </div>
           </div>}

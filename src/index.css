@@ -46,6 +46,11 @@ body {
   font-weight: 700;
 }
 
+.Taui-Dock-content .heading a {
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
 .Taui-Dock-content .title {
   color: rgba(255, 255, 255, 0.95);
   font-size: 1.5rem;
