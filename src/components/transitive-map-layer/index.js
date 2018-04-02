@@ -1,8 +1,8 @@
 // @flow
 import {MapLayer} from 'react-leaflet'
 import Transitive from 'transitive-js'
-import LeafletTransitiveLayer from 'leaflet-transitivelayer'
 
+import LeafletTransitiveLayer from './leaflet-transitivelayer'
 import styles from './style'
 
 type Props = {
@@ -10,10 +10,12 @@ type Props = {
 }
 
 const TRANSITIVE_SETTINGS = {
+  autoResize: false,
   gridCellSize: 200,
   useDynamicRendering: true,
   styles,
   // see https://github.com/conveyal/transitive.js/wiki/Zoom-Factors
+  zoomEnabled: false,
   zoomFactors: [
     {
       minScale: 0,
@@ -37,6 +39,10 @@ export default class TransitiveMapLayer extends MapLayer<LeafletTransitiveLayer,
     return this.props.data !== newProps.data
   }
 
+  componentDidCatch (error) {
+    console.error(error)
+  }
+
   createLeafletElement (props: Props) {
     return new LeafletTransitiveLayer(new Transitive({
       ...TRANSITIVE_SETTINGS,
@@ -45,16 +51,13 @@ export default class TransitiveMapLayer extends MapLayer<LeafletTransitiveLayer,
   }
 
   updateLeafletElement (prevProps: Props, currentProps: Props) {
-    this.leafletElement._transitive.updateData(currentProps.data)
-    this.leafletElement._refresh()
+    if (currentProps.data !== prevProps.data) {
+      this.leafletElement._transitive.updateData(currentProps.data)
+    }
   }
 
   componentDidMount () {
     super.componentDidMount()
     this.leafletElement._refresh()
-  }
-
-  render () {
-    return null
   }
 }

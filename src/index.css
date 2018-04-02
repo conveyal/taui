@@ -180,16 +180,17 @@ body {
   padding: 0 1rem 1rem;
 }
 
-.CardContent.Attribution {
+.Attribution {
+  color: #fff;
   text-align: center;
-  padding-top: 1rem;
 }
 
-.CardContent.Attribution a {
+.Attribution a {
+  color: #fff;
   background: url(https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png) no-repeat;
-  padding-left: 1.1rem;
+  padding: 2.2rem 0 2.2rem 2.2rem;
   display: inline-block;
-  background-size: 1rem;
+  background-size: 2rem;
   background-position: left;
   background-position-x: left;
   background-position-y: center;

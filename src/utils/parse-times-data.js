@@ -18,8 +18,7 @@ type TimesData = {
  * Parse the ArrayBuffer from a `*_times.dat` file for a point in a network.
  */
 export function parseTimesData (ab: ArrayBuffer): TimesData {
-  const headerData = new Int8Array(ab, 0, TIMES_GRID_TYPE.length)
-  const headerType = String.fromCharCode(...headerData)
+  const headerType = String.fromCharCode(...new Int8Array(ab, 0, TIMES_GRID_TYPE.length))
   if (headerType !== TIMES_GRID_TYPE) {
     throw new Error(
       `Retrieved grid header ${headerType} !== ${TIMES_GRID_TYPE}. Please check your data.`

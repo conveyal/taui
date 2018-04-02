@@ -10,17 +10,16 @@ import createTransitiveRoutes from '../utils/create-transitive-routes'
  * This assumes loaded query, paths, and targets.
  */
 const memoizedTransitiveRoutes = memoize(
-  (n, i, s, e, z) => createTransitiveRoutes(n, s, e, z),
-  (n, i, s, e, z) =>
-    `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${lonlat.toString(e.position)}-${z}`
+  (n, i, s, e) => createTransitiveRoutes(n, s, e),
+  (n, i, s, e) =>
+    `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${lonlat.toString(e.position)}`
 )
 
 export default createSelector(
   state => get(state, 'data.networks'),
   state => get(state, 'geocoder.start'),
   state => get(state, 'geocoder.end'),
-  state => get(state, 'map.zoom'),
-  (networks, start, end, zoom) =>
+  (networks, start, end) =>
     networks.map((network, nIndex) => {
       const td = network.transitive
       if (
@@ -32,7 +31,7 @@ export default createSelector(
         network.targets &&
         td.patterns
       ) {
-        return memoizedTransitiveRoutes(network, nIndex, start, end, zoom)
+        return memoizedTransitiveRoutes(network, nIndex, start, end)
       } else {
         return td
       }

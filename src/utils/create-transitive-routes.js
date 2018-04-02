@@ -31,8 +31,7 @@ const WALK = 'WALK'
 export default function createTransitiveRoutesForNetwork (
   network: Network,
   start: Location,
-  end: Location,
-  zoom: number
+  end: Location
 ) {
   const td = network.transitive
   const places = [

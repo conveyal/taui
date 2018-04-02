@@ -8,6 +8,7 @@ export default function RouteAccess (props) {
     <div className='heading'>
       {message('Systems.AccessTitle')}
     </div>
+    {props.grids.length === 0 && <span>{message('Systems.NoGrids')}</span>}
     {props.hasStart
       ? props.showComparison
         ? <ShowDiff

@@ -249,8 +249,7 @@ export default class Application extends Component<Props, State> {
                 {comparisonIsochrone &&
                   <GeoJSON data={comparisonIsochrone} key={comparisonIsochrone.key} style={COMP_ISOCHRONE_STYLE} />}
 
-                {activeTransitive && activeTransitive.journeys && activeTransitive.journeys.length > 0 &&
-                  <TransitiveLayer data={activeTransitive} />}
+                <TransitiveLayer data={activeTransitive} />
               </div>}
           </Map>
         </div>
@@ -300,16 +299,6 @@ export default class Application extends Component<Props, State> {
               </div>
               <Log items={actionLog} />
             </div>}
-          {ui.showLink &&
-            <div className='Card'>
-              <div className='CardContent Attribution'>
-                site made by
-                {' '}
-                <a href='https://www.conveyal.com' target='_blank'>
-                  conveyal
-                </a>
-              </div>
-            </div>}
           {ui.allowChangeConfig &&
             <div className='Card'>
               <a
@@ -317,9 +306,20 @@ export default class Application extends Component<Props, State> {
                 tabIndex={0}
                 onClick={this._updateConfig}
               >
-                config <span className='pull-right'>save changes</span>
+                Configure <span className='pull-right'>save changes</span>
               </a>
+              <div className='CardContent'>
+                <br /><a href='https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp' target='_blank'>See example config</a>
+              </div>
               <textarea ref={this._saveRefToConfig} defaultValue={window.localStorage.getItem('taui-config')} />
+            </div>}
+          {ui.showLink &&
+            <div className='Attribution'>
+              site made by
+              {' '}
+              <a href='https://www.conveyal.com' target='_blank'>
+                conveyal
+              </a>
             </div>}
         </Dock>
       </div>
