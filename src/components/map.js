@@ -34,18 +34,23 @@ if (Leaflet.Browser.retina) {
 }
 
 const iconWidth = 20
-const iconHeight = 26
+const iconHeight = 20
+const iconSize = [iconWidth, iconHeight]
+const iconAnchor = [iconWidth / 2, iconHeight + 13] // height plus the pointer size
+const iconHTML = '' // <div className="innerMarker"></div>'
 
 const startIcon = Leaflet.divIcon({
   className: 'LeafletIcon Start',
-  html: '<div className="innerMarker"></div>',
-  iconSize: [iconWidth, iconHeight]
+  html: iconHTML,
+  iconAnchor,
+  iconSize
 })
 
 const endIcon = Leaflet.divIcon({
   className: 'LeafletIcon End',
-  html: '<div className="innerMarker"></div>',
-  iconSize: [iconWidth, iconHeight]
+  html: iconHTML,
+  iconAnchor,
+  iconSize
 })
 
 type Props = {

@@ -326,7 +326,7 @@ body {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   position: absolute;
-  bottom: -10px;
+  bottom: -13px;
   left: 50%;
   margin-left: -10px;
 }
@@ -342,7 +342,7 @@ body {
 .LeafletIcon.Start:after {
   content: '';
   position: absolute;
-  top: 7px;
+  top: 5px;
   left: 7px;
   border-left: solid 8px #fff;
   border-bottom: solid 6px transparent;
@@ -360,7 +360,7 @@ body {
 .LeafletIcon.End:after {
   content: '';
   position: absolute;
-  top: 7px;
+  top: 5px;
   left: 5px;
   border: solid 5px #fff;
 }

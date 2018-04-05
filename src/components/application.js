@@ -118,6 +118,10 @@ export default class Application extends Component<Props, State> {
         label: qs.start,
         position: startCoordinate
       })
+    } else if (qs.centerCoordinates) {
+      this.props.updateMap({
+        centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)
+      })
     }
 
     if (qs.endCoordinate) {
@@ -129,12 +133,6 @@ export default class Application extends Component<Props, State> {
 
     if (qs.zoom) {
       this.props.updateMap({zoom: parseInt(qs.zoom, 10)})
-    }
-
-    if (qs.centerCoordinates) {
-      this.props.updateMap({
-        centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)
-      })
     }
 
     this.props.initialize(startCoordinate)
