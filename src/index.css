@@ -1,12 +1,6 @@
-
-@import url(node_modules/normalize.css/normalize.css);
-@import url(node_modules/mapbox.js/theme/style.css);
-@import url(node_modules/font-awesome/css/font-awesome.css);
 @import url(node_modules/react-select/dist/react-select.css);
 @import url(src/components/log/style.css);
-@import url(src/components/log-item/style.css);
 @import url(src/components/transitive-map-layer/style.css);
-@import url(src/utils/leaflet-icons/index.css);
 
 body {
   font-size: 16px;
@@ -50,6 +44,11 @@ body {
   color: rgba(255, 255, 255, 0.9);
   margin: 0.5rem 0 0.5rem;
   font-weight: 700;
+}
+
+.Taui-Dock-content .heading a {
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
 }
 
 .Taui-Dock-content .title {
@@ -134,6 +133,22 @@ body {
   margin-bottom: 1rem;
 }
 
+.Card pre {
+  overflow-x: scroll;
+  font-size: 0.8rem;
+}
+
+.Card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  min-height: 200px;
+  border: none;
+  border-radius: 1rem;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
 .Card-alternate .CardTitle {
   background-color: orange;
 }
@@ -170,11 +185,35 @@ body {
   padding: 0 1rem 1rem;
 }
 
+.Attribution {
+  color: #fff;
+  text-align: center;
+}
+
+.Attribution a {
+  color: #fff;
+  background: url(https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png) no-repeat;
+  padding: 2.2rem 0 2.2rem 2.2rem;
+  display: inline-block;
+  background-size: 2rem;
+  background-position: left;
+  background-position-x: left;
+  background-position-y: center;
+}
+
+.CardSegments {
+  display: flex;
+}
+
 .CardSegment {
   padding: 0.25rem;
   border-radius: 0.25rem;
   margin-right: 0.25rem;
   display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .CardAccess .CardSegment {
@@ -201,22 +240,18 @@ body {
   height: 1.5rem;
 }
 
-.Card .Metric > .fa-fw {
-  width: inherit;
-}
-
-.Card .BestTrip > div {
+.Card .Metric > div {
   width: 50%;
   display: inline-block;
   padding-bottom: 0.25rem;
 }
 
-.Card .BestTrip > div:nth-child(even) {
-  text-align: right;
+.Card .Metric > .fa-fw {
+  width: inherit;
 }
 
-.Card .Metric > .pull-right {
-  margin-top: 0.25rem;
+.Card .Metric > div:nth-child(even) {
+  text-align: right;
 }
 
 .CardIndex {
@@ -272,4 +307,60 @@ body {
   right: 0;
   left: 414px;
   overflow: hidden;
+}
+
+/* Leaflet Markers */
+.LeafletIcon {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.5));
+}
+
+.LeafletIcon:before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  margin-left: -10px;
+}
+
+.LeafletIcon.Start {
+  background-color: #0b2b40;
+}
+
+.LeafletIcon.Start:before {
+  border-top: 20px solid #0b2b40;
+}
+
+.LeafletIcon.Start:after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  border-left: solid 8px #fff;
+  border-bottom: solid 6px transparent;
+  border-top: solid 6px transparent;
+}
+
+.LeafletIcon.End {
+  background-color: orange;
+}
+
+.LeafletIcon.End:before {
+  border-top: 20px solid orange;
+}
+
+.LeafletIcon.End:after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  border: solid 5px #fff;
 }

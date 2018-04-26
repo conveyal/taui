@@ -1,0 +1,15 @@
+{
+  "grids": [{
+    "name": "hotel beds",
+    "icon": "hotel",
+    "url": "https://d2z7d5345ccuw9.cloudfront.net/5aa02c9d32b98e5ca02b54af/hotel_beds.grid"
+  }],
+  "networks": [{
+    "name": "2020",
+    "url": "https://d2z7d5345ccuw9.cloudfront.net/5aa50c5532b98e2f2064c6ca"
+  }, {
+    "name": "2018",
+    "url": "https://d2z7d5345ccuw9.cloudfront.net/5aa5117a32b98e2f2064c6cd"
+  }],
+  "pointsOfInterestUrl": "https://gist.githubusercontent.com/trevorgerhardt/8054d58b614ac69d21604ae47b0a4979/raw/6a2ebe14512d5da30130fc8b28ffacd95e361aad/tokyo_olympic_venues.json"
+}

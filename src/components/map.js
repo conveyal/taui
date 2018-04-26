@@ -1,8 +1,12 @@
 // @flow
-import {Browser, LatLng} from 'leaflet'
+import lonlat from '@conveyal/lonlat'
+import Icon from '@conveyal/woonerf/components/icon'
+import message from '@conveyal/woonerf/message'
+import Leaflet from 'leaflet'
+import memoize from 'lodash/memoize'
 import React, {PureComponent} from 'react'
 import {
-  GeoJson,
+  GeoJSON,
   Map as LeafletMap,
   Marker,
   Popup,
@@ -10,88 +14,124 @@ import {
   ZoomControl
 } from 'react-leaflet'
 
-import Icon from './icon'
-import {setKeyTo} from '../utils/hash'
-import leafletIcon from '../utils/leaflet-icons'
-import messages from '../utils/messages'
-import TransitiveLayer from './transitive-map-layer'
-import transitiveStyle from '../transitive-style'
+import type {
+  Coordinate,
+  Feature,
+  Location,
+  LonLat,
+  MapEvent,
+  PointsOfInterest
+} from '../types'
 
-import type {Coordinate, Feature, MapEvent, PointsOfInterest} from '../types'
-
-const TILE_LAYER_URL = Browser.retina && process.env.LEAFLET_RETINA_URL
+const TILE_URL = Leaflet.Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
   : process.env.LEAFLET_TILE_URL
 
-const startIcon = leafletIcon({
-  icon: 'play',
-  markerColor: 'darkblue'
+const TILE_LAYER_PROPS = {}
+if (Leaflet.Browser.retina) {
+  TILE_LAYER_PROPS.tileSize = 512
+  TILE_LAYER_PROPS.zoomOffset = -1
+}
+
+const iconWidth = 20
+const iconHeight = 20
+const iconSize = [iconWidth, iconHeight]
+const iconAnchor = [iconWidth / 2, iconHeight + 13] // height plus the pointer size
+const iconHTML = '' // <div className="innerMarker"></div>'
+
+const startIcon = Leaflet.divIcon({
+  className: 'LeafletIcon Start',
+  html: iconHTML,
+  iconAnchor,
+  iconSize
 })
 
-const endIcon = leafletIcon({
-  icon: 'stop',
-  markerColor: 'orange'
+const endIcon = Leaflet.divIcon({
+  className: 'LeafletIcon End',
+  html: iconHTML,
+  iconAnchor,
+  iconSize
 })
 
 type Props = {
-  active: number,
   centerCoordinates: Coordinate,
-  clearStartAndEnd(): void,
-  isochrones: any[],
-  markers: any[],
+  clearStartAndEnd: () => void,
+  end: null | Location,
   pointsOfInterest: PointsOfInterest,
-  setEnd(any): void,
-  setStart(any): void,
-  transitive: any,
+  setEndPosition: LonLat => void,
+  setStartPosition: LonLat => void,
+  start: null | Location,
+  updateMap: any => void,
   zoom: number
 }
 
 type State = {
   showSelectStartOrEnd: boolean,
-  lastClickedLabel: null,
-  lastClickedLatlng: null | LatLng
+  lastClickedLabel: null | string,
+  lastClickedPosition: null | Coordinate
 }
 
-export default class Map extends PureComponent<void, Props, State> {
+const poiToFeatures = memoize(poi => poi.map(p => p.feature))
+
+/**
+ *
+ */
+export default class Map extends PureComponent<Props, State> {
   state = {
-    showSelectStartOrEnd: false,
     lastClickedLabel: null,
-    lastClickedLatlng: null
+    lastClickedPosition: null,
+    showSelectStartOrEnd: false
   }
 
-  _clearState (): void {
+  componentDidCatch (error) {
+    console.error(error)
+  }
+
+  /**
+   * Reset state
+   */
+  _clearState () {
     this.setState({
-      showSelectStartOrEnd: false,
       lastClickedLabel: null,
-      lastClickedLatlng: null
+      lastClickedPosition: null,
+      showSelectStartOrEnd: false
     })
   }
 
   _clearStartAndEnd = (): void => {
-    const {clearStartAndEnd} = this.props
-    clearStartAndEnd()
+    this.props.clearStartAndEnd()
     this._clearState()
   }
 
-  _onMapClick = (e: MapEvent): void => {
-    this.setState({
-      showSelectStartOrEnd: !this.state.showSelectStartOrEnd,
-      lastClickedLatlng: e.latlng
-    })
+  _setEndWithEvent = (event: MapEvent) => {
+    this.props.setEndPosition(lonlat(event.latlng || event.target._latlng))
+  }
+
+  _setStartWithEvent = (event: MapEvent) => {
+    this.props.setStartPosition(lonlat(event.latlng || event.target._latlng))
+  }
+
+  _onMapClick = (e: Leaflet.MouseEvent): void => {
+    this.setState((previousState) => ({
+      lastClickedPosition: e.latlng || e.target._latlng,
+      showSelectStartOrEnd: !previousState.showSelectStartOrEnd
+    }))
   }
 
   _setEnd = (): void => {
-    const {setEnd} = this.props
-    const {lastClickedLatlng} = this.state
-    setEnd({latlng: lastClickedLatlng})
+    const {lastClickedPosition} = this.state
     this._clearState()
+    if (lastClickedPosition) {
+      this.props.setEndPosition(lonlat(lastClickedPosition))
+    }
   }
 
   _setStart = (): void => {
-    const {setStart} = this.props
-    const {lastClickedLatlng} = this.state
-    setStart({latlng: lastClickedLatlng})
+    const {lastClickedPosition} = this.state
     this._clearState()
+    if (lastClickedPosition) {
+      this.props.setStartPosition(lonlat(lastClickedPosition))
+    }
   }
 
   _clickPoi = (event: Event & {layer: {feature: Feature}}): void => {
@@ -103,45 +143,37 @@ export default class Map extends PureComponent<void, Props, State> {
     const {coordinates} = feature.geometry
     this.setState({
       lastClickedLabel: feature.properties.label,
-      lastClickedLatlng: {lat: coordinates[1], lng: coordinates[0]},
+      lastClickedPosition: lonlat.toLeaflet(coordinates),
       showSelectStartOrEnd: true
     })
   }
 
   _setZoom = (e: MapEvent) => {
-    setKeyTo('zoom', e.target._zoom)
+    const zoom = e.target._zoom
+    this.props.updateMap({zoom})
   }
 
-  render (): React$Element<LeafletMap> {
+  /**
+   * Render
+   */
+  render () {
     const {
-      active,
       centerCoordinates,
-      isochrones,
-      markers,
+      children,
+      end,
       pointsOfInterest,
-      transitive,
+      start,
       zoom
     } = this.props
     const {
       lastClickedLabel,
-      lastClickedLatlng,
+      lastClickedPosition,
       showSelectStartOrEnd
     } = this.state
-    const tileLayerProps = {}
-
-    if (Browser.retina) {
-      tileLayerProps.tileSize = 512
-      tileLayerProps.zoomOffset = -1
-    }
-
-    const baseIsochrone = isochrones[0]
-    const comparisonIsochrone = active !== 0 ? isochrones[active] : null
-
     return (
       <LeafletMap
         center={centerCoordinates}
         className='Taui-Map'
-        ref='map'
         onZoomend={this._setZoom}
         zoom={zoom}
         onClick={this._onMapClick}
@@ -150,44 +182,46 @@ export default class Map extends PureComponent<void, Props, State> {
       >
         <ZoomControl position='topright' />
         <TileLayer
-          url={TILE_LAYER_URL}
+          url={TILE_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
-          {...tileLayerProps}
+          {...TILE_LAYER_PROPS}
         />
-        {markers.length < 2 &&
-          <MapboxGeoJson
-            data={pointsOfInterest.map(poi => poi.feature)}
+
+        {children}
+
+        {(!start || !end) &&
+          pointsOfInterest.length > 0 &&
+          <GeoJSON
+            data={poiToFeatures(pointsOfInterest)}
             onClick={this._clickPoi}
           />}
 
-        {markers.map((m, index) => (
+        {start &&
           <Marker
             draggable
-            icon={index === 0 ? startIcon : endIcon}
-            key={`marker-${index}`}
-            onDragEnd={m.onDragEnd}
-            position={m.position}
+            icon={startIcon}
+            onDragEnd={this._setStartWithEvent}
+            position={start.position}
           >
-            {m.label &&
-              <Popup>
-                <span>
-                  {m.label}
-                </span>
-              </Popup>}
-          </Marker>
-        ))}
+            <Popup>
+              <span>{start.label}</span>
+            </Popup>
+          </Marker>}
 
-        {baseIsochrone &&
-          <Isochrone isochrone={baseIsochrone} color='#4269a4' />}
-
-        {comparisonIsochrone &&
-          <Isochrone isochrone={comparisonIsochrone} color='darkorange' />}
-
-        {transitive &&
-          <TransitiveLayer data={transitive} styles={transitiveStyle} />}
+        {end &&
+          <Marker
+            draggable
+            icon={endIcon}
+            onDragEnd={this._setEndWithEvent}
+            position={end.position}
+          >
+            <Popup>
+              <span>{end.label}</span>
+            </Popup>
+          </Marker>}
 
         {showSelectStartOrEnd &&
-          <Popup closeButton={false} position={lastClickedLatlng}>
+          <Popup closeButton={false} position={lastClickedPosition}>
             <div className='Popup'>
               {lastClickedLabel &&
                 <h3>
@@ -195,46 +229,21 @@ export default class Map extends PureComponent<void, Props, State> {
                 </h3>}
               <button onClick={this._setStart}>
                 <Icon type='map-marker' />{' '}
-                {messages.Map.SetLocationPopup.SetStart}
+                {message('Map.SetLocationPopup.SetStart')}
               </button>
-              {markers.length > 0 &&
+              {start &&
                 <button onClick={this._setEnd}>
                   <Icon type='map-marker' />{' '}
-                  {messages.Map.SetLocationPopup.SetEnd}
+                  {message('Map.SetLocationPopup.SetEnd')}
                 </button>}
-              {markers.length > 0 &&
+              {(start || end) &&
                 <button onClick={this._clearStartAndEnd}>
                   <Icon type='times' />{' '}
-                  {messages.Map.SetLocationPopup.ClearMarkers}
+                  {message('Map.SetLocationPopup.ClearMarkers')}
                 </button>}
             </div>
           </Popup>}
       </LeafletMap>
     )
-  }
-}
-
-function Isochrone ({isochrone, color}) {
-  return (
-    <GeoJson
-      key={`${isochrone.key}`}
-      data={isochrone}
-      style={{
-        fillColor: color,
-        pointerEvents: 'none',
-        stroke: color,
-        weight: 1
-      }}
-    />
-  )
-}
-
-class MapboxGeoJson extends GeoJson {
-  componentWillMount () {
-    const {mapbox} = require('mapbox.js')
-    super.componentWillMount()
-    const {data} = this.props
-    mapbox.accessToken = process.env.MAPBOX_ACCESS_TOKEN
-    this.leafletElement = mapbox.featureLayer(data)
   }
 }

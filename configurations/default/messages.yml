@@ -1,5 +1,6 @@
 Systems:
   CalculatingAccessibility: Calculating accessibility...
+  NoGrids: No opportunity data has been loaded...
   SelectStart: Select a location to see accessibility
   SelectEnd: Select an endpoint to see possible trips
   Show: show
@@ -33,7 +34,7 @@ Strings:
   HighlightAreaAccessibleWithin: Area accessible within
   Welcome: Search for your address above or click on the map to get started.
 Slower: slower
-Title: IndyConnect
+Title: Taui
 Units:
   Minutes: minutes
   Mins: min

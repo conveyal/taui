@@ -1,64 +1,63 @@
 // @flow
-import {Map} from 'leaflet'
-import isEqual from 'lodash/isEqual'
 import {MapLayer} from 'react-leaflet'
 import Transitive from 'transitive-js'
-import LeafletTransitiveLayer from 'leaflet-transitivelayer'
+
+import LeafletTransitiveLayer from './leaflet-transitivelayer'
+import styles from './style'
 
 type Props = {
-  data: any,
-  map: Map,
-  styles: any
+  data: any
 }
 
-export default class TransitiveMapLayer extends MapLayer<void, Props, void> {
+const TRANSITIVE_SETTINGS = {
+  autoResize: false,
+  gridCellSize: 200,
+  useDynamicRendering: true,
+  styles,
+  // see https://github.com/conveyal/transitive.js/wiki/Zoom-Factors
+  zoomEnabled: false,
+  zoomFactors: [
+    {
+      minScale: 0,
+      gridCellSize: 25,
+      internalVertexFactor: 1000000,
+      angleConstraint: 45,
+      mergeVertexThreshold: 200
+    },
+    {
+      minScale: 0.5,
+      gridCellSize: 0,
+      internalVertexFactor: 0,
+      angleConstraint: 5,
+      mergeVertexThreshold: 0
+    }
+  ]
+}
+
+export default class TransitiveMapLayer extends MapLayer<LeafletTransitiveLayer, Props> {
   shouldComponentUpdate (newProps: Props) {
-    return !isEqual(newProps, this.props)
+    return this.props.data !== newProps.data
   }
 
-  componentWillMount () {
-    super.componentWillMount()
-    this.transitive = new Transitive({
-      data: this.props.data,
-      gridCellSize: 200,
-      useDynamicRendering: true,
-      styles: this.props.styles,
-      // see https://github.com/conveyal/transitive.js/wiki/Zoom-Factors
-      zoomFactors: [
-        {
-          minScale: 0,
-          gridCellSize: 25,
-          internalVertexFactor: 1000000,
-          angleConstraint: 45,
-          mergeVertexThreshold: 200
-        },
-        {
-          minScale: 0.5,
-          gridCellSize: 0,
-          internalVertexFactor: 0,
-          angleConstraint: 5,
-          mergeVertexThreshold: 0
-        }
-      ]
-    })
-    this.leafletElement = new LeafletTransitiveLayer(this.transitive)
+  componentDidCatch (error) {
+    console.error(error)
+  }
+
+  createLeafletElement (props: Props) {
+    return new LeafletTransitiveLayer(new Transitive({
+      ...TRANSITIVE_SETTINGS,
+      data: props.data
+    }))
+  }
+
+  updateLeafletElement (prevProps: Props, currentProps: Props) {
+    if (currentProps.data !== prevProps.data) {
+      this.leafletElement._transitive.updateData(currentProps.data)
+    }
   }
 
   componentDidMount () {
     super.componentDidMount()
     this.leafletElement._refresh()
-  }
-
-  componentWillReceiveProps (props: Props) {
-    super.componentWillReceiveProps(props)
-    this.transitive.updateData(props.data)
-  }
-
-  componentDidUpdate () {
-    this.leafletElement._refresh()
-  }
-
-  render () {
-    return null
   }
 }

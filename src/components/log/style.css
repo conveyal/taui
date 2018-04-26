@@ -6,3 +6,24 @@
   overflow: scroll;
   padding: 0.5rem 1rem;
 }
+
+.LogItem {
+  margin-bottom: 0.5rem;
+  display: flex;
+}
+
+.LogItem.error {
+  color: #c92336;
+}
+
+.LogItem-label {
+  text-transform: capitalize;
+}
+
+.LogItem-createdAt {
+  opacity: 0.75;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}

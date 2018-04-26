@@ -12,6 +12,13 @@ export function getAsObject () {
   return parseQueryString(window.location.hash.split('#')[1])
 }
 
+export function setValues (values: Object) {
+  set({
+    ...getAsObject(),
+    ...values
+  })
+}
+
 export function setKeyTo (key: string, value: any) {
   set({
     ...getAsObject(),
