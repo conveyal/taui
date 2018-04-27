@@ -48,15 +48,19 @@ export default function createTransitiveRoutesForNetwork (
       place_lat: end.position.lat
     }
   ]
-
+  debugger;
   // Get the targetPathIndexes
   const baseIndex = network.pathsPerTarget * coordinateToIndex(end.position, network)
 
   // Don't use native slice here as `targets` is a TypedArray and that will force conversion to TypedArray values
-  const targetPathIndexes = uniq(slice(network.targets, baseIndex, baseIndex + network.pathsPerTarget))
+  const targetPathIndexes = uniq(slice(
+    network.targets,
+    baseIndex,
+    baseIndex + network.pathsPerTarget
+  )).filter(tpi => tpi !== -1) // some destinations will not have any paths
 
   // Cannot reach the destination
-  if (targetPathIndexes.findIndex(p => p !== -1) === -1) {
+  if (targetPathIndexes.length === 0) {
     return {
       ...td,
       places,
