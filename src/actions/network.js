@@ -51,15 +51,17 @@ export const setNetworksToEmpty = () =>
 export function initialize (startCoordinate?: LonLat) {
   try {
     const json = retrieveConfig()
-    if (!json || !json.networks) {
-      console.error('Invalid JSON config! A networks array is required.')
-    } else {
-      return loadDataset(
-        json.networks,
-        json.grids,
-        json.pointsOfInterestUrl,
-        startCoordinate || json.startCoordinate
-      )
+    if (json) {
+      if (!json.networks) {
+        window.alert('JSON config found in localStorage without a networks array.')
+      } else {
+        return loadDataset(
+          json.networks,
+          json.grids,
+          json.pointsOfInterestUrl,
+          startCoordinate || json.startCoordinate
+        )
+      }
     }
   } catch (e) {
     console.log('Error parsing taui-config', e)
@@ -70,7 +72,7 @@ export function initialize (startCoordinate?: LonLat) {
     next: response => {
       const c = response.value
       storeConfig(c)
-      return loadDatasetFromJSON(
+      return loadDataset(
         c.networks,
         c.grids,
         c.pointsOfInterestUrl,
