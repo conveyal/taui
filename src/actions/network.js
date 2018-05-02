@@ -48,38 +48,48 @@ export const setNetworksToEmpty = () =>
  * and parse the query parameters. If there is a `start`, set the networks to
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
-export function initialize (startCoordinate?: LonLat) {
-  try {
-    const json = retrieveConfig()
-    if (json) {
-      if (!json.networks) {
-        window.alert('JSON config found in localStorage without a networks array.')
-      } else {
+export const initialize = (startCoordinate?: LonLat) => (dispatch, getState) => {
+  if (process.env.DISABLE_CONFIG) {
+    const state = getState()
+    dispatch(loadDataset(
+      state.data.networks,
+      state.data.grids,
+      state.data.pointsOfInterestUrl,
+      startCoordinate || lonlat.fromString(state.geocoder.proximity)
+    ))
+  } else {
+    try {
+      const json = retrieveConfig()
+      if (json) {
+        if (!json.networks) {
+          window.alert('JSON config found in localStorage without a networks array.')
+        } else {
+          return dispatch(loadDataset(
+            json.networks,
+            json.grids,
+            json.pointsOfInterestUrl,
+            startCoordinate || json.startCoordinate
+          ))
+        }
+      }
+    } catch (e) {
+      console.log('Error parsing taui-config', e)
+    }
+
+    dispatch(fetch({
+      url: 'config.json',
+      next: response => {
+        const c = response.value
+        storeConfig(c)
         return loadDataset(
-          json.networks,
-          json.grids,
-          json.pointsOfInterestUrl,
-          startCoordinate || json.startCoordinate
+          c.networks,
+          c.grids,
+          c.pointsOfInterestUrl,
+          startCoordinate || c.startCoordinate
         )
       }
-    }
-  } catch (e) {
-    console.log('Error parsing taui-config', e)
+    }))
   }
-
-  return fetch({
-    url: 'config.json',
-    next: response => {
-      const c = response.value
-      storeConfig(c)
-      return loadDataset(
-        c.networks,
-        c.grids,
-        c.pointsOfInterestUrl,
-        startCoordinate || c.startCoordinate
-      )
-    }
-  })
 }
 
 export function loadDatasetFromJSON (jsonConfig: any) {

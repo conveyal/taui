@@ -48,7 +48,7 @@ export default function createTransitiveRoutesForNetwork (
       place_lat: end.position.lat
     }
   ]
-  debugger;
+
   // Get the targetPathIndexes
   const baseIndex = network.pathsPerTarget * coordinateToIndex(end.position, network)
 

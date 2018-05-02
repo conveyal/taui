@@ -4,85 +4,59 @@ import message from '@conveyal/woonerf/message'
 import toSpaceCase from 'lodash/lowerCase'
 
 export default function RouteAccess (props) {
-  return <div className='CardAccess'>
-    <div className='heading'>
-      {message('Systems.AccessTitle')}
-    </div>
-    {props.grids.length === 0 && <span>{message('Systems.NoGrids')}</span>}
-    {props.hasStart
-      ? props.showComparison
-        ? <ShowDiff
-          accessibility={props.accessibility}
-          comparison={props.oldAccessibility}
-          grids={props.grids}
-        />
-        : <ShowAccess accessibility={props.accessibility} grids={props.grids} />
-      : <span>{message('Systems.SelectStart')}</span>}
-  </div>
+  if (props.grids.length === 0) {
+    return <div className='alert'>{message('Systems.NoGrids')}</div>
+  }
+
+  if (!props.hasStart) {
+    return <div className='alert'>{message('Systems.SelectStart')}</div>
+  }
+
+  return <ShowAccess {...props} />
 }
 
 function ShowAccess ({
   accessibility,
-  grids
-}: {
-  accessibility: number[],
-  grids: any[]
+  grids,
+  oldAccessibility,
+  showComparison
 }) {
   return (
-    <div>
+    <div className='Opportunities'>
       {grids.map((grid, i) => (
-        <div className='Metric' key={grid.name}>
-          <div>
-            <Icon type={grid.icon} />
-            <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
-            {toSpaceCase(grid.name)}
-          </div>
+        <div className='Opportunity' key={grid.name}>
+          <span className={`fa fa-${grid.icon}`} />
+          <span> Access to</span>
+          <strong> {(accessibility[i] | 0).toLocaleString()} </strong>
+          {toSpaceCase(grid.name)}&nbsp;
+          {showComparison &&
+            <DiffPercentage
+              current={accessibility[i]}
+              old={oldAccessibility[i]}
+            />}
         </div>
       ))}
     </div>
   )
 }
 
-function AccessDiffPercentage ({newAccess, originalAccess}) {
-  const actualDiff = newAccess - originalAccess
-  const nume = actualDiff > 0
-    ? newAccess - originalAccess
-    : originalAccess - newAccess
-  const diff = parseInt((nume / originalAccess * 100).toFixed(1))
-  if (diff === 0 || isNaN(diff)) return <span />
-  else if (actualDiff > 0) {
+function DiffPercentage ({current, old}) {
+  const diff = (current - old) / old * 100
+
+  // only show if the diff is >= 0.1%
+  if (Math.abs(diff) < 0.1 || isNaN(diff)) return null
+
+  if (diff > 0) {
     return (
-      <div className='increase'>
-        <strong>{diff}</strong>%<Icon type='level-up' />
-      </div>
-    )
-  } else {
-    return (
-      <div className='decrease'>
-        <strong>{diff * -1}</strong>
-        %
-        <Icon className='fa-rotate-180' type='level-up' />
-      </div>
+      <span className='increase'>
+        (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up' />)
+      </span>
     )
   }
-}
 
-function ShowDiff ({accessibility, comparison, grids}) {
   return (
-    <div>
-      {grids.map((grid, i) => (
-        <div className='Metric' key={grid.name}>
-          <div>
-            <Icon type={grid.icon} />
-            <strong> {(accessibility[i] | 0).toLocaleString()} </strong>{' '}
-            {toSpaceCase(grid.name)}
-          </div>
-          <AccessDiffPercentage
-            newAccess={accessibility[i]}
-            originalAccess={comparison[i]}
-          />
-        </div>
-      ))}
-    </div>
+    <span className='decrease'>
+      (<strong>diff.toFixed(1)</strong>% <span className='fa fa-level-up fa-rotate-180' />)
+    </span>
   )
 }

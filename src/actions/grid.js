@@ -13,6 +13,10 @@ export function loadGrid (
   return fetch({
     url: grid.url,
     next (response) {
+      if (response.headers.get('Content-Type') !== 'application/octet-stream') {
+        return window.alert('Invalid opportunity dataset "Content-Type". Must be "application/octet-stream".')
+      }
+
       return {
         type: 'set grid',
         payload: {

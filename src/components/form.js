@@ -55,34 +55,24 @@ export default class Form extends React.PureComponent {
     } = this.props
     return (
       <div>
-        <div className='heading'>
-          {message('Geocoding.StartTitle')}
-        </div>
-        <div className='Geocoder'>
-          <Geocoder
-            geocode={geocode}
-            onChange={onChangeStart}
-            placeholder={message('Geocoding.StartPlaceholder')}
-            pointsOfInterest={pointsOfInterest}
-            reverseGeocode={reverseGeocode}
-            value={start}
-          />
-        </div>
+        <Geocoder
+          geocode={geocode}
+          onChange={onChangeStart}
+          placeholder={message('Geocoding.StartPlaceholder')}
+          pointsOfInterest={pointsOfInterest}
+          reverseGeocode={reverseGeocode}
+          value={start}
+        />
         {start &&
           <div>
-            <div className='heading'>
-              {message('Geocoding.EndTitle')}
-            </div>
-            <div className='Geocoder'>
-              <Geocoder
-                geocode={geocode}
-                onChange={onChangeEnd}
-                placeholder={message('Geocoding.EndPlaceholder')}
-                pointsOfInterest={pointsOfInterest}
-                reverseGeocode={reverseGeocode}
-                value={end}
-              />
-            </div>
+            <Geocoder
+              geocode={geocode}
+              onChange={onChangeEnd}
+              placeholder={message('Geocoding.EndPlaceholder')}
+              pointsOfInterest={pointsOfInterest}
+              reverseGeocode={reverseGeocode}
+              value={end}
+            />
             <div className='heading'>
               {message('Strings.HighlightAreaAccessibleWithin')}
               <a className='pull-right' onClick={this._animateTimeCutoff}>

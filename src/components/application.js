@@ -20,6 +20,7 @@ import type {
 import {getAsObject} from '../utils/hash'
 
 import Form from './form'
+import Gridualizer from './gridualizer'
 import Log from './log'
 import Map from './map'
 import RouteAccess from './route-access'
@@ -47,6 +48,7 @@ type Props = {
     grids: string[],
     networks: Network[]
   },
+  drawActiveOpportunityDataset: Function,
   geocoder: GeocoderStore,
   isLoading: boolean,
   isochrones: any[],
@@ -75,12 +77,12 @@ type State = {
   componentError: any
 }
 
-const getStyle = memoize(color => ({
+const getStyle = color => ({
   fillColor: color,
   pointerEvents: 'none',
   stroke: color,
   weight: 1
-}))
+})
 
 const BASE_ISOCHRONE_STYLE = getStyle('#4269a4')
 const COMP_ISOCHRONE_STYLE = getStyle('darkorange')
@@ -204,6 +206,7 @@ export default class Application extends Component<Props, State> {
       activeNetworkIndex,
       activeTransitive,
       allTransitiveData,
+      drawActiveOpportunityDataset,
       data,
       geocoder,
       geocode,
@@ -239,6 +242,9 @@ export default class Application extends Component<Props, State> {
             updateMap={updateMap}
             zoom={map.zoom}
           >
+            {drawActiveOpportunityDataset &&
+              <Gridualizer drawTile={drawActiveOpportunityDataset} />}
+
             {!isLoading &&
               <div>
                 {isochrones[0] &&
@@ -255,7 +261,6 @@ export default class Application extends Component<Props, State> {
           <Form
             boundary={geocoder.boundary}
             end={geocoder.end}
-            focusLatlng={geocoder.focusLatlng}
             geocode={geocode}
             onTimeCutoffChange={this._onTimeCutoffChange}
             onChangeEnd={this._setEndWithFeature}

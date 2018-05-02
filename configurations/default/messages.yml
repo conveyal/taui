@@ -10,16 +10,14 @@ Systems:
   TripsTitle: Example trips
   TripsEmpty: No trips found!
   BestTripTitle: Fastest trip
-  AlternateTripsTitle: Alternates
+  AlternateTripsTitle: Alternatively use
   Waiting: waiting included
 Faster: faster
 NewTrip: New Trip
 Geocoding:
-  StartTitle: Find my location
-  StartPlaceholder: Start
-  EndTitle: Traveling to
-  EndPlaceholder: End
-  PromptText: Type to search for an address
+  StartPlaceholder: Search the map
+  EndPlaceholder: Choose destination, or click on the map
+  PromptText: Type to find a location
 Log:
   Title: Log
 Map:
@@ -31,7 +29,7 @@ Strings:
   ApplicationReady: Application is ready!
   SearchForStartAddress: Start location
   SearchForEndAddress: End location
-  HighlightAreaAccessibleWithin: Area accessible within
+  HighlightAreaAccessibleWithin: Show the area accessible within
   Welcome: Search for your address above or click on the map to get started.
 Slower: slower
 Title: Taui
