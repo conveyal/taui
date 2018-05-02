@@ -2,43 +2,49 @@
 import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 
+import Alert from './tr-alert'
+
 export default function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
   if (travelTime === 255 || routeSegments.length === 0) {
-    return <div className='alert'>{message('Systems.TripsEmpty')}</div>
+    return <Alert>{message('Systems.TripsEmpty')}</Alert>
   }
 
   const [bestJourney, ...alternateJourneys] = routeSegments
 
   return (
-    <div>
-      <div className='BestTrip'>
-        <span className='fa fa-tachometer' />
-        <span> Take </span>
-        {bestJourney.map((segment, index) => (
-          <Segment key={index} segment={segment} />
-        ))}
-        <span>in </span>
-        <strong>{travelTime > 120 ? '> 120' : travelTime}</strong>
-        {` ${message('Units.Mins')} `}
-        <TripDiff
-          oldTravelTime={oldTravelTime}
-          travelTime={travelTime}
-        />
-      </div>
-      {routeSegments.length > 1 &&
-        <div className='AlternateTrips'>
-          <span className='fa fa-map-signs' />
-          <span> {message('Systems.AlternateTripsTitle')} </span>
-          {alternateJourneys.map((segments, jindex) => (
-            <span key={jindex}>
-              {segments.map((segment, index) => (
-                <Segment key={index} segment={segment} />
-              ))}
-              {jindex < alternateJourneys.length - 1 && <span>or </span>}
-            </span>
+    <tbody>
+      <tr className='BestTrip'>
+        <td><span className='fa fa-tachometer' /></td>
+        <td>
+          <span>Take </span>
+          {bestJourney.map((segment, index) => (
+            <Segment key={index} segment={segment} />
           ))}
-        </div>}
-    </div>
+          <span>in </span>
+          <strong>{travelTime > 120 ? '> 120' : travelTime}</strong>
+          {` ${message('Units.Mins')} `}
+          <TripDiff
+            oldTravelTime={oldTravelTime}
+            travelTime={travelTime}
+          />
+        </td>
+      </tr>
+      {routeSegments.length > 1 &&
+        <tr className='AlternateTrips'>
+          <td><span className='fa fa-map-signs' /></td>
+          <td>
+            <span>{message('Systems.AlternateTripsTitle')} </span>
+            {alternateJourneys.map((segments, jindex) => (
+              <span key={jindex}>
+                {segments.map((segment, index) => (
+                  <Segment key={index} segment={segment} />
+                ))}
+                {jindex < alternateJourneys.length - 1 && <span>or </span>}
+              </span>
+            ))}
+          </td>
+        </tr>}
+    </tbody>
   )
 }
 

@@ -39,7 +39,7 @@ export default class RouteCard extends React.PureComponent<Props> {
             {active ? <Icon type='map' /> : message('Systems.Show')}
           </span>
         </a>
-        <div className='CardContent'>{children}</div>
+        <table className='CardContent'>{children}</table>
       </div>
     )
   }

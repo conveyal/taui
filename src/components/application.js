@@ -43,7 +43,6 @@ type Props = {
   actionLog: LogItems,
   activeNetworkIndex: number,
   activeTransitive: any,
-  allTransitiveData: any[],
   data: {
     grids: string[],
     networks: Network[]
@@ -58,6 +57,7 @@ type Props = {
   timeCutoff: any,
   travelTimes: number[],
   ui: UIStore,
+  uniqueRoutes: any[],
 
   geocode: (string, Function) => void,
   reverseGeocode: (string, Function) => void,
@@ -205,7 +205,6 @@ export default class Application extends Component<Props, State> {
       actionLog,
       activeNetworkIndex,
       activeTransitive,
-      allTransitiveData,
       drawActiveOpportunityDataset,
       data,
       geocoder,
@@ -219,6 +218,7 @@ export default class Application extends Component<Props, State> {
       timeCutoff,
       travelTimes,
       ui,
+      uniqueRoutes,
       updateEndPosition,
       updateMap,
       updateStartPosition
@@ -290,7 +290,7 @@ export default class Application extends Component<Props, State> {
               {!isLoading && !!geocoder.end && !!geocoder.start &&
                 <RouteSegments
                   oldTravelTime={travelTimes[0]}
-                  routeSegments={(allTransitiveData[index] || {}).routeSegments}
+                  routeSegments={uniqueRoutes[index]}
                   travelTime={travelTimes[index]}
                 />}
             </RouteCard>
@@ -298,7 +298,7 @@ export default class Application extends Component<Props, State> {
           {ui.showLog &&
             <div className='Card'>
               <div className='CardTitle'>
-                {message('Log.Title')}
+                <span className='fa fa-terminal' /> {message('Log.Title')}
               </div>
               <Log items={actionLog} />
             </div>}
@@ -309,7 +309,8 @@ export default class Application extends Component<Props, State> {
                 tabIndex={0}
                 onClick={this._updateConfig}
               >
-                Configure <span className='pull-right'>save changes</span>
+                <span className='fa fa-cog' /> Configure
+                <span className='pull-right'>save changes</span>
               </a>
               <div className='CardContent'>
                 <br /><a href='https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp' target='_blank'>See example config</a>

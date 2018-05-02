@@ -3,13 +3,15 @@ import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import toSpaceCase from 'lodash/lowerCase'
 
+import Alert from './tr-alert'
+
 export default function RouteAccess (props) {
   if (props.grids.length === 0) {
-    return <div className='alert'>{message('Systems.NoGrids')}</div>
+    return <Alert>{message('Systems.NoGrids')}</Alert>
   }
 
   if (!props.hasStart) {
-    return <div className='alert'>{message('Systems.SelectStart')}</div>
+    return <Alert>{message('Systems.SelectStart')}</Alert>
   }
 
   return <ShowAccess {...props} />
@@ -22,21 +24,23 @@ function ShowAccess ({
   showComparison
 }) {
   return (
-    <div className='Opportunities'>
+    <tbody className='Opportunities'>
       {grids.map((grid, i) => (
-        <div className='Opportunity' key={grid.name}>
-          <span className={`fa fa-${grid.icon}`} />
-          <span> Access to</span>
-          <strong> {(accessibility[i] | 0).toLocaleString()} </strong>
-          {toSpaceCase(grid.name)}&nbsp;
-          {showComparison &&
-            <DiffPercentage
-              current={accessibility[i]}
-              old={oldAccessibility[i]}
-            />}
-        </div>
+        <tr className='Opportunity' key={grid.name}>
+          <td><span className={`fa fa-${grid.icon}`} /></td>
+          <td>
+            <span>Access to</span>
+            <strong> {(accessibility[i] | 0).toLocaleString()} </strong>
+            {toSpaceCase(grid.name)}&nbsp;
+            {showComparison &&
+              <DiffPercentage
+                current={accessibility[i]}
+                old={oldAccessibility[i]}
+              />}
+          </td>
+        </tr>
       ))}
-    </div>
+    </tbody>
   )
 }
 
@@ -56,7 +60,7 @@ function DiffPercentage ({current, old}) {
 
   return (
     <span className='decrease'>
-      (<strong>diff.toFixed(1)</strong>% <span className='fa fa-level-up fa-rotate-180' />)
+      (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up fa-rotate-180' />)
     </span>
   )
 }

@@ -24,7 +24,8 @@ function mapStateToProps (state, ownProps) {
     isLoading: select.loading(state, ownProps),
     pointsOfInterest: select.pointsOfInterest(state, ownProps),
     showComparison: select.showComparison(state, ownProps),
-    travelTimes: select.travelTimes(state, ownProps)
+    travelTimes: select.travelTimes(state, ownProps),
+    uniqueRoutes: select.uniqueRoutes(state, ownProps)
   }
 }
 

@@ -6,7 +6,7 @@
   --rad: 4px;
 }
 
-body {
+html, body {
   font-size: 15px;
   font-family: -apple-system,
                BlinkMacSystemFont,
@@ -187,29 +187,21 @@ body {
 .CardContent {
   color: #0b2b40;
   padding: 0 1rem;
-  display: inline-block;
   width: 100%;
   box-sizing: border-box;
+}
+
+table.CardContent {
+  padding: 0;
+  border-spacing: 1rem 0.75rem;
+}
+
+table.CardContent td {
+  vertical-align: top;
 }
 
 .CardContent .alert {
-  padding: 1rem;
-  font-weight: bold;
-  border: 1px solid #eac5ad;
-  background-color: #f9ede6;
-  color: #5c2d10;
-  border-radius: var(--rad);
-  margin-bottom: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.Opportunities {
-  padding: 1rem 0 0.5rem;
-}
-
-.Opportunity {
-  padding-bottom: 0.5rem;
+  color: #c92336;
 }
 
 .BestTrip {
@@ -237,6 +229,7 @@ body {
   padding: 0.25rem;
   border-radius: var(--rad);
   margin-right: 0.25rem;
+  white-space: nowrap;
 }
 
 .Card .increase {
@@ -248,7 +241,8 @@ body {
 }
 
 .AlternateTrips {
-  margin: 1rem 0;
+  margin: 0 0 0.75em;
+  line-height: 1.5em;
 }
 
 .leaflet-popup-content-wrapper,
