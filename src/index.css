@@ -3,6 +3,7 @@
 @import url(src/components/transitive-map-layer/style.css);
 
 :root {
+  --bold: 500;
   --rad: 4px;
 }
 
@@ -47,7 +48,7 @@ html, body {
 .Taui-Dock-content .heading {
   color: rgba(255, 255, 255);
   margin: 1rem 0 0.5rem;
-  font-weight: 700;
+  font-weight: var(--bold);
 }
 
 .Taui-Dock-content .heading a {
@@ -59,7 +60,7 @@ html, body {
   color: rgba(255, 255, 255);
   font-size: 1.5rem;
   margin: 1rem 0;
-  font-weight: 700;
+  font-weight: var(--bold);
 }
 
 .Taui-ActionLog {
@@ -122,7 +123,7 @@ html, body {
 }
 
 .TimeCutoff .Time {
-  font-weight: 700;
+  font-weight: var(--bold);
   color: rgba(255, 255, 255);
 }
 
@@ -161,7 +162,7 @@ html, body {
   background-color: #4269a4;
   color: rgba(255, 255, 255);
   padding: 0.5rem 1rem;
-  font-weight: 700;
+  font-weight: var(--bold);
   cursor: pointer;
   display: block;
 }
