@@ -1,14 +1,21 @@
 // @flow
-import Leaflet from 'leaflet'
-import 'leaflet.vectorgrid'
-import {MapLayer} from 'react-leaflet'
+import {GeoJSON} from 'react-leaflet'
 
-export default class GeoJSON extends MapLayer {
-  createLeafletElement (props) {
-    return Leaflet.vectorGrid.slicer(props.data, {
-      vectorTileLayerStyles: {
-        sliced: (properties, zoom) => props.style
-      }
-    })
+export default class TauiGeoJSON extends GeoJSON {
+  componentDidMount () {
+    super.componentDidMount()
+    window.MAP = this.context.map
+  }
+
+  componentWillUnmount () {
+    super.componentWillUnmount()
+    console.log('UNMOTSFSD')
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.data !== this.props.data) {
+      this.leafletElement.clearLayers()
+      this.leafletElement.addData(this.props.data)
+    }
   }
 }

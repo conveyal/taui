@@ -5,6 +5,7 @@ import message from '@conveyal/woonerf/message'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
 import {GeoJSON} from 'react-leaflet'
+import uuid from 'uuid'
 
 import type {
   Coordinate,
@@ -112,6 +113,10 @@ export default class Application extends Component<Props, State> {
    * Initialize the application.
    */
   componentDidMount () {
+    if (window) {
+      window.Application = this
+    }
+
     const qs = getAsObject()
     const startCoordinate = qs.startCoordinate
       ? lonlat.fromString(qs.startCoordinate)
@@ -216,7 +221,9 @@ export default class Application extends Component<Props, State> {
   /**
    *
    */
+  renderCount = 0
   render () {
+    console.log('render', this.renderCount++)
     const {
       accessibility,
       actionLog,
@@ -265,18 +272,16 @@ export default class Application extends Component<Props, State> {
             {!isLoading && isochrones[0] &&
               <GeoJSON
                 data={isochrones[0]}
-                key={isochrones[0].key}
                 style={BASE_ISOCHRONE_STYLE}
               />}
 
             {!isLoading && comparisonIsochrone &&
               <GeoJSON
                 data={comparisonIsochrone}
-                key={comparisonIsochrone.key}
                 style={COMP_ISOCHRONE_STYLE}
               />}
 
-            {!isLoading && <TransitiveLayer data={activeTransitive} />}
+            {!isLoading && false && <TransitiveLayer data={activeTransitive} />}
           </Map>
         </div>
         <Dock showSpinner={ui.fetches > 0} componentError={componentError}>
