@@ -5,4 +5,3 @@ export default createSelector(
   (state) => state.data.grids,
   (grids) => grids[0]
 )
-

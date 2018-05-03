@@ -1,5 +1,4 @@
 // @flow
-import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import toSpaceCase from 'lodash/lowerCase'
 

@@ -18,6 +18,7 @@ import type {
   UIStore
 } from '../types'
 import {getAsObject} from '../utils/hash'
+import downloadJson from '../utils/download-json'
 
 import Form from './form'
 import Gridualizer from './gridualizer'
@@ -77,15 +78,16 @@ type State = {
   componentError: any
 }
 
-const getStyle = color => ({
+const getStyle = color => () => ({
   fillColor: color,
+  fillOpacity: 0.4,
   pointerEvents: 'none',
   stroke: color,
   weight: 1
 })
 
 const BASE_ISOCHRONE_STYLE = getStyle('#4269a4')
-const COMP_ISOCHRONE_STYLE = getStyle('darkorange')
+const COMP_ISOCHRONE_STYLE = getStyle('#ff8c00')
 
 /**
  *
@@ -196,6 +198,21 @@ export default class Application extends Component<Props, State> {
 
   _setActiveNetwork = memoize(name => () => this.props.setActiveNetwork(name))
 
+  _downloadIsochrone = memoize(index => () => {
+    const p = this.props
+    const isochrone = p.isochrones[index]
+    if (isochrone) {
+      const name = p.data.networks[index].name
+      const ll = lonlat.toString(p.geocoder.start.position)
+      downloadJson({
+        data: isochrone,
+        filename: `${name}-${ll}-${p.timeCutoff.selected}min-isochrone.json`
+      })
+    } else {
+      window.alert('No isochrone has been generated for this network.')
+    }
+  })
+
   /**
    *
    */
@@ -245,16 +262,21 @@ export default class Application extends Component<Props, State> {
             {drawActiveOpportunityDataset &&
               <Gridualizer drawTile={drawActiveOpportunityDataset} />}
 
-            {!isLoading &&
-              <div>
-                {isochrones[0] &&
-                  <GeoJSON data={isochrones[0]} key={isochrones[0].key} style={BASE_ISOCHRONE_STYLE} />}
+            {!isLoading && isochrones[0] &&
+              <GeoJSON
+                data={isochrones[0]}
+                key={isochrones[0].key}
+                style={BASE_ISOCHRONE_STYLE}
+              />}
 
-                {comparisonIsochrone &&
-                  <GeoJSON data={comparisonIsochrone} key={comparisonIsochrone.key} style={COMP_ISOCHRONE_STYLE} />}
+            {!isLoading && comparisonIsochrone &&
+              <GeoJSON
+                data={comparisonIsochrone}
+                key={comparisonIsochrone.key}
+                style={COMP_ISOCHRONE_STYLE}
+              />}
 
-                <TransitiveLayer data={activeTransitive} />
-              </div>}
+            {!isLoading && <TransitiveLayer data={activeTransitive} />}
           </Map>
         </div>
         <Dock showSpinner={ui.fetches > 0} componentError={componentError}>
@@ -274,9 +296,10 @@ export default class Application extends Component<Props, State> {
             <RouteCard
               active={network.active}
               alternate={index !== 0}
+              downloadIsochrone={this._downloadIsochrone(index)}
               isLoading={isLoading}
               key={`${index}-route-card`}
-              onClick={this._setActiveNetwork(network.name)}
+              showIsochrone={this._setActiveNetwork(network.name)}
               title={network.name}
             >
               {!isLoading &&
@@ -304,14 +327,15 @@ export default class Application extends Component<Props, State> {
             </div>}
           {ui.allowChangeConfig &&
             <div className='Card'>
-              <a
+              <div
                 className='CardTitle'
-                tabIndex={0}
-                onClick={this._updateConfig}
               >
                 <span className='fa fa-cog' /> Configure
-                <span className='pull-right'>save changes</span>
-              </a>
+                <a
+                  className='pull-right'
+                  onClick={this._updateConfig}
+                >save changes</a>
+              </div>
               <div className='CardContent'>
                 <br /><a href='https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp' target='_blank'>See example config</a>
               </div>

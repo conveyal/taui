@@ -155,20 +155,23 @@ html, body {
 }
 
 .Card-alternate .CardTitle {
-  background-color: orange;
+  background-color: #ff8c00;
 }
 
 .CardTitle {
   background-color: #4269a4;
   color: rgba(255, 255, 255);
-  padding: 0.5rem 1rem;
+  padding: 1rem 0.5rem 1rem 1rem;
   font-weight: var(--bold);
-  cursor: pointer;
-  display: block;
 }
 
-.CardTitle:focus {
-  outline: none;
+.CardTitle > a {
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+.CardTitle > a:hover {
+  color: #D0021B;
 }
 
 .Card-active > .CardTitle {
@@ -193,20 +196,21 @@ html, body {
 }
 
 table.CardContent {
-  padding: 0;
-  border-spacing: 1rem 0.75rem;
+  padding: 0.25rem 0;
+  border-spacing: 1rem 0.5rem;
+  line-height: 1.5rem;
 }
 
 table.CardContent td {
   vertical-align: top;
 }
 
-.CardContent .alert {
-  color: #c92336;
+table.CardContent td:first-of-type {
+  text-align: center;
 }
 
-.BestTrip {
-  margin-bottom: 1rem;
+.CardContent .alert {
+  color: #c92336;
 }
 
 .Attribution {
@@ -227,10 +231,15 @@ table.CardContent td {
 
 .CardSegment {
   font-size: 0.75rem;
-  padding: 0.25rem;
+  padding: 0 0.25rem;
   border-radius: var(--rad);
   margin-right: 0.25rem;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40px;
+  margin-bottom: -6px;
+  display: inline-block;
 }
 
 .Card .increase {
@@ -239,11 +248,6 @@ table.CardContent td {
 
 .Card .decrease {
   color: red;
-}
-
-.AlternateTrips {
-  margin: 0 0 0.75em;
-  line-height: 1.5em;
 }
 
 .leaflet-popup-content-wrapper,
@@ -335,11 +339,11 @@ table.CardContent td {
 }
 
 .LeafletIcon.End {
-  background-color: orange;
+  background-color: #ff8c00;
 }
 
 .LeafletIcon.End:before {
-  border-top: 20px solid orange;
+  border-top: 20px solid #ff8c00;
 }
 
 .LeafletIcon.End:after {

@@ -2,13 +2,13 @@
 import jsolines from 'jsolines'
 import {Map as LeafletMap} from 'leaflet'
 import get from 'lodash/get'
-import memoize from 'lodash/memoize'
 import {createSelector} from 'reselect'
 
 export default createSelector(
   state => get(state, 'data.networks'),
   state => get(state, 'timeCutoff.selected'),
-  (networks = [], timeCutoff) =>
+  state => state.map,
+  (networks = [], timeCutoff, mapData) =>
     networks.map((network, index) => {
       if (network.travelTimeSurface && network.travelTimeSurface.data) {
         return getIsochrone(network, index, timeCutoff)
@@ -26,7 +26,7 @@ function toKey (n, i, c) {
 /**
  * Create an isochrone. Save results based on the network and timecutoff.
  */
-const getIsochrone = memoize((network, index, timeCutoff) => {
+const getIsochrone = (network, index, timeCutoff) => {
   const surface = network.travelTimeSurface
   const isochrone = jsolines({
     ...surface, // height, width, surface
@@ -43,4 +43,4 @@ const getIsochrone = memoize((network, index, timeCutoff) => {
 
   // create the key for react-leaflet/GeoJSON here
   return {...isochrone, key: toKey(network, index, timeCutoff)}
-}, toKey)
+}

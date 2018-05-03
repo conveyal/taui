@@ -27,6 +27,8 @@ const TILE_URL = Leaflet.Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
   : process.env.LEAFLET_TILE_URL
 
+const LABEL_URL = process.env.LABEL_URL
+
 const TILE_LAYER_PROPS = {}
 if (Leaflet.Browser.retina) {
   TILE_LAYER_PROPS.tileSize = 512
@@ -177,17 +179,22 @@ export default class Map extends PureComponent<Props, State> {
         onZoomend={this._setZoom}
         zoom={zoom}
         onClick={this._onMapClick}
-        preferCanvas
         zoomControl={false}
       >
         <ZoomControl position='topright' />
         <TileLayer
           url={TILE_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
-          {...TILE_LAYER_PROPS}
         />
 
         {children}
+
+        {LABEL_URL &&
+          <TileLayer
+            attribution={process.env.LEAFLET_ATTRIBUTION}
+            url={LABEL_URL}
+            zIndex={40}
+          />}
 
         {(!start || !end) &&
           pointsOfInterest.length > 0 &&

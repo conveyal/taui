@@ -13,4 +13,3 @@ export default createSelector(
       interpolator: gridualizer.interpolators.bicubic
     })
 )
-

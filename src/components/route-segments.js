@@ -14,7 +14,7 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
   return (
     <tbody>
       <tr className='BestTrip'>
-        <td><span className='fa fa-tachometer' /></td>
+        <td><span className='fa fa-street-view' /></td>
         <td>
           <span>Take </span>
           {bestJourney.map((segment, index) => (
@@ -55,6 +55,7 @@ const Segment = ({segment}) => (
       backgroundColor: segment.backgroundColor || 'inherit',
       color: segment.color || 'inherit'
     }}
+    title={segment.name}
   >
     <i className={`fa fa-${segment.type}`} /> {segment.name}
   </span>

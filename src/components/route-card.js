@@ -1,6 +1,5 @@
 // @flow
 import Icon from '@conveyal/woonerf/components/icon'
-import message from '@conveyal/woonerf/message'
 import React from 'react'
 
 type Props = {
@@ -17,7 +16,8 @@ export default class RouteCard extends React.PureComponent<Props> {
       active,
       alternate,
       children,
-      onClick,
+      downloadIsochrone,
+      showIsochrone,
       title
     } = this.props
     return (
@@ -28,17 +28,25 @@ export default class RouteCard extends React.PureComponent<Props> {
             (active ? ' Card-active' : '')
         }
       >
-        <a
+        <div
           className='CardTitle'
-          onClick={onClick}
-          tabIndex={0}
-          title='Set network active'
         >
           {title}
-          <span className='pull-right'>
-            {active ? <Icon type='map' /> : message('Systems.Show')}
-          </span>
-        </a>
+          <a
+            className='pull-right'
+            onClick={showIsochrone}
+            title='Show/hide isochrone for network'
+          >
+            {active ? <Icon type='eye-slash' /> : <Icon type='eye' />}
+          </a>
+          <a
+            className='pull-right'
+            onClick={downloadIsochrone}
+            title='Download GeoJSON isochrone for network'
+          >
+            <Icon type='download' />
+          </a>
+        </div>
         <table className='CardContent'>{children}</table>
       </div>
     )
