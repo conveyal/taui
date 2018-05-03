@@ -185,6 +185,7 @@ export default class Map extends PureComponent<Props, State> {
         <TileLayer
           url={TILE_URL}
           attribution={process.env.LEAFLET_ATTRIBUTION}
+          {...TILE_LAYER_PROPS}
         />
 
         {children}
