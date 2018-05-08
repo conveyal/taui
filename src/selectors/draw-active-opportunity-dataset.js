@@ -6,7 +6,7 @@ import selectActiveOpportunityDataset from './active-opportunity-dataset'
 
 export default createSelector(
   selectActiveOpportunityDataset,
-  (grid) => grid &&
+  (grid) => grid && grid.showOnMap &&
     gridualizer.createDrawTile({
       colorizer: gridualizer.colorizers.dot(),
       grid,

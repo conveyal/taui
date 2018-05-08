@@ -1,5 +1,5 @@
 // @flow
-import fetch from '@conveyal/woonerf/fetch'
+import fetch from 'isomorphic-fetch'
 
 import createGrid from '../utils/create-grid'
 
@@ -7,24 +7,21 @@ export function loadGrid (
   grid: {
     icon: string,
     name: string,
+    showOnMap: boolean,
     url: string
   }
 ) {
-  return fetch({
-    url: grid.url,
-    next (response) {
-      if (response.headers.get('Content-Type') !== 'application/octet-stream') {
-        return window.alert('Invalid opportunity dataset "Content-Type". Must be "application/octet-stream".')
+  return fetch(grid.url)
+    .then(res => res.arrayBuffer())
+    .then(arrayBuffer => ({
+      type: 'set grid',
+      payload: {
+        ...grid,
+        ...createGrid(arrayBuffer)
       }
-
-      return {
-        type: 'set grid',
-        payload: {
-          icon: grid.icon,
-          name: grid.name,
-          ...createGrid(response.value)
-        }
-      }
-    }
-  })
+    }))
+    .catch(err => {
+      window.alert(`Error fetching ${grid.name} grid from ${grid.url}`)
+      console.error(err)
+    })
 }

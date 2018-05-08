@@ -20,6 +20,7 @@ export const setActiveNetwork = (payload: string) => ({
   type: 'set active network',
   payload
 })
+
 export const setNetworksAccessibilityTo = (value: string) => (
   dispatch: Dispatch,
   getState: any
@@ -51,6 +52,12 @@ export const setNetworksToEmpty = () =>
 export const initialize = (startCoordinate?: LonLat) => (dispatch, getState) => {
   if (process.env.DISABLE_CONFIG) {
     const state = getState()
+    if (!startCoordinate && state.geocoder.proximity) {
+      const centerCoordinates = lonlat(state.geocoder.proximity)
+      dispatch(updateMap({centerCoordinates: lonlat.toLeaflet(centerCoordinates)}))
+      dispatch(updateStartPosition(centerCoordinates))
+    }
+
     dispatch(loadDataset(
       state.data.networks,
       state.data.grids,
@@ -103,8 +110,8 @@ export function loadDatasetFromJSON (jsonConfig: any) {
 }
 
 export const loadDataset = (
-  networks: {name: string, url: string},
-  grids: {name: string, url: string, icon: string},
+  networks: {name: string, url: string, showOnMap: boolean},
+  grids: {name: string, url: string, icon: string, showOnMap: boolean},
   pointsOfInterestUrl?: string,
   startCoordinate?: LonLat
 ) => (dispatch: Dispatch, getState: any) => {
@@ -117,18 +124,21 @@ export const loadDataset = (
   grids.forEach(grid => dispatch(loadGrid(grid)))
 
   // Log loading networks
-  dispatch(logItem(`Fetching network data for ${networks.map(n => n.url).join(', ')}`))
+  dispatch(logItem(
+    `Fetching network data for ${networks.map(n => n.url).join(', ')}`))
 
   // Load all networks
   dispatch(fetchMultiple({
-    fetches: networks.reduce((urls, n) =>
-      [...urls, {url: `${n.url}/request.json`}, {url: `${n.url}/transitive.json`}]
-      , []),
+    fetches: networks.reduce((urls, n) => [
+      ...urls,
+      {url: `${n.url}/request.json`}, {url: `${n.url}/transitive.json`}
+    ], []),
     next: responses => {
       let offset = 0
       const fullNetworks = networks.map((network, index) => {
         const requestValue = responses[offset++].value
-        const request = (requestValue.request ? requestValue.request : requestValue) // TODO remove when request data is moved to top level
+        // TODO remove when request data is moved to top level
+        const request = requestValue.request || requestValue
         const transitive = responses[offset++].value
         return {
           ...network,
@@ -146,12 +156,16 @@ export const loadDataset = (
         dispatch(fetchAllTimesAndPathsForCoordinate(startCoordinate))
       } else {
         // Center x / y of the first network
-        dispatch(logItem(`No starting coordinate set, fetching data for the middle of the network...`))
+        dispatch(logItem(
+          `No starting coordinate, fetching data for network center...`))
         const x = fullNetworks[0].west + fullNetworks[0].width / 2
         const y = fullNetworks[0].north + fullNetworks[0].height / 2
         const centerCoordinates = pointToCoordinate(x, y, fullNetworks[0].zoom)
         dispatch(updateMap({centerCoordinates}))
-        dispatch({type: 'set geocoder', payload: {proximity: lonlat.toString(centerCoordinates)}})
+        dispatch({
+          type: 'set geocoder',
+          payload: {proximity: lonlat.toString(centerCoordinates)}
+        })
         dispatch(updateStartPosition(centerCoordinates))
       }
     }

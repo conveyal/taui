@@ -5,7 +5,6 @@ import message from '@conveyal/woonerf/message'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
 import {GeoJSON} from 'react-leaflet'
-import uuid from 'uuid'
 
 import type {
   Coordinate,
@@ -18,6 +17,7 @@ import type {
   PointsOfInterest,
   UIStore
 } from '../types'
+import {NETWORK_COLORS} from '../constants'
 import {getAsObject} from '../utils/hash'
 import downloadJson from '../utils/download-json'
 
@@ -28,7 +28,6 @@ import Map from './map'
 import RouteAccess from './route-access'
 import RouteCard from './route-card'
 import RouteSegments from './route-segments'
-import TransitiveLayer from './transitive-map-layer'
 
 type Network = {
   name: string,
@@ -64,7 +63,6 @@ type Props = {
   geocode: (string, Function) => void,
   reverseGeocode: (string, Function) => void,
   initialize: Function => void,
-  setActiveNetwork: (name: string) => void,
   setEnd: any => void,
   setSelectedTimeCutoff: any => void,
   setStart: any => void,
@@ -79,16 +77,13 @@ type State = {
   componentError: any
 }
 
-const getStyle = color => () => ({
-  fillColor: color,
+const getIsochroneStyleFor = index => () => ({
+  fillColor: NETWORK_COLORS[index],
   fillOpacity: 0.4,
   pointerEvents: 'none',
-  stroke: color,
+  stroke: NETWORK_COLORS[index],
   weight: 1
 })
-
-const BASE_ISOCHRONE_STYLE = getStyle('#4269a4')
-const COMP_ISOCHRONE_STYLE = getStyle('#ff8c00')
 
 /**
  *
@@ -201,7 +196,14 @@ export default class Application extends Component<Props, State> {
     this.props.setSelectedTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
 
-  _setActiveNetwork = memoize(name => () => this.props.setActiveNetwork(name))
+  _setShowOnMap = memoize(index => () => {
+    const p = this.props
+    const network = p.data.networks[index]
+    p.setNetwork({
+      ...network,
+      showOnMap: !network.showOnMap
+    })
+  })
 
   _downloadIsochrone = memoize(index => () => {
     const p = this.props
@@ -221,9 +223,7 @@ export default class Application extends Component<Props, State> {
   /**
    *
    */
-  renderCount = 0
   render () {
-    console.log('render', this.renderCount++)
     const {
       accessibility,
       actionLog,
@@ -248,9 +248,6 @@ export default class Application extends Component<Props, State> {
       updateStartPosition
     } = this.props
     const {componentError} = this.state
-    const comparisonIsochrone = activeNetworkIndex > 0
-      ? isochrones[activeNetworkIndex]
-      : null
     return (
       <div>
         <div className='Fullscreen'>
@@ -269,19 +266,13 @@ export default class Application extends Component<Props, State> {
             {drawActiveOpportunityDataset &&
               <Gridualizer drawTile={drawActiveOpportunityDataset} />}
 
-            {!isLoading && isochrones[0] &&
-              <GeoJSON
-                data={isochrones[0]}
-                style={BASE_ISOCHRONE_STYLE}
-              />}
-
-            {!isLoading && comparisonIsochrone &&
-              <GeoJSON
-                data={comparisonIsochrone}
-                style={COMP_ISOCHRONE_STYLE}
-              />}
-
-            {!isLoading && false && <TransitiveLayer data={activeTransitive} />}
+            {!isLoading && isochrones.map((isochrone, index) => isochrone
+              ? <GeoJSON
+                  data={isochrone}
+                  key={isochrone.key}
+                  style={getIsochroneStyleFor(index)}
+                />
+              : null)}
           </Map>
         </div>
         <Dock showSpinner={ui.fetches > 0} componentError={componentError}>
@@ -299,12 +290,12 @@ export default class Application extends Component<Props, State> {
           />
           {data.networks.map((network, index) => (
             <RouteCard
-              active={network.active}
-              alternate={index !== 0}
-              downloadIsochrone={this._downloadIsochrone(index)}
-              isLoading={isLoading}
+              cardColor={NETWORK_COLORS[index]}
+              downloadIsochrone={isochrones[index] && this._downloadIsochrone(index)}
+              index={index}
               key={`${index}-route-card`}
-              showIsochrone={this._setActiveNetwork(network.name)}
+              setShowOnMap={this._setShowOnMap(index)}
+              showOnMap={network.showOnMap}
               title={network.name}
             >
               {!isLoading &&

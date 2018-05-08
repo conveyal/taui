@@ -3,49 +3,48 @@ import Icon from '@conveyal/woonerf/components/icon'
 import React from 'react'
 
 type Props = {
-  active: boolean,
-  alternate: boolean,
+  cardColor: string,
   children?: any,
-  onClick(): void,
+  downloadIsochrone?: Function,
+  setShowOnMap: Function,
+  showOnMap: boolean,
   title: string
 }
 
 export default class RouteCard extends React.PureComponent<Props> {
   render () {
     const {
-      active,
-      alternate,
+      cardColor,
       children,
       downloadIsochrone,
-      showIsochrone,
+      setShowOnMap,
+      showOnMap,
       title
     } = this.props
     return (
       <div
-        className={
-          'Card' +
-            (alternate ? ' Card-alternate' : '') +
-            (active ? ' Card-active' : '')
-        }
+        className={'Card'}
       >
         <div
           className='CardTitle'
+          style={{backgroundColor: cardColor}}
         >
           {title}
           <a
             className='pull-right'
-            onClick={showIsochrone}
+            onClick={setShowOnMap}
             title='Show/hide isochrone for network'
           >
-            {active ? <Icon type='eye-slash' /> : <Icon type='eye' />}
+            {showOnMap ? <Icon type='eye-slash' /> : <Icon type='eye' />}
           </a>
-          <a
-            className='pull-right'
-            onClick={downloadIsochrone}
-            title='Download GeoJSON isochrone for network'
-          >
-            <Icon type='download' />
-          </a>
+          {downloadIsochrone &&
+            <a
+              className='pull-right'
+              onClick={downloadIsochrone}
+              title='Download GeoJSON isochrone for network'
+            >
+              <Icon type='download' />
+            </a>}
         </div>
         <table className='CardContent'>{children}</table>
       </div>

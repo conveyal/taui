@@ -39,6 +39,7 @@ export default class Form extends React.PureComponent {
   _animateTo (cutoff: number) {
     this.props.onTimeCutoffChange({currentTarget: {value: cutoff}})
     if (cutoff < 120) setTimeout(() => this._animateTo(cutoff + 1), 50)
+    else this.setState({animating: false})
   }
 
   render () {

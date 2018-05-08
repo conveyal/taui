@@ -33,7 +33,7 @@ export default createSelector(
       ) {
         return memoizedTransitiveRoutes(network, nIndex, start, end)
       } else {
-        return td
+        return td || {}
       }
     })
 )

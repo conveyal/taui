@@ -10,7 +10,7 @@ export default createSelector(
   state => state.map,
   (networks = [], timeCutoff, mapData) =>
     networks.map((network, index) => {
-      if (network.travelTimeSurface && network.travelTimeSurface.data) {
+      if (network.showOnMap && network.travelTimeSurface && network.travelTimeSurface.data) {
         return getIsochrone(network, index, timeCutoff)
       }
     })
