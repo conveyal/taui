@@ -21,6 +21,7 @@ import {NETWORK_COLORS} from '../constants'
 import {getAsObject} from '../utils/hash'
 import downloadJson from '../utils/download-json'
 
+import DrawRoute from './draw-route'
 import Form from './form'
 import Gridualizer from './gridualizer'
 import Log from './log'
@@ -49,6 +50,7 @@ type Props = {
     networks: Network[]
   },
   drawActiveOpportunityDataset: Function,
+  drawIsochrones: Function[],
   geocoder: GeocoderStore,
   isLoading: boolean,
   isochrones: any[],
@@ -230,6 +232,7 @@ export default class Application extends Component<Props, State> {
       activeNetworkIndex,
       activeTransitive,
       drawActiveOpportunityDataset,
+      drawIsochrones,
       data,
       geocoder,
       geocode,
@@ -264,7 +267,10 @@ export default class Application extends Component<Props, State> {
             zoom={map.zoom}
           >
             {drawActiveOpportunityDataset &&
-              <Gridualizer drawTile={drawActiveOpportunityDataset} />}
+              <Gridualizer drawTile={drawActiveOpportunityDataset} zoom={map.zoom} />}
+
+            {drawIsochrones && drawIsochrones[0] &&
+              <Gridualizer drawTile={drawIsochrones[0]} zoom={map.zoom} />}
 
             {!isLoading && isochrones.map((isochrone, index) => isochrone
               ? <GeoJSON
@@ -273,6 +279,9 @@ export default class Application extends Component<Props, State> {
                   style={getIsochroneStyleFor(index)}
                 />
               : null)}
+
+            {!isLoading && activeTransitive && activeTransitive.journeys &&
+              activeTransitive.journeys[0] && <DrawRoute transitive={activeTransitive} />}
           </Map>
         </div>
         <Dock showSpinner={ui.fetches > 0} componentError={componentError}>

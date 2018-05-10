@@ -15,6 +15,6 @@ export default handleActions(
     }
   },
   {
-    zoom: 11
+    zoom: 13
   }
 )
