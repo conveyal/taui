@@ -267,7 +267,7 @@ export default class Application extends Component<Props, State> {
             {drawActiveOpportunityDataset &&
               <Gridualizer drawTile={drawActiveOpportunityDataset} zoom={map.zoom} />}
 
-            {drawIsochrones && drawIsochrones[0] &&
+            {false && drawIsochrones && drawIsochrones[0] &&
               <Gridualizer drawTile={drawIsochrones[0]} zoom={map.zoom} />}
 
             {!isLoading && isochrones.map((isochrone, index) => isochrone

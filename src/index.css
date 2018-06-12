@@ -335,6 +335,7 @@ table.CardContent td:first-of-type {
 
 .LeafletIcon.End {
   background-color: var(--orange);
+  margin-top: -20px !important;
 }
 
 .LeafletIcon.End:before {
