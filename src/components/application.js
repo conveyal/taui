@@ -43,7 +43,6 @@ type MapState = {
 type Props = {
   accessibility: number[][],
   actionLog: LogItems,
-  activeNetworkIndex: number,
   activeTransitive: any,
   data: {
     grids: string[],
@@ -229,7 +228,6 @@ export default class Application extends Component<Props, State> {
     const {
       accessibility,
       actionLog,
-      activeNetworkIndex,
       activeTransitive,
       drawActiveOpportunityDataset,
       drawIsochrones,
@@ -274,10 +272,10 @@ export default class Application extends Component<Props, State> {
 
             {!isLoading && isochrones.map((isochrone, index) => isochrone
               ? <GeoJSON
-                  data={isochrone}
-                  key={isochrone.key}
-                  style={getIsochroneStyleFor(index)}
-                />
+                data={isochrone}
+                key={isochrone.key}
+                style={getIsochroneStyleFor(index)}
+              />
               : null)}
 
             {!isLoading && activeTransitive && activeTransitive.journeys &&

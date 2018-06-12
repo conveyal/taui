@@ -6,7 +6,6 @@ import Leaflet from 'leaflet'
 import memoize from 'lodash/memoize'
 import React, {PureComponent} from 'react'
 import {
-  CircleMarker,
   GeoJSON,
   Map as LeafletMap,
   Marker,

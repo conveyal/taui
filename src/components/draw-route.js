@@ -85,13 +85,12 @@ export default class DrawRoute extends React.PureComponent {
       {j.segments
         .filter(s => s.type === 'TRANSIT')
         .reduce((stops, s, i) => [
-            ...stops,
-            this._getStopPosition(s.pattern_id, s.from_stop_index),
-            this._getStopPosition(s.pattern_id, s.to_stop_index)
+          ...stops,
+          this._getStopPosition(s.pattern_id, s.from_stop_index),
+          this._getStopPosition(s.pattern_id, s.to_stop_index)
         ], [])
         .map((s, i) =>
           <CircleMarker key={`stop-${i}`} center={s} {...STOP_STYLE} />)}
     </LayerGroup>
   }
 }
-

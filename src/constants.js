@@ -11,5 +11,5 @@ export const NETWORK_COLORS = [
   '#2389c9', // conveyal blue
   '#c96323', // orange
   '#36c923', // green
-  '#6323c9', // violet
+  '#6323c9' // violet
 ]
