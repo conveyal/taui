@@ -5,7 +5,7 @@ import message from '@conveyal/woonerf/message'
 import Alert from './tr-alert'
 
 export default function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
-  if (travelTime === 255 || routeSegments.length === 0) {
+  if (routeSegments.length === 0) {
     return <Alert>{message('Systems.TripsEmpty')}</Alert>
   }
 
@@ -20,13 +20,15 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
           {bestJourney.map((segment, index) => (
             <Segment key={index} segment={segment} />
           ))}
-          <span>in </span>
-          <strong>{travelTime > 120 ? '> 120' : travelTime}</strong>
-          {` ${message('Units.Mins')} `}
-          <TripDiff
-            oldTravelTime={oldTravelTime}
-            travelTime={travelTime}
-          />
+          {travelTime > 120
+            ? <span className='decrease'>inaccessible within 120 minutes</span>
+            : <span> in
+              <strong> {travelTime}</strong> {message('Units.Mins')}
+              <TripDiff
+                baseTravelTime={oldTravelTime}
+                travelTime={travelTime}
+              />
+              </span>}
         </td>
       </tr>
       {routeSegments.length > 1 &&
@@ -61,16 +63,22 @@ const Segment = ({segment}) => (
   </span>
 )
 
-function TripDiff ({oldTravelTime, travelTime}) {
-  if (oldTravelTime === 255) {
+function TripDiff ({baseTravelTime, travelTime}) {
+  if (baseTravelTime === 2147483647) {
     return (
       <span className='increase'>
         ({message('NewTrip')} <Icon type='star' />)
       </span>
     )
+  } else if (travelTime === 2147483647) {
+    return (
+      <span className='decrease'>
+        (<strong>> {120 - baseTravelTime}</strong>% <span className='fa fa-level-up' />)
+      </span>
+    )
   }
 
-  const diff = (travelTime - oldTravelTime) / oldTravelTime * 100
+  const diff = (travelTime - baseTravelTime) / baseTravelTime * 100
   if (isNaN(diff) || Math.abs(diff) < 0.1) return null
 
   if (diff > 0) {
