@@ -1,7 +1,7 @@
 // @flow
-import toCapitalCase from 'lodash/capitalize'
 import slice from 'lodash/slice'
 import uniq from 'lodash/uniq'
+import toUpperCase from 'lodash/upperCase'
 
 import type {Location, Path, QualifiedPath} from '../types'
 
@@ -102,15 +102,17 @@ export default function createTransitiveRoutesForNetwork (
     routeSegments: paths.map(path => path.map(leg => {
       const route = fot(td.routes, r => r.route_id === leg[1].route_id)
       const seg = {}
+      const getRouteName = r =>
+        toUpperCase(route.route_long_name || route.route_short_name)
       const color = route.route_color
         ? `#${route.route_color}`
         : '#0b2b40'
-      seg.name = toCapitalCase(route.route_short_name)
+      seg.name = getRouteName(route)
 
       if (leg[1].patterns && leg[1].patterns.length > 0) {
         const patternNames = leg[1].patterns
           .map(p => fot(td.routes, r => r.route_id === p.route_id))
-          .map(r => toCapitalCase(r.route_short_name))
+          .map(getRouteName)
         seg.name = uniq(patternNames).join(' / ')
       }
 
