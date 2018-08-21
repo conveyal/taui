@@ -103,7 +103,7 @@ export default function createTransitiveRoutesForNetwork (
       const route = fot(td.routes, r => r.route_id === leg[1].route_id)
       const seg = {}
       const getRouteName = r =>
-        toUpperCase(route.route_long_name || route.route_short_name)
+        toUpperCase(route.route_short_name)
       const color = route.route_color
         ? `#${route.route_color}`
         : '#0b2b40'

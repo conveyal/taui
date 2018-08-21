@@ -14,6 +14,7 @@
   --green: #36c923;
 
   --anchor-hover-color: #333;
+  --shadow: #333;
 }
 
 html, body {
@@ -43,7 +44,7 @@ html, body {
   top: 0;
   left: 0;
   height: 100%;
-  box-shadow: 0 0 25px 0 rgba(0, 0, 0, .15);
+  box-shadow: 0 0 25px 0 var(--shadow);
 }
 
 .Taui-Dock-content {
@@ -56,17 +57,20 @@ html, body {
 
 .Taui-Dock-content .heading {
   color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
   margin: 1rem 0 0.5rem;
   font-weight: var(--bold);
 }
 
 .Taui-Dock-content .heading a {
   color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
   cursor: pointer;
 }
 
 .Taui-Dock-content .title {
   color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
   font-size: 1.5rem;
   margin: 1rem 0;
   font-weight: var(--bold);
@@ -82,6 +86,7 @@ html, body {
 
 .Select {
   margin-bottom: 1px;
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
 .Select-control {
@@ -134,6 +139,7 @@ html, body {
 .TimeCutoff .Time {
   font-weight: var(--bold);
   color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
 }
 
 .TimeCutoff input[type=range] {
@@ -145,6 +151,7 @@ html, body {
   background-color: #fff;
   border-radius: var(--rad);
   margin-top: 1rem;
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
 .Card pre {
@@ -165,6 +172,7 @@ html, body {
 
 .CardTitle {
   color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
   background-color: var(--blue);
   padding: 1rem 0.5rem 1rem 1rem;
   font-weight: var(--bold);
@@ -177,6 +185,7 @@ html, body {
 
 .CardTitle > a:hover {
   color: var(--anchor-hover-color);
+  text-shadow: none;
 }
 
 .Card > .CardTitle {
@@ -211,6 +220,7 @@ table.CardContent td:first-of-type {
 .Attribution {
   color: #fff;
   text-align: center;
+  text-shadow: 0 0 1px var(--shadow);
 }
 
 .Attribution a {
@@ -230,19 +240,19 @@ table.CardContent td:first-of-type {
   border-radius: var(--rad);
   margin-right: 0.25rem;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 40px;
-  margin-bottom: -6px;
   display: inline-block;
 }
 
 .Card .increase {
   color: var(--green);
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .Card .decrease {
   color: var(--red);
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .leaflet-popup-content-wrapper,

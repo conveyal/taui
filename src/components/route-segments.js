@@ -22,7 +22,7 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
           ))}
           {travelTime > 120
             ? <span className='decrease'>inaccessible within 120 minutes</span>
-            : <span> in
+            : <span>in
               <strong> {travelTime}</strong> {message('Units.Mins')}
               <TripDiff
                 baseTravelTime={oldTravelTime}
@@ -55,7 +55,8 @@ const Segment = ({segment}) => (
     className='CardSegment'
     style={{
       backgroundColor: segment.backgroundColor || 'inherit',
-      color: segment.color || 'inherit'
+      color: segment.color || 'inherit',
+      textShadow: `0 0 1px ${segment.color === '#fff' ? '#333' : '#fff'}`
     }}
     title={segment.name}
   >
@@ -66,15 +67,11 @@ const Segment = ({segment}) => (
 function TripDiff ({baseTravelTime, travelTime}) {
   if (baseTravelTime === 2147483647) {
     return (
-      <span className='increase'>
-        ({message('NewTrip')} <Icon type='star' />)
-      </span>
+      <span className='increase'>&nbsp;({message('NewTrip')} <Icon type='star' />)</span>
     )
   } else if (travelTime === 2147483647) {
     return (
-      <span className='decrease'>
-        (<strong>> {120 - baseTravelTime}</strong>% <span className='fa fa-level-up' />)
-      </span>
+      <span className='decrease'>&nbsp;(<strong>> {120 - baseTravelTime}</strong>% <span className='fa fa-level-up' />)</span>
     )
   }
 
