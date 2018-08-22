@@ -185,7 +185,7 @@ html, body {
 
 .CardTitle > a:hover {
   color: var(--anchor-hover-color);
-  text-shadow: none;
+  text-shadow: 0 0 1px #fff;
 }
 
 .Card > .CardTitle {
@@ -358,4 +358,8 @@ table.CardContent td:first-of-type {
   top: 5px;
   left: 5px;
   border: solid 5px #fff;
+}
+
+.TransitSegment, .WalkSegment, .Stop {
+  /* filter: url(#shadow); */
 }

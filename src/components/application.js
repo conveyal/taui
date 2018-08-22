@@ -82,7 +82,7 @@ const getIsochroneStyleFor = index => () => ({
   fillColor: NETWORK_COLORS[index],
   fillOpacity: 0.4,
   pointerEvents: 'none',
-  stroke: NETWORK_COLORS[index],
+  color: NETWORK_COLORS[index],
   weight: 1
 })
 
@@ -234,6 +234,13 @@ export default class Application extends Component<Props, State> {
     return (
       <div>
         <div className='Fullscreen'>
+          <svg>
+            <defs>
+              <filter id='shadow'>
+                <feDropShadow dx='1' dy='1' stdDeviation='1' />
+              </filter>
+            </defs>
+          </svg>
           <Map
             {...p.map}
             centerCoordinates={p.map.centerCoordinates}
@@ -249,7 +256,7 @@ export default class Application extends Component<Props, State> {
             {p.drawActiveOpportunityDataset &&
               <Gridualizer drawTile={p.drawActiveOpportunityDataset} zoom={p.map.zoom} />}
 
-            {!p.isLoading && p.isochrones.filter(iso => !!iso).map((iso, i) =>
+            {!p.isLoading && p.isochrones.map((iso, i) => !iso ? null :
               <GeoJSON
                 data={iso}
                 key={iso.key}
