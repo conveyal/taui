@@ -256,8 +256,9 @@ export default class Application extends Component<Props, State> {
             {p.drawActiveOpportunityDataset &&
               <Gridualizer drawTile={p.drawActiveOpportunityDataset} zoom={p.map.zoom} />}
 
-            {!p.isLoading && p.isochrones.map((iso, i) => !iso ? null :
-              <GeoJSON
+            {!p.isLoading && p.isochrones.map((iso, i) => !iso
+              ? null
+              : <GeoJSON
                 data={iso}
                 key={iso.key}
                 style={getIsochroneStyleFor(i)}

@@ -69,12 +69,14 @@ export default class DrawRoute extends React.PureComponent {
       {j.segments.map((segment, i) => {
         if (segment.type === 'WALK') {
           return <Polyline
+            className='WalkSegment'
             key={`walk-segment-${i}`}
             positions={this._findPositionsForWalk(segment)}
             {...WALK_STYLE}
           />
         } else {
           return <Polyline
+            className='TransitSegment'
             key={`transit-segment-${i}`}
             {...TRANSIT_STYLE}
             positions={this._findPositionsForTransit(segment)}
@@ -90,7 +92,7 @@ export default class DrawRoute extends React.PureComponent {
           this._getStopPosition(s.pattern_id, s.to_stop_index)
         ], [])
         .map((s, i) =>
-          <CircleMarker key={`stop-${i}`} center={s} {...STOP_STYLE} />)}
+          <CircleMarker className='Stop' key={`stop-${i}`} center={s} {...STOP_STYLE} />)}
     </LayerGroup>
   }
 }
