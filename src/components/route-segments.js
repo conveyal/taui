@@ -28,7 +28,7 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
                 baseTravelTime={oldTravelTime}
                 travelTime={travelTime}
               />
-              </span>}
+            </span>}
         </td>
       </tr>
       {routeSegments.length > 1 &&

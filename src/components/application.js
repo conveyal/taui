@@ -221,114 +221,91 @@ export default class Application extends Component<Props, State> {
     }
   })
 
+  _showRoutes () {
+    const at = this.props.activeTransitive
+    return !this.props.isLoading && at && at.journeys && at.journeys[0]
+  }
+
   /**
    *
    */
   render () {
-    const {
-      accessibility,
-      actionLog,
-      activeTransitive,
-      drawActiveOpportunityDataset,
-      drawIsochrones,
-      data,
-      geocoder,
-      geocode,
-      isochrones,
-      isLoading,
-      map,
-      pointsOfInterest,
-      reverseGeocode,
-      showComparison,
-      timeCutoff,
-      travelTimes,
-      ui,
-      uniqueRoutes,
-      updateEndPosition,
-      updateMap,
-      updateStartPosition
-    } = this.props
-    const {componentError} = this.state
+    const p = this.props
     return (
       <div>
         <div className='Fullscreen'>
           <Map
-            {...map}
-            centerCoordinates={map.centerCoordinates}
+            {...p.map}
+            centerCoordinates={p.map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
-            end={geocoder.end}
-            pointsOfInterest={pointsOfInterest}
-            setEndPosition={updateEndPosition}
-            setStartPosition={updateStartPosition}
-            start={geocoder.start}
-            updateMap={updateMap}
-            zoom={map.zoom}
+            end={p.geocoder.end}
+            pointsOfInterest={p.pointsOfInterest}
+            setEndPosition={p.updateEndPosition}
+            setStartPosition={p.updateStartPosition}
+            start={p.geocoder.start}
+            updateMap={p.updateMap}
+            zoom={p.map.zoom}
           >
-            {drawActiveOpportunityDataset &&
-              <Gridualizer drawTile={drawActiveOpportunityDataset} zoom={map.zoom} />}
+            {p.drawActiveOpportunityDataset &&
+              <Gridualizer drawTile={p.drawActiveOpportunityDataset} zoom={p.map.zoom} />}
 
-            {false && drawIsochrones && drawIsochrones[0] &&
-              <Gridualizer drawTile={drawIsochrones[0]} zoom={map.zoom} />}
+            {!p.isLoading && p.isochrones.filter(iso => !!iso).map((iso, i) =>
+              <GeoJSON
+                data={iso}
+                key={iso.key}
+                style={getIsochroneStyleFor(i)}
+              />)}
 
-            {!isLoading && isochrones.map((isochrone, index) => isochrone
-              ? <GeoJSON
-                data={isochrone}
-                key={isochrone.key}
-                style={getIsochroneStyleFor(index)}
-              />
-              : null)}
-
-            {!isLoading && activeTransitive && activeTransitive.journeys &&
-              activeTransitive.journeys[0] && <DrawRoute transitive={activeTransitive} />}
+            {this._showRoutes() && <DrawRoute transitive={p.activeTransitive} />}
           </Map>
         </div>
-        <Dock showSpinner={ui.fetches > 0} componentError={componentError}>
+        <Dock showSpinner={p.ui.fetches > 0} componentError={this.state.componentError}>
           <Form
-            boundary={geocoder.boundary}
-            end={geocoder.end}
-            geocode={geocode}
+            boundary={p.geocoder.boundary}
+            end={p.geocoder.end}
+            geocode={p.geocode}
             onTimeCutoffChange={this._onTimeCutoffChange}
             onChangeEnd={this._setEndWithFeature}
             onChangeStart={this._setStartWithFeature}
-            pointsOfInterest={pointsOfInterest}
-            reverseGeocode={reverseGeocode}
-            selectedTimeCutoff={timeCutoff.selected}
-            start={geocoder.start}
+            pointsOfInterest={p.pointsOfInterest}
+            reverseGeocode={p.reverseGeocode}
+            selectedTimeCutoff={p.timeCutoff.selected}
+            start={p.geocoder.start}
           />
-          {data.networks.map((network, index) => (
+          {p.data.networks.map((network, index) => (
             <RouteCard
               cardColor={NETWORK_COLORS[index]}
-              downloadIsochrone={isochrones[index] && this._downloadIsochrone(index)}
+              downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
               index={index}
               key={`${index}-route-card`}
               setShowOnMap={this._setShowOnMap(index)}
               showOnMap={network.showOnMap}
               title={network.name}
             >
-              {!isLoading &&
+              {!p.isLoading &&
                 <RouteAccess
-                  accessibility={accessibility[index]}
-                  grids={data.grids}
-                  hasStart={!!geocoder.start}
-                  oldAccessibility={accessibility[0]}
-                  showComparison={showComparison}
+                  accessibility={p.accessibility[index]}
+                  grids={p.data.grids}
+                  hasStart={!!p.geocoder.start}
+                  oldAccessibility={p.accessibility[0]}
+                  showComparison={p.showComparison}
                 />}
-              {!isLoading && !!geocoder.end && !!geocoder.start &&
+              {!p.isLoading && !!p.geocoder.end && !!p.geocoder.start &&
                 <RouteSegments
-                  oldTravelTime={travelTimes[0]}
-                  routeSegments={uniqueRoutes[index]}
-                  travelTime={travelTimes[index]}
+                  oldTravelTime={p.travelTimes[0]}
+                  routeSegments={p.uniqueRoutes[index]}
+                  travelTime={p.travelTimes[index]}
                 />}
             </RouteCard>
           ))}
-          {ui.showLog &&
+          {p.ui.showLog &&
             <div className='Card'>
               <div className='CardTitle'>
                 <span className='fa fa-terminal' /> {message('Log.Title')}
               </div>
-              <Log items={actionLog} />
+              <Log items={p.actionLog} />
             </div>}
-          {ui.allowChangeConfig &&
+          {p.ui.allowChangeConfig &&
             <div className='Card'>
               <div
                 className='CardTitle'
@@ -344,7 +321,7 @@ export default class Application extends Component<Props, State> {
               </div>
               <textarea ref={this._saveRefToConfig} defaultValue={window.localStorage.getItem('taui-config')} />
             </div>}
-          {ui.showLink &&
+          {p.ui.showLink &&
             <div className='Attribution'>
               site made by
               {' '}

@@ -2697,7 +2697,7 @@ d3-scale@^1.0.6:
     d3-time "1"
     d3-time-format "2"
 
-d3-scale@^2.0.0:
+d3-scale@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/d3-scale/-/d3-scale-2.1.0.tgz#8d3fd3e2a7c9080782a523c08507c5248289eef8"
   dependencies:
@@ -2764,7 +2764,7 @@ debug@3.1.0, debug@^3.1.0:
   dependencies:
     ms "2.0.0"
 
-debuglog@*, debuglog@^1.0.1:
+debuglog@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/debuglog/-/debuglog-1.0.1.tgz#aa24ffb9ac3df9a2351837cfb2d279360cd78492"
 
@@ -3683,10 +3683,6 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
-flow-bin@^0.68.0:
-  version "0.68.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.68.0.tgz#86c2d14857d306eb2e85e274f2eebf543564f623"
-
 flow-bin@^0.77.0:
   version "0.77.0"
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.77.0.tgz#4e5c93929f289a0c28e08fb361a9734944a11297"
@@ -4338,7 +4334,7 @@ import-local@^1.0.0:
     pkg-dir "^2.0.0"
     resolve-cwd "^2.0.0"
 
-imurmurhash@*, imurmurhash@^0.1.4:
+imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
 
@@ -5403,9 +5399,9 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-leaflet@^1.3.1:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.3.3.tgz#5c8f2fd50e4a41ead93ab850dcd9e058811da9b9"
+leaflet@^1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.3.4.tgz#7f006ea5832603b53d7269ef5c595fd773060a40"
 
 left-pad@^1.3.0:
   version "1.3.0"
@@ -5520,10 +5516,6 @@ lodash-es@^4.0.0, lodash-es@^4.17.5, lodash-es@^4.2.1:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.10.tgz#62cd7104cdf5dd87f235a837f0ede0e8e5117e05"
 
-lodash._baseindexof@*:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/lodash._baseindexof/-/lodash._baseindexof-3.1.0.tgz#fe52b53a1c6761e42618d654e4a25789ed61822c"
-
 lodash._baseuniq@~4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash._baseuniq/-/lodash._baseuniq-4.6.0.tgz#0ebb44e456814af7905c6212fa2c9b2d51b841e8"
@@ -5531,27 +5523,9 @@ lodash._baseuniq@~4.6.0:
     lodash._createset "~4.0.0"
     lodash._root "~3.0.0"
 
-lodash._bindcallback@*:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/lodash._bindcallback/-/lodash._bindcallback-3.0.1.tgz#e531c27644cf8b57a99e17ed95b35c748789392e"
-
-lodash._cacheindexof@*:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/lodash._cacheindexof/-/lodash._cacheindexof-3.0.2.tgz#3dc69ac82498d2ee5e3ce56091bafd2adc7bde92"
-
-lodash._createcache@*:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/lodash._createcache/-/lodash._createcache-3.1.2.tgz#56d6a064017625e79ebca6b8018e17440bdcf093"
-  dependencies:
-    lodash._getnative "^3.0.0"
-
 lodash._createset@~4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/lodash._createset/-/lodash._createset-4.0.3.tgz#0f4659fbb09d75194fa9e2b88a6644d363c9fe26"
-
-lodash._getnative@*, lodash._getnative@^3.0.0:
-  version "3.9.1"
-  resolved "https://registry.yarnpkg.com/lodash._getnative/-/lodash._getnative-3.9.1.tgz#570bc7dede46d61cdcde687d65d3eecbaa3aaff5"
 
 lodash._reinterpolate@~3.0.0:
   version "3.0.0"
@@ -5612,10 +5586,6 @@ lodash.memoize@~3.0.3:
 lodash.merge@^4.6.0:
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.1.tgz#adc25d9cb99b9391c59624f379fbba60d7111d54"
-
-lodash.restparam@*:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
 
 lodash.sortby@^4.7.0:
   version "4.7.0"
@@ -5795,7 +5765,7 @@ marked@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.5.0.tgz#9e590bad31584a48ff405b33ab1c0dd25172288e"
 
-mastarm@^4.1.1:
+mastarm@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/mastarm/-/mastarm-4.2.1.tgz#d5810ea3a302d7c95b580ff48f590ce3b575b8a7"
   dependencies:
@@ -7688,7 +7658,7 @@ promzard@^0.3.0:
   dependencies:
     read "1"
 
-prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2:
+prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
@@ -7850,7 +7820,7 @@ react-dom@^15.6.2:
     object-assign "^4.1.0"
     prop-types "^15.5.10"
 
-react-dom@^16.3.1:
+react-dom@^16.4.2:
   version "16.4.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.2.tgz#4afed569689f2c561d2b8da0b819669c38a0bda4"
   dependencies:
@@ -7931,7 +7901,7 @@ react@^15.6.2:
     object-assign "^4.1.0"
     prop-types "^15.5.10"
 
-react@^16.3.1:
+react@^16.4.2:
   version "16.4.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.4.2.tgz#2cd90154e3a9d9dd8da2991149fdca3c260e129f"
   dependencies:
@@ -8088,7 +8058,7 @@ readable-stream@~1.1.10:
     isarray "0.0.1"
     string_decoder "~0.10.x"
 
-readdir-scoped-modules@*, readdir-scoped-modules@^1.0.0:
+readdir-scoped-modules@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/readdir-scoped-modules/-/readdir-scoped-modules-1.0.2.tgz#9fafa37d286be5d92cbaebdee030dc9b5f406747"
   dependencies:
@@ -8156,7 +8126,7 @@ reduce-reducers@^0.1.0:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/reduce-reducers/-/reduce-reducers-0.1.5.tgz#ff77ca8068ff41007319b8b4b91533c7e0e54576"
 
-redux-actions@^2.2.1, redux-actions@^2.3.0:
+redux-actions@^2.2.1, redux-actions@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/redux-actions/-/redux-actions-2.6.1.tgz#42c06e94739fbe6db35db3605abb105bdb3724d8"
   dependencies:
@@ -8171,11 +8141,7 @@ redux-logger@^3.0.6:
   dependencies:
     deep-diff "^0.3.5"
 
-redux-mock-store@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/redux-mock-store/-/redux-mock-store-1.3.0.tgz#6edfef0d2332f20576381069d6d889a6d0a4451c"
-
-redux-mock-store@^1.3.0:
+redux-mock-store@1.5.3, redux-mock-store@^1.3.0:
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/redux-mock-store/-/redux-mock-store-1.5.3.tgz#1f10528949b7ce8056c2532624f7cafa98576c6d"
   dependencies:
@@ -8193,6 +8159,13 @@ redux@^3.7.2:
     lodash-es "^4.2.1"
     loose-envify "^1.1.0"
     symbol-observable "^1.0.3"
+
+redux@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.0.0.tgz#aa698a92b729315d22b34a0553d7e6533555cc03"
+  dependencies:
+    loose-envify "^1.1.0"
+    symbol-observable "^1.2.0"
 
 regenerate@^1.2.1:
   version "1.4.0"
@@ -8552,7 +8525,7 @@ sax@>=0.6.0, sax@^1.2.4, sax@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
-semantic-release@^15.0.3:
+semantic-release@^15.9.9:
   version "15.9.9"
   resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-15.9.9.tgz#967f0a5eea4c297d8052a6f4cb91b2e20aa00496"
   dependencies:
@@ -9221,7 +9194,7 @@ symbol-observable@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.0.1.tgz#8340fc4702c3122df5d22288f88283f513d3fdd4"
 
-symbol-observable@^1.0.3:
+symbol-observable@^1.0.3, symbol-observable@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
 

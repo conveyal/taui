@@ -10,7 +10,7 @@
     "pretest": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "mastarm build --serve --env development",
-    "test": "mastarm lint src && mastarm flow"
+    "test": "mastarm lint src"
   },
   "repository": {
     "type": "git",
@@ -31,26 +31,25 @@
     "@conveyal/lonlat": "^1.3.0",
     "@conveyal/woonerf": "^3.0.1",
     "@mapbox/polyline": "^1.0.0",
-    "d3-scale": "^2.0.0",
+    "d3-scale": "^2.1.0",
     "date-fns": "^1.29.0",
     "debug": "^3.1.0",
-    "flow-bin": "^0.68.0",
     "isomorphic-fetch": "^2.2.1",
     "jsolines": "^1.0.2",
-    "leaflet": "^1.3.1",
-    "lodash": "^4.17.5",
-    "mastarm": "^4.1.1",
-    "prop-types": "^15.6.1",
-    "react": "^16.3.1",
-    "react-dom": "^16.3.1",
+    "leaflet": "^1.3.4",
+    "lodash": "^4.17.10",
+    "mastarm": "^4.2.1",
+    "prop-types": "^15.6.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
     "react-leaflet": "^1.9.1",
     "react-redux": "^5.0.7",
     "react-select": "^1.2.1",
-    "redux": "^3.7.2",
-    "redux-actions": "^2.3.0",
-    "redux-mock-store": "1.3.0",
+    "redux": "^4.0.0",
+    "redux-actions": "^2.6.1",
+    "redux-mock-store": "1.5.3",
     "reselect": "^3.0.1",
-    "semantic-release": "^15.0.3"
+    "semantic-release": "^15.9.9"
   },
   "standard": {
     "parser": "babel-eslint"
