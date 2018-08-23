@@ -1,17 +1,84 @@
 // @flow
+export type Coordinate = [number, number]
+export type Coordinates = Coordinate[]
 
-import Browsochrones from 'browsochrones'
-
-/**
- * Simple types
- */
 export type LatLng = {
   lat: number,
   lng: number
 }
 
-export type Coordinate = [number, number]
-export type Coordinates = Coordinate[]
+export type LonLat = {lon: number, lat: number}
+export type Point = {x: number, y: number}
+
+export type Location = {
+  label: string,
+  position: LonLat
+}
+
+export type PartialLocation = {
+  label: string | void,
+  position: LonLat | void
+}
+
+export type Grid = {
+  contains: (number, number) => boolean,
+  valueAtPoint: (number, number) => number,
+  data: Int32Array,
+  north: number,
+  west: number,
+  height: number,
+  width: number,
+  zoom: number
+}
+
+export type Query = {
+  height: number,
+  width: number,
+  north: number,
+  west: number,
+  zoom: number
+}
+
+/**
+ * Path data
+ */
+
+export type Leg = [string, string, string] // boardStopId, patternId, alightStopId
+export type Path = Leg[]
+
+export type PathsData = {
+  paths: Path[],
+  targets: number[] // path index
+}
+
+export type TransitiveStop = {
+  stop_id: string,
+  geometry: string,
+  stop_lat: number,
+  stop_lon: number,
+  stopIndex: number
+}
+
+export type TransitivePattern = {
+  pattern_id: string,
+  patterns?: TransitivePattern[],
+  route_id: string,
+  stops: TransitiveStop[]
+}
+
+export type TransitiveRoute = {
+  route_id: string,
+  route_short_name: string
+}
+
+export type TransitiveData = {
+  patterns: TransitivePattern[],
+  stops: TransitiveStop[],
+  routes: TransitiveRoute[]
+}
+
+export type QualifiedLeg = [TransitiveStop, TransitivePattern, TransitiveStop] // [boardStopId, Pattern, alightStopId]
+export type QualifiedPath = QualifiedLeg[]
 
 /**
  * GeoJSON
@@ -43,6 +110,11 @@ export type PointFeature = {
   }
 }
 
+export type MapboxFeature = {
+  id: string,
+  place_name: string
+} & PointFeature
+
 /**
  * Store
  */
@@ -54,25 +126,12 @@ export type LogItem = {
 
 export type LogItems = LogItem[]
 
-export type BrowsochronesStore = {
-  active: number,
-  instances: Browsochrones[],
-  origins: Array<{
-    name: string,
-    url: string
-  }>,
-  grids: string[],
-  gridsUrl: string
-}
-
-export type Accessibility = {
-  name: string,
-  accessibility: | 'accessibility-is-empty'
-    | 'accessibility-is-loading'
-    | {
-        [key: string]: number
-      }
-}
+export type Accessibility =
+  | 'accessibility-is-empty'
+  | 'accessibility-is-loading'
+  | {
+      [key: string]: number
+    }
 
 export type Option = {
   label: string,
@@ -96,12 +155,19 @@ export type PointsOfInterest = Array<{
 }>
 
 export type GeocoderStore = {
-  start: Option,
-  end: Option,
-  focusLatlng: LatLng,
-  boundary: GeocoderBoundary,
-  pointsOfInterest: PointsOfInterest
+  start: void | Location,
+  end: void | Location,
+  focusLatlng: void | LatLng,
+  boundary: void | GeocoderBoundary,
+  pointsOfInterest: void | PointsOfInterest
 }
+
+export type MapStore = {
+  centerCoordinates: string,
+  zoom: number
+}
+
+export type NetworkStore = any
 
 export type UIStore = {
   fetches: number,
@@ -110,11 +176,9 @@ export type UIStore = {
 
 export type Store = {
   actionLog: LogItems,
-  browsochrones: BrowsochronesStore,
-  destinations: Accessibility[],
   geocoder: GeocoderStore,
-  map: any,
-  mapMarkers: any,
+  map: MapStore,
+  network: NetworkStore,
   timeCutoff: {
     selected: number
   },

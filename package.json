@@ -10,7 +10,7 @@
     "pretest": "yarn",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "mastarm build --serve --env development",
-    "test": "mastarm lint && mastarm flow && mastarm test --env test --config configurations/test"
+    "test": "mastarm lint src"
   },
   "repository": {
     "type": "git",
@@ -26,45 +26,32 @@
     "url": "https://github.com/conveyal/taui/issues"
   },
   "homepage": "https://github.com/conveyal/taui",
-  "devDependencies": {
-    "enzyme": "^2.8.2",
-    "enzyme-to-json": "^1.5.1",
-    "mastarm": "^3.9.3",
-    "react-addons-test-utils": "^15.5.1",
-    "redux-mock-store": "^1.2.3",
-    "semantic-release": "^6.3.2"
-  },
   "dependencies": {
-    "@conveyal/lonlat": "^1.1.1",
-    "@conveyal/woonerf": "^2.3.0",
-    "browsochrones": "^0.9.1",
-    "color": "^1.0.3",
-    "date-fns": "^1.28.5",
-    "debug": "^2.6.8",
-    "font-awesome": "^4.6.3",
+    "@conveyal/gridualizer": "^2.1.0",
+    "@conveyal/lonlat": "^1.3.0",
+    "@conveyal/woonerf": "^3.0.1",
+    "@mapbox/polyline": "^1.0.0",
+    "d3-scale": "^2.1.0",
+    "date-fns": "^1.29.0",
+    "debug": "^3.1.0",
     "isomorphic-fetch": "^2.2.1",
-    "isomorphic-mapzen-search": "^1.2.0",
-    "leaflet": "^0.7.7",
-    "leaflet-transitivelayer": "^0.2.0",
-    "lodash": "^4.17.4",
-    "mapbox.js": "^2.4.0",
-    "normalize.css": "^7.0.0",
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
-    "react-leaflet": "^0.12.2",
-    "react-redux": "^5.0.5",
-    "react-select-geocoder": "^1.2.0",
-    "redux": "^3.6.0",
-    "redux-actions": "^2.0.3",
+    "jsolines": "^1.0.2",
+    "leaflet": "^1.3.4",
+    "lodash": "^4.17.10",
+    "mastarm": "^4.2.1",
+    "prop-types": "^15.6.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-leaflet": "^1.9.1",
+    "react-redux": "^5.0.7",
+    "react-select": "^1.2.1",
+    "redux": "^4.0.0",
+    "redux-actions": "^2.6.1",
+    "redux-mock-store": "1.5.3",
     "reselect": "^3.0.1",
-    "transitive-js": "^0.9.2"
+    "semantic-release": "^15.9.9"
   },
   "standard": {
     "parser": "babel-eslint"
-  },
-  "mastarm lint": {
-    "ignore": [
-      "flow-typed"
-    ]
   }
 }

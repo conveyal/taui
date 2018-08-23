@@ -1,6 +1,6 @@
 // @flow
+import message from '@conveyal/woonerf/message'
 import {handleActions} from 'redux-actions'
-import messages from '../utils/messages'
 
 export default handleActions(
   {
@@ -12,7 +12,7 @@ export default handleActions(
     {
       createdAt: new Date(),
       index: 0,
-      text: messages.Strings.Welcome
+      text: message('Strings.Welcome')
     }
   ]
 )

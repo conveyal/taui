@@ -1,276 +1,364 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
-import isEqual from 'lodash/isEqual'
+import Icon from '@conveyal/woonerf/components/icon'
+import message from '@conveyal/woonerf/message'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
-
-import Form from './form'
-import Icon from './icon'
-import Log from './log'
-import Map from './map'
-import messages from '../utils/messages'
-import RouteCard from './route-card'
+import {GeoJSON} from 'react-leaflet'
 
 import type {
-  Accessibility,
-  BrowsochronesStore,
   Coordinate,
   GeocoderStore,
   LogItems,
+  LonLat,
   InputEvent,
+  MapboxFeature,
   MapEvent,
-  PointFeature,
   PointsOfInterest,
   UIStore
 } from '../types'
+import {NETWORK_COLORS} from '../constants'
+import {getAsObject} from '../utils/hash'
+import downloadJson from '../utils/download-json'
+
+import DrawRoute from './draw-route'
+import Form from './form'
+import Gridualizer from './gridualizer'
+import Log from './log'
+import Map from './map'
+import RouteAccess from './route-access'
+import RouteCard from './route-card'
+import RouteSegments from './route-segments'
+
+type Network = {
+  name: string,
+  active: boolean
+}
+
+type MapState = {
+  centerCoordinates: Coordinate,
+  zoom: number
+}
 
 type Props = {
-  accessibilityKeys: string[],
+  accessibility: number[][],
   actionLog: LogItems,
-  browsochrones: BrowsochronesStore,
-  destinations: Accessibility[],
+  activeTransitive: any,
+  data: {
+    grids: string[],
+    networks: Network[]
+  },
+  drawActiveOpportunityDataset: Function,
+  drawIsochrones: Function[],
   geocoder: GeocoderStore,
-  journeys: any[],
-  mapMarkers: any,
-  map: any,
+  isLoading: boolean,
+  isochrones: any[],
+  map: MapState,
   pointsOfInterest: PointsOfInterest,
   showComparison: boolean,
   timeCutoff: any,
+  travelTimes: number[],
   ui: UIStore,
+  uniqueRoutes: any[],
 
-  clearEnd(): void,
-  clearIsochrone(): void,
-  clearStart(): void,
-  initializeBrowsochrones(any): void,
-  setActiveBrowsochronesInstance(number): void,
-  updateEnd(any): void,
-  updateStart(any): void,
-  updateSelectedTimeCutoff(any): void
-}
-
-type Marker = {
-  position: Coordinate,
-  label: string,
-  onDragEnd(MapEvent): void
+  geocode: (string, Function) => void,
+  reverseGeocode: (string, Function) => void,
+  initialize: Function => void,
+  setEnd: any => void,
+  setSelectedTimeCutoff: any => void,
+  setStart: any => void,
+  updateEnd: any => void,
+  updateEndPosition: LonLat => void,
+  updateMap: any => void,
+  updateStart: any => void,
+  updateStartPosition: LonLat => void
 }
 
 type State = {
-  markers: Marker[]
+  componentError: any
 }
 
-export default class Application extends Component<void, Props, State> {
+const getIsochroneStyleFor = index => () => ({
+  fillColor: NETWORK_COLORS[index],
+  fillOpacity: 0.4,
+  pointerEvents: 'none',
+  color: NETWORK_COLORS[index],
+  weight: 1
+})
+
+/**
+ *
+ */
+export default class Application extends Component<Props, State> {
   state = {
-    markers: this._createMarkersFromProps(this.props)
+    componentError: null
   }
 
-  constructor (props: Props) {
-    super(props)
-    const {
-      browsochrones,
-      initializeBrowsochrones,
-      geocoder,
-      map,
-      timeCutoff
-    } = props
-    initializeBrowsochrones({
-      browsochrones,
-      geocoder,
-      map,
-      timeCutoff
+  /**
+   * Top level component error catch
+   */
+  componentDidCatch (error, info) {
+    this.setState({
+      componentError: {
+        error, info
+      }
     })
   }
 
-  componentWillReceiveProps (nextProps: Props) {
-    if (!isEqual(this.props.mapMarkers, nextProps.mapMarkers)) {
-      this.setState({markers: this._createMarkersFromProps(nextProps)})
+  /**
+   * Initialize the application.
+   */
+  componentDidMount () {
+    if (window) {
+      window.Application = this
+    }
+
+    const qs = getAsObject()
+    const startCoordinate = qs.startCoordinate
+      ? lonlat.fromString(qs.startCoordinate)
+      : undefined
+
+    if (startCoordinate) {
+      this.props.setStart({
+        label: qs.start,
+        position: startCoordinate
+      })
+    } else if (qs.centerCoordinates) {
+      this.props.updateMap({
+        centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)
+      })
+    }
+
+    if (qs.endCoordinate) {
+      this.props.setEnd({
+        label: qs.end,
+        position: lonlat.fromString(qs.endCoordinate)
+      })
+    }
+
+    if (qs.zoom) {
+      this.props.updateMap({zoom: parseInt(qs.zoom, 10)})
+    }
+
+    this.props.initialize(startCoordinate)
+  }
+
+  _saveRefToConfig = (ref) => {
+    this._refToConfig = ref
+  }
+
+  _updateConfig = () => {
+    try {
+      const json = JSON.parse(this._refToConfig.value)
+      this.props.loadDatasetFromJSON(json)
+    } catch (e) {
+      console.error(e)
+      window.alert('Invalid JSON!')
     }
   }
 
   _clearStartAndEnd = () => {
-    const {clearEnd, clearIsochrone, clearStart} = this.props
-    clearStart()
-    clearIsochrone()
-    clearEnd()
-  }
-
-  _createMarkersFromProps (props: Props) {
-    const {mapMarkers} = props
-    const markers = []
-    if (mapMarkers.start && mapMarkers.start.latlng) {
-      markers.push({
-        position: mapMarkers.start.latlng,
-        label: mapMarkers.start.label || '',
-        onDragEnd: this._setStartWithEvent
-      })
-    }
-
-    if (mapMarkers.end && mapMarkers.end.latlng) {
-      markers.push({
-        position: mapMarkers.end.latlng,
-        label: mapMarkers.end.label || '',
-        onDragEnd: this._setEndWithEvent
-      })
-    }
-    return markers
-  }
-
-  _setStart = ({label, latlng}: {label?: string, latlng: Coordinate}) => {
-    const {browsochrones, map, mapMarkers, timeCutoff, updateStart} = this.props
-    const endLatlng = mapMarkers.end && mapMarkers.end.latlng
-      ? mapMarkers.end.latlng
-      : null
-
-    updateStart({
-      browsochronesInstances: browsochrones.instances,
-      endLatlng,
-      label,
-      latlng: lonlat(latlng),
-      timeCutoff: timeCutoff.selected,
-      zoom: map.zoom
-    })
+    const {setEnd, setStart} = this.props
+    setStart(null)
+    setEnd(null)
   }
 
   _setStartWithEvent = (event: MapEvent) => {
-    this._setStart({latlng: event.latlng || event.target._latlng})
+    this.props.updateStartPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _setStartWithFeature = (feature: PointFeature) => {
+  _setStartWithFeature = (feature?: MapboxFeature) => {
     if (!feature) {
       this._clearStartAndEnd()
     } else {
-      const {geometry} = feature
-
-      this._setStart({
-        label: feature.properties.label,
-        latlng: geometry.coordinates
+      this.props.updateStart({
+        label: feature.place_name,
+        position: lonlat(feature.geometry.coordinates)
       })
     }
   }
 
-  _setEnd = ({label, latlng}: {label?: string, latlng: Coordinate}) => {
-    const {browsochrones, map, mapMarkers, updateEnd} = this.props
-    updateEnd({
-      browsochronesInstances: browsochrones.instances,
-      startLatlng: mapMarkers.start.latlng,
-      label,
-      latlng: lonlat(latlng),
-      zoom: map.zoom
-    })
-  }
-
   _setEndWithEvent = (event: MapEvent) => {
-    this._setEnd({latlng: event.latlng || event.target._latlng})
+    this.props.updateEndPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _setEndWithFeature = (feature: PointFeature) => {
+  _setEndWithFeature = (feature?: MapboxFeature) => {
     if (!feature) {
-      this.props.clearEnd()
+      this.props.setEnd(null)
     } else {
-      const {geometry} = feature
-
-      this._setEnd({
-        label: feature.properties.label,
-        latlng: geometry.coordinates
+      this.props.updateEnd({
+        label: feature.place_name,
+        position: lonlat(feature.geometry.coordinates)
       })
     }
   }
 
   _onTimeCutoffChange = (event: InputEvent) => {
-    const {browsochrones, mapMarkers, updateSelectedTimeCutoff} = this.props
-    const timeCutoff = parseInt(event.currentTarget.value, 10)
-    updateSelectedTimeCutoff({
-      browsochrones,
-      latlng: mapMarkers.start.latlng,
-      timeCutoff
-    })
+    this.props.setSelectedTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
 
-  _setActiveBrowsochronesInstance = memoize(index => () =>
-    this.props.setActiveBrowsochronesInstance(index))
+  _setShowOnMap = memoize(index => () => {
+    const p = this.props
+    const network = p.data.networks[index]
+    p.setNetwork({
+      ...network,
+      showOnMap: !network.showOnMap
+    })
+  })
 
-  count = 0
+  _downloadIsochrone = memoize(index => () => {
+    const p = this.props
+    const isochrone = p.isochrones[index]
+    if (isochrone) {
+      const name = p.data.networks[index].name
+      const ll = lonlat.toString(p.geocoder.start.position)
+      downloadJson({
+        data: isochrone,
+        filename: `${name}-${ll}-${p.timeCutoff.selected}min-isochrone.json`
+      })
+    } else {
+      window.alert('No isochrone has been generated for this network.')
+    }
+  })
+
+  _showRoutes () {
+    const at = this.props.activeTransitive
+    return !this.props.isLoading && at && at.journeys && at.journeys[0]
+  }
+
+  /**
+   *
+   */
   render () {
-    const {
-      accessibilityKeys,
-      actionLog,
-      browsochrones,
-      destinations,
-      geocoder,
-      journeys,
-      map,
-      pointsOfInterest,
-      showComparison,
-      timeCutoff,
-      ui
-    } = this.props
-    const {markers} = this.state
-
+    const p = this.props
     return (
       <div>
         <div className='Fullscreen'>
+          <svg>
+            <defs>
+              <filter id='shadow'>
+                <feDropShadow dx='1' dy='1' stdDeviation='1' />
+              </filter>
+            </defs>
+          </svg>
           <Map
-            active={browsochrones.active}
-            centerCoordinates={map.centerCoordinates}
+            {...p.map}
+            centerCoordinates={p.map.centerCoordinates}
             clearStartAndEnd={this._clearStartAndEnd}
-            isochrones={map.isochrones}
-            markers={markers}
-            pointsOfInterest={pointsOfInterest}
-            setEnd={this._setEnd}
-            setStart={this._setStart}
-            transitive={map.transitive}
-            zoom={map.zoom}
+            end={p.geocoder.end}
+            pointsOfInterest={p.pointsOfInterest}
+            setEndPosition={p.updateEndPosition}
+            setStartPosition={p.updateStartPosition}
+            start={p.geocoder.start}
+            updateMap={p.updateMap}
+            zoom={p.map.zoom}
+          >
+            {p.drawActiveOpportunityDataset &&
+              <Gridualizer drawTile={p.drawActiveOpportunityDataset} zoom={p.map.zoom} />}
+
+            {!p.isLoading && p.isochrones.map((iso, i) => !iso
+              ? null
+              : <GeoJSON
+                data={iso}
+                key={iso.key}
+                style={getIsochroneStyleFor(i)}
+              />)}
+
+            {this._showRoutes() && <DrawRoute transitive={p.activeTransitive} />}
+          </Map>
+        </div>
+        <Dock showSpinner={p.ui.fetches > 0} componentError={this.state.componentError}>
+          <Form
+            boundary={p.geocoder.boundary}
+            end={p.geocoder.end}
+            geocode={p.geocode}
+            onTimeCutoffChange={this._onTimeCutoffChange}
+            onChangeEnd={this._setEndWithFeature}
+            onChangeStart={this._setStartWithFeature}
+            pointsOfInterest={p.pointsOfInterest}
+            reverseGeocode={p.reverseGeocode}
+            selectedTimeCutoff={p.timeCutoff.selected}
+            start={p.geocoder.start}
           />
-        </div>
-        <div className='Taui-Dock'>
-          <div className='Taui-Dock-content'>
-            <div className='title'>
-              {ui.fetches > 0
-                ? <Icon type='spinner' className='fa-spin' />
-                : <Icon type='map' />}
-              {' '}
-              {messages.Title}
-            </div>
-            <Form
-              boundary={geocoder.boundary}
-              end={geocoder.end}
-              focusLatlng={geocoder.focusLatlng}
-              onTimeCutoffChange={this._onTimeCutoffChange}
-              onChangeEnd={this._setEndWithFeature}
-              onChangeStart={this._setStartWithFeature}
-              pointsOfInterest={pointsOfInterest}
-              selectedTimeCutoff={timeCutoff.selected}
-              start={geocoder.start}
-            />
-            {destinations.map((accessibility, index) => (
-              <RouteCard
-                accessibility={accessibility.accessibility}
-                accessibilityKeys={accessibilityKeys}
-                active={browsochrones.active === index}
-                alternate={index !== 0}
-                key={`${index}-route-card`}
-                journeys={journeys[index]}
-                oldAccessibility={destinations[0].accessibility}
-                oldTravelTime={map.travelTimes[0]}
-                onClick={this._setActiveBrowsochronesInstance(index)}
-                showComparison={showComparison}
-                travelTime={map.travelTimes[index]}
-                waitTime={map.waitTimes[index]}
+          {p.data.networks.map((network, index) => (
+            <RouteCard
+              cardColor={NETWORK_COLORS[index]}
+              downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
+              index={index}
+              key={`${index}-route-card`}
+              setShowOnMap={this._setShowOnMap(index)}
+              showOnMap={network.showOnMap}
+              title={network.name}
+            >
+              {!p.isLoading &&
+                <RouteAccess
+                  accessibility={p.accessibility[index]}
+                  grids={p.data.grids}
+                  hasStart={!!p.geocoder.start}
+                  oldAccessibility={p.accessibility[0]}
+                  showComparison={p.showComparison}
+                />}
+              {!p.isLoading && !!p.geocoder.end && !!p.geocoder.start &&
+                <RouteSegments
+                  oldTravelTime={p.travelTimes[0]}
+                  routeSegments={p.uniqueRoutes[index]}
+                  travelTime={p.travelTimes[index]}
+                />}
+            </RouteCard>
+          ))}
+          {p.ui.showLog &&
+            <div className='Card'>
+              <div className='CardTitle'>
+                <span className='fa fa-terminal' /> {message('Log.Title')}
+              </div>
+              <Log items={p.actionLog} />
+            </div>}
+          {p.ui.allowChangeConfig &&
+            <div className='Card'>
+              <div
+                className='CardTitle'
               >
-                {accessibility.name}
-              </RouteCard>
-            ))}
-            {ui.showLog &&
-              actionLog &&
-              actionLog.length > 0 &&
-              <div className='Card'>
-                <div className='CardTitle'>
-                  {messages.Log.Title}
-                </div>
-                <Log items={actionLog} />
-              </div>}
-          </div>
-        </div>
+                <span className='fa fa-cog' /> Configure
+                <a
+                  className='pull-right'
+                  onClick={this._updateConfig}
+                >save changes</a>
+              </div>
+              <div className='CardContent'>
+                <br /><a href='https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp' target='_blank'>See example config</a>
+              </div>
+              <textarea ref={this._saveRefToConfig} defaultValue={window.localStorage.getItem('taui-config')} />
+            </div>}
+          {p.ui.showLink &&
+            <div className='Attribution'>
+              site made by
+              {' '}
+              <a href='https://www.conveyal.com' target='_blank'>
+                conveyal
+              </a>
+            </div>}
+        </Dock>
       </div>
     )
   }
+}
+
+function Dock (props) {
+  return <div className='Taui-Dock'>
+    <div className='Taui-Dock-content'>
+      <div className='title'>
+        {props.showSpinner
+          ? <Icon type='spinner' className='fa-spin' />
+          : <Icon type='map' />}
+        {' '}
+        {message('Title')}
+      </div>
+      {props.componentError &&
+        <div>
+          <h1>Error</h1>
+          <p>{props.componentError.info}</p>
+        </div>}
+      {props.children}
+    </div>
+  </div>
 }

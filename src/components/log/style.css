@@ -1,8 +1,27 @@
 
 .Log {
-  height: 6rem;
-  font-size: 1rem;
-  line-height: 1.5;
+  height: 8rem;
   overflow: scroll;
   padding: 0.5rem 1rem;
+}
+
+.LogItem {
+  margin-bottom: 0.5rem;
+  display: flex;
+}
+
+.LogItem.error {
+  color: #c92336;
+}
+
+.LogItem-label {
+  text-transform: capitalize;
+}
+
+.LogItem-createdAt {
+  opacity: 0.75;
+  font-size: 0.75rem;
+  line-height: 15px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }

@@ -1,15 +1,24 @@
-
-@import url(node_modules/normalize.css/normalize.css);
-@import url(node_modules/mapbox.js/theme/style.css);
-@import url(node_modules/font-awesome/css/font-awesome.css);
 @import url(node_modules/react-select/dist/react-select.css);
 @import url(src/components/log/style.css);
-@import url(src/components/log-item/style.css);
-@import url(src/components/transitive-map-layer/style.css);
-@import url(src/utils/leaflet-icons/index.css);
 
-body {
-  font-size: 16px;
+/** Colors from https://palx.jxnblk.com/2389c9 **/
+
+:root {
+  --bold: 500;
+  --rad: 4px;
+
+  --dark-blue: #103f5c;
+  --blue: #2389c9;
+  --orange: #c96323;
+  --red: #c92336;
+  --green: #36c923;
+
+  --anchor-hover-color: #333;
+  --shadow: #333;
+}
+
+html, body {
+  font-size: 15px;
   font-family: -apple-system,
                BlinkMacSystemFont,
                "Segoe UI",
@@ -19,7 +28,7 @@ body {
                Cantarell,
                "Helvetica Neue",
                sans-serif;
-  color: #0b2b40;
+  color: var(--dark-blue);
 }
 
 .Taui-Map {
@@ -29,34 +38,42 @@ body {
 }
 
 .Taui-Dock {
-  background-color: #0b2b40; /* Conveyal blue down to 25% brightness in HSB */
+  background-color: var(--dark-blue);
   position: absolute;
   width: 414px;
   top: 0;
   left: 0;
   height: 100%;
-  box-shadow: 0 0 25px 0 rgba(0, 0, 0, .15);
+  box-shadow: 0 0 25px 0 var(--shadow);
 }
 
 .Taui-Dock-content {
   position: relative;
   height: 100%;
   overflow-y: scroll;
-  padding: 0.5rem 1rem;
+  padding: 1.5rem;
   box-sizing: border-box;
 }
 
 .Taui-Dock-content .heading {
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0.5rem 0 0.5rem;
-  font-weight: 700;
+  color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
+  margin: 1rem 0 0.5rem;
+  font-weight: var(--bold);
+}
+
+.Taui-Dock-content .heading a {
+  color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
+  cursor: pointer;
 }
 
 .Taui-Dock-content .title {
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
   font-size: 1.5rem;
-  margin: 0.5rem 0;
-  font-weight: 700;
+  margin: 1rem 0;
+  font-weight: var(--bold);
 }
 
 .Taui-ActionLog {
@@ -67,14 +84,15 @@ body {
   padding: 0.5rem 1rem;
 }
 
-.Geocoder {
-  margin-bottom: 1rem;
+.Select {
+  margin-bottom: 1px;
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
 .Select-control {
   border: none;
   background-color: rgba(255, 255, 255, 0.95);
-  color: #0b2b40;
+  color: var(--dark-blue);
   height: 3rem;
 }
 
@@ -86,13 +104,13 @@ body {
   padding-right: 1rem;
 }
 
-.has-value.Select--single > .Select-control .Select-value {
-  padding-right: 3rem;
+.Select.has-value.is-clearable.Select--single > .Select-control .Select-value {
+  padding-right: 3.5rem;
 }
 
 .has-value.Select--single > .Select-control .Select-value .Select-value-label,
 .has-value.is-pseudo-focused.Select--single > .Select-control .Select-value .Select-value-label {
-  color: #0b2b40;
+  color: var(--dark-blue);
 }
 
 .Select-clear {
@@ -119,8 +137,9 @@ body {
 }
 
 .TimeCutoff .Time {
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  font-weight: var(--bold);
+  color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
 }
 
 .TimeCutoff input[type=range] {
@@ -130,107 +149,117 @@ body {
 
 .Card {
   background-color: #fff;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
+  border-radius: var(--rad);
+  margin-top: 1rem;
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
-.Card-alternate .CardTitle {
-  background-color: orange;
+.Card pre {
+  overflow-x: scroll;
+  font-size: 0.8rem;
+}
+
+.Card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  min-height: 200px;
+  border: none;
+  border-radius: var(--rad);
+  font-family: monospace;
+  font-size: 0.9em;
 }
 
 .CardTitle {
-  background-color: #4269a4;
-  color: rgba(255, 255, 255, 0.9);
-  padding: 0.5rem 1rem;
-  font-weight: 700;
+  color: rgba(255, 255, 255);
+  text-shadow: 0 0 1px var(--shadow);
+  background-color: var(--blue);
+  padding: 1rem 0.5rem 1rem 1rem;
+  font-weight: var(--bold);
+}
+
+.CardTitle > a {
   cursor: pointer;
-  display: block;
+  padding: 0 0.5rem;
 }
 
-.CardTitle:focus {
-  outline: none;
-}
-
-.Card-active > .CardTitle {
-  cursor: inherit;
-}
-
-.Card .heading {
-  color: #0b2b40;
-  border-bottom: 1px solid rgba(11, 44, 65, 0.25);
-  padding-bottom: 0.25rem;
+.CardTitle > a:hover {
+  color: var(--anchor-hover-color);
+  text-shadow: 0 0 1px #fff;
 }
 
 .Card > .CardTitle {
-  border-radius: 0.5rem 0.5rem 0 0;
+  border-radius: var(--rad) var(--rad) 0 0;
 }
 
 .CardContent {
-  color: #0b2b40;
-  padding: 0 1rem 1rem;
+  color: var(--dark-blue);
+  padding: 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+table.CardContent {
+  padding: 0.25rem 0;
+  border-spacing: 1rem 0.5rem;
+  line-height: 1.5rem;
+}
+
+table.CardContent td {
+  vertical-align: top;
+}
+
+table.CardContent td:first-of-type {
+  text-align: center;
+}
+
+.CardContent .alert {
+  color: var(--red);
+}
+
+.Attribution {
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 1px var(--shadow);
+}
+
+.Attribution a {
+  color: #fff;
+  background: url(https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png) no-repeat;
+  padding: 2.2rem 0 2.2rem 2.2rem;
+  display: inline-block;
+  background-size: 2rem;
+  background-position: left;
+  background-position-x: left;
+  background-position-y: center;
 }
 
 .CardSegment {
-  padding: 0.25rem;
-  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  padding: 0 0.25rem;
+  border-radius: var(--rad);
   margin-right: 0.25rem;
+  white-space: nowrap;
   display: inline-block;
-}
-
-.CardAccess .CardSegment {
-  padding: 0;
 }
 
 .Card .increase {
-  color: green;
+  color: var(--green);
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .Card .decrease {
-  color: red;
-}
-
-.Card .Trips {
-  margin-top: 0.5rem;
-}
-
-.Card .Trip {
-  margin-top: 0.5rem;
-}
-
-.Card .Metric {
-  height: 1.5rem;
-}
-
-.Card .Metric > .fa-fw {
-  width: inherit;
-}
-
-.Card .BestTrip > div {
-  width: 50%;
+  color: var(--red);
+  white-space: nowrap;
   display: inline-block;
-  padding-bottom: 0.25rem;
-}
-
-.Card .BestTrip > div:nth-child(even) {
-  text-align: right;
-}
-
-.Card .Metric > .pull-right {
-  margin-top: 0.25rem;
-}
-
-.CardIndex {
-  margin-right: 0.25rem;
-  font-weight: bold;
-  display: inline-block;
-  width: 1rem;
 }
 
 .leaflet-popup-content-wrapper,
 .map-legends,
 .map-tooltip {
-  border-radius: 0.5rem;
-  background-color: #0b2b40;
+  border-radius: var(--rad);
+  background-color: var(--dark-blue);
   font-size: 1rem;
   color: #fff;
 }
@@ -244,10 +273,10 @@ body {
   display: block;
   font-size: 1rem;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: var(--rad);
   margin-bottom: 0.5rem;
   cursor: pointer;
-  color: #0b2b40;
+  color: var(--dark-blue);
   background-color: rgba(255, 255, 255, 0.95);
   border: none;
   width: 100%;
@@ -263,7 +292,7 @@ body {
 }
 
 .leaflet-popup-tip {
-  border-top-color: #0b2b40;
+  border-top-color: var(--dark-blue);
 }
 
 .Fullscreen {
@@ -272,4 +301,65 @@ body {
   right: 0;
   left: 414px;
   overflow: hidden;
+}
+
+/* Leaflet Markers */
+.LeafletIcon {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.5));
+}
+
+.LeafletIcon:before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  margin-left: -10px;
+}
+
+.LeafletIcon.Start {
+  background-color: var(--dark-blue);
+}
+
+.LeafletIcon.Start:before {
+  border-top: 20px solid var(--dark-blue);
+}
+
+.LeafletIcon.Start:after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  border-left: solid 8px #fff;
+  border-bottom: solid 6px transparent;
+  border-top: solid 6px transparent;
+}
+
+.LeafletIcon.End {
+  background-color: var(--orange);
+  margin-top: -20px !important;
+}
+
+.LeafletIcon.End:before {
+  border-top: 20px solid var(--orange);
+}
+
+.LeafletIcon.End:after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  border: solid 5px #fff;
+}
+
+.TransitSegment, .WalkSegment, .Stop {
+  /* filter: url(#shadow); */
 }
