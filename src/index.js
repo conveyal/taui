@@ -9,6 +9,11 @@ import mount from './mount'
 import reducers from './reducers'
 import * as select from './selectors'
 
+if (process.env.LOGROCKET) {
+  const LogRocket = require('logrocket')
+  LogRocket.init(process.env.LOGROCKET)
+}
+
 // Set the title
 document.title = message('Title')
 
