@@ -68,9 +68,9 @@ type Props = {
 }
 
 type State = {
-  showSelectStartOrEnd: boolean,
   lastClickedLabel: null | string,
-  lastClickedPosition: null | Coordinate
+  lastClickedPosition: null | Coordinate,
+  showSelectStartOrEnd: boolean
 }
 
 const poiToFeatures = memoize(poi => poi.map(p => p.feature))
