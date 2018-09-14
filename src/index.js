@@ -1,11 +1,11 @@
 // @flow
 import message from '@conveyal/woonerf/message'
+import mount from '@conveyal/woonerf/mount'
 import React from 'react'
 import {connect} from 'react-redux'
 
 import actions from './actions'
 import Application from './components/application'
-import mount from './mount'
 import reducers from './reducers'
 import * as select from './selectors'
 
