@@ -17,6 +17,10 @@
   --shadow: #333;
 }
 
+::-webkit-scrollbar {
+  width: 0;
+}
+
 html, body {
   font-size: 15px;
   font-family: -apple-system,

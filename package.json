@@ -9,7 +9,7 @@
     "prestart": "yarn",
     "pretest": "yarn",
     "semantic-release": "semantic-release",
-    "start": "mastarm build --serve --env",
+    "start": "mastarm build --serve",
     "test": "mastarm lint src"
   },
   "repository": {
