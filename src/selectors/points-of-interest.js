@@ -6,22 +6,22 @@ export default createSelector(
   featureCollection =>
     (featureCollection
       ? featureCollection.features.map(feature => {
-          const p = feature.properties
-          const label = p.label || p.name || p.Name
-          return {
-            label,
-            value: `poi-${label}-${feature.geometry.coordinates.join(',')}`,
-            feature: {
-              ...feature,
-              properties: {
-                ...p,
-                label,
-                'marker-color': '#0b2b40',
-                'marker-size': 'small'
-              }
+        const p = feature.properties
+        const label = p.label || p.name || p.Name
+        return {
+          label,
+          value: `poi-${label}-${feature.geometry.coordinates.join(',')}`,
+          feature: {
+            ...feature,
+            properties: {
+              ...p,
+              label,
+              'marker-color': '#0b2b40',
+              'marker-size': 'small'
             }
           }
-        })
+        }
+      })
       : []
     )
 )
