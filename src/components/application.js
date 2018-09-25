@@ -48,8 +48,8 @@ type Props = {
     grids: string[],
     networks: Network[]
   },
-  drawOpportunityDatasets: any[],
   drawIsochrones: Function[],
+  drawOpportunityDatasets: any[],
   geocode: (string, Function) => void,
   geocoder: GeocoderStore,
   initialize: Function => void,
