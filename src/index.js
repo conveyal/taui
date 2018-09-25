@@ -19,7 +19,7 @@ function mapStateToProps (state, ownProps) {
     activeNetworkIndex: select.activeNetworkIndex(state, ownProps),
     activeTransitive: select.activeTransitive(state, ownProps),
     allTransitiveData: select.allTransitiveData(state, ownProps),
-    drawActiveOpportunityDataset: select.drawActiveOpportunityDataset(state, ownProps),
+    drawOpportunityDatasets: select.drawOpportunityDatasets(state, ownProps),
     drawIsochrones: select.drawIsochrones(state, ownProps),
     isochrones: select.isochrones(state, ownProps),
     isLoading: select.loading(state, ownProps),

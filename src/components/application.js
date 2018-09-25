@@ -48,7 +48,7 @@ type Props = {
     grids: string[],
     networks: Network[]
   },
-  drawActiveOpportunityDataset: Function,
+  drawOpportunityDatasets: any[],
   drawIsochrones: Function[],
   geocode: (string, Function) => void,
   geocoder: GeocoderStore,
@@ -253,8 +253,8 @@ export default class Application extends Component<Props, State> {
             updateMap={p.updateMap}
             zoom={p.map.zoom}
           >
-            {p.drawActiveOpportunityDataset &&
-              <Gridualizer drawTile={p.drawActiveOpportunityDataset} zoom={p.map.zoom} />}
+            {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
+              <Gridualizer drawTile={drawTile} key={`draw-od-${i}`} zoom={p.map.zoom} />)}
 
             {!p.isLoading && p.isochrones.map((iso, i) => !iso
               ? null
