@@ -27,8 +27,11 @@ export function geocode (text: string, nextAction: any) {
     dispatch(fetch({
       next: (response) => {
         try {
-          const features = JSON.parse(response.value).features
-          return nextAction(features)
+          if (typeof response.value === 'string') {
+            return nextAction(JSON.parse(response.value).features)
+          } else {
+            return nextAction(response.value.features)
+          }
         } catch (e) {
           console.error('Error parsing geocoder response.')
           console.error(e)

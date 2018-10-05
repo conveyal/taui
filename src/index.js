@@ -1,11 +1,11 @@
 // @flow
 import message from '@conveyal/woonerf/message'
+import mount from '@conveyal/woonerf/mount'
 import React from 'react'
 import {connect} from 'react-redux'
 
 import actions from './actions'
 import Application from './components/application'
-import mount from './mount'
 import reducers from './reducers'
 import * as select from './selectors'
 
@@ -19,7 +19,7 @@ function mapStateToProps (state, ownProps) {
     activeNetworkIndex: select.activeNetworkIndex(state, ownProps),
     activeTransitive: select.activeTransitive(state, ownProps),
     allTransitiveData: select.allTransitiveData(state, ownProps),
-    drawActiveOpportunityDataset: select.drawActiveOpportunityDataset(state, ownProps),
+    drawOpportunityDatasets: select.drawOpportunityDatasets(state, ownProps),
     drawIsochrones: select.drawIsochrones(state, ownProps),
     isochrones: select.isochrones(state, ownProps),
     isLoading: select.loading(state, ownProps),

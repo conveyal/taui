@@ -31,8 +31,8 @@ import RouteCard from './route-card'
 import RouteSegments from './route-segments'
 
 type Network = {
-  name: string,
-  active: boolean
+  active: boolean,
+  name: string
 }
 
 type MapState = {
@@ -48,25 +48,25 @@ type Props = {
     grids: string[],
     networks: Network[]
   },
-  drawActiveOpportunityDataset: Function,
   drawIsochrones: Function[],
+  drawOpportunityDatasets: any[],
+  geocode: (string, Function) => void,
   geocoder: GeocoderStore,
+  initialize: Function => void,
   isLoading: boolean,
   isochrones: any[],
   map: MapState,
   pointsOfInterest: PointsOfInterest,
+  reverseGeocode: (string, Function) => void,
+  setEnd: any => void,
+  setSelectedTimeCutoff: any => void,
+
+  setStart: any => void,
   showComparison: boolean,
   timeCutoff: any,
   travelTimes: number[],
   ui: UIStore,
   uniqueRoutes: any[],
-
-  geocode: (string, Function) => void,
-  reverseGeocode: (string, Function) => void,
-  initialize: Function => void,
-  setEnd: any => void,
-  setSelectedTimeCutoff: any => void,
-  setStart: any => void,
   updateEnd: any => void,
   updateEndPosition: LonLat => void,
   updateMap: any => void,
@@ -234,7 +234,7 @@ export default class Application extends Component<Props, State> {
     return (
       <div>
         <div className='Fullscreen'>
-          <svg>
+          <svg width='0' height='0' style={{position: 'absolute'}}>
             <defs>
               <filter id='shadow'>
                 <feDropShadow dx='1' dy='1' stdDeviation='1' />
@@ -253,8 +253,8 @@ export default class Application extends Component<Props, State> {
             updateMap={p.updateMap}
             zoom={p.map.zoom}
           >
-            {p.drawActiveOpportunityDataset &&
-              <Gridualizer drawTile={p.drawActiveOpportunityDataset} zoom={p.map.zoom} />}
+            {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
+              <Gridualizer drawTile={drawTile} key={`draw-od-${i}`} zoom={p.map.zoom} />)}
 
             {!p.isLoading && p.isochrones.map((iso, i) => !iso
               ? null

@@ -7,7 +7,7 @@ export type LatLng = {
   lng: number
 }
 
-export type LonLat = {lon: number, lat: number}
+export type LonLat = {lat: number, lon: number}
 export type Point = {x: number, y: number}
 
 export type Location = {
@@ -22,20 +22,20 @@ export type PartialLocation = {
 
 export type Grid = {
   contains: (number, number) => boolean,
-  valueAtPoint: (number, number) => number,
   data: Int32Array,
-  north: number,
-  west: number,
   height: number,
+  north: number,
+  valueAtPoint: (number, number) => number,
+  west: number,
   width: number,
   zoom: number
 }
 
 export type Query = {
   height: number,
-  width: number,
   north: number,
   west: number,
+  width: number,
   zoom: number
 }
 
@@ -52,11 +52,11 @@ export type PathsData = {
 }
 
 export type TransitiveStop = {
-  stop_id: string,
   geometry: string,
+  stopIndex: number,
+  stop_id: string,
   stop_lat: number,
-  stop_lon: number,
-  stopIndex: number
+  stop_lon: number
 }
 
 export type TransitivePattern = {
@@ -73,8 +73,8 @@ export type TransitiveRoute = {
 
 export type TransitiveData = {
   patterns: TransitivePattern[],
-  stops: TransitiveStop[],
-  routes: TransitiveRoute[]
+  routes: TransitiveRoute[],
+  stops: TransitiveStop[]
 }
 
 export type QualifiedLeg = [TransitiveStop, TransitivePattern, TransitiveStop] // [boardStopId, Pattern, alightStopId]
@@ -92,22 +92,22 @@ export type GeometryType =
   | 'MultiPolygon'
 
 export type Feature = {
-  type: 'Feature',
+  geometry: {
+    coordinates: Coordinate | Coordinates,
+    type: GeometryType
+  },
   key: string,
   properties: any,
-  geometry: {
-    type: GeometryType,
-    coordinates: Coordinate | Coordinates
-  }
+  type: 'Feature'
 }
 
 export type PointFeature = {
-  type: 'Feature',
-  properties: any,
   geometry: {
-    type: 'Point',
-    coordinates: Coordinate
-  }
+    coordinates: Coordinate,
+    type: 'Point'
+  },
+  properties: any,
+  type: 'Feature'
 }
 
 export type MapboxFeature = {
@@ -149,17 +149,17 @@ export type GeocoderBoundary = {
 }
 
 export type PointsOfInterest = Array<{
-  label: string,
   feature: PointFeature,
+  label: string,
   value: Coordinate
 }>
 
 export type GeocoderStore = {
-  start: void | Location,
+  boundary: void | GeocoderBoundary,
   end: void | Location,
   focusLatlng: void | LatLng,
-  boundary: void | GeocoderBoundary,
-  pointsOfInterest: void | PointsOfInterest
+  pointsOfInterest: void | PointsOfInterest,
+  start: void | Location
 }
 
 export type MapStore = {
