@@ -68,9 +68,9 @@ type Props = {
 }
 
 type State = {
-  showSelectStartOrEnd: boolean,
   lastClickedLabel: null | string,
-  lastClickedPosition: null | Coordinate
+  lastClickedPosition: null | Coordinate,
+  showSelectStartOrEnd: boolean
 }
 
 const poiToFeatures = memoize(poi => poi.map(p => p.feature))
@@ -167,6 +167,13 @@ export default class Map extends PureComponent<Props, State> {
       start,
       zoom
     } = this.props
+
+    // Index elements with keys to reset them when elements are added / removed
+    const poiKey = pointsOfInterest.length > 0 ? 1 : 0
+    const startKey = `${poiKey + 1}-start-key`
+    const endKey = `${startKey + 1}-end-key`
+    const selectKey = `${endKey + 1}-select-key`
+
     const {
       lastClickedLabel,
       lastClickedPosition,
@@ -201,6 +208,7 @@ export default class Map extends PureComponent<Props, State> {
           pointsOfInterest.length > 0 &&
           <GeoJSON
             data={poiToFeatures(pointsOfInterest)}
+            key={poiKey}
             onClick={this._clickPoi}
           />}
 
@@ -208,6 +216,7 @@ export default class Map extends PureComponent<Props, State> {
           <Marker
             draggable
             icon={startIcon}
+            key={startKey}
             onDragEnd={this._setStartWithEvent}
             position={start.position}
           >
@@ -220,6 +229,7 @@ export default class Map extends PureComponent<Props, State> {
           <Marker
             draggable
             icon={endIcon}
+            key={endKey}
             onDragEnd={this._setEndWithEvent}
             position={end.position}
           >
@@ -229,7 +239,11 @@ export default class Map extends PureComponent<Props, State> {
           </Marker>}
 
         {showSelectStartOrEnd &&
-          <Popup closeButton={false} position={lastClickedPosition}>
+          <Popup
+            closeButton={false}
+            key={selectKey}
+            position={lastClickedPosition}
+          >
             <div className='Popup'>
               {lastClickedLabel &&
                 <h3>

@@ -9,8 +9,8 @@ import {coordinateToIndex} from './coordinate-to-point'
 import {isLight} from './hex-color-contrast'
 
 type Network = {
-  targets: number[],
-  paths: Path[]
+  paths: Path[],
+  targets: number[]
 }
 
 /**

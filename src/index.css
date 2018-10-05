@@ -17,6 +17,10 @@
   --shadow: #333;
 }
 
+::-webkit-scrollbar {
+  width: 0;
+}
+
 html, body {
   font-size: 15px;
   font-family: -apple-system,
@@ -56,20 +60,20 @@ html, body {
 }
 
 .Taui-Dock-content .heading {
-  color: rgba(255, 255, 255);
+  color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
   margin: 1rem 0 0.5rem;
   font-weight: var(--bold);
 }
 
 .Taui-Dock-content .heading a {
-  color: rgba(255, 255, 255);
+  color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
   cursor: pointer;
 }
 
 .Taui-Dock-content .title {
-  color: rgba(255, 255, 255);
+  color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
   font-size: 1.5rem;
   margin: 1rem 0;
@@ -138,7 +142,7 @@ html, body {
 
 .TimeCutoff .Time {
   font-weight: var(--bold);
-  color: rgba(255, 255, 255);
+  color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
 }
 
@@ -171,7 +175,7 @@ html, body {
 }
 
 .CardTitle {
-  color: rgba(255, 255, 255);
+  color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
   background-color: var(--blue);
   padding: 1rem 0.5rem 1rem 1rem;

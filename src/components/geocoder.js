@@ -18,21 +18,19 @@ type ReactSelectOption = {
 }
 
 type Props = {
-  placeholder: string,
-  pointsOfInterest: PointsOfInterest,
-  value: null | Location,
-
   geocode: (string, Function) => void,
   onChange: any => void,
-  reverseGeocode: (string, Function) => void
+  placeholder: string,
+
+  pointsOfInterest: PointsOfInterest,
+  reverseGeocode: (string, Function) => void,
+  value: null | Location
 }
 
 /**
  *
  */
-export default class Geocoder extends Component {
-  props: Props
-
+export default class Geocoder extends Component<Props> {
   autocompleteCache = {}
   options = {}
 

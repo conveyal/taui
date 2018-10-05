@@ -4,14 +4,14 @@ const HEADER_LENGTH = 9
 const TIMES_GRID_TYPE = 'ACCESSGR'
 
 type TimesData = {
-  version: number,
-  zoom: number,
-  west: number,
-  north: number,
-  width: number,
-  height: number,
+  data: Int32Array,
   depth: number,
-  data: Int32Array
+  height: number,
+  north: number,
+  version: number,
+  west: number,
+  width: number,
+  zoom: number
 }
 
 /**

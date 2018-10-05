@@ -7,3 +7,4 @@ configurations/*
 !configurations/messages
 tmp
 config.json
+yarn-error.log
