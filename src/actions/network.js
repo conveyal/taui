@@ -235,7 +235,7 @@ const fetchTimesAndPathsForNetworkAtIndex = (network, originPoint, index) =>
       const travelTimeSurface = parseTimesData(timesResponse.value)
       const {paths, pathsPerTarget, targets} = parsePathsData(pathsResponse.value)
 
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'test') {
         warnForInvalidPaths(paths, network.transitive)
       }
 
