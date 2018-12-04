@@ -3,27 +3,7 @@ import polyline from '@mapbox/polyline'
 import React from 'react'
 import {CircleMarker, LayerGroup, Polyline} from 'react-leaflet'
 
-const WALK_STYLE = {
-  color: '#333',
-  dashArray: '5, 5',
-  lineCap: 'butt',
-  lineMeter: 'miter',
-  weight: 5
-}
-
-const TRANSIT_STYLE = {
-  color: 'green',
-  weight: 5
-}
-
-const STOP_STYLE = {
-  color: '#333',
-  fill: true,
-  fillColor: '#fff',
-  fillOpacity: 1,
-  radius: 3,
-  weight: 2
-}
+import {STOP_STYLE, TRANSIT_STYLE, WALK_STYLE} from '../constants'
 
 export default class DrawRoute extends React.PureComponent {
   _findPositionsForWalk (segment) {

@@ -1,4 +1,6 @@
 @import url(node_modules/react-select/dist/react-select.css);
+@import url(node_modules/react-virtualized/styles.css);
+@import url(node_modules/react-virtualized-select/styles.css);
 @import url(src/components/log/style.css);
 
 /** Colors from https://palx.jxnblk.com/2389c9 **/
@@ -39,6 +41,11 @@ html, body {
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.isLoading .Taui-Map {
+  pointer-events: none;
+  opacity: 0.4;
 }
 
 .Taui-Dock {

@@ -1,6 +1,7 @@
 // @flow
 import message from '@conveyal/woonerf/message'
 import mount from '@conveyal/woonerf/mount'
+import get from 'lodash/get'
 import React from 'react'
 import {connect} from 'react-redux'
 
@@ -23,7 +24,8 @@ function mapStateToProps (state, ownProps) {
     drawIsochrones: select.drawIsochrones(state, ownProps),
     isochrones: select.isochrones(state, ownProps),
     isLoading: select.loading(state, ownProps),
-    pointsOfInterest: select.pointsOfInterest(state, ownProps),
+    pointsOfInterest: get(state, 'data.pointsOfInterest'),
+    pointsOfInterestOptions: select.pointsOfInterestOptions(state, ownProps),
     showComparison: select.showComparison(state, ownProps),
     travelTimes: select.travelTimes(state, ownProps),
     uniqueRoutes: select.uniqueRoutes(state, ownProps)

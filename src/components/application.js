@@ -4,7 +4,6 @@ import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
-import {GeoJSON} from 'react-leaflet'
 
 import type {
   Coordinate,
@@ -21,9 +20,7 @@ import {NETWORK_COLORS} from '../constants'
 import {getAsObject} from '../utils/hash'
 import downloadJson from '../utils/download-json'
 
-import DrawRoute from './draw-route'
 import Form from './form'
-import Gridualizer from './gridualizer'
 import Log from './log'
 import Map from './map'
 import RouteAccess from './route-access'
@@ -56,7 +53,8 @@ type Props = {
   isLoading: boolean,
   isochrones: any[],
   map: MapState,
-  pointsOfInterest: PointsOfInterest,
+  pointsOfInterest: any, // FeatureCollection
+  pointsOfInterestOptions: PointsOfInterest,
   reverseGeocode: (string, Function) => void,
   setEnd: any => void,
   setSelectedTimeCutoff: any => void,
@@ -77,14 +75,6 @@ type Props = {
 type State = {
   componentError: any
 }
-
-const getIsochroneStyleFor = index => () => ({
-  fillColor: NETWORK_COLORS[index],
-  fillOpacity: 0.4,
-  pointerEvents: 'none',
-  color: NETWORK_COLORS[index],
-  weight: 1
-})
 
 /**
  *
@@ -232,7 +222,7 @@ export default class Application extends Component<Props, State> {
   render () {
     const p = this.props
     return (
-      <div>
+      <div className={p.isLoading ? 'isLoading' : ''}>
         <div className='Fullscreen'>
           <svg width='0' height='0' style={{position: 'absolute'}}>
             <defs>
@@ -243,29 +233,19 @@ export default class Application extends Component<Props, State> {
           </svg>
           <Map
             {...p.map}
-            centerCoordinates={p.map.centerCoordinates}
+            activeTransitive={p.activeTransitive}
             clearStartAndEnd={this._clearStartAndEnd}
             end={p.geocoder.end}
+            isLoading={p.isLoading}
+            isochrones={p.isochrones}
+            drawOpportunityDatasets={p.drawOpportunityDatasets}
             pointsOfInterest={p.pointsOfInterest}
+            showRoutes={this._showRoutes()}
             setEndPosition={p.updateEndPosition}
             setStartPosition={p.updateStartPosition}
             start={p.geocoder.start}
             updateMap={p.updateMap}
-            zoom={p.map.zoom}
-          >
-            {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
-              <Gridualizer drawTile={drawTile} key={`draw-od-${i}`} zoom={p.map.zoom} />)}
-
-            {!p.isLoading && p.isochrones.map((iso, i) => !iso
-              ? null
-              : <GeoJSON
-                data={iso}
-                key={iso.key}
-                style={getIsochroneStyleFor(i)}
-              />)}
-
-            {this._showRoutes() && <DrawRoute transitive={p.activeTransitive} />}
-          </Map>
+          />
         </div>
         <Dock showSpinner={p.ui.fetches > 0} componentError={this.state.componentError}>
           <Form
@@ -275,10 +255,12 @@ export default class Application extends Component<Props, State> {
             onTimeCutoffChange={this._onTimeCutoffChange}
             onChangeEnd={this._setEndWithFeature}
             onChangeStart={this._setStartWithFeature}
-            pointsOfInterest={p.pointsOfInterest}
+            pointsOfInterest={p.pointsOfInterestOptions}
             reverseGeocode={p.reverseGeocode}
             selectedTimeCutoff={p.timeCutoff.selected}
             start={p.geocoder.start}
+            updateEnd={p.updateEnd}
+            updateStart={p.updateStart}
           />
           {p.data.networks.map((network, index) => (
             <RouteCard

@@ -3,31 +3,36 @@ import lonlat from '@conveyal/lonlat'
 import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import Leaflet from 'leaflet'
+import find from 'lodash/find'
 import memoize from 'lodash/memoize'
 import React, {PureComponent} from 'react'
 import {
-  GeoJSON,
   Map as LeafletMap,
   Marker,
   Popup,
   TileLayer,
   ZoomControl
 } from 'react-leaflet'
+import VectorGrid from 'react-leaflet-vectorgrid/dist/react-leaflet-vectorgrid'
 
+import {NETWORK_COLORS, STOP_STYLE} from '../constants'
 import type {
   Coordinate,
-  Feature,
   Location,
   LonLat,
-  MapEvent,
-  PointsOfInterest
+  MapEvent
 } from '../types'
+
+import DrawRoute from './draw-route'
+import Gridualizer from './gridualizer'
 
 const TILE_URL = Leaflet.Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
   : process.env.LEAFLET_TILE_URL
 
-const LABEL_URL = process.env.LABEL_URL
+const LABEL_URL = Leaflet.Browser.retina && process.env.LABEL_RETINA_URL
+  ? process.env.LABEL_RETINA_URL
+  : process.env.LABEL_URL
 
 const TILE_LAYER_PROPS = {}
 if (Leaflet.Browser.retina) {
@@ -59,7 +64,8 @@ type Props = {
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
   end: null | Location,
-  pointsOfInterest: PointsOfInterest,
+  isLoading: boolean,
+  pointsOfInterest: void | any, // FeatureCollection
   setEndPosition: LonLat => void,
   setStartPosition: LonLat => void,
   start: null | Location,
@@ -73,7 +79,33 @@ type State = {
   showSelectStartOrEnd: boolean
 }
 
-const poiToFeatures = memoize(poi => poi.map(p => p.feature))
+const getIsochroneStyleFor = memoize(index => ({
+  fillColor: NETWORK_COLORS[index],
+  fillOpacity: 0.4,
+  pointerEvents: 'none',
+  color: NETWORK_COLORS[index],
+  weight: 0
+}))
+
+/**
+ * Temporary class that fixes VectorGrid's `getFeature`
+ */
+class VGrid extends VectorGrid {
+  _propagateEvent (eventHandler, e) {
+    if (!eventHandler) return
+    const featureId = this._getFeatureId(e.layer)
+    const feature = this.getFeature(featureId)
+    if (feature) {
+      Leaflet.DomEvent.stopPropagation(e)
+      eventHandler(feature)
+    }
+  }
+
+  getFeature (featureId) {
+    const p = this.props
+    return find(p.data.features, f => f.properties[p.idField] === featureId)
+  }
+}
 
 /**
  *
@@ -136,55 +168,35 @@ export default class Map extends PureComponent<Props, State> {
     }
   }
 
-  _clickPoi = (event: Event & {layer: {feature: Feature}}): void => {
-    if (!event.layer || !event.layer.feature) {
-      return this._clearState()
-    }
-
-    const {feature} = event.layer
-    const {coordinates} = feature.geometry
-    this.setState({
-      lastClickedLabel: feature.properties.label,
-      lastClickedPosition: lonlat.toLeaflet(coordinates),
-      showSelectStartOrEnd: true
-    })
-  }
-
   _setZoom = (e: MapEvent) => {
     const zoom = e.target._zoom
     this.props.updateMap({zoom})
+  }
+
+  _clickPoi = (feature) => {
+    this.setState({
+      lastClickedLabel: feature.properties.label,
+      lastClickedPosition: lonlat.toLeaflet(feature.geometry.coordinates),
+      showSelectStartOrEnd: true
+    })
   }
 
   /**
    * Render
    */
   render () {
-    const {
-      centerCoordinates,
-      children,
-      end,
-      pointsOfInterest,
-      start,
-      zoom
-    } = this.props
+    const p = this.props
+    const s = this.state
 
     // Index elements with keys to reset them when elements are added / removed
-    const poiKey = pointsOfInterest.length > 0 ? 1 : 0
-    const startKey = `${poiKey + 1}-start-key`
-    const endKey = `${startKey + 1}-end-key`
-    const selectKey = `${endKey + 1}-select-key`
+    let keyCount = 0
 
-    const {
-      lastClickedLabel,
-      lastClickedPosition,
-      showSelectStartOrEnd
-    } = this.state
     return (
       <LeafletMap
-        center={centerCoordinates}
+        center={p.centerCoordinates}
         className='Taui-Map'
         onZoomend={this._setZoom}
-        zoom={zoom}
+        zoom={p.zoom}
         onClick={this._onMapClick}
         zoomControl={false}
       >
@@ -195,70 +207,94 @@ export default class Map extends PureComponent<Props, State> {
           {...TILE_LAYER_PROPS}
         />
 
-        {children}
+        {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
+          <Gridualizer
+            drawTile={drawTile}
+            key={`draw-od-${i}-${keyCount++}`}
+            zoom={p.zoom}
+          />)}
+
+        {!p.isLoading && p.isochrones.map((iso, i) => !iso
+          ? null
+          : <VGrid
+            data={iso}
+            key={`${iso.key}-${keyCount++}`}
+            style={getIsochroneStyleFor(i)}
+          />)}
 
         {LABEL_URL &&
           <TileLayer
             attribution={process.env.LEAFLET_ATTRIBUTION}
+            key={`tile-layer-${keyCount++}`}
             url={LABEL_URL}
             zIndex={40}
+            {...TILE_LAYER_PROPS}
           />}
 
-        {(!start || !end) &&
-          pointsOfInterest.length > 0 &&
-          <GeoJSON
-            data={poiToFeatures(pointsOfInterest)}
-            key={poiKey}
+        {p.showRoutes &&
+          <DrawRoute
+            key={`draw-routes-${keyCount++}`}
+            transitive={p.activeTransitive}
+          />}
+
+        {(!p.start || !p.end) && p.pointsOfInterest &&
+          <VGrid
+            data={p.pointsOfInterest}
+            idField='label'
+            minZoom={12}
             onClick={this._clickPoi}
+            style={STOP_STYLE}
+            tooltip='label'
+            zIndex={50}
           />}
 
-        {start &&
+        {p.start &&
           <Marker
             draggable
             icon={startIcon}
-            key={startKey}
+            key={`start-${keyCount++}`}
             onDragEnd={this._setStartWithEvent}
-            position={start.position}
+            position={p.start.position}
           >
             <Popup>
-              <span>{start.label}</span>
+              <span>{p.start.label}</span>
             </Popup>
           </Marker>}
 
-        {end &&
+        {p.end &&
           <Marker
             draggable
             icon={endIcon}
-            key={endKey}
+            key={`end-${keyCount++}`}
             onDragEnd={this._setEndWithEvent}
-            position={end.position}
+            position={p.end.position}
           >
             <Popup>
-              <span>{end.label}</span>
+              <span>{p.end.label}</span>
             </Popup>
           </Marker>}
 
-        {showSelectStartOrEnd &&
+        {s.showSelectStartOrEnd &&
           <Popup
             closeButton={false}
-            key={selectKey}
-            position={lastClickedPosition}
+            key={`select-${keyCount++}`}
+            position={s.lastClickedPosition}
           >
             <div className='Popup'>
-              {lastClickedLabel &&
+              {s.lastClickedLabel &&
                 <h3>
-                  {lastClickedLabel}
+                  {s.lastClickedLabel}
                 </h3>}
               <button onClick={this._setStart}>
                 <Icon type='map-marker' />{' '}
                 {message('Map.SetLocationPopup.SetStart')}
               </button>
-              {start &&
+              {p.start &&
                 <button onClick={this._setEnd}>
                   <Icon type='map-marker' />{' '}
                   {message('Map.SetLocationPopup.SetEnd')}
                 </button>}
-              {(start || end) &&
+              {(p.start || p.end) &&
                 <button onClick={this._clearStartAndEnd}>
                   <Icon type='times' />{' '}
                   {message('Map.SetLocationPopup.ClearMarkers')}
