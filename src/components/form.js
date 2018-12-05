@@ -1,6 +1,5 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
-import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import memoize from 'lodash/memoize'
 import React from 'react'
