@@ -244,7 +244,9 @@ export default class Application extends Component<Props, State> {
             setEndPosition={p.updateEndPosition}
             setStartPosition={p.updateStartPosition}
             start={p.geocoder.start}
+            updateEnd={p.updateEnd}
             updateMap={p.updateMap}
+            updateStart={p.updateStart}
           />
         </div>
         <Dock showSpinner={p.ui.fetches > 0} componentError={this.state.componentError}>

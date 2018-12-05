@@ -69,7 +69,9 @@ type Props = {
   setEndPosition: LonLat => void,
   setStartPosition: LonLat => void,
   start: null | Location,
+  updateEnd: () => void,
   updateMap: any => void,
+  updateStart: () => void,
   zoom: number
 }
 
@@ -153,19 +155,25 @@ export default class Map extends PureComponent<Props, State> {
   }
 
   _setEnd = (): void => {
-    const {lastClickedPosition} = this.state
-    this._clearState()
-    if (lastClickedPosition) {
-      this.props.setEndPosition(lonlat(lastClickedPosition))
+    const p = this.props
+    const s = this.state
+    if (s.lastClickedPosition) {
+      const position = lonlat(s.lastClickedPosition)
+      if (s.lastClickedLabel) p.updateEnd({label: s.lastClickedLabel, position})
+      else p.setEndPosition(position)
     }
+    this._clearState()
   }
 
   _setStart = (): void => {
-    const {lastClickedPosition} = this.state
-    this._clearState()
-    if (lastClickedPosition) {
-      this.props.setStartPosition(lonlat(lastClickedPosition))
+    const p = this.props
+    const s = this.state
+    if (s.lastClickedPosition) {
+      const position = lonlat(s.lastClickedPosition)
+      if (s.lastClickedLabel) p.updateStart({label: s.lastClickedLabel, position})
+      else p.setStartPosition(position)
     }
+    this._clearState()
   }
 
   _setZoom = (e: MapEvent) => {
