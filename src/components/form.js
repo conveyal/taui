@@ -101,10 +101,10 @@ export default class Form extends React.PureComponent {
               />}
             <div className='heading'>
               {message('Strings.HighlightAreaAccessibleWithin')}
-              {!this.state.animating &&
+              {/* DISABLED: VectorGrid is incompatible with animation. !this.state.animating &&
                 <a className='pull-right' onClick={this._animateTimeCutoff}>
                   <Icon type='play' />
-                </a>}
+                </a> */}
             </div>
             <div className='TimeCutoff'>
               <div className='Time'>
