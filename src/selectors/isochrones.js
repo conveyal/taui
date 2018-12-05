@@ -7,11 +7,10 @@ import {createSelector} from 'reselect'
 export default createSelector(
   state => get(state, 'data.networks'),
   state => get(state, 'timeCutoff.selected'),
-  state => state.map,
-  (networks = [], timeCutoff, mapData) =>
-    networks.map((network, index) => {
-      if (network.showOnMap && network.travelTimeSurface && network.travelTimeSurface.data) {
-        return getIsochrone(network, index, timeCutoff)
+  (networks = [], timeCutoff) =>
+    networks.map((n, i) => {
+      if (n.showOnMap && n.travelTimeSurface && n.travelTimeSurface.data) {
+        return getIsochrone(n, i, timeCutoff)
       }
     })
 )
@@ -42,5 +41,13 @@ const getIsochrone = (network, index, timeCutoff) => {
   })
 
   // create the key for react-leaflet/GeoJSON here
-  return {...isochrone, key: toKey(network, index, timeCutoff)}
+  return {
+    ...isochrone,
+    key: toKey(network, index, timeCutoff),
+    properties: {
+      name: network.name,
+      origin: [network.originPoint.x, network.originPoint.y],
+      timeCutoff
+    }
+  }
 }
