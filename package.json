@@ -10,7 +10,7 @@
     "pretest": "yarn",
     "semantic-release": "semantic-release",
     "start": "mastarm build --serve",
-    "test": "mastarm lint src"
+    "test": "mastarm lint src && mastarm build"
   },
   "repository": {
     "type": "git",
@@ -38,7 +38,7 @@
     "jsolines": "^2.1.0",
     "leaflet": "^1.3.4",
     "lodash": "^4.17.10",
-    "mastarm": "^4.3.1",
+    "mastarm": "^4.4.2",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
     "react-leaflet": "^1.9.1",
