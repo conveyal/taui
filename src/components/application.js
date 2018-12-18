@@ -2,6 +2,7 @@
 import lonlat from '@conveyal/lonlat'
 import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
+import get from 'lodash/get'
 import memoize from 'lodash/memoize'
 import React, {Component} from 'react'
 
@@ -41,12 +42,14 @@ type Props = {
   accessibility: number[][],
   actionLog: LogItems,
   activeTransitive: any,
+  allTransitive: any,
   data: {
     grids: string[],
     networks: Network[]
   },
   drawIsochrones: Function[],
   drawOpportunityDatasets: any[],
+  drawRoutes: any[],
   geocode: (string, Function) => void,
   geocoder: GeocoderStore,
   initialize: Function => void,
@@ -190,10 +193,12 @@ export default class Application extends Component<Props, State> {
   _setShowOnMap = memoize(index => () => {
     const p = this.props
     const network = p.data.networks[index]
+    const showOnMap = !network.showOnMap
     p.setNetwork({
       ...network,
-      showOnMap: !network.showOnMap
+      showOnMap
     })
+    if (showOnMap) p.setActiveNetwork(network.name)
   })
 
   _downloadIsochrone = memoize(index => () => {
@@ -212,8 +217,8 @@ export default class Application extends Component<Props, State> {
   })
 
   _showRoutes () {
-    const at = this.props.activeTransitive
-    return !this.props.isLoading && at && at.journeys && at.journeys[0]
+    const p = this.props
+    return !p.isLoading && get(p, 'allTransitiveData[0].journeys[0]')
   }
 
   /**
@@ -233,12 +238,14 @@ export default class Application extends Component<Props, State> {
           </svg>
           <Map
             {...p.map}
-            activeTransitive={p.activeTransitive}
+            activeNetworkIndex={p.activeNetworkIndex}
             clearStartAndEnd={this._clearStartAndEnd}
             end={p.geocoder.end}
             isLoading={p.isLoading}
             isochrones={p.isochrones}
+            drawIsochrones={p.drawIsochrones}
             drawOpportunityDatasets={p.drawOpportunityDatasets}
+            drawRoutes={p.drawRoutes}
             pointsOfInterest={p.pointsOfInterest}
             showRoutes={this._showRoutes()}
             setEndPosition={p.updateEndPosition}
@@ -266,10 +273,12 @@ export default class Application extends Component<Props, State> {
           />
           {p.data.networks.map((network, index) => (
             <RouteCard
+              active={p.activeNetworkIndex === index}
               cardColor={NETWORK_COLORS[index]}
               downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
               index={index}
               key={`${index}-route-card`}
+              onMouseOver={() => p.setActiveNetwork(network.name)}
               setShowOnMap={this._setShowOnMap(index)}
               showOnMap={network.showOnMap}
               title={network.name}
@@ -279,12 +288,12 @@ export default class Application extends Component<Props, State> {
                   accessibility={p.accessibility[index]}
                   grids={p.data.grids}
                   hasStart={!!p.geocoder.start}
-                  oldAccessibility={p.accessibility[0]}
+                  oldAccessibility={p.accessibility[p.accessibility.length - 1]}
                   showComparison={p.showComparison}
                 />}
               {!p.isLoading && !!p.geocoder.end && !!p.geocoder.start &&
                 <RouteSegments
-                  oldTravelTime={p.travelTimes[0]}
+                  oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
                   routeSegments={p.uniqueRoutes[index]}
                   travelTime={p.travelTimes[index]}
                 />}

@@ -4,6 +4,16 @@ import {Map as LeafletMap} from 'leaflet'
 import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
+import {NETWORK_COLORS} from '../constants'
+
+const getIsochroneStyleFor = (index) => ({
+  fillColor: NETWORK_COLORS[index],
+  fillOpacity: index === 0 ? 0.6 : 0.4,
+  pointerEvents: 'none',
+  color: NETWORK_COLORS[index],
+  weight: 0
+})
+
 export default createSelector(
   state => get(state, 'data.networks'),
   state => get(state, 'timeCutoff.selected'),
@@ -44,6 +54,7 @@ const getIsochrone = (network, index, timeCutoff) => {
   return {
     ...isochrone,
     key: toKey(network, index, timeCutoff),
+    style: getIsochroneStyleFor(index),
     properties: {
       name: network.name,
       origin: [network.originPoint.x, network.originPoint.y],

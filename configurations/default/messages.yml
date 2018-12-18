@@ -12,6 +12,7 @@ Systems:
   BestTripTitle: Fastest trip
   AlternateTripsTitle: Alternatively use
   Waiting: waiting included
+  NoAccess: No data from this point...
 Faster: faster
 NewTrip: New Trip
 Geocoding:

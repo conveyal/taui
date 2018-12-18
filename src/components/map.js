@@ -4,7 +4,6 @@ import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import Leaflet from 'leaflet'
 import find from 'lodash/find'
-import memoize from 'lodash/memoize'
 import React, {PureComponent} from 'react'
 import {
   Map as LeafletMap,
@@ -15,7 +14,7 @@ import {
 } from 'react-leaflet'
 import VectorGrid from 'react-leaflet-vectorgrid/dist/react-leaflet-vectorgrid'
 
-import {NETWORK_COLORS, STOP_STYLE} from '../constants'
+import {STOP_STYLE} from '../constants'
 import type {
   Coordinate,
   Location,
@@ -34,10 +33,10 @@ const LABEL_URL = Leaflet.Browser.retina && process.env.LABEL_RETINA_URL
   ? process.env.LABEL_RETINA_URL
   : process.env.LABEL_URL
 
-const TILE_LAYER_PROPS = {}
-if (Leaflet.Browser.retina) {
-  TILE_LAYER_PROPS.tileSize = 512
-  TILE_LAYER_PROPS.zoomOffset = -1
+const TILE_OPTIONS = {
+  attribution: process.env.LEAFLET_ATTRIBUTION,
+  tileSize: 512,
+  zoomOffset: -1
 }
 
 const iconWidth = 20
@@ -61,8 +60,12 @@ const endIcon = Leaflet.divIcon({
 })
 
 type Props = {
+  allTransitiveData: any[],
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
+  drawIsochrones: Function[],
+  drawOpportunityDatasets: Function[],
+  drawRoutes: any[],
   end: null | Location,
   isLoading: boolean,
   pointsOfInterest: void | any, // FeatureCollection
@@ -81,14 +84,6 @@ type State = {
   showSelectStartOrEnd: boolean
 }
 
-const getIsochroneStyleFor = memoize(index => ({
-  fillColor: NETWORK_COLORS[index],
-  fillOpacity: 0.4,
-  pointerEvents: 'none',
-  color: NETWORK_COLORS[index],
-  weight: 0
-}))
-
 /**
  * Temporary class that fixes VectorGrid's `getFeature`
  */
@@ -101,6 +96,12 @@ class VGrid extends VectorGrid {
       Leaflet.DomEvent.stopPropagation(e)
       eventHandler(feature)
     }
+  }
+
+  createLeafletElement (props) {
+    const le = super.createLeafletElement(props)
+    le.options.rendererFactory = Leaflet.canvas.tile
+    return le
   }
 
   getFeature (featureId) {
@@ -189,15 +190,18 @@ export default class Map extends PureComponent<Props, State> {
     })
   }
 
-  /**
-   * Render
-   */
+  _key = 0
+  _getKey () { return this._key++ }
+
   render () {
     const p = this.props
     const s = this.state
 
     // Index elements with keys to reset them when elements are added / removed
-    let keyCount = 0
+
+    this._key = 0
+    let zIndex = 0
+    const getZIndex = () => zIndex++
 
     return (
       <LeafletMap
@@ -210,59 +214,79 @@ export default class Map extends PureComponent<Props, State> {
       >
         <ZoomControl position='topright' />
         <TileLayer
+          {...TILE_OPTIONS}
           url={TILE_URL}
-          attribution={process.env.LEAFLET_ATTRIBUTION}
-          {...TILE_LAYER_PROPS}
+          zIndex={getZIndex()}
         />
 
-        {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
+        {/* p.drawIsochrones.map((drawTile, i) => drawTile &&
           <Gridualizer
             drawTile={drawTile}
-            key={`draw-od-${i}-${keyCount++}`}
+            key={`draw-iso-${i}-${keyCount++}`}
             zoom={p.zoom}
-          />)}
+          />) */}
+
+        {/* !p.isLoading && p.isochrones.map((iso, i) => !iso
+          ? null
+          : <GeoJSON
+            data={iso}
+            key={`${iso.key}-${i}-${keyCount++}`}
+            style={iso.style}
+            zIndex={getZIndex()}
+          />) */}
 
         {!p.isLoading && p.isochrones.map((iso, i) => !iso
           ? null
           : <VGrid
             data={iso}
-            key={`${iso.key}-${keyCount++}`}
-            style={getIsochroneStyleFor(i)}
+            key={`${iso.key}-${i}-${this._getKey()}`}
+            style={iso.style}
+            zIndex={getZIndex()}
+          />)}
+
+        {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
+          <Gridualizer
+            drawTile={drawTile}
+            key={`draw-od-${i}-${this._getKey()}`}
+            zIndex={getZIndex()}
+            zoom={p.zoom}
           />)}
 
         {LABEL_URL &&
           <TileLayer
-            attribution={process.env.LEAFLET_ATTRIBUTION}
-            key={`tile-layer-${keyCount++}`}
+            {...TILE_OPTIONS}
+            key={`tile-layer-${this._getKey()}`}
             url={LABEL_URL}
-            zIndex={40}
-            {...TILE_LAYER_PROPS}
+            zIndex={getZIndex()}
           />}
 
-        {p.showRoutes &&
+        {p.showRoutes && p.drawRoutes.map(drawRoute =>
           <DrawRoute
-            key={`draw-routes-${keyCount++}`}
-            transitive={p.activeTransitive}
-          />}
+            {...drawRoute}
+            key={`draw-routes-${drawRoute.index}-${this._getKey()}`}
+            zIndex={getZIndex()}
+          />)}
 
         {(!p.start || !p.end) && p.pointsOfInterest &&
           <VGrid
             data={p.pointsOfInterest}
             idField='label'
-            minZoom={12}
+            key={`poi-${this._getKey()}`}
+            minZoom={10}
             onClick={this._clickPoi}
             style={STOP_STYLE}
             tooltip='label'
-            zIndex={50}
+            zIndex={getZIndex()}
           />}
 
         {p.start &&
           <Marker
             draggable
             icon={startIcon}
-            key={`start-${keyCount++}`}
+            key={`start-${this._getKey()}`}
             onDragEnd={this._setStartWithEvent}
             position={p.start.position}
+            zIndex={getZIndex()}
           >
             <Popup>
               <span>{p.start.label}</span>
@@ -273,9 +297,10 @@ export default class Map extends PureComponent<Props, State> {
           <Marker
             draggable
             icon={endIcon}
-            key={`end-${keyCount++}`}
+            key={`end-${this._getKey()}`}
             onDragEnd={this._setEndWithEvent}
             position={p.end.position}
+            zIndex={getZIndex()}
           >
             <Popup>
               <span>{p.end.label}</span>
@@ -285,8 +310,9 @@ export default class Map extends PureComponent<Props, State> {
         {s.showSelectStartOrEnd &&
           <Popup
             closeButton={false}
-            key={`select-${keyCount++}`}
+            key={`select-${this._getKey()}`}
             position={s.lastClickedPosition}
+            zIndex={getZIndex()}
           >
             <div className='Popup'>
               {s.lastClickedLabel &&

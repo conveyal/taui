@@ -185,16 +185,23 @@ html, body {
   color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
   background-color: var(--blue);
-  padding: 1rem 0.5rem 1rem 1rem;
+  padding: 1rem 4rem 1rem 1rem;
   font-weight: var(--bold);
+  position: relative;
 }
 
-.CardTitle > a {
+.CardLinks {
+  position: absolute;
+  top: 1rem;
+  right: 0;
+}
+
+.CardLinks > a {
   cursor: pointer;
   padding: 0 0.5rem;
 }
 
-.CardTitle > a:hover {
+.CardLinks > a:hover {
   color: var(--anchor-hover-color);
   text-shadow: 0 0 1px #fff;
 }
