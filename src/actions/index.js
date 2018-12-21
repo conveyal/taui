@@ -1,4 +1,5 @@
 // @flow
+import * as config from './config'
 import * as geocode from './geocode'
 import * as grid from './grid'
 import * as location from './location'
@@ -12,6 +13,7 @@ const setSelectedTimeCutoff = (payload: number) => ({
 })
 
 export default {
+  ...config,
   ...geocode,
   ...grid,
   ...location,

@@ -258,7 +258,6 @@ export default class Application extends Component<Props, State> {
         </div>
         <Dock showSpinner={p.ui.fetches > 0} componentError={this.state.componentError}>
           <Form
-            boundary={p.geocoder.boundary}
             end={p.geocoder.end}
             geocode={p.geocode}
             onTimeCutoffChange={this._onTimeCutoffChange}

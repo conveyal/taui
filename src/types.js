@@ -155,7 +155,6 @@ export type PointsOfInterest = Array<{
 }>
 
 export type GeocoderStore = {
-  boundary: void | GeocoderBoundary,
   end: void | Location,
   focusLatlng: void | LatLng,
   pointsOfInterest: void | PointsOfInterest,

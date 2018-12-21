@@ -68,6 +68,7 @@ type Props = {
   drawRoutes: any[],
   end: null | Location,
   isLoading: boolean,
+  maxBounds: void | number[][],
   pointsOfInterest: void | any, // FeatureCollection
   setEndPosition: LonLat => void,
   setStartPosition: LonLat => void,
@@ -207,9 +208,12 @@ export default class Map extends PureComponent<Props, State> {
       <LeafletMap
         center={p.centerCoordinates}
         className='Taui-Map'
+        maxBounds={p.maxBounds}
+        maxZoom={p.maxZoom}
+        minZoom={p.minZoom}
+        onClick={this._onMapClick}
         onZoomend={this._setZoom}
         zoom={p.zoom}
-        onClick={this._onMapClick}
         zoomControl={false}
       >
         <ZoomControl position='topright' />

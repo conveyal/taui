@@ -37,12 +37,6 @@ export default class RouteCard extends React.PureComponent<Props> {
         >
           {title}
           <div className='CardLinks'>
-            <a
-              onClick={setShowOnMap}
-              title='Show/hide isochrone for network'
-            >
-              {showOnMap ? <Icon type='eye-slash' /> : <Icon type='eye' />}
-            </a>
             {downloadIsochrone &&
               <a
                 onClick={downloadIsochrone}
@@ -50,6 +44,12 @@ export default class RouteCard extends React.PureComponent<Props> {
               >
                 <Icon type='download' />
               </a>}
+            <a
+              onClick={setShowOnMap}
+              title='Show/hide isochrone for network'
+            >
+              {showOnMap ? <Icon type='eye-slash' /> : <Icon type='eye' />}
+            </a>
           </div>
         </div>
         <table className='CardContent'>{children}</table>

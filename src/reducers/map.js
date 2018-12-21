@@ -1,4 +1,6 @@
 // @flow
+import lonlat from '@conveyal/lonlat'
+import get from 'lodash/get'
 import {handleActions} from 'redux-actions'
 
 export default handleActions(
@@ -7,10 +9,10 @@ export default handleActions(
       return {...state, ...action.payload}
     },
     'set start' (state, action) {
-      const newCenter = action.payload && action.payload.position
+      const c = get(action, 'payload.position')
       return {
         ...state,
-        centerCoordinates: newCenter
+        centerCoordinates: c ? lonlat.toLeaflet(c) : state.centerCoordinates
       }
     }
   },
