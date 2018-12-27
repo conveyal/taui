@@ -9,10 +9,11 @@ export default handleActions(
       return {...state, ...action.payload}
     },
     'set start' (state, action) {
-      const c = get(action, 'payload.position')
+      const c = get(action, 'payload.position') || state.centerCoordinates
+      const ll = lonlat(c)
       return {
         ...state,
-        centerCoordinates: c ? lonlat.toLeaflet(c) : state.centerCoordinates
+        centerCoordinates: {lat: c.lat, lng: c.lon}
       }
     }
   },

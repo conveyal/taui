@@ -2,11 +2,9 @@
 import formatDate from 'date-fns/format'
 import React from 'react'
 
-import type {LogItem} from '../../types'
-
 const FORMAT = 'HH:mm:ss'
 
-export default function Item (props: LogItem) {
+export default function Item (props) {
   return (
     <div className={`LogItem ${props.level}`}>
       <span className='LogItem-createdAt'>

@@ -1,0 +1,26 @@
+{
+  "data": {
+    "grids": [],
+    "networks": []
+  },
+  "geocoder": {
+    "proximity": "139.75673675537107,35.655483013543204",
+    "types": "country,region,postcode,district,place,locality,neighborhood,address,poi"
+  },
+  "map": {
+    "attribution": "<a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, &copy; <a href='https://www.mapbox.com/about/maps/'>Mapbox</a>",
+    "centerCoordinates": [
+       35.655483013543204,
+       139.75673675537107
+    ],
+    "labelUrl": "https://api.mapbox.com/styles/v1/conveyal/cjpnnubht1xcd2rqoetnjo46n/tiles/{z}/{x}/{y}",
+    "tileUrl": "https://api.mapbox.com/styles/v1/conveyal/cjh1sf04v0k292sulm8qu2pbr/tiles/{z}/{x}/{y}",
+    "zoom": 11
+  },
+  "ui": {
+    "fetches": 0,
+    "showLink": true,
+    "showLog": true,
+    "allowChangeConfig": true
+  }
+}

@@ -1,7 +1,8 @@
 // @flow
-import message from '@conveyal/woonerf/message'
 import toSpaceCase from 'lodash/lowerCase'
 import get from 'lodash/get'
+
+import message from '../message'
 
 import Alert from './tr-alert'
 

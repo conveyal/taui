@@ -3,15 +3,8 @@ import slice from 'lodash/slice'
 import uniq from 'lodash/uniq'
 import toUpperCase from 'lodash/upperCase'
 
-import type {Location, Path, QualifiedPath} from '../types'
-
 import {coordinateToIndex} from './coordinate-to-point'
 import {isLight} from './hex-color-contrast'
-
-type Network = {
-  paths: Path[],
-  targets: number[]
-}
 
 /**
  * Find or throw
@@ -28,11 +21,7 @@ const STOP = 'STOP'
 const TRANSIT = 'TRANSIT'
 const WALK = 'WALK'
 
-export default function createTransitiveRoutesForNetwork (
-  network: Network,
-  start: Location,
-  end: Location
-) {
+export default function createTransitiveRoutesForNetwork (network, start, end) {
   const td = network.transitive
   const places = [
     {
@@ -144,7 +133,7 @@ function createWalkOnlyJourney () {
 /**
  * Used to show a transitive route
  */
-function getTransitiveSegmentsFromPath (path: QualifiedPath) {
+function getTransitiveSegmentsFromPath (path) {
   const initialStopId = path[0][0].stop_id
   const segments = []
   let previousStopId = initialStopId

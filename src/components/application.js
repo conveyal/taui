@@ -1,88 +1,27 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
 import Icon from '@conveyal/woonerf/components/icon'
-import message from '@conveyal/woonerf/message'
 import get from 'lodash/get'
 import memoize from 'lodash/memoize'
+import dynamic from 'next/dynamic'
 import React, {Component} from 'react'
 
-import type {
-  Coordinate,
-  GeocoderStore,
-  LogItems,
-  LonLat,
-  InputEvent,
-  MapboxFeature,
-  MapEvent,
-  PointsOfInterest,
-  UIStore
-} from '../types'
+import {retrieveConfig} from '../config'
 import {NETWORK_COLORS} from '../constants'
+import message from '../message'
 import {getAsObject} from '../utils/hash'
 import downloadJson from '../utils/download-json'
 
 import Form from './form'
 import Log from './log'
-import Map from './map'
 import RouteAccess from './route-access'
 import RouteCard from './route-card'
 import RouteSegments from './route-segments'
 
-type Network = {
-  active: boolean,
-  name: string
-}
+// Cannot import Leaflet on the server
+const Map = dynamic(() => import('./map'), {ssr: false})
 
-type MapState = {
-  centerCoordinates: Coordinate,
-  zoom: number
-}
-
-type Props = {
-  accessibility: number[][],
-  actionLog: LogItems,
-  activeTransitive: any,
-  allTransitive: any,
-  data: {
-    grids: string[],
-    networks: Network[]
-  },
-  drawIsochrones: Function[],
-  drawOpportunityDatasets: any[],
-  drawRoutes: any[],
-  geocode: (string, Function) => void,
-  geocoder: GeocoderStore,
-  initialize: Function => void,
-  isLoading: boolean,
-  isochrones: any[],
-  map: MapState,
-  pointsOfInterest: any, // FeatureCollection
-  pointsOfInterestOptions: PointsOfInterest,
-  reverseGeocode: (string, Function) => void,
-  setEnd: any => void,
-  setSelectedTimeCutoff: any => void,
-
-  setStart: any => void,
-  showComparison: boolean,
-  timeCutoff: any,
-  travelTimes: number[],
-  ui: UIStore,
-  uniqueRoutes: any[],
-  updateEnd: any => void,
-  updateEndPosition: LonLat => void,
-  updateMap: any => void,
-  updateStart: any => void,
-  updateStartPosition: LonLat => void
-}
-
-type State = {
-  componentError: any
-}
-
-/**
- *
- */
-export default class Application extends Component<Props, State> {
+export default class Application extends Component {
   state = {
     componentError: null
   }
@@ -102,7 +41,7 @@ export default class Application extends Component<Props, State> {
    * Initialize the application.
    */
   componentDidMount () {
-    if (window) {
+    if (typeof window !== 'undefined') {
       window.Application = this
     }
 
@@ -319,7 +258,7 @@ export default class Application extends Component<Props, State> {
               <div className='CardContent'>
                 <br /><a href='https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp' target='_blank'>See example config</a>
               </div>
-              <textarea ref={this._saveRefToConfig} defaultValue={window.localStorage.getItem('taui-config')} />
+              <textarea ref={this._saveRefToConfig} defaultValue={JSON.stringify(retrieveConfig() || {}, null, '  ')} />
             </div>}
           {p.ui.showLink &&
             <div className='Attribution'>

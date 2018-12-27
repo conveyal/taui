@@ -3,14 +3,12 @@
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
   "scripts": {
-    "build": "mastarm build",
-    "deploy": "mastarm deploy",
-    "predeploy": "yarn",
-    "prestart": "yarn",
-    "pretest": "yarn",
+    "build": "next build",
+    "dev": "node --require dotenv/config node_modules/.bin/next",
+    "flow": "flow",
+    "predev": "yarn",
     "semantic-release": "semantic-release",
-    "start": "mastarm build --serve",
-    "test": "mastarm lint src && mastarm build"
+    "start": "next start"
   },
   "repository": {
     "type": "git",
@@ -31,29 +29,34 @@
     "@conveyal/lonlat": "^1.4.0",
     "@conveyal/woonerf": "^4.1.0",
     "@mapbox/polyline": "^1.0.0",
+    "@zeit/next-css": "^1.0.1",
+    "arg": "^3.0.0",
     "d3-scale": "^2.1.0",
     "date-fns": "^1.29.0",
     "debug": "^4.1.0",
+    "dotenv": "^6.2.0",
     "isomorphic-fetch": "^2.2.1",
     "jsolines": "^2.1.0",
     "leaflet": "^1.3.4",
     "lodash": "^4.17.10",
-    "mastarm": "^4.4.2",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
+    "mapbox.js": "^3.1.1",
+    "next": "latest",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
     "react-leaflet": "^1.9.1",
     "react-leaflet-vectorgrid": "^2.1.3",
-    "react-redux": "^5.0.7",
+    "react-redux": "^6.0.0",
     "react-select": "^1.2.1",
     "react-select-fast-filter-options": "^0.2.3",
     "react-virtualized-select": "^3.1.3",
     "redux": "^4.0.1",
     "redux-actions": "^2.6.4",
-    "redux-mock-store": "1.5.3",
     "reselect": "^4.0.0",
-    "semantic-release": "^15.12.4"
+    "yamljs": "^0.3.0"
   },
-  "standard": {
-    "parser": "babel-eslint"
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "flow-bin": "^0.89.0"
   }
 }

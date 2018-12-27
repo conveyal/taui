@@ -1,7 +1,6 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
 import Icon from '@conveyal/woonerf/components/icon'
-import message from '@conveyal/woonerf/message'
 import Leaflet from 'leaflet'
 import find from 'lodash/find'
 import React, {PureComponent} from 'react'
@@ -15,26 +14,14 @@ import {
 import VectorGrid from 'react-leaflet-vectorgrid/dist/react-leaflet-vectorgrid'
 
 import {STOP_STYLE} from '../constants'
-import type {
-  Coordinate,
-  Location,
-  LonLat,
-  MapEvent
-} from '../types'
+import env from '../env'
+import message from '../message'
 
 import DrawRoute from './draw-route'
 import Gridualizer from './gridualizer'
 
-const TILE_URL = Leaflet.Browser.retina && process.env.LEAFLET_RETINA_URL
-  ? process.env.LEAFLET_RETINA_URL
-  : process.env.LEAFLET_TILE_URL
-
-const LABEL_URL = Leaflet.Browser.retina && process.env.LABEL_RETINA_URL
-  ? process.env.LABEL_RETINA_URL
-  : process.env.LABEL_URL
-
+const MAPBOX_TOKEN = env.MAPBOX_ACCESS_TOKEN
 const TILE_OPTIONS = {
-  attribution: process.env.LEAFLET_ATTRIBUTION,
   tileSize: 512,
   zoomOffset: -1
 }
@@ -58,32 +45,6 @@ const endIcon = Leaflet.divIcon({
   iconAnchor,
   iconSize
 })
-
-type Props = {
-  allTransitiveData: any[],
-  centerCoordinates: Coordinate,
-  clearStartAndEnd: () => void,
-  drawIsochrones: Function[],
-  drawOpportunityDatasets: Function[],
-  drawRoutes: any[],
-  end: null | Location,
-  isLoading: boolean,
-  maxBounds: void | number[][],
-  pointsOfInterest: void | any, // FeatureCollection
-  setEndPosition: LonLat => void,
-  setStartPosition: LonLat => void,
-  start: null | Location,
-  updateEnd: () => void,
-  updateMap: any => void,
-  updateStart: () => void,
-  zoom: number
-}
-
-type State = {
-  lastClickedLabel: null | string,
-  lastClickedPosition: null | Coordinate,
-  showSelectStartOrEnd: boolean
-}
 
 /**
  * Temporary class that fixes VectorGrid's `getFeature`
@@ -114,7 +75,7 @@ class VGrid extends VectorGrid {
 /**
  *
  */
-export default class Map extends PureComponent<Props, State> {
+export default class Map extends PureComponent {
   state = {
     lastClickedLabel: null,
     lastClickedPosition: null,
@@ -219,7 +180,8 @@ export default class Map extends PureComponent<Props, State> {
         <ZoomControl position='topright' />
         <TileLayer
           {...TILE_OPTIONS}
-          url={TILE_URL}
+          attribution={p.attribution}
+          url={`${p.tileUrl}?access_token=${MAPBOX_TOKEN}`}
           zIndex={getZIndex()}
         />
 
@@ -256,11 +218,11 @@ export default class Map extends PureComponent<Props, State> {
             zoom={p.zoom}
           />)}
 
-        {LABEL_URL &&
+        {p.labelUrl &&
           <TileLayer
             {...TILE_OPTIONS}
             key={`tile-layer-${this._getKey()}`}
-            url={LABEL_URL}
+            url={`${p.labelUrl}?access_token=${MAPBOX_TOKEN}`}
             zIndex={getZIndex()}
           />}
 

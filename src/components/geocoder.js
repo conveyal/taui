@@ -1,35 +1,19 @@
 // @flow
-import message from '@conveyal/woonerf/message'
 import isEqual from 'lodash/isEqual'
 import throttle from 'lodash/throttle'
 import React, {Component} from 'react'
 import Select from 'react-select'
 
-import type {Location, MapboxFeature} from '../types'
+import message from '../message'
 
 const USE_GEOLOCATE = true
 const GEOLOCATE_VALUE = 'geolocate'
 const RATE_LIMIT = 500
 
-type ReactSelectOption = {
-  feature: MapboxFeature,
-  label: string,
-  value: string
-}
-
-type Props = {
-  geocode: (string, Function) => void,
-  onChange: any => void,
-  options: ReactSelectOption[],
-  placeholder: string,
-  reverseGeocode: (string, Function) => void,
-  value: null | Location
-}
-
 /**
  *
  */
-export default class Geocoder extends Component<Props> {
+export default class Geocoder extends Component {
   autocompleteCache = {}
   options = {}
 

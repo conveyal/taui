@@ -1,6 +1,7 @@
 // @flow
 import Icon from '@conveyal/woonerf/components/icon'
-import message from '@conveyal/woonerf/message'
+
+import message from '../message'
 
 import Alert from './tr-alert'
 

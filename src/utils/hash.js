@@ -1,7 +1,10 @@
 // @flow
 import {parse as parseQueryString} from 'querystring'
 
+import get from 'lodash/get'
+
 function set (opts) {
+  if (typeof window === 'undefined') return
   window.location.hash = Object.keys(opts)
     .filter(key => opts[key] !== undefined && opts[key] !== null)
     .map(key => `${key}=${encodeURIComponent(opts[key])}`)
@@ -9,7 +12,7 @@ function set (opts) {
 }
 
 export function getAsObject () {
-  return parseQueryString(window.location.hash.split('#')[1])
+  return parseQueryString(get(window, 'location.hash', '').split('#')[1])
 }
 
 export function setValues (values: Object) {

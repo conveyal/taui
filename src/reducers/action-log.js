@@ -1,6 +1,7 @@
 // @flow
-import message from '@conveyal/woonerf/message'
 import {handleActions} from 'redux-actions'
+
+import message from '../message'
 
 export default handleActions(
   {

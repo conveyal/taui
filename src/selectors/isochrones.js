@@ -1,6 +1,6 @@
 // @flow
+import lonlat from '@conveyal/lonlat'
 import jsolines from 'jsolines'
-import {Map as LeafletMap} from 'leaflet'
 import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
@@ -42,15 +42,15 @@ const getIsochrone = (network, index, timeCutoff) => {
     surface: surface.data,
     cutoff: timeCutoff,
     project ([x, y]) {
-      const {lat, lng} = LeafletMap.prototype.unproject(
-        [x + surface.west, y + surface.north],
-        surface.zoom
-      )
-      return [lng, lat]
+      const {lon, lat} = lonlat.fromPixel({
+        x: x + surface.west,
+        y: y + surface.north
+      }, surface.zoom)
+      return [lon, lat]
     }
   })
 
-  // create the key for react-leaflet/GeoJSON here
+  // create the key for GeoJSON here
   return {
     ...isochrone,
     key: toKey(network, index, timeCutoff),

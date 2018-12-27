@@ -1,37 +1,17 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
-import message from '@conveyal/woonerf/message'
 import memoize from 'lodash/memoize'
 import React from 'react'
 import Select from 'react-virtualized-select'
 import createFilterOptions from 'react-select-fast-filter-options'
 
-import type {
-  InputEvent,
-  Location,
-  MapboxFeature,
-  PointsOfInterest
-} from '../types'
+import message from '../message'
 
 import Geocoder from './geocoder'
-
-type Props = {
-  end: null | Location,
-  geocode: (string, Function) => void,
-  onChangeEnd: MapboxFeature => void,
-  onChangeStart: MapboxFeature => void,
-  onTimeCutoffChange: InputEvent => void,
-  pointsOfInterest: PointsOfInterest,
-  reverseGeocode: (string, Function) => void,
-  selectedTimeCutoff: number,
-  start: null | Location
-}
 
 const cfo = memoize(o => createFilterOptions({options: o}))
 
 export default class Form extends React.PureComponent {
-  props: Props
-
   state = {
     animating: false
   }

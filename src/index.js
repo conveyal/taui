@@ -1,17 +1,15 @@
 // @flow
-import message from '@conveyal/woonerf/message'
-import mount from '@conveyal/woonerf/mount'
 import get from 'lodash/get'
 import React from 'react'
 import {connect} from 'react-redux'
 
 import actions from './actions'
 import Application from './components/application'
-import reducers from './reducers'
+import message from './message'
 import * as select from './selectors'
 
 // Set the title
-document.title = message('Title')
+if (typeof document !== 'undefined') document.title = message('Title')
 
 function mapStateToProps (state, ownProps) {
   return {
@@ -36,11 +34,11 @@ function mapStateToProps (state, ownProps) {
 const ConnectedApplication = connect(mapStateToProps, actions)(Application)
 
 // Create an Application wrapper
-class InitializationWrapper extends React.Component {
+export default class InitializationWrapper extends React.Component {
   constructor (props) {
     super(props)
 
-    if (window) {
+    if (typeof window !== 'undefined') {
       window.app = {
         action: {},
         select: {},
@@ -59,15 +57,6 @@ class InitializationWrapper extends React.Component {
   }
 
   render () {
-    return <ConnectedApplication
-      history={this.props.history}
-      store={this.props.store}
-    />
+    return <ConnectedApplication store={this.props.store} />
   }
 }
-
-// Mount the app
-mount({
-  app: InitializationWrapper,
-  reducers
-})

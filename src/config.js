@@ -1,7 +1,9 @@
 // @flow
-
 const KEY = 'taui-config'
 
-export const retrieveConfig = () => JSON.parse(window.localStorage.getItem(KEY))
-export const storeConfig = json =>
-  window.localStorage.setItem(KEY, JSON.stringify(json, null, '  '))
+const ls = typeof window === 'undefined'
+  ? {getItem () { return '{}' }, setItem () {}}
+  : window.localStorage
+
+export const retrieveConfig = () => JSON.parse(ls.getItem(KEY))
+export const storeConfig = json => ls.setItem(KEY, JSON.stringify(json))

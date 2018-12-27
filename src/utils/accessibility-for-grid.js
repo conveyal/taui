@@ -1,6 +1,4 @@
 // @flow
-import type {Grid, Query} from '../types'
-
 /**
  * Get the cumulative accessibility number for a cutoff from a travel time
  * surface. This function always calculates _average_ accessibility. Calculating
@@ -40,8 +38,8 @@ export default function accessibilityForGrid ({
   surface
 }: {
   cutoff: number,
-  grid: Grid,
-  network: Query,
+  grid: any,
+  network: any,
   surface: Uint8Array
 }): number {
   let accessibility = 0

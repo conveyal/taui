@@ -1,6 +1,7 @@
 // @flow
-import message from '@conveyal/woonerf/message'
 import {handleActions} from 'redux-actions'
+
+import message from '../message'
 
 const timeStep = 10
 const timeMin = 10

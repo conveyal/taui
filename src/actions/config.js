@@ -1,11 +1,9 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
-import fetch, {fetchMultiple} from '@conveyal/woonerf/fetch'
-import {LatLngBounds} from 'leaflet'
+import {fetchMultiple} from '@conveyal/woonerf/fetch'
 import get from 'lodash/get'
 
 import {retrieveConfig, storeConfig} from '../config'
-import type {LonLat} from '../types'
 import cacheURL from '../utils/cache-url'
 import {pointToCoordinate} from '../utils/coordinate-to-point'
 
@@ -21,41 +19,32 @@ import {loadPointsOfInterest} from './points-of-interest'
  * and parse the query parameters. If there is a `start`, set the networks to
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
-export const initialize = (startCoordinate?: LonLat) => (dispatch, getState) => {
-  if (process.env.DISABLE_CONFIG) {
-    const state = getState()
-    dispatch(loadDataset(
-      state.data.networks,
-      state.data.grids,
-      state.data.pointsOfInterestUrl,
-      startCoordinate,
-      state.map
-    ))
-  } else {
+export const initialize = (startCoordinate?: any) => (dispatch, getState) => {
+  const state = getState()
+  if (state.ui.allowChangeConfig) {
     try {
       const json = retrieveConfig()
-      if (json) {
-        if (!json.networks) {
-          window.alert('JSON found in localStorage without a networks array.')
-        } else {
-          return dispatch(loadDataset(
-            json.networks,
-            json.grids,
-            json.pointsOfInterestUrl,
-            startCoordinate || json.startCoordinate,
-            json.map
-          ))
-        }
+      if (json && json.networks) {
+        return dispatch(loadDataset(
+          json.networks,
+          json.grids,
+          json.pointsOfInterestUrl,
+          startCoordinate || json.startCoordinate,
+          json.map
+        ))
       }
     } catch (e) {
       console.log('Error parsing taui-config', e)
     }
-
-    dispatch(fetch({
-      url: cacheURL('config.json'),
-      next: response => loadDatasetFromJSON(response.value)
-    }))
   }
+
+  dispatch(loadDataset(
+    state.data.networks,
+    state.data.grids,
+    state.data.pointsOfInterestUrl,
+    startCoordinate,
+    state.map
+  ))
 }
 
 export function loadDatasetFromJSON (jsonConfig: any) {
@@ -73,7 +62,7 @@ export const loadDataset = (
   networks: {name: string, showOnMap: boolean, url: string},
   grids: {icon: string, name: string, showOnMap: boolean, url: string},
   pointsOfInterestUrl?: string,
-  startCoordinate?: LonLat,
+  startCoordinate?: any,
   map?: {maxBounds?: number[][], maxZoom?: number, minZoom?: number}
 ) => (dispatch: Dispatch, getState: any) => {
   dispatch({type: 'clear data'})
@@ -116,24 +105,28 @@ export const loadDataset = (
       // Set all the networks
       fullNetworks.forEach(n => dispatch(setNetwork(n)))
 
-      debugger;
-
+      try {
       // Load the config start coordinate or the center
-      const centerFromMap = lonlat.fromLeaflet(
-        get(map, 'centerCoordinates', getCenterFromNetwork(fullNetworks[0])))
-      const centerCoordinates = startCoordinate || centerFromMap
+        const centerFromMap = get(map, 'centerCoordinates') !== undefined
+          ? lonlat.fromLeaflet(map.centerCoordinates)
+          : getCenterFromNetwork(fullNetworks[0])
+        const centerCoordinates = startCoordinate || centerFromMap
 
-      const geocoder = {
-        proximity: lonlat.toString(centerFromMap)
-      }
-      const maxBounds = get(map, 'maxBounds')
-      if (maxBounds) {
-        const bounds = new LatLngBounds(maxBounds)
-        geocoder.bbox = bounds.toBBoxString()
-      }
+        const geocoder = {
+          proximity: lonlat.toString(centerFromMap)
+        }
+        const maxBounds = get(map, 'maxBounds')
+        if (maxBounds) {
+          geocoder.bbox = typeof maxBounds === 'string'
+            ? maxBounds
+            : `${maxBounds[0].join(',')},${maxBounds[1].join(',')}`
+        }
 
-      dispatch({type: 'set geocoder', payload: geocoder})
-      dispatch(updateStartPosition(centerCoordinates))
+        dispatch({type: 'set geocoder', payload: geocoder})
+        dispatch(updateStartPosition(centerCoordinates))
+      } catch (e) {
+        console.error(e)
+      }
     }
   }))
 }

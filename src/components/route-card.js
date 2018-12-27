@@ -2,16 +2,7 @@
 import Icon from '@conveyal/woonerf/components/icon'
 import React from 'react'
 
-type Props = {
-  cardColor: string,
-  children?: any,
-  downloadIsochrone?: Function,
-  setShowOnMap: Function,
-  showOnMap: boolean,
-  title: string
-}
-
-export default class RouteCard extends React.PureComponent<Props> {
+export default class RouteCard extends React.PureComponent {
   render () {
     const p = this.props
     const {

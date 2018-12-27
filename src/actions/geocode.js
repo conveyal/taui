@@ -3,15 +3,14 @@ import lonlat from '@conveyal/lonlat'
 import fetch from '@conveyal/woonerf/fetch'
 
 import {MAPBOX_GEOCODING_URL} from '../constants'
-import type {LonLat} from '../types'
-
+import env from '../env'
 import cacheURL from '../utils/cache-url'
 
 /**
  * Format URL for fetching with query parameters
  */
 function formatURL (text: string, opts) {
-  opts.access_token = process.env.MAPBOX_ACCESS_TOKEN
+  opts.access_token = env.MAPBOX_ACCESS_TOKEN
   const queryParams = Object.keys(opts).map(k => `${k}=${opts[k]}`).join('&')
   return cacheURL(`${MAPBOX_GEOCODING_URL}/${text}.json?${queryParams}`)
 }
@@ -45,5 +44,5 @@ export function geocode (text: string, nextAction: any) {
   }
 }
 
-export const reverseGeocode = (position: LonLat, nextAction: any) =>
+export const reverseGeocode = (position, nextAction) =>
   geocode(lonlat.toString(position), nextAction)

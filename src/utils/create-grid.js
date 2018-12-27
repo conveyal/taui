@@ -1,10 +1,9 @@
 // @flow
-import type {Grid} from '../types'
 
 /**
  * Create a grid from an ArrayBuffer
  */
-export default function createGrid (data: ArrayBuffer): Grid {
+export default function createGrid (data: ArrayBuffer) {
   const array = new Int32Array(data, 4 * 5)
   const header = new Int32Array(data)
 

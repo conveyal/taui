@@ -1,7 +1,6 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
 
-import type {Location, LonLat} from '../types'
 import {setValues} from '../utils/hash'
 
 import {addActionLogItem} from './log'

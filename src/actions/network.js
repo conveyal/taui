@@ -3,7 +3,7 @@ import lonlat from '@conveyal/lonlat'
 import fetch from '@conveyal/woonerf/fetch'
 
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
-import type {LonLat} from '../types'
+import env from '../env'
 import cacheURL from '../utils/cache-url'
 import coordinateToPoint, {pointToCoordinate} from '../utils/coordinate-to-point'
 import {parsePathsData, warnForInvalidPaths} from '../utils/parse-paths-data'
@@ -55,11 +55,11 @@ export const fetchAllTimesAndPathsForIndex = (index: number) => (
   const y = Math.floor(index / n.width)
   const centerCoordinates = pointToCoordinate(n.west + x, n.north + y, n.zoom)
 
-  dispatch(updateMap({centerCoordinates}))
-  dispatch(updateStartPosition(lonlat.fromLeaflet(centerCoordinates)))
+  dispatch(updateMap({centerCoordinates: lonlat.toLeaflet(centerCoordinates)}))
+  dispatch(updateStartPosition(centerCoordinates))
 }
 
-export const fetchAllTimesAndPathsForCoordinate = (coordinate: LonLat) => (
+export const fetchAllTimesAndPathsForCoordinate = (coordinate) => (
   dispatch: Dispatch,
   getState: any
 ) => {
@@ -107,7 +107,7 @@ const fetchTimesAndPathsForNetworkAtIndex = (network, originPoint, index) => [
 
       const {paths, pathsPerTarget, targets} = parsePathsData(response.value)
 
-      if (process.env.NODE_ENV === 'test') {
+      if (env.NODE_ENV === 'test') {
         warnForInvalidPaths(paths, network.transitive)
       }
 
