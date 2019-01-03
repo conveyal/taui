@@ -1,4 +1,3 @@
-// @flow
 import find from 'lodash/find'
 
 const PATHS_GRID_TYPE = 'PATHGRID'
@@ -6,7 +5,7 @@ const PATHS_GRID_TYPE = 'PATHGRID'
 /**
  * Parse the ArrayBuffer of a `*_paths.dat` file for a point in a network.
  */
-export function parsePathsData (ab: ArrayBuffer) {
+export function parsePathsData (ab) {
   const headerData = new Int8Array(ab, 0, PATHS_GRID_TYPE.length)
   const headerType = String.fromCharCode(...headerData)
   if (headerType !== PATHS_GRID_TYPE) {

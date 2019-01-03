@@ -4,14 +4,7 @@ import fetch from 'isomorphic-fetch'
 import cacheURL from '../utils/cache-url'
 import createGrid from '../utils/create-grid'
 
-export function loadGrid (
-  grid: {
-    icon: string,
-    name: string,
-    showOnMap: boolean,
-    url: string
-  }
-) {
+export function loadGrid (grid) {
   return fetch(cacheURL(grid.url))
     .then(res => res.arrayBuffer())
     .then(arrayBuffer => ({

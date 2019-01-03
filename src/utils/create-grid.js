@@ -1,9 +1,7 @@
-// @flow
-
 /**
  * Create a grid from an ArrayBuffer
  */
-export default function createGrid (data: ArrayBuffer) {
+export default function createGrid (data) {
   const array = new Int32Array(data, 4 * 5)
   const header = new Int32Array(data)
 

@@ -10,7 +10,7 @@ import {
 } from './network'
 import {reverseGeocode} from './geocode'
 
-const setLocation = (which: 'end' | 'start', location?: Location) => {
+const setLocation = (which, location) => {
   if (location) {
     setValues({
       [`${which}`]: location.label,
@@ -26,7 +26,7 @@ const setLocation = (which: 'end' | 'start', location?: Location) => {
   }
 }
 
-export const setEnd = (end: any) => {
+export const setEnd = (end) => {
   setLocation('end', end)
   return {
     type: 'set end',
@@ -34,7 +34,7 @@ export const setEnd = (end: any) => {
   }
 }
 
-export const setStart = (start: any) => {
+export const setStart = (start) => {
   setLocation('start', start)
   return {
     type: 'set start',
@@ -45,7 +45,7 @@ export const setStart = (start: any) => {
 /**
  * Update the start
  */
-export const updateStart = (value?: Location) =>
+export const updateStart = (value) =>
   value && value.label && value.position
     ? [
       setNetworksToLoading(),
@@ -58,7 +58,7 @@ export const updateStart = (value?: Location) =>
       setStart()
     ]
 
-export const updateStartPosition = (position: LonLat) => [
+export const updateStartPosition = (position) => [
   reverseGeocode(position, features =>
     setStart({position, label: features[0].place_name})
   ),
@@ -68,12 +68,12 @@ export const updateStartPosition = (position: LonLat) => [
 /**
  * Update the end point
  */
-export const updateEnd = (value?: Location) => [
+export const updateEnd = (value) => [
   addActionLogItem(value ? `Updating end to ${value.label}` : 'Clearing end'),
   setEnd(value)
 ]
 
-export const updateEndPosition = (position: LonLat) =>
+export const updateEndPosition = (position) =>
   reverseGeocode(position, features =>
     setEnd({position, label: features[0].place_name})
   )

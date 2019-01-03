@@ -41,38 +41,39 @@ export default class Application extends Component {
    * Initialize the application.
    */
   componentDidMount () {
-    if (typeof window !== 'undefined') {
-      window.Application = this
-    }
-
+    const p = this.props
     const qs = getAsObject()
-    const startCoordinate = qs.startCoordinate
-      ? lonlat.fromString(qs.startCoordinate)
-      : undefined
-
-    if (startCoordinate) {
-      this.props.setStart({
-        label: qs.start,
-        position: startCoordinate
-      })
-    } else if (qs.centerCoordinates) {
-      this.props.updateMap({
-        centerCoordinates: lonlat.toLeaflet(qs.centerCoordinates)
-      })
-    }
-
-    if (qs.endCoordinate) {
-      this.props.setEnd({
-        label: qs.end,
-        position: lonlat.fromString(qs.endCoordinate)
-      })
-    }
 
     if (qs.zoom) {
-      this.props.updateMap({zoom: parseInt(qs.zoom, 10)})
+      p.updateMap({zoom: parseInt(qs.zoom, 10)})
     }
 
-    this.props.initialize(startCoordinate)
+    try {
+      const startCoordinate = qs.startCoordinate
+        ? lonlat.fromString(qs.startCoordinate)
+        : undefined
+
+      if (qs.endCoordinate) {
+        p.setEnd({
+          label: qs.end,
+          position: lonlat.fromString(qs.endCoordinate)
+        })
+      }
+
+      if (startCoordinate) {
+        p.setStart({label: qs.start, position: startCoordinate})
+        return p.initialize(startCoordinate)
+      } else if (qs.centerCoordinates) {
+        p.updateMap({
+          centerCoordinates: lonlat.fromString(qs.centerCoordinates)
+        })
+      }
+
+    } catch (e) {
+      console.error(e)
+    }
+
+    p.initialize()
   }
 
   _saveRefToConfig = (ref) => {
@@ -95,11 +96,11 @@ export default class Application extends Component {
     setEnd(null)
   }
 
-  _setStartWithEvent = (event: MapEvent) => {
+  _setStartWithEvent = (event) => {
     this.props.updateStartPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _setStartWithFeature = (feature?: MapboxFeature) => {
+  _setStartWithFeature = (feature) => {
     if (!feature) {
       this._clearStartAndEnd()
     } else {
@@ -110,11 +111,11 @@ export default class Application extends Component {
     }
   }
 
-  _setEndWithEvent = (event: MapEvent) => {
+  _setEndWithEvent = (event) => {
     this.props.updateEndPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _setEndWithFeature = (feature?: MapboxFeature) => {
+  _setEndWithFeature = (feature) => {
     if (!feature) {
       this.props.setEnd(null)
     } else {
@@ -125,7 +126,7 @@ export default class Application extends Component {
     }
   }
 
-  _onTimeCutoffChange = (event: InputEvent) => {
+  _onTimeCutoffChange = (event) => {
     this.props.setSelectedTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
 

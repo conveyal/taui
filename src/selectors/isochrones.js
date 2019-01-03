@@ -15,11 +15,12 @@ const getIsochroneStyleFor = (index) => ({
 })
 
 export default createSelector(
+  state => get(state, 'geocoder.start'),
   state => get(state, 'data.networks'),
   state => get(state, 'timeCutoff.selected'),
-  (networks = [], timeCutoff) =>
+  (start, networks = [], timeCutoff) =>
     networks.map((n, i) => {
-      if (n.showOnMap && n.travelTimeSurface && n.travelTimeSurface.data) {
+      if (start && n.showOnMap && n.travelTimeSurface && n.travelTimeSurface.data) {
         return getIsochrone(n, i, timeCutoff)
       }
     })

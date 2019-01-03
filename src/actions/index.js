@@ -7,7 +7,7 @@ import * as log from './log'
 import * as map from './map'
 import * as network from './network'
 
-const setSelectedTimeCutoff = (payload: number) => ({
+const setSelectedTimeCutoff = (payload) => ({
   type: 'set selected time cutoff',
   payload
 })

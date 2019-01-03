@@ -1,4 +1,3 @@
-// @flow
 import lonlat from '@conveyal/lonlat'
 import {fetchMultiple} from '@conveyal/woonerf/fetch'
 import get from 'lodash/get'
@@ -19,7 +18,7 @@ import {loadPointsOfInterest} from './points-of-interest'
  * and parse the query parameters. If there is a `start`, set the networks to
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
-export const initialize = (startCoordinate?: any) => (dispatch, getState) => {
+export const initialize = (startCoordinate) => (dispatch, getState) => {
   const state = getState()
   if (state.ui.allowChangeConfig) {
     try {
@@ -47,7 +46,7 @@ export const initialize = (startCoordinate?: any) => (dispatch, getState) => {
   ))
 }
 
-export function loadDatasetFromJSON (jsonConfig: any) {
+export function loadDatasetFromJSON (jsonConfig) {
   storeConfig(jsonConfig)
   return loadDataset(
     jsonConfig.networks,
@@ -58,13 +57,7 @@ export function loadDatasetFromJSON (jsonConfig: any) {
   )
 }
 
-export const loadDataset = (
-  networks: {name: string, showOnMap: boolean, url: string},
-  grids: {icon: string, name: string, showOnMap: boolean, url: string},
-  pointsOfInterestUrl?: string,
-  startCoordinate?: any,
-  map?: {maxBounds?: number[][], maxZoom?: number, minZoom?: number}
-) => (dispatch: Dispatch, getState: any) => {
+export const loadDataset = (networks, grids, pointsOfInterestUrl, startCoordinate, map) => (dispatch, getState) => {
   dispatch({type: 'clear data'})
 
   // Try to load points of interest
@@ -106,10 +99,8 @@ export const loadDataset = (
       fullNetworks.forEach(n => dispatch(setNetwork(n)))
 
       try {
-      // Load the config start coordinate or the center
-        const centerFromMap = get(map, 'centerCoordinates') !== undefined
-          ? lonlat.fromLeaflet(map.centerCoordinates)
-          : getCenterFromNetwork(fullNetworks[0])
+        // Load the config start coordinate or the center
+        const centerFromMap = get(map, 'centerCoordinates', getCenterFromNetwork(fullNetworks[0]))
         const centerCoordinates = startCoordinate || centerFromMap
 
         const geocoder = {

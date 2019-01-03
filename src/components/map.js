@@ -97,27 +97,27 @@ export default class Map extends PureComponent {
     })
   }
 
-  _clearStartAndEnd = (): void => {
+  _clearStartAndEnd = () => {
     this.props.clearStartAndEnd()
     this._clearState()
   }
 
-  _setEndWithEvent = (event: MapEvent) => {
+  _setEndWithEvent = (event) => {
     this.props.setEndPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _setStartWithEvent = (event: MapEvent) => {
+  _setStartWithEvent = (event) => {
     this.props.setStartPosition(lonlat(event.latlng || event.target._latlng))
   }
 
-  _onMapClick = (e: Leaflet.MouseEvent): void => {
+  _onMapClick = (e) => {
     this.setState((previousState) => ({
       lastClickedPosition: e.latlng || e.target._latlng,
       showSelectStartOrEnd: !previousState.showSelectStartOrEnd
     }))
   }
 
-  _setEnd = (): void => {
+  _setEnd = () => {
     const p = this.props
     const s = this.state
     if (s.lastClickedPosition) {
@@ -128,7 +128,7 @@ export default class Map extends PureComponent {
     this._clearState()
   }
 
-  _setStart = (): void => {
+  _setStart = () => {
     const p = this.props
     const s = this.state
     if (s.lastClickedPosition) {
@@ -139,7 +139,7 @@ export default class Map extends PureComponent {
     this._clearState()
   }
 
-  _setZoom = (e: MapEvent) => {
+  _setZoom = (e) => {
     const zoom = e.target._zoom
     this.props.updateMap({zoom})
   }
@@ -154,20 +154,18 @@ export default class Map extends PureComponent {
 
   _key = 0
   _getKey () { return this._key++ }
+  _getZIndex () { return this._key * 10 }
 
   render () {
     const p = this.props
     const s = this.state
 
     // Index elements with keys to reset them when elements are added / removed
-
     this._key = 0
-    let zIndex = 0
-    const getZIndex = () => zIndex++
 
     return (
       <LeafletMap
-        center={p.centerCoordinates}
+        center={lonlat.toLeaflet(p.centerCoordinates)}
         className='Taui-Map'
         maxBounds={p.maxBounds}
         maxZoom={p.maxZoom}
@@ -182,7 +180,7 @@ export default class Map extends PureComponent {
           {...TILE_OPTIONS}
           attribution={p.attribution}
           url={`${p.tileUrl}?access_token=${MAPBOX_TOKEN}`}
-          zIndex={getZIndex()}
+          zIndex={this._getZIndex()}
         />
 
         {/* p.drawIsochrones.map((drawTile, i) => drawTile &&
@@ -198,7 +196,7 @@ export default class Map extends PureComponent {
             data={iso}
             key={`${iso.key}-${i}-${keyCount++}`}
             style={iso.style}
-            zIndex={getZIndex()}
+            zIndex={this._getZIndex()}
           />) */}
 
         {!p.isLoading && p.isochrones.map((iso, i) => !iso
@@ -207,14 +205,14 @@ export default class Map extends PureComponent {
             data={iso}
             key={`${iso.key}-${i}-${this._getKey()}`}
             style={iso.style}
-            zIndex={getZIndex()}
+            zIndex={this._getZIndex()}
           />)}
 
         {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
           <Gridualizer
             drawTile={drawTile}
             key={`draw-od-${i}-${this._getKey()}`}
-            zIndex={getZIndex()}
+            zIndex={this._getZIndex()}
             zoom={p.zoom}
           />)}
 
@@ -223,14 +221,14 @@ export default class Map extends PureComponent {
             {...TILE_OPTIONS}
             key={`tile-layer-${this._getKey()}`}
             url={`${p.labelUrl}?access_token=${MAPBOX_TOKEN}`}
-            zIndex={getZIndex()}
+            zIndex={this._getZIndex()}
           />}
 
         {p.showRoutes && p.drawRoutes.map(drawRoute =>
           <DrawRoute
             {...drawRoute}
             key={`draw-routes-${drawRoute.index}-${this._getKey()}`}
-            zIndex={getZIndex()}
+            zIndex={this._getZIndex()}
           />)}
 
         {(!p.start || !p.end) && p.pointsOfInterest &&
@@ -242,7 +240,7 @@ export default class Map extends PureComponent {
             onClick={this._clickPoi}
             style={STOP_STYLE}
             tooltip='label'
-            zIndex={getZIndex()}
+            zIndex={this._getZIndex()}
           />}
 
         {p.start &&
@@ -251,8 +249,8 @@ export default class Map extends PureComponent {
             icon={startIcon}
             key={`start-${this._getKey()}`}
             onDragEnd={this._setStartWithEvent}
-            position={p.start.position}
-            zIndex={getZIndex()}
+            position={lonlat.toLeaflet(p.start.position)}
+            zIndex={this._getZIndex()}
           >
             <Popup>
               <span>{p.start.label}</span>
@@ -265,8 +263,8 @@ export default class Map extends PureComponent {
             icon={endIcon}
             key={`end-${this._getKey()}`}
             onDragEnd={this._setEndWithEvent}
-            position={p.end.position}
-            zIndex={getZIndex()}
+            position={lonlat.toLeaflet(p.end.position)}
+            zIndex={this._getZIndex()}
           >
             <Popup>
               <span>{p.end.label}</span>
@@ -278,7 +276,7 @@ export default class Map extends PureComponent {
             closeButton={false}
             key={`select-${this._getKey()}`}
             position={s.lastClickedPosition}
-            zIndex={getZIndex()}
+            zIndex={this._getZIndex()}
           >
             <div className='Popup'>
               {s.lastClickedLabel &&

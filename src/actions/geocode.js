@@ -9,7 +9,7 @@ import cacheURL from '../utils/cache-url'
 /**
  * Format URL for fetching with query parameters
  */
-function formatURL (text: string, opts) {
+function formatURL (text, opts) {
   opts.access_token = env.MAPBOX_ACCESS_TOKEN
   const queryParams = Object.keys(opts).map(k => `${k}=${opts[k]}`).join('&')
   return cacheURL(`${MAPBOX_GEOCODING_URL}/${text}.json?${queryParams}`)
@@ -20,8 +20,8 @@ function formatURL (text: string, opts) {
  *
  * NB Content-Type is application/vnd.geo+json so woonerf/fetch parses as text
  */
-export function geocode (text: string, nextAction: any) {
-  return function (dispatch: Dispatch, getState: any) {
+export function geocode (text, nextAction) {
+  return function (dispatch, getState) {
     const state = getState()
     const {geocoder} = state
 

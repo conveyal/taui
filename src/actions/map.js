@@ -1,4 +1,3 @@
-// @flow
 import lonlat from '@conveyal/lonlat'
 
 import {setKeyTo} from '../utils/hash'
@@ -6,7 +5,7 @@ import {setKeyTo} from '../utils/hash'
 /**
  * Update the map and store the settings as query parameters in the URL
  */
-export function updateMap (payload: any) {
+export function updateMap (payload) {
   if (payload.zoom) {
     setKeyTo('zoom', payload.zoom)
   }

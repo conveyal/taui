@@ -1,4 +1,3 @@
-// @flow
 import lonlat from '@conveyal/lonlat'
 import fetch from '@conveyal/woonerf/fetch'
 
@@ -13,16 +12,13 @@ import {updateStartPosition} from './location'
 import {addActionLogItem as logItem, logError} from './log'
 import {updateMap} from './map'
 
-export const setNetwork = (payload: any) => ({type: 'set network', payload})
-export const setActiveNetwork = (payload: string) => ({
+export const setNetwork = (payload) => ({type: 'set network', payload})
+export const setActiveNetwork = (payload) => ({
   type: 'set active network',
   payload
 })
 
-export const setNetworksAccessibilityTo = (value: string) => (
-  dispatch: Dispatch,
-  getState: any
-) => {
+export const setNetworksAccessibilityTo = (value) => (dispatch, getState) => {
   const state = getState()
   dispatch(
     state.data.networks.map(network =>
@@ -45,10 +41,7 @@ export const setNetworksToEmpty = () =>
 /**
  * Used for debugging on the command line.
  */
-export const fetchAllTimesAndPathsForIndex = (index: number) => (
-  dispatch: Dispatch,
-  getState: any
-) => {
+export const fetchAllTimesAndPathsForIndex = (index) => (dispatch, getState) => {
   const state = getState()
   const n = state.data.networks[0]
   const x = index % n.width
@@ -60,8 +53,8 @@ export const fetchAllTimesAndPathsForIndex = (index: number) => (
 }
 
 export const fetchAllTimesAndPathsForCoordinate = (coordinate) => (
-  dispatch: Dispatch,
-  getState: any
+  dispatch,
+  getState
 ) => {
   const state = getState()
   const currentZoom = state.map.zoom

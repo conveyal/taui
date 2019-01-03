@@ -36,12 +36,7 @@ export default function accessibilityForGrid ({
   grid,
   network,
   surface
-}: {
-  cutoff: number,
-  grid: any,
-  network: any,
-  surface: Uint8Array
-}): number {
+}) {
   let accessibility = 0
   for (let pixel = 0, y = 0; y < network.height; y++) {
     for (let x = 0; x < network.width; x++, pixel++) {

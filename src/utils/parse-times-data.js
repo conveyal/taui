@@ -1,8 +1,8 @@
-// @flow
 const HEADER_ENTRIES = 7
 const HEADER_LENGTH = 9
 const TIMES_GRID_TYPE = 'ACCESSGR'
 
+/*
 type TimesData = {
   data: Int32Array,
   depth: number,
@@ -13,11 +13,12 @@ type TimesData = {
   width: number,
   zoom: number
 }
+*/
 
 /**
  * Parse the ArrayBuffer from a `*_times.dat` file for a point in a network.
  */
-export function parseTimesData (ab: ArrayBuffer): TimesData {
+export function parseTimesData (ab) {
   const headerType = String.fromCharCode(...new Int8Array(ab, 0, TIMES_GRID_TYPE.length))
   if (headerType !== TIMES_GRID_TYPE) {
     throw new Error(

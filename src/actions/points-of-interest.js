@@ -3,7 +3,7 @@ import fetch from '@conveyal/woonerf/fetch'
 
 import cacheURL from '../utils/cache-url'
 
-export function loadPointsOfInterest (url: string) {
+export function loadPointsOfInterest (url) {
   return fetch({
     url: cacheURL(url),
     next: response => ({

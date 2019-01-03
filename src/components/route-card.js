@@ -5,14 +5,6 @@ import React from 'react'
 export default class RouteCard extends React.PureComponent {
   render () {
     const p = this.props
-    const {
-      cardColor,
-      children,
-      downloadIsochrone,
-      setShowOnMap,
-      showOnMap,
-      title
-    } = this.props
     return (
       <div
         className={'Card'}
@@ -22,28 +14,28 @@ export default class RouteCard extends React.PureComponent {
           onClick={p.setShowOnMap}
           onMouseOver={p.onMouseOver}
           style={{
-            backgroundColor: cardColor,
+            backgroundColor: p.cardColor,
             cursor: 'pointer'
           }}
         >
-          {title}
+          {p.title}
           <div className='CardLinks'>
-            {downloadIsochrone &&
+            {p.downloadIsochrone &&
               <a
-                onClick={downloadIsochrone}
+                onClick={p.downloadIsochrone}
                 title='Download GeoJSON isochrone for network'
               >
                 <Icon type='download' />
               </a>}
             <a
-              onClick={setShowOnMap}
+              onClick={p.setShowOnMap}
               title='Show/hide isochrone for network'
             >
-              {showOnMap ? <Icon type='eye-slash' /> : <Icon type='eye' />}
+              {p.showOnMap ? <Icon type='eye-slash' /> : <Icon type='eye' />}
             </a>
           </div>
         </div>
-        <table className='CardContent'>{children}</table>
+        <table className='CardContent'>{p.children}</table>
       </div>
     )
   }

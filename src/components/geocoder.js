@@ -1,4 +1,4 @@
-// @flow
+import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
 import throttle from 'lodash/throttle'
 import React, {Component} from 'react'
@@ -29,13 +29,13 @@ export default class Geocoder extends Component {
     }
   }
 
-  cacheOptions (options: ReactSelectOption[]) {
+  cacheOptions (options) {
     options.forEach(o => {
       this.options[o.value] = o.feature
     })
   }
 
-  componentWillReceiveProps (nextProps: Props) {
+  componentWillReceiveProps (nextProps) {
     if (!isEqual(nextProps.value, this.props.value)) {
       this.setState({value: nextProps.value})
     }
@@ -55,7 +55,7 @@ export default class Geocoder extends Component {
     return [...geolocateOptions, ...(p.options || [])]
   }
 
-  featureToOption = (feature: MapboxFeature) => {
+  featureToOption = (feature) => {
     return {
       feature,
       label: feature.place_name,
@@ -63,8 +63,7 @@ export default class Geocoder extends Component {
     }
   }
 
-  loadOptions = throttle((input: string, callback: Function) => {
-    const {geocode} = this.props
+  loadOptions = throttle((input, callback) => {
     if (!input) {
       if (USE_GEOLOCATE && 'geolocation' in navigator) {
         callback(null, {
@@ -80,7 +79,7 @@ export default class Geocoder extends Component {
         return callback(null, {options: cachedOptions})
       }
 
-      geocode(input, features => {
+      this.props.geocode(input, features => {
         const options = features.map(this.featureToOption)
         this.cacheOptions(options)
         this.autocompleteCache[input] = options
@@ -89,21 +88,19 @@ export default class Geocoder extends Component {
     }
   }, RATE_LIMIT)
 
-  _onChange = (value?: ReactSelectOption) => {
-    const {onChange, reverseGeocode} = this.props
-    if (value && value.value === GEOLOCATE_VALUE) {
+  _onChange = (value) => {
+    const p = this.props
+    if (get(value, 'value') === GEOLOCATE_VALUE) {
       this.setState({
         value: {
           label: message('Geocoding.FindingLocation', 'Locating you...')
         }
       })
       window.navigator.geolocation.getCurrentPosition(position => {
-        reverseGeocode(position.coords, feature => {
+        p.reverseGeocode(position.coords, feature => {
           const value = this.featureToOption(feature)
-          this.setState({
-            value
-          })
-          onChange && onChange(value)
+          this.setState({value})
+          p.onChange && p.onChange(value)
         })
       })
     } else {
@@ -115,8 +112,7 @@ export default class Geocoder extends Component {
       } else {
         this.setState({value})
       }
-      this.props.onChange &&
-        this.props.onChange(value && this.options[value.value])
+      p.onChange && p.onChange(value && this.options[value.value])
     }
   }
 

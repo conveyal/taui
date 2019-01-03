@@ -1,4 +1,3 @@
-// @flow
 import slice from 'lodash/slice'
 import uniq from 'lodash/uniq'
 import toUpperCase from 'lodash/upperCase'
