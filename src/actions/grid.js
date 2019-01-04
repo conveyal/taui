@@ -1,6 +1,7 @@
 // @flow
 import fetch from 'isomorphic-fetch'
 
+import cacheURL from '../utils/cache-url'
 import createGrid from '../utils/create-grid'
 
 export function loadGrid (
@@ -11,7 +12,7 @@ export function loadGrid (
     url: string
   }
 ) {
-  return fetch(grid.url)
+  return fetch(cacheURL(grid.url))
     .then(res => res.arrayBuffer())
     .then(arrayBuffer => ({
       type: 'set grid',

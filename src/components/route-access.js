@@ -1,6 +1,7 @@
 // @flow
 import message from '@conveyal/woonerf/message'
 import toSpaceCase from 'lodash/lowerCase'
+import get from 'lodash/get'
 
 import Alert from './tr-alert'
 
@@ -11,6 +12,10 @@ export default function RouteAccess (props) {
 
   if (!props.hasStart) {
     return <Alert>{message('Systems.SelectStart')}</Alert>
+  }
+
+  if (get(props, 'accessibility[0]') === -1) {
+    return <Alert>{message('Systems.NoAccess')}</Alert>
   }
 
   return <ShowAccess {...props} />

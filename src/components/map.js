@@ -3,36 +3,40 @@ import lonlat from '@conveyal/lonlat'
 import Icon from '@conveyal/woonerf/components/icon'
 import message from '@conveyal/woonerf/message'
 import Leaflet from 'leaflet'
-import memoize from 'lodash/memoize'
+import find from 'lodash/find'
 import React, {PureComponent} from 'react'
 import {
-  GeoJSON,
   Map as LeafletMap,
   Marker,
   Popup,
   TileLayer,
   ZoomControl
 } from 'react-leaflet'
+import VectorGrid from 'react-leaflet-vectorgrid/dist/react-leaflet-vectorgrid'
 
+import {STOP_STYLE} from '../constants'
 import type {
   Coordinate,
-  Feature,
   Location,
   LonLat,
-  MapEvent,
-  PointsOfInterest
+  MapEvent
 } from '../types'
+
+import DrawRoute from './draw-route'
+import Gridualizer from './gridualizer'
 
 const TILE_URL = Leaflet.Browser.retina && process.env.LEAFLET_RETINA_URL
   ? process.env.LEAFLET_RETINA_URL
   : process.env.LEAFLET_TILE_URL
 
-const LABEL_URL = process.env.LABEL_URL
+const LABEL_URL = Leaflet.Browser.retina && process.env.LABEL_RETINA_URL
+  ? process.env.LABEL_RETINA_URL
+  : process.env.LABEL_URL
 
-const TILE_LAYER_PROPS = {}
-if (Leaflet.Browser.retina) {
-  TILE_LAYER_PROPS.tileSize = 512
-  TILE_LAYER_PROPS.zoomOffset = -1
+const TILE_OPTIONS = {
+  attribution: process.env.LEAFLET_ATTRIBUTION,
+  tileSize: 512,
+  zoomOffset: -1
 }
 
 const iconWidth = 20
@@ -56,14 +60,21 @@ const endIcon = Leaflet.divIcon({
 })
 
 type Props = {
+  allTransitiveData: any[],
   centerCoordinates: Coordinate,
   clearStartAndEnd: () => void,
+  drawIsochrones: Function[],
+  drawOpportunityDatasets: Function[],
+  drawRoutes: any[],
   end: null | Location,
-  pointsOfInterest: PointsOfInterest,
+  isLoading: boolean,
+  pointsOfInterest: void | any, // FeatureCollection
   setEndPosition: LonLat => void,
   setStartPosition: LonLat => void,
   start: null | Location,
+  updateEnd: () => void,
   updateMap: any => void,
+  updateStart: () => void,
   zoom: number
 }
 
@@ -73,7 +84,31 @@ type State = {
   showSelectStartOrEnd: boolean
 }
 
-const poiToFeatures = memoize(poi => poi.map(p => p.feature))
+/**
+ * Temporary class that fixes VectorGrid's `getFeature`
+ */
+class VGrid extends VectorGrid {
+  _propagateEvent (eventHandler, e) {
+    if (!eventHandler) return
+    const featureId = this._getFeatureId(e.layer)
+    const feature = this.getFeature(featureId)
+    if (feature) {
+      Leaflet.DomEvent.stopPropagation(e)
+      eventHandler(feature)
+    }
+  }
+
+  createLeafletElement (props) {
+    const le = super.createLeafletElement(props)
+    le.options.rendererFactory = Leaflet.canvas.tile
+    return le
+  }
+
+  getFeature (featureId) {
+    const p = this.props
+    return find(p.data.features, f => f.properties[p.idField] === featureId)
+  }
+}
 
 /**
  *
@@ -121,33 +156,25 @@ export default class Map extends PureComponent<Props, State> {
   }
 
   _setEnd = (): void => {
-    const {lastClickedPosition} = this.state
-    this._clearState()
-    if (lastClickedPosition) {
-      this.props.setEndPosition(lonlat(lastClickedPosition))
+    const p = this.props
+    const s = this.state
+    if (s.lastClickedPosition) {
+      const position = lonlat(s.lastClickedPosition)
+      if (s.lastClickedLabel) p.updateEnd({label: s.lastClickedLabel, position})
+      else p.setEndPosition(position)
     }
+    this._clearState()
   }
 
   _setStart = (): void => {
-    const {lastClickedPosition} = this.state
+    const p = this.props
+    const s = this.state
+    if (s.lastClickedPosition) {
+      const position = lonlat(s.lastClickedPosition)
+      if (s.lastClickedLabel) p.updateStart({label: s.lastClickedLabel, position})
+      else p.setStartPosition(position)
+    }
     this._clearState()
-    if (lastClickedPosition) {
-      this.props.setStartPosition(lonlat(lastClickedPosition))
-    }
-  }
-
-  _clickPoi = (event: Event & {layer: {feature: Feature}}): void => {
-    if (!event.layer || !event.layer.feature) {
-      return this._clearState()
-    }
-
-    const {feature} = event.layer
-    const {coordinates} = feature.geometry
-    this.setState({
-      lastClickedLabel: feature.properties.label,
-      lastClickedPosition: lonlat.toLeaflet(coordinates),
-      showSelectStartOrEnd: true
-    })
   }
 
   _setZoom = (e: MapEvent) => {
@@ -155,110 +182,153 @@ export default class Map extends PureComponent<Props, State> {
     this.props.updateMap({zoom})
   }
 
-  /**
-   * Render
-   */
+  _clickPoi = (feature) => {
+    this.setState({
+      lastClickedLabel: feature.properties.label,
+      lastClickedPosition: lonlat.toLeaflet(feature.geometry.coordinates),
+      showSelectStartOrEnd: true
+    })
+  }
+
+  _key = 0
+  _getKey () { return this._key++ }
+
   render () {
-    const {
-      centerCoordinates,
-      children,
-      end,
-      pointsOfInterest,
-      start,
-      zoom
-    } = this.props
+    const p = this.props
+    const s = this.state
 
     // Index elements with keys to reset them when elements are added / removed
-    const poiKey = pointsOfInterest.length > 0 ? 1 : 0
-    const startKey = `${poiKey + 1}-start-key`
-    const endKey = `${startKey + 1}-end-key`
-    const selectKey = `${endKey + 1}-select-key`
 
-    const {
-      lastClickedLabel,
-      lastClickedPosition,
-      showSelectStartOrEnd
-    } = this.state
+    this._key = 0
+    let zIndex = 0
+    const getZIndex = () => zIndex++
+
     return (
       <LeafletMap
-        center={centerCoordinates}
+        center={p.centerCoordinates}
         className='Taui-Map'
         onZoomend={this._setZoom}
-        zoom={zoom}
+        zoom={p.zoom}
         onClick={this._onMapClick}
         zoomControl={false}
       >
         <ZoomControl position='topright' />
         <TileLayer
+          {...TILE_OPTIONS}
           url={TILE_URL}
-          attribution={process.env.LEAFLET_ATTRIBUTION}
-          {...TILE_LAYER_PROPS}
+          zIndex={getZIndex()}
         />
 
-        {children}
+        {/* p.drawIsochrones.map((drawTile, i) => drawTile &&
+          <Gridualizer
+            drawTile={drawTile}
+            key={`draw-iso-${i}-${keyCount++}`}
+            zoom={p.zoom}
+          />) */}
+
+        {/* !p.isLoading && p.isochrones.map((iso, i) => !iso
+          ? null
+          : <GeoJSON
+            data={iso}
+            key={`${iso.key}-${i}-${keyCount++}`}
+            style={iso.style}
+            zIndex={getZIndex()}
+          />) */}
+
+        {!p.isLoading && p.isochrones.map((iso, i) => !iso
+          ? null
+          : <VGrid
+            data={iso}
+            key={`${iso.key}-${i}-${this._getKey()}`}
+            style={iso.style}
+            zIndex={getZIndex()}
+          />)}
+
+        {p.drawOpportunityDatasets.map((drawTile, i) => drawTile &&
+          <Gridualizer
+            drawTile={drawTile}
+            key={`draw-od-${i}-${this._getKey()}`}
+            zIndex={getZIndex()}
+            zoom={p.zoom}
+          />)}
 
         {LABEL_URL &&
           <TileLayer
-            attribution={process.env.LEAFLET_ATTRIBUTION}
+            {...TILE_OPTIONS}
+            key={`tile-layer-${this._getKey()}`}
             url={LABEL_URL}
-            zIndex={40}
+            zIndex={getZIndex()}
           />}
 
-        {(!start || !end) &&
-          pointsOfInterest.length > 0 &&
-          <GeoJSON
-            data={poiToFeatures(pointsOfInterest)}
-            key={poiKey}
+        {p.showRoutes && p.drawRoutes.map(drawRoute =>
+          <DrawRoute
+            {...drawRoute}
+            key={`draw-routes-${drawRoute.index}-${this._getKey()}`}
+            zIndex={getZIndex()}
+          />)}
+
+        {(!p.start || !p.end) && p.pointsOfInterest &&
+          <VGrid
+            data={p.pointsOfInterest}
+            idField='label'
+            key={`poi-${this._getKey()}`}
+            minZoom={10}
             onClick={this._clickPoi}
+            style={STOP_STYLE}
+            tooltip='label'
+            zIndex={getZIndex()}
           />}
 
-        {start &&
+        {p.start &&
           <Marker
             draggable
             icon={startIcon}
-            key={startKey}
+            key={`start-${this._getKey()}`}
             onDragEnd={this._setStartWithEvent}
-            position={start.position}
+            position={p.start.position}
+            zIndex={getZIndex()}
           >
             <Popup>
-              <span>{start.label}</span>
+              <span>{p.start.label}</span>
             </Popup>
           </Marker>}
 
-        {end &&
+        {p.end &&
           <Marker
             draggable
             icon={endIcon}
-            key={endKey}
+            key={`end-${this._getKey()}`}
             onDragEnd={this._setEndWithEvent}
-            position={end.position}
+            position={p.end.position}
+            zIndex={getZIndex()}
           >
             <Popup>
-              <span>{end.label}</span>
+              <span>{p.end.label}</span>
             </Popup>
           </Marker>}
 
-        {showSelectStartOrEnd &&
+        {s.showSelectStartOrEnd &&
           <Popup
             closeButton={false}
-            key={selectKey}
-            position={lastClickedPosition}
+            key={`select-${this._getKey()}`}
+            position={s.lastClickedPosition}
+            zIndex={getZIndex()}
           >
             <div className='Popup'>
-              {lastClickedLabel &&
+              {s.lastClickedLabel &&
                 <h3>
-                  {lastClickedLabel}
+                  {s.lastClickedLabel}
                 </h3>}
               <button onClick={this._setStart}>
                 <Icon type='map-marker' />{' '}
                 {message('Map.SetLocationPopup.SetStart')}
               </button>
-              {start &&
+              {p.start &&
                 <button onClick={this._setEnd}>
                   <Icon type='map-marker' />{' '}
                   {message('Map.SetLocationPopup.SetEnd')}
                 </button>}
-              {(start || end) &&
+              {(p.start || p.end) &&
                 <button onClick={this._clearStartAndEnd}>
                   <Icon type='times' />{' '}
                   {message('Map.SetLocationPopup.ClearMarkers')}

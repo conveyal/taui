@@ -5,7 +5,7 @@ import throttle from 'lodash/throttle'
 import React, {Component} from 'react'
 import Select from 'react-select'
 
-import type {Location, MapboxFeature, PointsOfInterest} from '../types'
+import type {Location, MapboxFeature} from '../types'
 
 const USE_GEOLOCATE = true
 const GEOLOCATE_VALUE = 'geolocate'
@@ -20,9 +20,8 @@ type ReactSelectOption = {
 type Props = {
   geocode: (string, Function) => void,
   onChange: any => void,
+  options: ReactSelectOption[],
   placeholder: string,
-
-  pointsOfInterest: PointsOfInterest,
   reverseGeocode: (string, Function) => void,
   value: null | Location
 }
@@ -41,8 +40,8 @@ export default class Geocoder extends Component<Props> {
 
   constructor (props, context) {
     super(props, context)
-    if (props.pointsOfInterest) {
-      this.cacheOptions(props.pointsOfInterest)
+    if (props.options) {
+      this.cacheOptions(props.options)
     }
   }
 
@@ -59,7 +58,8 @@ export default class Geocoder extends Component<Props> {
   }
 
   defaultOptions () {
-    const geolocateOptions = this.props.geolocate && 'geolocation' in navigator
+    const p = this.props
+    const geolocateOptions = p.geolocate && 'geolocation' in navigator
       ? [{
         label: message(
           'Geocoding.UseCurrentLocation',
@@ -68,7 +68,7 @@ export default class Geocoder extends Component<Props> {
         value: GEOLOCATE_VALUE
       }]
       : []
-    return [...geolocateOptions, ...this.props.pointsOfInterest]
+    return [...geolocateOptions, ...(p.options || [])]
   }
 
   featureToOption = (feature: MapboxFeature) => {

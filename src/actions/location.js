@@ -46,12 +46,18 @@ export const setStart = (start: any) => {
 /**
  * Update the start
  */
-export const updateStart = (value: Location) => [
-  setNetworksToLoading(),
-  addActionLogItem(`Updating start to ${value.label}`),
-  setStart(value),
-  fetchAllTimesAndPathsForCoordinate(value.position)
-]
+export const updateStart = (value?: Location) =>
+  value && value.label && value.position
+    ? [
+      setNetworksToLoading(),
+      addActionLogItem(`Updating start to ${value.label}`),
+      setStart(value),
+      fetchAllTimesAndPathsForCoordinate(value.position)
+    ]
+    : [
+      addActionLogItem('Clearing start'),
+      setStart()
+    ]
 
 export const updateStartPosition = (position: LonLat) => [
   reverseGeocode(position, features =>
@@ -63,8 +69,8 @@ export const updateStartPosition = (position: LonLat) => [
 /**
  * Update the end point
  */
-export const updateEnd = (value: Location) => [
-  addActionLogItem(`Updating end point to ${value.label}`),
+export const updateEnd = (value?: Location) => [
+  addActionLogItem(value ? `Updating end to ${value.label}` : 'Clearing end'),
   setEnd(value)
 ]
 

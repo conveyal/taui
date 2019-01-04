@@ -1,7 +1,10 @@
 // @flow
-import Icon from '@conveyal/woonerf/components/icon'
+import lonlat from '@conveyal/lonlat'
 import message from '@conveyal/woonerf/message'
+import memoize from 'lodash/memoize'
 import React from 'react'
+import Select from 'react-virtualized-select'
+import createFilterOptions from 'react-select-fast-filter-options'
 
 import type {
   InputEvent,
@@ -24,6 +27,8 @@ type Props = {
   start: null | Location
 }
 
+const cfo = memoize(o => createFilterOptions({options: o}))
+
 export default class Form extends React.PureComponent {
   props: Props
 
@@ -42,57 +47,76 @@ export default class Form extends React.PureComponent {
     else this.setState({animating: false})
   }
 
+  _selectPoiStart = (option?: ReactSelectOption) =>
+    this.props.updateStart(option ? {
+      label: option.label,
+      position: lonlat(option.feature.geometry.coordinates)
+    } : null)
+
+  _selectPoiEnd = (option?: ReactSelectOption) =>
+    this.props.updateEnd(option ? {
+      label: option.label,
+      position: lonlat(option.feature.geometry.coordinates)
+    } : null)
+
   render () {
-    const {
-      end,
-      geocode,
-      onChangeEnd,
-      onChangeStart,
-      onTimeCutoffChange,
-      pointsOfInterest,
-      reverseGeocode,
-      selectedTimeCutoff,
-      start
-    } = this.props
+    const p = this.props
+    const poi = p.pointsOfInterest || []
+    const filterPoi = cfo(poi) // memoized filtering function
+    const showPoiSelect = poi.length > 0
     return (
       <div>
-        <Geocoder
-          geocode={geocode}
-          onChange={onChangeStart}
-          placeholder={message('Geocoding.StartPlaceholder')}
-          pointsOfInterest={pointsOfInterest}
-          reverseGeocode={reverseGeocode}
-          value={start}
-        />
-        {start &&
+        {showPoiSelect
+          ? <Select
+            filterOptions={filterPoi}
+            options={poi}
+            onChange={this._selectPoiStart}
+            placeholder={message('Geocoding.StartPlaceholder')}
+            value={p.start}
+          />
+          : <Geocoder
+            geocode={p.geocode}
+            onChange={p.onChangeStart}
+            placeholder={message('Geocoding.StartPlaceholder')}
+            reverseGeocode={p.reverseGeocode}
+            value={p.start}
+          />}
+        {p.start &&
           <div>
-            <Geocoder
-              geocode={geocode}
-              onChange={onChangeEnd}
-              placeholder={message('Geocoding.EndPlaceholder')}
-              pointsOfInterest={pointsOfInterest}
-              reverseGeocode={reverseGeocode}
-              value={end}
-            />
+            {showPoiSelect
+              ? <Select
+                filterOptions={cfo(poi)}
+                options={poi}
+                onChange={this._selectPoiEnd}
+                placeholder={message('Geocoding.EndPlaceholder')}
+                value={p.end}
+              />
+              : <Geocoder
+                geocode={p.geocode}
+                onChange={p.onChangeEnd}
+                placeholder={message('Geocoding.StartPlaceholder')}
+                reverseGeocode={p.reverseGeocode}
+                value={p.end}
+              />}
             <div className='heading'>
               {message('Strings.HighlightAreaAccessibleWithin')}
-              {!this.state.animating &&
+              {/* DISABLED: VectorGrid is incompatible with animation. !this.state.animating &&
                 <a className='pull-right' onClick={this._animateTimeCutoff}>
                   <Icon type='play' />
-                </a>}
+                </a> */}
             </div>
             <div className='TimeCutoff'>
               <div className='Time'>
-                {selectedTimeCutoff} {message('Units.Minutes')}
+                {p.selectedTimeCutoff} {message('Units.Minutes')}
               </div>
               <input
                 disabled={this.state.animating}
-                onChange={onTimeCutoffChange}
+                onChange={p.onTimeCutoffChange}
                 type='range'
                 min={10}
                 max={120}
                 step={1}
-                value={selectedTimeCutoff}
+                value={p.selectedTimeCutoff}
               />
             </div>
           </div>}

@@ -5,13 +5,15 @@ import fetch from '@conveyal/woonerf/fetch'
 import {MAPBOX_GEOCODING_URL} from '../constants'
 import type {LonLat} from '../types'
 
+import cacheURL from '../utils/cache-url'
+
 /**
  * Format URL for fetching with query parameters
  */
 function formatURL (text: string, opts) {
   opts.access_token = process.env.MAPBOX_ACCESS_TOKEN
   const queryParams = Object.keys(opts).map(k => `${k}=${opts[k]}`).join('&')
-  return `${MAPBOX_GEOCODING_URL}/${text}.json?${queryParams}`
+  return cacheURL(`${MAPBOX_GEOCODING_URL}/${text}.json?${queryParams}`)
 }
 
 /**
