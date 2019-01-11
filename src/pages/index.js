@@ -1,6 +1,5 @@
 import get from 'lodash/get'
 import nextCookies from 'next-cookies'
-import React from 'react'
 import {connect} from 'react-redux'
 
 import actions from '../actions'
