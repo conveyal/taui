@@ -3,27 +3,49 @@ import React from 'react'
 
 import DefaultStore from '../store.json'
 
+import actions from './actions'
 import createStore from './create-store'
 import reducers from './reducers'
+import * as select from './selectors'
 
 const isServer = typeof window === 'undefined'
+const __APP__ = 'Taui'
 const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__'
 
-// NB: Currently does not use initial state
-function initializeStore (initialState) {
-  return createStore(reducers, initialState)
+function initializeStore (initialState, isServer) {
+  return createStore(reducers, initialState, isServer)
 }
 
 function getOrCreateStore (initialState) {
   // Always make a new store if server, otherwise state is shared between requests
   if (isServer) {
-    return initializeStore(initialState)
+    return initializeStore(initialState, isServer)
   }
 
   // Create store if unavailable on the client and set it on the window object
   if (!window[__NEXT_REDUX_STORE__]) {
-    window[__NEXT_REDUX_STORE__] = initializeStore(initialState)
+    const store = initializeStore(initialState)
+
+    // Attach actions & selectors to window object for debugging
+    const app = {
+      action: {},
+      select: {},
+      store
+    }
+
+    Object.keys(actions).forEach(key => {
+      app.action[key] = (...args) =>
+        store.dispatch(actions[key](...args))
+    })
+
+    Object.keys(select).forEach(key => {
+      app.select[key] = () => select[key](store.getState())
+    })
+
+    window[__APP__] = app
+    window[__NEXT_REDUX_STORE__] = store
   }
+
   return window[__NEXT_REDUX_STORE__]
 }
 

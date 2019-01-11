@@ -4,12 +4,11 @@ import Icon from '@conveyal/woonerf/components/icon'
 import get from 'lodash/get'
 import memoize from 'lodash/memoize'
 import dynamic from 'next/dynamic'
+import Cookies from 'js-cookie'
 import React, {Component} from 'react'
 
-import {retrieveConfig} from '../config'
 import {NETWORK_COLORS} from '../constants'
 import message from '../message'
-import {getAsObject} from '../utils/hash'
 import downloadJson from '../utils/download-json'
 
 import Form from './form'
@@ -17,6 +16,9 @@ import Log from './log'
 import RouteAccess from './route-access'
 import RouteCard from './route-card'
 import RouteSegments from './route-segments'
+
+// Example config
+const exampleConfigLink = 'https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp'
 
 // Cannot import Leaflet on the server
 const Map = dynamic(() => import('./map'), {ssr: false})
@@ -37,45 +39,6 @@ export default class Application extends Component {
     })
   }
 
-  /**
-   * Initialize the application.
-   */
-  componentDidMount () {
-    const p = this.props
-    const qs = getAsObject()
-
-    if (qs.zoom) {
-      p.updateMap({zoom: parseInt(qs.zoom, 10)})
-    }
-
-    try {
-      const startCoordinate = qs.startCoordinate
-        ? lonlat.fromString(qs.startCoordinate)
-        : undefined
-
-      if (qs.endCoordinate) {
-        p.setEnd({
-          label: qs.end,
-          position: lonlat.fromString(qs.endCoordinate)
-        })
-      }
-
-      if (startCoordinate) {
-        p.setStart({label: qs.start, position: startCoordinate})
-        return p.initialize(startCoordinate)
-      } else if (qs.centerCoordinates) {
-        p.updateMap({
-          centerCoordinates: lonlat.fromString(qs.centerCoordinates)
-        })
-      }
-
-    } catch (e) {
-      console.error(e)
-    }
-
-    p.initialize()
-  }
-
   _saveRefToConfig = (ref) => {
     this._refToConfig = ref
   }
@@ -83,7 +46,8 @@ export default class Application extends Component {
   _updateConfig = () => {
     try {
       const json = JSON.parse(this._refToConfig.value)
-      this.props.loadDatasetFromJSON(json)
+      Cookies.set('tauiConfig', json)
+      window.location.reload(true)
     } catch (e) {
       console.error(e)
       window.alert('Invalid JSON!')
@@ -196,7 +160,10 @@ export default class Application extends Component {
             updateStart={p.updateStart}
           />
         </div>
-        <Dock showSpinner={p.ui.fetches > 0} componentError={this.state.componentError}>
+        <Dock
+          showSpinner={p.ui.fetches > 0}
+          componentError={this.state.componentError}
+        >
           <Form
             end={p.geocoder.end}
             geocode={p.geocode}
@@ -257,9 +224,13 @@ export default class Application extends Component {
                 >save changes</a>
               </div>
               <div className='CardContent'>
-                <br /><a href='https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp' target='_blank'>See example config</a>
+                <br />
+                <a href={exampleConfigLink} target='_blank'>See example config</a>
               </div>
-              <textarea ref={this._saveRefToConfig} defaultValue={JSON.stringify(retrieveConfig() || {}, null, '  ')} />
+              <textarea
+                ref={this._saveRefToConfig}
+                defaultValue={JSON.stringify(p.tauiConfig || {}, null, '  ')}
+              />
             </div>}
           {p.ui.showLink &&
             <div className='Attribution'>

@@ -14,11 +14,14 @@ const middlewares = [
   fetch,
   multi,
   promise,
-  thunkMiddleware,
-  logger
+  thunkMiddleware
 ]
 
-export default function configureStore (rootReducer, initialState) {
+export default function configureStore (rootReducer, initialState, isServer) {
+  if (!isServer) {
+    middlewares.push(logger)
+  }
+
   return createStore(
     combineReducers(rootReducer),
     initialState,

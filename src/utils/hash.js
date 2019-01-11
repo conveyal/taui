@@ -11,6 +11,7 @@ function set (opts) {
 }
 
 export function getAsObject () {
+  if (typeof window === 'undefined') return {}
   return parseQueryString(get(window, 'location.hash', '').split('#')[1])
 }
 

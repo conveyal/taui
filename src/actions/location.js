@@ -1,5 +1,6 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
+import get from 'lodash/get'
 
 import {setValues} from '../utils/hash'
 
@@ -8,7 +9,7 @@ import {
   fetchAllTimesAndPathsForCoordinate,
   setNetworksToLoading
 } from './network'
-import {reverseGeocode} from './geocode'
+import {geocode, reverseGeocode} from './geocode'
 
 const setLocation = (which, location) => {
   if (location) {
@@ -45,18 +46,29 @@ export const setStart = (start) => {
 /**
  * Update the start
  */
-export const updateStart = (value) =>
-  value && value.label && value.position
-    ? [
-      setNetworksToLoading(),
-      addActionLogItem(`Updating start to ${value.label}`),
-      setStart(value),
-      fetchAllTimesAndPathsForCoordinate(value.position)
-    ]
-    : [
-      addActionLogItem('Clearing start'),
-      setStart()
-    ]
+export function updateStart (value) {
+  if (value) {
+    if (value.label && value.position) {
+      return [
+        setNetworksToLoading(),
+        addActionLogItem(`Updating start to ${value.label}`),
+        setStart(value),
+        fetchAllTimesAndPathsForCoordinate(value.position)
+      ]
+    } else if (value.position) {
+      return updateStartPosition(value.position)
+    } else {
+      return geocode(value.label, features =>
+        updateStart({
+          label: value.label,
+          position: get(features, [0, 'center'])
+        })
+      )
+    }
+  } else {
+    return [addActionLogItem('Clearing start'), setStart()]
+  }
+}
 
 export const updateStartPosition = (position) => [
   reverseGeocode(position, features =>

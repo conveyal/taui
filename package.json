@@ -3,11 +3,13 @@
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
   "scripts": {
-    "build": "next build",
-    "dev": "node --require dotenv/config node_modules/.bin/next",
+    "build": "next build src",
+    "dev": "node --require dotenv/config node_modules/.bin/next src",
     "predev": "yarn",
     "semantic-release": "semantic-release",
-    "start": "next start"
+    "start": "next start src",
+    "test": "jest",
+    "test-debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "repository": {
     "type": "git",
@@ -33,12 +35,14 @@
     "date-fns": "^1.29.0",
     "debug": "^4.1.0",
     "dotenv": "^6.2.0",
-    "isomorphic-fetch": "^2.2.1",
+    "js-cookie": "^2.2.0",
     "jsolines": "^2.1.0",
     "leaflet": "^1.4.0",
     "lodash": "^4.17.10",
     "mapbox.js": "^3.1.1",
     "next": "latest",
+    "next-cookies": "^1.0.4",
+    "node-fetch": "^2.3.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-leaflet": "^1.9.1",
@@ -50,9 +54,14 @@
     "redux": "^4.0.1",
     "redux-actions": "^2.6.4",
     "reselect": "^4.0.0",
+    "whatwg-fetch": "^3.0.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1"
+    "@babel/core": "^7.2.2",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "jest": "^23.6.0",
+    "regenerator-runtime": "^0.13.1"
   }
 }

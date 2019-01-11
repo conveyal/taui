@@ -1,5 +1,6 @@
+import get from 'lodash/get'
 import getConfig from 'next/config'
 
 const configs = getConfig()
 
-export default configs.publicRuntimeConfig
+export default get(configs, 'publicRuntimeConfig', {})

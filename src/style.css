@@ -1,10 +1,10 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
 @import url('https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css');
-@import url(node_modules/react-select/dist/react-select.css);
-@import url(node_modules/react-virtualized/styles.css);
-@import url(node_modules/react-virtualized-select/styles.css);
-@import url(src/components/log/style.css);
+@import url(../node_modules/react-select/dist/react-select.css);
+@import url(../node_modules/react-virtualized/styles.css);
+@import url(../node_modules/react-virtualized-select/styles.css);
+@import url(components/log/style.css);
 
 /** Colors from https://palx.jxnblk.com/2389c9 **/
 

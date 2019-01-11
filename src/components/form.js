@@ -61,23 +61,23 @@ export default class Form extends React.PureComponent {
             reverseGeocode={p.reverseGeocode}
             value={p.start}
           />}
-        {showPoiSelect
-          ? <Select
-            filterOptions={filterPoi}
-            options={poi}
-            onChange={this._selectPoiEnd}
-            placeholder={message('Geocoding.EndPlaceholder')}
-            value={p.end}
-          />
-          : <Geocoder
-            geocode={p.geocode}
-            onChange={p.onChangeEnd}
-            placeholder={message('Geocoding.StartPlaceholder')}
-            reverseGeocode={p.reverseGeocode}
-            value={p.end}
-          />}
         {p.start &&
           <div>
+          {showPoiSelect
+            ? <Select
+              filterOptions={filterPoi}
+              options={poi}
+              onChange={this._selectPoiEnd}
+              placeholder={message('Geocoding.EndPlaceholder')}
+              value={p.end}
+            />
+            : <Geocoder
+              geocode={p.geocode}
+              onChange={p.onChangeEnd}
+              placeholder={message('Geocoding.StartPlaceholder')}
+              reverseGeocode={p.reverseGeocode}
+              value={p.end}
+            />}
             <div className='heading'>
               {message('Strings.HighlightAreaAccessibleWithin')}
               {/* DISABLED: VectorGrid is incompatible with animation. !this.state.animating &&
