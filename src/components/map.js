@@ -1,7 +1,6 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
 import Icon from '@conveyal/woonerf/components/icon'
-import Leaflet from 'leaflet'
 import find from 'lodash/find'
 import React, {PureComponent} from 'react'
 import {
@@ -11,65 +10,20 @@ import {
   TileLayer,
   ZoomControl
 } from 'react-leaflet'
-import VectorGrid from 'react-leaflet-vectorgrid/dist/react-leaflet-vectorgrid'
 
 import {STOP_STYLE} from '../constants'
 import env from '../env'
+import {endIcon, startIcon} from '../map/icons'
 import message from '../message'
 
 import DrawRoute from './draw-route'
 import Gridualizer from './gridualizer'
+import VGrid from './vector-grid'
 
 const MAPBOX_TOKEN = env.MAPBOX_ACCESS_TOKEN
 const TILE_OPTIONS = {
   tileSize: 512,
   zoomOffset: -1
-}
-
-const iconWidth = 20
-const iconHeight = 20
-const iconSize = [iconWidth, iconHeight]
-const iconAnchor = [iconWidth / 2, iconHeight + 13] // height plus the pointer size
-const iconHTML = '' // <div className="innerMarker"></div>'
-
-const startIcon = Leaflet.divIcon({
-  className: 'LeafletIcon Start',
-  html: iconHTML,
-  iconAnchor,
-  iconSize
-})
-
-const endIcon = Leaflet.divIcon({
-  className: 'LeafletIcon End',
-  html: iconHTML,
-  iconAnchor,
-  iconSize
-})
-
-/**
- * Temporary class that fixes VectorGrid's `getFeature`
- */
-class VGrid extends VectorGrid {
-  _propagateEvent (eventHandler, e) {
-    if (!eventHandler) return
-    const featureId = this._getFeatureId(e.layer)
-    const feature = this.getFeature(featureId)
-    if (feature) {
-      Leaflet.DomEvent.stopPropagation(e)
-      eventHandler(feature)
-    }
-  }
-
-  createLeafletElement (props) {
-    const le = super.createLeafletElement(props)
-    le.options.rendererFactory = Leaflet.canvas.tile
-    return le
-  }
-
-  getFeature (featureId) {
-    const p = this.props
-    return find(p.data.features, f => f.properties[p.idField] === featureId)
-  }
 }
 
 /**
