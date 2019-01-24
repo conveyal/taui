@@ -1,8 +1,6 @@
-// @flow
 import gdlz from '@conveyal/gridualizer'
 import {scaleQuantize} from 'd3-scale'
 import {createSelector} from 'reselect'
-import get from 'lodash/get'
 
 import {COLORS_RGB} from '../constants'
 
@@ -19,7 +17,7 @@ const colorizer = (i) => (v) => {
 }
 
 export default createSelector(
-  state => get(state, 'data.networks', []),
+  state => state.networks,
   (networks = []) =>
     networks.map((n, i) => {
       if (n.showOnMap && n.travelTimeSurface && n.travelTimeSurface.data) {

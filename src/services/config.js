@@ -7,15 +7,17 @@ import {pointToCoordinate} from '../utils/coordinate-to-point'
 import fetch from '../utils/fetch'
 
 import {loadGrid} from './grid'
+import * as NetworkAPI from './network'
 import {loadPointsOfInterest} from './points-of-interest'
 
 /**
- * Download the initial set of data and set the state accordingly. First, check
- * and parse the query parameters. If there is a `start`, set the networks to
- * loading. Second, load the grids. Third, gecode the starting parameters
+ * Configure the locations.
+ *
+ * Query strings > cookie config > initial state
  */
-export default async function config (qs = {}, customConfig = {}, initialState = {}) {
+export function configureInitialLocations (qs = {}, cc = {}, is = {}) {
   const data = {
+    center: get(customConfig, 'center'),
     end: get(customConfig, 'end'),
     start: get(customConfig, 'start')
   }
@@ -42,6 +44,16 @@ export default async function config (qs = {}, customConfig = {}, initialState =
   } catch (e) {
     console.error(e)
   }
+
+  return data
+}
+
+/**
+ * Download the initial set of data and set the state accordingly. First, check
+ * and parse the query parameters. If there is a `start`, set the networks to
+ * loading. Second, load the grids. Third, gecode the starting parameters
+ */
+export default async function config (qs = {}, customConfig = {}, initialState = {}) {
 
   // Load the rest of the data from initial state or the custom saved config
   const allowChangeConfig = get(initialState, 'ui.allowChangeConfig')
@@ -77,8 +89,6 @@ export default async function config (qs = {}, customConfig = {}, initialState =
   })
 
   get(configData, 'networks', []).forEach((network, i) => {
-    console.log(network)
-
     fetches.push(fetchTransitive(network).then(transitive =>
       set(data, ['networks', i, 'transitive'], transitive)
     ))
@@ -93,6 +103,18 @@ export default async function config (qs = {}, customConfig = {}, initialState =
         ready: true,
         transitive
       })
+
+      // Load the start data
+      const startPosition = get(data, 'start.position')
+      if (false && startPosition) {
+        return NetworkAPI.fetchDataAtCoordinate(data.networks[i], startPosition)
+          .then(([travelTimeSurface, pathsData]) => {
+            set(data, ['networks', i, 'travelTimeSurface'], travelTimeSurface)
+            set(data, ['networks', i, 'paths'], pathsData.paths)
+            set(data, ['networks', i, 'pathsPerTarget'], pathsData.pathsPerTarget)
+            set(data, ['networks', i, 'targets'], pathsData.targets)
+          })
+      }
 
       // Only load the center from the first network
       if (i > 0) return

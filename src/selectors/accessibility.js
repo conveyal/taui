@@ -1,5 +1,4 @@
 // @flow
-import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
 import accessibilityForGrid from '../utils/accessibility-for-grid'
@@ -8,9 +7,9 @@ import selectTravelTimeSurfaces from './travel-time-surfaces'
 
 export default createSelector(
   selectTravelTimeSurfaces,
-  state => get(state, 'data.grids'),
-  state => get(state, 'data.networks'),
-  state => get(state, 'timeCutoff.selected'),
+  state => state.grids,
+  state => state.networks,
+  state => state.timeCutoff,
   (surfaces, grids, networks, cutoff) =>
     surfaces.map((surface, index) =>
       grids.map(

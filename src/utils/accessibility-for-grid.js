@@ -1,4 +1,3 @@
-// @flow
 /**
  * Get the cumulative accessibility number for a cutoff from a travel time
  * surface. This function always calculates _average_ accessibility. Calculating
@@ -46,10 +45,24 @@ export default function accessibilityForGrid ({
       if (travelTime <= cutoff) {
         const gridx = x + network.west - grid.west
         const gridy = y + network.north - grid.north
-        accessibility += grid.valueAtPoint(gridx, gridy)
+        accessibility += valueAtPoint(grid, gridx, gridy)
       }
     }
   }
 
   return accessibility
+}
+
+/**
+ * Removed from the grid object itself.
+ */
+function valueAtPoint (grid, x, y) {
+  if (!contains(grid, x, y)) {
+    return 0
+  }
+  return grid.data[y * grid.width + x]
+}
+
+function contains (grid, x, y) {
+  return x >= 0 && x < grid.width && y >= 0 && y < grid.height
 }

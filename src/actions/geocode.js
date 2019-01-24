@@ -1,9 +1,9 @@
 // @flow
 import lonlat from '@conveyal/lonlat'
-import fetch from '@conveyal/woonerf/fetch'
 
 import {MAPBOX_GEOCODING_URL} from '../constants'
 import env from '../env'
+import fetch from '../utils/fetch'
 import cacheURL from '../utils/cache-url'
 
 /**
@@ -18,30 +18,15 @@ function formatURL (text, opts) {
 /**
  * Create an action that dispatches the given action on success.
  *
- * NB Content-Type is application/vnd.geo+json so woonerf/fetch parses as text
+ * NB Content-Type is application/vnd.geo+json
  */
-export function geocode (text, nextAction) {
-  return function (dispatch, getState) {
-    const state = getState()
-    const {geocoder} = state
+export const geocode = (text, nextAction) => (dispatch, getState) => {
+  const state = getState()
+  const {geocoder} = state
 
-    dispatch(fetch({
-      next: (response) => {
-        try {
-          if (typeof response.value === 'string') {
-            return nextAction(JSON.parse(response.value).features)
-          } else {
-            return nextAction(response.value.features)
-          }
-        } catch (e) {
-          console.error('Error parsing geocoder response.')
-          console.error(e)
-          throw e
-        }
-      },
-      url: formatURL(text, geocoder)
-    }))
-  }
+  dispatch(fetch(formatURL(text, geocoder))
+    .then(response => response.json())
+    .then(geojson => nextAction(geojson.features)))
 }
 
 export const reverseGeocode = (position, nextAction) =>

@@ -1,8 +1,7 @@
-// @flow
 import {createSelector} from 'reselect'
 
 export default createSelector(
-  state => state.data.pointsOfInterest,
+  state => state.pointsOfInterest,
   featureCollection =>
     (featureCollection
       ? featureCollection.features.map(feature => {

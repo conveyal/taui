@@ -5,7 +5,7 @@ import DefaultStore from '../store.json'
 
 import actions from './actions'
 import createStore from './create-store'
-import reducers from './reducers'
+import reducer from './reducer'
 import * as select from './selectors'
 
 const isServer = typeof window === 'undefined'
@@ -13,7 +13,7 @@ const __APP__ = 'Taui'
 const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__'
 
 function initializeStore (initialState, isServer) {
-  return createStore(reducers, initialState, isServer)
+  return createStore(reducer, initialState, isServer)
 }
 
 function getOrCreateStore (initialState) {

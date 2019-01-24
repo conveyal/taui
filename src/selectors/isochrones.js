@@ -1,7 +1,5 @@
-// @flow
 import lonlat from '@conveyal/lonlat'
 import jsolines from 'jsolines'
-import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
 import {NETWORK_COLORS} from '../constants'
@@ -15,9 +13,9 @@ const getIsochroneStyleFor = (index) => ({
 })
 
 export default createSelector(
-  state => get(state, 'geocoder.start'),
-  state => get(state, 'data.networks'),
-  state => get(state, 'timeCutoff.selected'),
+  state => state.start,
+  state => state.networks,
+  state => state.timeCutoff,
   (start, networks = [], timeCutoff) =>
     networks.map((n, i) => {
       if (start && n.showOnMap && n.travelTimeSurface && n.travelTimeSurface.data) {
@@ -30,7 +28,7 @@ export default createSelector(
  * Inputs to key for memoization
  */
 function toKey (n, i, c) {
-  return `${n.name}-${i}-${n.originPoint.x}-${n.originPoint.y}-${c}`
+  return `${n.name}-${i}-${c}`
 }
 
 /**
@@ -58,7 +56,7 @@ const getIsochrone = (network, index, timeCutoff) => {
     style: getIsochroneStyleFor(index),
     properties: {
       name: network.name,
-      origin: [network.originPoint.x, network.originPoint.y],
+      index,
       timeCutoff
     }
   }

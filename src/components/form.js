@@ -1,5 +1,5 @@
-// @flow
 import lonlat from '@conveyal/lonlat'
+import Icon from '@conveyal/woonerf/components/icon'
 import memoize from 'lodash/memoize'
 import React from 'react'
 import Select from 'react-virtualized-select'
@@ -45,7 +45,7 @@ export default class Form extends React.PureComponent {
     const filterPoi = cfo(poi) // memoized filtering function
     const showPoiSelect = poi.length > 0
     return (
-      <div>
+      <React.Fragment>
         {showPoiSelect
           ? <Select
             filterOptions={filterPoi}
@@ -62,7 +62,7 @@ export default class Form extends React.PureComponent {
             value={p.start}
           />}
         {p.start &&
-          <div>
+          <React.Fragment>
             {showPoiSelect
               ? <Select
                 filterOptions={filterPoi}
@@ -80,10 +80,9 @@ export default class Form extends React.PureComponent {
               />}
             <div className='heading'>
               {message('Strings.HighlightAreaAccessibleWithin')}
-              {/* DISABLED: VectorGrid is incompatible with animation. !this.state.animating &&
-                <a className='pull-right' onClick={this._animateTimeCutoff}>
-                  <Icon type='play' />
-                </a> */}
+              <a className='pull-right' onClick={this._animateTimeCutoff}>
+                <Icon type='play' />
+              </a>
             </div>
             <div className='TimeCutoff'>
               <div className='Time'>
@@ -99,8 +98,8 @@ export default class Form extends React.PureComponent {
                 value={p.selectedTimeCutoff}
               />
             </div>
-          </div>}
-      </div>
+          </React.Fragment>}
+      </React.Fragment>
     )
   }
 }

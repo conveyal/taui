@@ -91,7 +91,7 @@ export default class Application extends Component {
   }
 
   _onTimeCutoffChange = (event) => {
-    this.props.setSelectedTimeCutoff(parseInt(event.currentTarget.value, 10))
+    this.props.setTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
 
   _setShowOnMap = memoize(index => () => {
@@ -140,25 +140,28 @@ export default class Application extends Component {
               </filter>
             </defs>
           </svg>
-          <Map
-            {...p.map}
-            activeNetworkIndex={p.activeNetworkIndex}
-            clearStartAndEnd={this._clearStartAndEnd}
-            end={p.geocoder.end}
-            isLoading={p.isLoading}
-            isochrones={p.isochrones}
-            drawIsochrones={p.drawIsochrones}
-            drawOpportunityDatasets={p.drawOpportunityDatasets}
-            drawRoutes={p.drawRoutes}
-            pointsOfInterest={p.pointsOfInterest}
-            showRoutes={this._showRoutes()}
-            setEndPosition={p.updateEndPosition}
-            setStartPosition={p.updateStartPosition}
-            start={p.geocoder.start}
-            updateEnd={p.updateEnd}
-            updateMap={p.updateMap}
-            updateStart={p.updateStart}
-          />
+          <div className='Taui-Map'>
+            <Map
+              {...p.map}
+              activeNetworkIndex={p.activeNetworkIndex}
+              center={p.map.centerCoordinates}
+              clearStartAndEnd={this._clearStartAndEnd}
+              end={p.geocoder.end}
+              isLoading={p.isLoading}
+              isochrones={p.isochrones}
+              drawIsochrones={p.drawIsochrones}
+              drawOpportunityDatasets={p.drawOpportunityDatasets}
+              drawRoutes={p.drawRoutes}
+              pointsOfInterest={p.pointsOfInterest}
+              showRoutes={this._showRoutes()}
+              setEndPosition={p.updateEndPosition}
+              setStartPosition={p.updateStartPosition}
+              start={p.geocoder.start}
+              updateEnd={p.updateEnd}
+              updateMap={p.updateMap}
+              updateStart={p.updateStart}
+            />
+          </div>
         </div>
         <Dock
           showSpinner={p.ui.fetches > 0}

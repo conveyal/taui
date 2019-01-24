@@ -14,7 +14,7 @@ const INACTIVE_OPACITY = 0.5
  * NB: All positions are [latitude, longitude] as they go directly to Leaflet
  */
 export default createSelector(
-  state => get(state, 'data.networks', []),
+  state => state.networks,
   selectActiveNetworkIndex,
   selectAllTransitiveData,
   (networks, activeNetworkIndex, td = []) => {

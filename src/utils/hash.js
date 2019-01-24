@@ -1,18 +1,24 @@
-import {parse as parseQueryString} from 'querystring'
-
 import get from 'lodash/get'
 
 function set (opts) {
   if (typeof window === 'undefined') return
-  window.location.hash = Object.keys(opts)
-    .filter(key => opts[key] !== undefined && opts[key] !== null)
-    .map(key => `${key}=${encodeURIComponent(opts[key])}`)
-    .join('&')
+  const queryString = encodeURIComponent(JSON.stringify(opts))
+  window.history.pushState(null, document.title, `?search=${queryString}`)
 }
 
 export function getAsObject () {
   if (typeof window === 'undefined') return {}
-  return parseQueryString(get(window, 'location.hash', '').split('#')[1])
+  try {
+    const v = JSON.parse(
+      decodeURIComponent(
+        get(window, 'location.search', '').split('?search=')[1]
+      )
+    )
+    return v
+  } catch (e) {
+    console.error(e)
+    return {}
+  }
 }
 
 export function setValues (values) {

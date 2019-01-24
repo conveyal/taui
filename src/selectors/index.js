@@ -1,4 +1,3 @@
-// @flow
 export {default as accessibility} from './accessibility'
 export {default as activeNetworkIndex} from './active-network-index'
 export {default as activeTransitive} from './active-transitive'

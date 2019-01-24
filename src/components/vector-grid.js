@@ -1,5 +1,4 @@
 import Leaflet from 'leaflet'
-import React from 'react'
 import VectorGrid from 'react-leaflet-vectorgrid/dist/react-leaflet-vectorgrid'
 
 /**

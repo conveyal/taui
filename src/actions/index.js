@@ -20,8 +20,8 @@ const setPointsOfInterest = (payload) => ({
   payload
 })
 
-const setSelectedTimeCutoff = (payload) => ({
-  type: 'set selected time cutoff',
+const setTimeCutoff = (payload) => ({
+  type: 'set time cutoff',
   payload
 })
 
@@ -34,5 +34,5 @@ export default {
   setGeocoder,
   setGrid,
   setPointsOfInterest,
-  setSelectedTimeCutoff
+  setTimeCutoff
 }

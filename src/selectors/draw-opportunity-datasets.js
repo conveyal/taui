@@ -1,4 +1,3 @@
-// @flow
 import gridualizer from '@conveyal/gridualizer'
 import {createSelector} from 'reselect'
 
@@ -12,7 +11,7 @@ function DotColorizer (density) {
 DotColorizer.normalize = true
 
 export default createSelector(
-  (state) => state.data.grids,
+  (state) => state.grids,
   (grids = []) => grids.map(grid => grid.showOnMap &&
     gridualizer.createDrawTile({
       colorizer: DotColorizer,

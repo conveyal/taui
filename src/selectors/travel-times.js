@@ -1,11 +1,9 @@
-// @flow
-import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
 import selectEndIndexes from './end-indexes'
 
 export default createSelector(
-  state => get(state, 'data.networks'),
+  state => state.networks,
   selectEndIndexes,
   (networks, endIndexes) =>
     networks.map(

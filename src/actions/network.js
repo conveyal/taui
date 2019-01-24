@@ -1,16 +1,9 @@
-import lonlat from '@conveyal/lonlat'
-import fetch from '@conveyal/woonerf/fetch'
+import get from 'lodash/get'
 
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
-import env from '../env'
-import cacheURL from '../utils/cache-url'
-import coordinateToPoint, {pointToCoordinate} from '../utils/coordinate-to-point'
-import {parsePathsData, warnForInvalidPaths} from '../utils/parse-paths-data'
-import {parseTimesData} from '../utils/parse-times-data'
+import * as NetworkAPI from '../services/network'
 
-import {updateStartPosition} from './location'
-import {addActionLogItem as logItem, logError} from './log'
-import {updateMap} from './map'
+import {logError} from './log'
 
 export const setNetwork = (payload) => ({type: 'set network', payload})
 export const setActiveNetwork = (payload) => ({
@@ -25,7 +18,6 @@ export const setNetworksAccessibilityTo = (value) => (dispatch, getState) => {
       setNetwork({
         ...network,
         accessibility: value,
-        originPoint: null,
         paths: null,
         targets: null,
         travelTimeSurface: null
@@ -38,101 +30,36 @@ export const setNetworksToLoading = () =>
 export const setNetworksToEmpty = () =>
   setNetworksAccessibilityTo(ACCESSIBILITY_IS_EMPTY)
 
-/**
- * Used for debugging on the command line.
- */
-export const fetchAllTimesAndPathsForIndex = (index) => (dispatch, getState) => {
-  const state = getState()
-  const n = state.data.networks[0]
-  const x = index % n.width
-  const y = Math.floor(index / n.width)
-  const centerCoordinates = pointToCoordinate(n.west + x, n.north + y, n.zoom)
-
-  dispatch(updateMap({centerCoordinates: lonlat.toLeaflet(centerCoordinates)}))
-  dispatch(updateStartPosition(centerCoordinates))
-}
-
 export const fetchAllTimesAndPathsForCoordinate = (coordinate) => (
   dispatch,
   getState
 ) => {
   const state = getState()
-  const currentZoom = state.map.zoom
-  dispatch(
-    state.data.networks.map(network =>
-      fetchTimesAndPathsForNetworkAtCoordinate(network, coordinate, currentZoom)
-    )
-  )
-}
+  const networks = get(state, 'data.networks')
 
-const fetchTimesAndPathsForNetworkAtCoordinate = (network, coordinate, currentZoom) => {
-  const originPoint = coordinateToPoint(
-    coordinate,
-    network.zoom,
-    network.west,
-    network.north
-  )
-  const index = originPoint.x + originPoint.y * network.width
-  return [
-    logItem(`Fetching data for index ${index} (x: ${originPoint.x}, y: ${originPoint.y})...`),
-    fetchTimesAndPathsForNetworkAtIndex(network, originPoint, index)
-  ]
-}
+  return Promise.all(networks.map(network => {
+    // Reset the network
+    dispatch(setNetwork({
+      ...network,
+      paths: null,
+      pathsPerTarget: null,
+      targets: null,
+      travelTimeSurface: null
+    }))
 
-const fetchTimesAndPathsForNetworkAtIndex = (network, originPoint, index) => [
-  setNetwork({
-    ...network,
-    originPoint,
-    paths: null,
-    pathsPerTarget: null,
-    targets: null,
-    travelTimeSurface: null
-  }),
-  fetch({
-    url: cacheURL(`${network.url}/${index}_paths.dat`),
-    next: (error, response) => {
-      if (error) {
-        console.error(error)
-        return logError(error.status === 400
-          ? 'Paths data not available for these coordinates.'
-          : 'Error while retrieving paths for these coordinates.')
-      }
-
-      const {paths, pathsPerTarget, targets} = parsePathsData(response.value)
-
-      if (env.NODE_ENV === 'test') {
-        warnForInvalidPaths(paths, network.transitive)
-      }
-
-      return [
-        logItem(`Found paths for ${index}...`),
-        setNetwork({
+    return NetworkAPI.fetchDataAtCoordinate(network, coordinate)
+      .then(([travelTimeSurface, pathsData]) => {
+        dispatch(setNetwork({
           name: network.name,
-          paths,
-          pathsPerTarget,
-          targets
-        })
-      ]
-    }
-  }),
-  fetch({
-    url: cacheURL(`${network.url}/${index}_times.dat`),
-    next: (error, timesResponse) => {
-      if (error) {
+          travelTimeSurface,
+          ...pathsData
+        }))
+      })
+      .catch(error => {
         console.error(error)
-        return logError(error.status === 400
+        dispatch(logError(error.status === 400
           ? 'Data not available for these coordinates.'
-          : 'Error while retrieving data for these coordinates.')
-      }
-
-      const travelTimeSurface = parseTimesData(timesResponse.value)
-      return [
-        logItem(`Found times for ${index}...`),
-        setNetwork({
-          name: network.name,
-          travelTimeSurface
-        })
-      ]
-    }
-  })
-]
+          : 'Error while retrieving data for these coordinates.'))
+      })
+  }))
+}

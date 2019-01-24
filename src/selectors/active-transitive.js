@@ -1,4 +1,3 @@
-// @flow
 import {createSelector} from 'reselect'
 
 import selectActiveNetworkIndex from './active-network-index'

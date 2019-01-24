@@ -17,7 +17,6 @@ export default function createGrid (data) {
 
   const width = header[3]
   const height = header[4]
-  const contains = (x, y) => x >= 0 && x < width && y >= 0 && y < height
 
   // parse header
   return {
@@ -28,14 +27,6 @@ export default function createGrid (data) {
     height,
     data: array,
     min,
-    max,
-    contains,
-    valueAtPoint (x, y) {
-      if (contains(x, y)) {
-        return array[y * width + x]
-      } else {
-        return 0
-      }
-    }
+    max
   }
 }
