@@ -14,7 +14,7 @@ export const setActiveNetwork = (payload) => ({
 export const setNetworksAccessibilityTo = (value) => (dispatch, getState) => {
   const state = getState()
   dispatch(
-    state.data.networks.map(network =>
+    state.networks.map(network =>
       setNetwork({
         ...network,
         accessibility: value,
@@ -35,7 +35,7 @@ export const fetchAllTimesAndPathsForCoordinate = (coordinate) => (
   getState
 ) => {
   const state = getState()
-  const networks = get(state, 'data.networks')
+  const networks = state.networks
 
   return Promise.all(networks.map(network => {
     // Reset the network

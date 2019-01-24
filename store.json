@@ -1,4 +1,5 @@
 {
+  "actionLog": [],
   "grids": [],
   "networks": [],
   "poiUrl": null,
@@ -6,12 +7,14 @@
     "types": "country,region,postcode,district,place,locality,neighborhood,address,poi"
   },
   "map": {
-    "center": [73.995193, 40.716867],
+    "center": [-73.995193, 40.716867],
     "style": "mapbox://styles/conveyal/cjr7kztgv1ac22sp9h7ucqhgp",
     "zoom": 11
   },
   "fetches": 0,
   "showLink": true,
   "showLog": true,
+  "timeCutoff": 60,
+  "title": "Taui",
   "allowChangeConfig": true
 }

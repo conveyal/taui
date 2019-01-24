@@ -96,7 +96,7 @@ export default class Application extends Component {
 
   _setShowOnMap = memoize(index => () => {
     const p = this.props
-    const network = p.data.networks[index]
+    const network = p.networks[index]
     const showOnMap = !network.showOnMap
     p.setNetwork({
       ...network,
@@ -109,11 +109,11 @@ export default class Application extends Component {
     const p = this.props
     const isochrone = p.isochrones[index]
     if (isochrone) {
-      const name = p.data.networks[index].name
-      const ll = lonlat.toString(p.geocoder.start.position)
+      const name = p.networks[index].name
+      const ll = lonlat.toString(p.start.position)
       downloadJson({
         data: isochrone,
-        filename: `${name}-${ll}-${p.timeCutoff.selected}min-isochrone.json`
+        filename: `${name}-${ll}-${p.timeCutoff}min-isochrone.json`
       })
     } else {
       window.alert('No isochrone has been generated for this network.')
@@ -144,9 +144,9 @@ export default class Application extends Component {
             <Map
               {...p.map}
               activeNetworkIndex={p.activeNetworkIndex}
-              center={p.map.centerCoordinates}
+              center={p.map.center}
               clearStartAndEnd={this._clearStartAndEnd}
-              end={p.geocoder.end}
+              end={p.end}
               isLoading={p.isLoading}
               isochrones={p.isochrones}
               drawIsochrones={p.drawIsochrones}
@@ -156,7 +156,7 @@ export default class Application extends Component {
               showRoutes={this._showRoutes()}
               setEndPosition={p.updateEndPosition}
               setStartPosition={p.updateStartPosition}
-              start={p.geocoder.start}
+              start={p.start}
               updateEnd={p.updateEnd}
               updateMap={p.updateMap}
               updateStart={p.updateStart}
@@ -164,23 +164,23 @@ export default class Application extends Component {
           </div>
         </div>
         <Dock
-          showSpinner={p.ui.fetches > 0}
+          showSpinner={p.fetches > 0}
           componentError={this.state.componentError}
         >
           <Form
-            end={p.geocoder.end}
+            end={p.end}
             geocode={p.geocode}
             onTimeCutoffChange={this._onTimeCutoffChange}
             onChangeEnd={this._setEndWithFeature}
             onChangeStart={this._setStartWithFeature}
             pointsOfInterest={p.pointsOfInterestOptions}
             reverseGeocode={p.reverseGeocode}
-            selectedTimeCutoff={p.timeCutoff.selected}
-            start={p.geocoder.start}
+            selectedTimeCutoff={p.timeCutoff}
+            start={p.start}
             updateEnd={p.updateEnd}
             updateStart={p.updateStart}
           />
-          {p.data.networks.map((network, index) => (
+          {p.networks.map((network, index) => (
             <RouteCard
               active={p.activeNetworkIndex === index}
               cardColor={NETWORK_COLORS[index]}
@@ -195,12 +195,12 @@ export default class Application extends Component {
               {!p.isLoading &&
                 <RouteAccess
                   accessibility={p.accessibility[index]}
-                  grids={p.data.grids}
+                  grids={p.grids}
                   hasStart={!!p.geocoder.start}
                   oldAccessibility={p.accessibility[p.accessibility.length - 1]}
                   showComparison={p.showComparison}
                 />}
-              {!p.isLoading && !!p.geocoder.end && !!p.geocoder.start &&
+              {!p.isLoading && !!p.end && !!p.start &&
                 <RouteSegments
                   oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
                   routeSegments={p.uniqueRoutes[index]}
@@ -208,14 +208,14 @@ export default class Application extends Component {
                 />}
             </RouteCard>
           ))}
-          {p.ui.showLog &&
+          {p.showLog && p.actionLog &&
             <div className='Card'>
               <div className='CardTitle'>
                 <span className='fa fa-terminal' /> {message('Log.Title')}
               </div>
               <Log items={p.actionLog} />
             </div>}
-          {p.ui.allowChangeConfig &&
+          {p.allowChangeConfig &&
             <div className='Card'>
               <div
                 className='CardTitle'
@@ -232,10 +232,10 @@ export default class Application extends Component {
               </div>
               <textarea
                 ref={this._saveRefToConfig}
-                defaultValue={JSON.stringify(p.tauiConfig || {}, null, '  ')}
+                defaultValue={JSON.stringify(p.cookieConfig || {}, null, '  ')}
               />
             </div>}
-          {p.ui.showLink &&
+          {p.showLink &&
             <div className='Attribution'>
               site made by
               {' '}

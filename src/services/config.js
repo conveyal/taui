@@ -7,88 +7,35 @@ import {pointToCoordinate} from '../utils/coordinate-to-point'
 import fetch from '../utils/fetch'
 
 import {loadGrid} from './grid'
-import * as NetworkAPI from './network'
 import {loadPointsOfInterest} from './points-of-interest'
-
-/**
- * Configure the locations.
- *
- * Query strings > cookie config > initial state
- */
-export function configureInitialLocations (qs = {}, cc = {}, is = {}) {
-  const data = {
-    center: get(customConfig, 'center'),
-    end: get(customConfig, 'end'),
-    start: get(customConfig, 'start')
-  }
-
-  if (qs.zoom) {
-    set(data, 'map.zoom', parseInt(qs.zoom, 10))
-  }
-
-  // Handle errors in parsing coordinates
-  try {
-    if (qs.startCoordinate) {
-      data.start = {
-        label: qs.start,
-        position: lonlat.fromString(qs.startCoordinate)
-      }
-    }
-
-    if (qs.endCoordinate) {
-      data.end = {
-        label: qs.end,
-        position: lonlat.fromString(qs.endCoordinate)
-      }
-    }
-  } catch (e) {
-    console.error(e)
-  }
-
-  return data
-}
 
 /**
  * Download the initial set of data and set the state accordingly. First, check
  * and parse the query parameters. If there is a `start`, set the networks to
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
-export default async function config (qs = {}, customConfig = {}, initialState = {}) {
-
-  // Load the rest of the data from initial state or the custom saved config
-  const allowChangeConfig = get(initialState, 'ui.allowChangeConfig')
-  const configData = allowChangeConfig && customConfig && customConfig.networks
-    ? customConfig
-    : {...initialState, ...initialState.data}
-
-  // Set the geocoder bounding box from the map
-  const maxBounds = get(configData, 'map.maxBounds')
-  if (maxBounds) {
-    const bbox = typeof maxBounds === 'string'
-      ? maxBounds
-      : `${maxBounds[0].join(',')},${maxBounds[1].join(',')}`
-    set(data, 'geocoder.bbox', bbox)
-  }
+export default async function config (initialState) {
+  const data = {}
 
   // Create all of the fetches to run in parallel
   const fetches = []
 
   // Try to load points of interest
-  if (configData.poiUrl) {
-    fetches.push(loadPointsOfInterest(configData.poiUrl)
+  if (initialState.poiUrl) {
+    fetches.push(loadPointsOfInterest(initialState.poiUrl)
       .then(poi => {
         data.poi = poi
       }))
   }
 
   // Load all opportunity grids
-  get(configData, 'grids', []).forEach((grid, i) => {
+  get(initialState, 'grids', []).forEach((grid, i) => {
     fetches.push(loadGrid(grid).then(fullGrid => {
       set(data, ['grids', i], fullGrid)
     }))
   })
 
-  get(configData, 'networks', []).forEach((network, i) => {
+  get(initialState, 'networks', []).forEach((network, i) => {
     fetches.push(fetchTransitive(network).then(transitive =>
       set(data, ['networks', i, 'transitive'], transitive)
     ))
@@ -104,8 +51,9 @@ export default async function config (qs = {}, customConfig = {}, initialState =
         transitive
       })
 
-      // Load the start data
-      const startPosition = get(data, 'start.position')
+      /** Load the start data
+       * TODO decide where this should be done
+      const startPosition = get(initialState, 'start.position')
       if (false && startPosition) {
         return NetworkAPI.fetchDataAtCoordinate(data.networks[i], startPosition)
           .then(([travelTimeSurface, pathsData]) => {
@@ -115,17 +63,17 @@ export default async function config (qs = {}, customConfig = {}, initialState =
             set(data, ['networks', i, 'targets'], pathsData.targets)
           })
       }
+      */
 
       // Only load the center from the first network
       if (i > 0) return
 
       try {
         const centerFromNetwork = getCenterFromNetwork(request)
-        const centerCoordinates =
-          get(configData, 'map.centerCoordinates', centerFromNetwork)
+        const center = get(initialState, 'map.center', centerFromNetwork)
 
-        set(data, 'map.centerCoordinates', centerCoordinates)
-        set(data, 'geocoder.proximity', lonlat.toString(centerCoordinates))
+        set(data, 'map.center', center)
+        set(data, 'geocoder.proximity', lonlat.toString(center))
       } catch (e) {
         console.error(e)
       }

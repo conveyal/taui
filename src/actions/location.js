@@ -1,8 +1,4 @@
-// @flow
-import lonlat from '@conveyal/lonlat'
 import get from 'lodash/get'
-
-import {setValues} from '../utils/hash'
 
 import {addActionLogItem} from './log'
 import {
@@ -11,37 +7,15 @@ import {
 } from './network'
 import {geocode, reverseGeocode} from './geocode'
 
-const setLocation = (which, location) => {
-  if (location) {
-    setValues({
-      [`${which}`]: location.label,
-      [`${which}Coordinate`]: location.position
-        ? lonlat.toString(location.position)
-        : null
-    })
-  } else {
-    setValues({
-      [`${which}`]: null,
-      [`${which}Coordinate`]: null
-    })
-  }
-}
+export const setEnd = (end) => ({
+  type: 'set end',
+  payload: end
+})
 
-export const setEnd = (end) => {
-  setLocation('end', end)
-  return {
-    type: 'set end',
-    payload: end
-  }
-}
-
-export const setStart = (start) => {
-  setLocation('start', start)
-  return {
-    type: 'set start',
-    payload: start
-  }
-}
+export const setStart = (start) => ({
+  type: 'set start',
+  payload: start
+})
 
 /**
  * Update the start

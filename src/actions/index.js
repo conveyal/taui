@@ -1,8 +1,6 @@
-// @flow
 import * as geocode from './geocode'
 import * as location from './location'
 import * as log from './log'
-import * as map from './map'
 import * as network from './network'
 
 const setGeocoder = (payload) => ({
@@ -25,14 +23,19 @@ const setTimeCutoff = (payload) => ({
   payload
 })
 
+const updateMap = (payload) => ({
+  type: 'update map',
+  payload
+})
+
 export default {
   ...geocode,
   ...location,
   ...log,
-  ...map,
   ...network,
   setGeocoder,
   setGrid,
   setPointsOfInterest,
-  setTimeCutoff
+  setTimeCutoff,
+  updateMap
 }

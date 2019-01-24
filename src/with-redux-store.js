@@ -1,82 +1,39 @@
-// @flow
-import React from 'react'
-
-import DefaultStore from '../store.json'
-
 import actions from './actions'
 import createStore from './create-store'
-import reducer from './reducer'
 import * as select from './selectors'
 
 const isServer = typeof window === 'undefined'
 const __APP__ = 'Taui'
-const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__'
+const __NRS__ = '__NEXT_REDUX_STORE__'
 
-function initializeStore (initialState, isServer) {
-  return createStore(reducer, initialState, isServer)
-}
-
-function getOrCreateStore (initialState) {
+export function getOrCreateStore (initialState) {
   // Always make a new store if server, otherwise state is shared between requests
-  if (isServer) {
-    return initializeStore(initialState, isServer)
+  if (isServer) return createStore(initialState)
+
+  // Return the store if it has already been created in the client
+  if (window[__NRS__]) return window[__NRS__]
+
+  // Create the store for the client
+  const store = createStore(initialState)
+  // Attach actions & selectors to window object for debugging
+  const app = {
+    action: {},
+    select: {},
+    store
   }
 
-  // Create store if unavailable on the client and set it on the window object
-  if (!window[__NEXT_REDUX_STORE__]) {
-    const store = initializeStore(initialState)
+  Object.keys(actions).forEach(key => {
+    app.action[key] = (...args) =>
+      store.dispatch(actions[key](...args))
+  })
 
-    // Attach actions & selectors to window object for debugging
-    const app = {
-      action: {},
-      select: {},
-      store
-    }
+  Object.keys(select).forEach(key => {
+    app.select[key] = () => select[key](store.getState())
+  })
 
-    Object.keys(actions).forEach(key => {
-      app.action[key] = (...args) =>
-        store.dispatch(actions[key](...args))
-    })
+  window[__APP__] = app
+  window[__NRS__] = store
+  console.log(`Taui store, selectors, and actions are at 'window.${__APP__}'`)
 
-    Object.keys(select).forEach(key => {
-      app.select[key] = () => select[key](store.getState())
-    })
-
-    window[__APP__] = app
-    window[__NEXT_REDUX_STORE__] = store
-  }
-
-  return window[__NEXT_REDUX_STORE__]
-}
-
-export default App => {
-  return class AppWithRedux extends React.Component {
-    static async getInitialProps (appContext) {
-      // Get or Create the store with `undefined` as initialState
-      // This allows you to set a custom default initialState
-      const reduxStore = getOrCreateStore(DefaultStore)
-
-      // Provide the store to getInitialProps of pages
-      appContext.ctx.reduxStore = reduxStore
-
-      let appProps = {}
-      if (typeof App.getInitialProps === 'function') {
-        appProps = await App.getInitialProps(appContext)
-      }
-
-      return {
-        ...appProps,
-        initialReduxState: reduxStore.getState()
-      }
-    }
-
-    constructor (props) {
-      super(props)
-      this.reduxStore = getOrCreateStore(props.initialReduxState)
-    }
-
-    render () {
-      return <App {...this.props} reduxStore={this.reduxStore} />
-    }
-  }
+  return store
 }

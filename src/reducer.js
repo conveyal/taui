@@ -1,4 +1,6 @@
-export default function reducer (state, action) {
+import * as qs from './utils/querystring'
+
+export default function reducer (state = {}, action) {
   switch (action.type) {
     case 'add action log item':
       return {
@@ -14,10 +16,7 @@ export default function reducer (state, action) {
     case 'set active network':
       return setActiveNetwork(state, action)
     case 'set end':
-      return {
-        ...state,
-        end: action.payload
-      }
+      return setLocation('end')(state, action)
     case 'set geocoder':
       return {
         ...state,
@@ -33,25 +32,19 @@ export default function reducer (state, action) {
         pointsOfInterest: action.payload
       }
     case 'set start':
-      return {
-        ...state,
-        start: action.payload
-      }
+      return setLocation('start')(state, action)
     case 'set time cutoff':
       return {
         ...state,
         timeCutoff: action.payload
       }
     case 'update map':
-      return {
-        ...state,
-        map: {
-          ...state.map,
-          ...action.payload
-        }
-      }
+      return updateMap(state, action)
     default:
-      console.error(`No reducer found for ${action.type}.`)
+      if (action.type.indexOf('@@redux/INIT') === -1) {
+        console.error(`No reducer found for ${action.type}.`)
+      }
+
       return state
   }
 }
@@ -86,6 +79,20 @@ function setGrid (state, action) {
   }
 }
 
+/**
+ * Set start/end and save to querystring at the same time.
+ */
+function setLocation (location) {
+  return function set (state, action) {
+    qs.setKeyTo(location, action.payload)
+
+    return {
+      ...state,
+      [`${location}`]: action.payload
+    }
+  }
+}
+
 function setNetwork (state, action) {
   const networks = [...state.networks]
   const networkIndex = networks.findIndex(
@@ -101,5 +108,20 @@ function setNetwork (state, action) {
   return {
     ...state,
     networks
+  }
+}
+
+function updateMap (state, action) {
+  const map = {
+    ...state.map,
+    ...action.payload
+  }
+
+  // Set the map in the query string
+  qs.setKeyTo('map', map)
+
+  return {
+    ...state,
+    map
   }
 }
