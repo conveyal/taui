@@ -48,6 +48,7 @@ export default class Form extends React.PureComponent {
       <React.Fragment>
         {showPoiSelect
           ? <Select
+            clearable={false}
             filterOptions={filterPoi}
             options={poi}
             onChange={this._selectPoiStart}
@@ -55,6 +56,7 @@ export default class Form extends React.PureComponent {
             value={p.start}
           />
           : <Geocoder
+            clearable={false}
             geocode={p.geocode}
             onChange={p.onChangeStart}
             placeholder={message('Geocoding.StartPlaceholder')}

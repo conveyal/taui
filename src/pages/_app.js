@@ -1,3 +1,4 @@
+import merge from 'lodash/merge'
 import App, {Container} from 'next/app'
 import Head from 'next/head'
 import nextCookies from 'next-cookies'
@@ -24,11 +25,8 @@ export default class TauiApp extends App {
 
     // Create the store with the initial state prioritizing:
     // query string > cookie config > store.json
-    const reduxStore = getOrCreateStore({
-      ...defaultStore,
-      ...cookieConfig,
-      ...queryConfig
-    })
+    const configs = [defaultStore, cookieConfig, queryConfig]
+    const reduxStore = getOrCreateStore(merge(...configs))
 
     return {
       cookieConfig,

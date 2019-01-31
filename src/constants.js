@@ -1,4 +1,3 @@
-// @flow
 export const ACCESSIBILITY_IS_EMPTY = 'accessibility-is-empty'
 export const ACCESSIBILITY_IS_LOADING = 'accessibility-is-loading'
 
@@ -19,6 +18,19 @@ export const COLORS_RGB = [
   [31, 137, 201],
   [201, 99, 35]
 ]
+
+export const darkBlue = '#103f5c'
+
+export const colors = [{
+  hex: '#2389c9', // conveyal blue
+  rgb: {r: 31, g: 137, b: 201}
+}, {
+  hex: '#c92336', // red
+  rgb: {r: 201, g: 35, b: 54}
+}]
+
+export const cutoffs =   [ 10,  20,  30,  40,  50,  60]
+export const opacities = [1, 0.2, 0.2, 0.2, 0.2, 0.2]
 
 export const WALK_STYLE = {
   color: '#333',

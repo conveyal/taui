@@ -1,63 +1,31 @@
-import lonlat from '@conveyal/lonlat'
-import jsolines from 'jsolines'
 import {createSelector} from 'reselect'
 
-import {NETWORK_COLORS} from '../constants'
-
-const getIsochroneStyleFor = (index) => ({
-  fillColor: NETWORK_COLORS[index],
-  fillOpacity: index === 0 ? 0.6 : 0.4,
-  pointerEvents: 'none',
-  color: NETWORK_COLORS[index],
-  weight: 0
-})
+import {colors, cutoffs, opacities} from '../constants'
+import getIsochroneForNetwork from '../utils/get-isochrone-for-network'
 
 export default createSelector(
   state => state.start,
   state => state.networks,
-  state => state.timeCutoff,
-  (start, networks = [], timeCutoff) =>
+  (start, networks = []) =>
     networks.map((n, i) => {
-      if (start && n.showOnMap && n.travelTimeSurface && n.travelTimeSurface.data) {
-        return getIsochrone(n, i, timeCutoff)
+      if (start && n.travelTimeSurface && n.travelTimeSurface.data) {
+        return {
+          type: 'FeatureCollection',
+          properties: {
+            name: n.name,
+            type: i === 0 ? 'fill' : 'line'
+          },
+          features: cutoffs.map((cutoff, cutoffIndex) => ({
+            ...getIsochroneForNetwork(n, start, cutoff),
+            properties: {
+              color: colors[i].hex,
+              opacity: opacities[cutoffIndex],
+              timeCutoff: cutoff,
+              width: 3
+            }
+          }))
+        }
       }
     })
 )
 
-/**
- * Inputs to key for memoization
- */
-function toKey (n, i, c) {
-  return `${n.name}-${i}-${c}`
-}
-
-/**
- * Create an isochrone. Save results based on the network and timecutoff.
- */
-const getIsochrone = (network, index, timeCutoff) => {
-  const surface = network.travelTimeSurface
-  const isochrone = jsolines({
-    ...surface, // height, width, surface
-    surface: surface.data,
-    cutoff: timeCutoff,
-    project ([x, y]) {
-      const {lon, lat} = lonlat.fromPixel({
-        x: x + surface.west,
-        y: y + surface.north
-      }, surface.zoom)
-      return [lon, lat]
-    }
-  })
-
-  // create the key for GeoJSON here
-  return {
-    ...isochrone,
-    key: toKey(network, index, timeCutoff),
-    style: getIsochroneStyleFor(index),
-    properties: {
-      name: network.name,
-      index,
-      timeCutoff
-    }
-  }
-}

@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import Cookies from 'js-cookie'
 import React, {Component} from 'react'
 
-import {NETWORK_COLORS} from '../constants'
+import {colors} from '../constants'
 import message from '../message'
 import downloadJson from '../utils/download-json'
 
@@ -20,7 +20,7 @@ import RouteSegments from './route-segments'
 // Example config
 const exampleConfigLink = 'https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp'
 
-// Cannot import Leaflet on the server
+// Cannot import map on the server
 const Map = dynamic(() => import('./map'), {ssr: false})
 
 export default class Application extends Component {
@@ -143,23 +143,21 @@ export default class Application extends Component {
           <div className='Taui-Map'>
             <Map
               {...p.map}
-              activeNetworkIndex={p.activeNetworkIndex}
-              center={p.map.center}
-              clearStartAndEnd={this._clearStartAndEnd}
               end={p.end}
-              isLoading={p.isLoading}
+              grids={p.grids}
+              isochroneOutline={p.isochroneOutline}
               isochrones={p.isochrones}
-              drawIsochrones={p.drawIsochrones}
-              drawOpportunityDatasets={p.drawOpportunityDatasets}
-              drawRoutes={p.drawRoutes}
-              pointsOfInterest={p.pointsOfInterest}
-              showRoutes={this._showRoutes()}
-              setEndPosition={p.updateEndPosition}
-              setStartPosition={p.updateStartPosition}
+              networkGeoJSONRoutes={p.networkGeoJSONRoutes}
               start={p.start}
               updateEnd={p.updateEnd}
               updateMap={p.updateMap}
               updateStart={p.updateStart}
+
+              activeNetworkIndex={p.activeNetworkIndex}
+              clearStartAndEnd={this._clearStartAndEnd}
+              isLoading={p.isLoading}
+              pointsOfInterest={p.pointsOfInterest}
+              showRoutes={this._showRoutes()}
             />
           </div>
         </div>
@@ -183,7 +181,7 @@ export default class Application extends Component {
           {p.networks.map((network, index) => (
             <RouteCard
               active={p.activeNetworkIndex === index}
-              cardColor={NETWORK_COLORS[index]}
+              cardColor={colors[index]}
               downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
               index={index}
               key={`${index}-route-card`}
@@ -196,14 +194,14 @@ export default class Application extends Component {
                 <RouteAccess
                   accessibility={p.accessibility[index]}
                   grids={p.grids}
-                  hasStart={!!p.geocoder.start}
+                  hasStart={!!p.start}
                   oldAccessibility={p.accessibility[p.accessibility.length - 1]}
                   showComparison={p.showComparison}
                 />}
               {!p.isLoading && !!p.end && !!p.start &&
                 <RouteSegments
                   oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
-                  routeSegments={p.uniqueRoutes[index]}
+                  routeSegments={p.networkRoutes[index]}
                   travelTime={p.travelTimes[index]}
                 />}
             </RouteCard>
@@ -221,10 +219,12 @@ export default class Application extends Component {
                 className='CardTitle'
               >
                 <span className='fa fa-cog' /> Configure
-                <a
-                  className='pull-right'
-                  onClick={this._updateConfig}
-                >save changes</a>
+                <div className='CardLinks'>
+                  <a
+                    onClick={this._updateConfig}
+                    title='Update config and reload the page'
+                  >save config</a>
+                </div>
               </div>
               <div className='CardContent'>
                 <br />

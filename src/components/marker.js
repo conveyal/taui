@@ -16,6 +16,7 @@ export default function Marker (p) {
   return (
     <Layer
       id={p.id}
+      images={p.images}
       layout={p.layout}
       type='symbol'
     >

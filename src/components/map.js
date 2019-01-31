@@ -1,65 +1,38 @@
+import get from 'lodash/get'
+import mapboxgl from 'mapbox-gl'
 import React from 'react'
-import ReactMapboxGL, {GeoJSONLayer, ZoomControl} from 'react-mapbox-gl'
 
+import {darkBlue, colors} from '../constants'
 import env from '../env'
+import useGeoJSONRoutes from '../hooks/use-geojson-routes'
+import useIsochrones from '../hooks/use-isochrones'
+import useMap from '../hooks/use-map'
+import useMarker from '../hooks/use-marker'
 
-import {createMarker} from './marker'
+// Set the token from `env`
+mapboxgl.accessToken = env.MAPBOX_ACCESS_TOKEN
 
-const MapboxGL = ReactMapboxGL({
-  accessToken: env.MAPBOX_ACCESS_TOKEN,
-  dragRotate: false
-})
+const containerStyle = {height: '100%', width: '100%'}
 
-const containerStyle = {
-  height: '100%',
-  width: '100%'
-}
-
-const defaultCenter = [-73.92837524414062, 40.78366099619794]
-
-// Create the start and end markers
-const StartMarker = createMarker({
-  iconImage: 'map-marker',
-  iconSize: 0.07,
-  id: 'start-marker'
-})
-const EndMarker = createMarker({
-  iconAnchor: 'center',
-  iconImage: 'marker-15',
-  id: 'end-marker'
-})
+// Always use the same markers
+const startMarkerProps = {color: darkBlue}
+const endMarkerProps = {color: colors[1].hex}
 
 export default function Map (p) {
-  const [center, setCenter] = React.useState(defaultCenter)
+  const [mapRef, map] = useMap(p, {
+    onClick: position => p.start ? p.updateEnd({position}) : p.updateStart({position}),
+    onMove: center => p.updateMap({center}),
+    onZoom: zoom => p.updateMap({zoom})
+  })
 
-  if (p.center !== center) {
-    setCenter(p.center)
-  }
+  useMarker(startMarkerProps, map, get(p, 'start.position'), {
+    onDragEnd: position => p.updateStart({position})
+  })
+  useMarker(endMarkerProps, map, get(p, 'end.position'), {
+    onDragEnd: position => p.updateEnd({position})
+  })
+  useIsochrones(map, [...p.isochrones, p.isochroneOutline])
+  useGeoJSONRoutes(map, p.networkGeoJSONRoutes)
 
-  return (
-    <MapboxGL
-      center={center}
-      containerStyle={containerStyle}
-      style={p.style}
-    >
-      <ZoomControl />
-
-      {p.isochrones.filter(Boolean).map((isochrone, index) =>
-        <GeoJSONLayer
-          before='water-shadow'
-          data={isochrone}
-          fillPaint={{
-            'fill-color': isochrone.style.fillColor,
-            'fill-opacity': isochrone.style.fillOpacity
-          }}
-          key={`isochrone-${index}`}
-        />)}
-
-      {p.start &&
-        <StartMarker {...p.start} />}
-
-      {p.end &&
-        <EndMarker {...p.end} />}
-    </MapboxGL>
-  )
+  return <div ref={mapRef} style={containerStyle} />
 }

@@ -1,4 +1,3 @@
-// @flow
 import toSpaceCase from 'lodash/lowerCase'
 import get from 'lodash/get'
 
@@ -6,46 +5,43 @@ import message from '../message'
 
 import Alert from './tr-alert'
 
-export default function RouteAccess (props) {
-  if (props.grids.length === 0) {
+export default function RouteAccess (p) {
+  if (p.grids.length === 0) {
     return <Alert>{message('Systems.NoGrids')}</Alert>
   }
 
-  if (!props.hasStart) {
+  if (!p.hasStart) {
     return <Alert>{message('Systems.SelectStart')}</Alert>
   }
 
-  if (get(props, 'accessibility[0]') === -1) {
+  if (get(p, 'accessibility[0]') === -1) {
     return <Alert>{message('Systems.NoAccess')}</Alert>
   }
 
-  return <ShowAccess {...props} />
-}
-
-function ShowAccess ({
-  accessibility,
-  grids,
-  oldAccessibility,
-  showComparison
-}) {
   return (
     <tbody className='Opportunities'>
-      {grids.map((grid, i) => (
-        <tr className='Opportunity' key={grid.name}>
-          <td><span className={`fa fa-${grid.icon}`} /></td>
-          <td>
-            <span>Access to</span>
-            <strong> {(accessibility[i] | 0).toLocaleString()} </strong>
-            {toSpaceCase(grid.name)}&nbsp;
-            {showComparison &&
-              <DiffPercentage
-                current={accessibility[i]}
-                old={oldAccessibility[i]}
-              />}
-          </td>
-        </tr>
-      ))}
+      {p.grids.map((grid, i) =>
+        <Opportunity grid={grid} key={grid.name}>
+          <strong> {(p.accessibility[i] | 0).toLocaleString()} </strong>
+          {toSpaceCase(grid.name)}&nbsp;
+          {p.showComparison &&
+            <DiffPercentage
+              current={p.accessibility[i]}
+              old={p.oldAccessibility[i]}
+            />}
+        </Opportunity>)}
     </tbody>
+  )
+}
+
+function Opportunity ({children, grid}) {
+  return (
+    <tr className='Opportunity' key={grid.name}>
+      <td><span className={`fa fa-${grid.icon}`} /></td>
+      <td>
+        <span>Access to</span> {children}
+      </td>
+    </tr>
   )
 }
 

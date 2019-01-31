@@ -119,6 +119,8 @@ export default class Geocoder extends Component {
   render () {
     return (
       <Select.Async
+        {...this.props} // clearable, placeholder
+        {...this.state} // options, value
         autoBlur
         autoload={false}
         cache={false}
@@ -129,10 +131,7 @@ export default class Geocoder extends Component {
         minimumInput={3}
         onBlurResetsInput={false}
         onChange={this._onChange}
-        options={this.state.options}
-        placeholder={this.props.placeholder}
         searchPromptText={message('Geocoding.PromptText')}
-        value={this.state.value}
       />
     )
   }

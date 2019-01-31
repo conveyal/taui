@@ -45,21 +45,34 @@ export function updateStart (value) {
 }
 
 export const updateStartPosition = (position) => [
+  fetchAllTimesAndPathsForCoordinate(position),
+  setStart({position}), // so the marker updates quickly
   reverseGeocode(position, features =>
     setStart({position, label: features[0].place_name})
-  ),
-  fetchAllTimesAndPathsForCoordinate(position)
+  )
 ]
 
 /**
  * Update the end point
  */
-export const updateEnd = (value) => [
-  addActionLogItem(value ? `Updating end to ${value.label}` : 'Clearing end'),
-  setEnd(value)
-]
+export const updateEnd = (value) => {
+  if (value) {
+    if (value.label && value.position) {
+      return [
+        addActionLogItem(`Updating end to ${value.label}`),
+        setEnd(value)
+      ]
+    } else if (value.position) {
+      return updateEndPosition(value.position)
+    }
+  } else {
+    return [addActionLogItem('Clearing end'), setEnd()]
+  }
+}
 
-export const updateEndPosition = (position) =>
+export const updateEndPosition = (position) => [
+  setEnd({position}),
   reverseGeocode(position, features =>
     setEnd({position, label: features[0].place_name})
   )
+]

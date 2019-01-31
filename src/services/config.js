@@ -51,29 +51,12 @@ export default async function config (initialState) {
         transitive
       })
 
-      /** Load the start data
-       * TODO decide where this should be done
-      const startPosition = get(initialState, 'start.position')
-      if (false && startPosition) {
-        return NetworkAPI.fetchDataAtCoordinate(data.networks[i], startPosition)
-          .then(([travelTimeSurface, pathsData]) => {
-            set(data, ['networks', i, 'travelTimeSurface'], travelTimeSurface)
-            set(data, ['networks', i, 'paths'], pathsData.paths)
-            set(data, ['networks', i, 'pathsPerTarget'], pathsData.pathsPerTarget)
-            set(data, ['networks', i, 'targets'], pathsData.targets)
-          })
-      }
-      */
-
-      // Only load the center from the first network
-      if (i > 0) return
+      // Only load the center from the first network if a center is not set
+      if (i > 0 || get(initialState, 'map.center')) return
 
       try {
         const centerFromNetwork = getCenterFromNetwork(request)
-        const center = get(initialState, 'map.center', centerFromNetwork)
-
-        set(data, 'map.center', center)
-        set(data, 'geocoder.proximity', lonlat.toString(center))
+        set(data, 'map.center', centerFromNetwork)
       } catch (e) {
         console.error(e)
       }

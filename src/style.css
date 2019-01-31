@@ -1,5 +1,6 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+@import url(../node_modules/mapbox-gl/dist/mapbox-gl.css);
 @import url(../node_modules/react-select/dist/react-select.css);
 @import url(../node_modules/react-virtualized/styles.css);
 @import url(../node_modules/react-virtualized-select/styles.css);
@@ -40,8 +41,15 @@ html, body {
 }
 
 .Taui-Map {
-  position: relative;
   height: 100vh;
+}
+
+.SsrLoad {
+  height: 100%;
+  width: 100%;
+  font-size: 3rem;
+  text-align: center;
+  line-height: 100%;
 }
 
 .isLoading .Taui-Map {
@@ -218,6 +226,15 @@ html, body {
   box-sizing: border-box;
 }
 
+.CardBands {
+  border-spacing: 0;
+  width: 100%;
+}
+
+.CardBands td {
+  padding: 0.5rem 1rem;
+}
+
 table.CardContent {
   padding: 0.25rem 0;
   border-spacing: 1rem 0.5rem;
@@ -274,18 +291,12 @@ table.CardContent td:first-of-type {
   display: inline-block;
 }
 
-.leaflet-popup-content-wrapper,
 .map-legends,
 .map-tooltip {
   border-radius: var(--rad);
   background-color: var(--dark-blue);
   font-size: 1rem;
   color: #fff;
-}
-
-.leaflet-popup-close-button + .leaflet-popup-content-wrapper .leaflet-popup-content,
-.leaflet-popup-content {
-  padding: 0.5rem;
 }
 
 .Popup button {
@@ -310,10 +321,6 @@ table.CardContent td:first-of-type {
   background-color: #fff;
 }
 
-.leaflet-popup-tip {
-  border-top-color: var(--dark-blue);
-}
-
 .Fullscreen {
   position: absolute;
   height: 100%;
@@ -322,63 +329,3 @@ table.CardContent td:first-of-type {
   overflow: hidden;
 }
 
-/* Leaflet Markers */
-.LeafletIcon {
-  position: relative;
-  display: block;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.5));
-}
-
-.LeafletIcon:before {
-  content: "";
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  position: absolute;
-  bottom: -13px;
-  left: 50%;
-  margin-left: -10px;
-}
-
-.LeafletIcon.Start {
-  background-color: var(--dark-blue);
-}
-
-.LeafletIcon.Start:before {
-  border-top: 20px solid var(--dark-blue);
-}
-
-.LeafletIcon.Start:after {
-  content: '';
-  position: absolute;
-  top: 5px;
-  left: 7px;
-  border-left: solid 8px #fff;
-  border-bottom: solid 6px transparent;
-  border-top: solid 6px transparent;
-}
-
-.LeafletIcon.End {
-  background-color: var(--orange);
-  margin-top: -20px !important;
-}
-
-.LeafletIcon.End:before {
-  border-top: 20px solid var(--orange);
-}
-
-.LeafletIcon.End:after {
-  content: '';
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  border: solid 5px #fff;
-}
-
-.TransitSegment, .WalkSegment, .Stop {
-  /* filter: url(#shadow); */
-}

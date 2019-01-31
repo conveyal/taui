@@ -118,7 +118,10 @@ function updateMap (state, action) {
   }
 
   // Set the map in the query string
-  qs.setKeyTo('map', map)
+  qs.setKeyTo('map', {
+    center: map.center,
+    zoom: map.zoom
+  })
 
   return {
     ...state,

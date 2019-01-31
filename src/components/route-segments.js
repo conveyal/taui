@@ -1,7 +1,7 @@
-// @flow
 import Icon from '@conveyal/woonerf/components/icon'
 
 import message from '../message'
+import {isLight} from '../utils/hex-color-contrast'
 
 import Alert from './tr-alert'
 
@@ -18,7 +18,7 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
         <td><span className='fa fa-street-view' /></td>
         <td>
           <span>Take </span>
-          {bestJourney.map((segment, index) => (
+          {bestJourney.filter(s => s.mode !== 'WALK').map((segment, index) => (
             <Segment key={index} segment={segment} />
           ))}
           {travelTime > 120
@@ -39,7 +39,7 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
             <span>{message('Systems.AlternateTripsTitle')} </span>
             {alternateJourneys.map((segments, jindex) => (
               <span key={jindex}>
-                {segments.map((segment, index) => (
+                {segments.filter(s => s.mode !== 'WALK').map((segment, index) => (
                   <Segment key={index} segment={segment} />
                 ))}
                 {jindex < alternateJourneys.length - 1 && <span>or </span>}
@@ -51,17 +51,23 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
   )
 }
 
+const getFontColor = backgroundColor => {
+  const il = isLight(backgroundColor.substr(1))
+  const color = il ? '#000' : '#fff'
+  const textShadow = `0 0 1px ${il ? '#fff' : '#000'}`
+  return {color, textShadow}
+}
+
 const Segment = ({segment}) => (
   <span
     className='CardSegment'
     style={{
-      backgroundColor: segment.backgroundColor || 'inherit',
-      color: segment.color || 'inherit',
-      textShadow: `0 0 1px ${segment.color === '#fff' ? '#333' : '#fff'}`
+      backgroundColor: segment.routeColor,
+      ...getFontColor(segment.routeColor)
     }}
     title={segment.name}
   >
-    <i className={`fa fa-${segment.type}`} /> {segment.name}
+    <i className={`fa fa-${segment.mode}`} /> {segment.name}
   </span>
 )
 
