@@ -22,11 +22,8 @@ export default function useGeoJSONRoutes (map, allRoutes) {
           id: `${id}-walk`,
           source: id,
           type: 'line',
-          layout: {
-            'line-cap': 'butt'
-          },
           paint: {
-            'line-color': '#333',
+            'line-color': '#000',
             'line-dasharray': [1, 1],
             'line-width': 5
           },
@@ -34,35 +31,34 @@ export default function useGeoJSONRoutes (map, allRoutes) {
         }, 'road-label')
 
         map.addLayer({
-          id: `${id}-transit`,
+          id: `${id}-transit-shadow`,
           source: id,
           type: 'line',
-          layout: {
-            'line-cap': 'round',
-            'line-join': 'round'
-          },
           paint: {
-            'line-color': ['get', 'routeColor'],
-            'line-width': 5,
+            'line-color': '#000',
+            'line-width': 1,
+            'line-gap-width': 3
           },
           filter: [
-            "all",
+            'all',
             ['!=', 'mode', 'WALK'],
             ['==', '$type', 'LineString']
           ]
         }, 'road-label')
 
         map.addLayer({
-          id: `${id}-stops`,
+          id: `${id}-transit`,
           source: id,
-          type: 'circle',
+          type: 'line',
           paint: {
-            'circle-radius': 3,
-            'circle-color': '#fff',
-            'circle-stroke-width': 3,
-            'circle-stroke-color': '#333'
+            'line-color': ['get', 'routeColor'],
+            'line-width': 3,
           },
-          filter: ['==', '$type', 'Point']
+          filter: [
+            "all",
+            ['!=', 'mode', 'WALK'],
+            ['==', '$type', 'LineString']
+          ]
         }, 'road-label')
       }
     })

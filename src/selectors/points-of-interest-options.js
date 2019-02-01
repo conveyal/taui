@@ -10,15 +10,7 @@ export default createSelector(
         return {
           label,
           value: `poi-${label}-${feature.geometry.coordinates.join(',')}`,
-          feature: {
-            ...feature,
-            properties: {
-              ...p,
-              label,
-              'marker-color': '#0b2b40',
-              'marker-size': 'small'
-            }
-          }
+          coordinates: feature.geometry.coordinates
         }
       })
       : []

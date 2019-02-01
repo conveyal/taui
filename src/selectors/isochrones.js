@@ -21,7 +21,7 @@ export default createSelector(
               color: colors[i].hex,
               opacity: opacities[cutoffIndex],
               timeCutoff: cutoff,
-              width: 3
+              width: 2
             }
           }))
         }

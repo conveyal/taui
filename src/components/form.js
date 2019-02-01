@@ -30,13 +30,13 @@ export default class Form extends React.PureComponent {
   _selectPoiStart = (option) =>
     this.props.updateStart(option ? {
       label: option.label,
-      position: lonlat(option.feature.geometry.coordinates)
+      position: lonlat(option.coordinates)
     } : null)
 
   _selectPoiEnd = (option) =>
     this.props.updateEnd(option ? {
       label: option.label,
-      position: lonlat(option.feature.geometry.coordinates)
+      position: lonlat(option.coordinates)
     } : null)
 
   render () {

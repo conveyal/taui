@@ -120,11 +120,6 @@ export default class Application extends Component {
     }
   })
 
-  _showRoutes () {
-    const p = this.props
-    return !p.isLoading && get(p, 'allTransitiveData[0].journeys[0]')
-  }
-
   /**
    *
    */
@@ -148,16 +143,11 @@ export default class Application extends Component {
               isochroneOutline={p.isochroneOutline}
               isochrones={p.isochrones}
               networkGeoJSONRoutes={p.networkGeoJSONRoutes}
+              pointsOfInterest={p.pointsOfInterest}
               start={p.start}
               updateEnd={p.updateEnd}
               updateMap={p.updateMap}
               updateStart={p.updateStart}
-
-              activeNetworkIndex={p.activeNetworkIndex}
-              clearStartAndEnd={this._clearStartAndEnd}
-              isLoading={p.isLoading}
-              pointsOfInterest={p.pointsOfInterest}
-              showRoutes={this._showRoutes()}
             />
           </div>
         </div>
@@ -257,7 +247,7 @@ function Dock (props) {
           ? <Icon type='spinner' className='fa-spin' />
           : <Icon type='map' />}
         {' '}
-        {message('Title')}
+        {props.title || message('Title')}
       </div>
       {props.componentError &&
         <div>

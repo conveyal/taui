@@ -10,15 +10,7 @@ export default function RouteCard (p) {
     <div
       className={'Card'}
     >
-      <div
-        className='CardTitle'
-        onClick={p.setShowOnMap}
-        onMouseOver={p.onMouseOver}
-        style={{
-          backgroundColor: p.cardColor.hex,
-          cursor: 'pointer'
-        }}
-      >
+      <div className='CardTitle' style={{backgroundColor: p.cardColor.hex}}>
         {p.title}
         <div className='CardLinks'>
           {p.downloadIsochrone &&
@@ -28,12 +20,6 @@ export default function RouteCard (p) {
             >
               <Icon type='download' />
             </a>}
-          <a
-            onClick={p.setShowOnMap}
-            title='Show/hide isochrone for network'
-          >
-            {p.showOnMap ? <Icon type='eye-slash' /> : <Icon type='eye' />}
-          </a>
         </div>
       </div>
       <table className='CardBands'>

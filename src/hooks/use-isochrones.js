@@ -20,7 +20,7 @@ export default function useIsochrones (map, isochrones) {
         map.addSource(id, {type: 'geojson', data})
 
         const beforeLayer = i === 0
-          ? 'water-shadow'
+          ? 'road-label'
           : `isochrone-${i - 1}`
 
         // Fill the base layer
@@ -33,7 +33,7 @@ export default function useIsochrones (map, isochrones) {
               'fill-color': ['get', 'color'],
               'fill-opacity': ['get', 'opacity']
             }
-          }, beforeLayer)
+          }, 'waterway')
         } else {
           map.addLayer({
             id,

@@ -21,7 +21,7 @@ export default createSelector(
             color: darkBlue,
             opacity: 1,
             timeCutoff,
-            width: 3
+            width: 2
           }
         }]
       }

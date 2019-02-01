@@ -24,7 +24,7 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
           {travelTime > 120
             ? <span className='decrease'>inaccessible within 120 minutes</span>
             : <span>in
-              <strong> {travelTime}</strong> {message('Units.Mins')}
+              <strong> {travelTime}</strong> {message('Units.Mins')}&nbsp;
               <TripDiff
                 baseTravelTime={oldTravelTime}
                 travelTime={travelTime}
@@ -74,11 +74,11 @@ const Segment = ({segment}) => (
 function TripDiff ({baseTravelTime, travelTime}) {
   if (baseTravelTime === 2147483647) {
     return (
-      <span className='increase'>&nbsp;({message('NewTrip')} <Icon type='star' />)</span>
+      <span className='increase'>({message('NewTrip')} <Icon type='star' />)</span>
     )
   } else if (travelTime === 2147483647) {
     return (
-      <span className='decrease'>&nbsp;(<strong>> {120 - baseTravelTime}</strong>% <span className='fa fa-level-up' />)</span>
+      <span className='decrease'>(<strong>> {120 - baseTravelTime}</strong>% <span className='fa fa-level-up' />)</span>
     )
   }
 
