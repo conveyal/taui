@@ -8,6 +8,8 @@ export default function usePointsOfInterest (map, poi, onClick) {
     const id = 'taui-points-of-interest'
     const source = map.getSource(id)
 
+    console.log('POI', poi)
+
     if (source) {
       source.setData(poi)
     } else {
@@ -16,13 +18,17 @@ export default function usePointsOfInterest (map, poi, onClick) {
       map.addLayer({
         id,
         source: id,
-        type: 'circle',
-        paint: {
+        type: 'symbol',
+        layout: {
+          'icon-image': 'stroked-circle',
+          'icon-size': 0.1
+        }
+        /*paint: {
           'circle-radius': 3,
           'circle-color': '#fff',
           'circle-stroke-width': 3,
           'circle-stroke-color': '#000'
-        }
+        },*/
       })
 
       const popup = new mapboxgl.Popup({
