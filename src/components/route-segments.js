@@ -16,13 +16,10 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
       <tr className='BestTrip'>
         <td><span className='fa fa-street-view' /></td>
         <td>
-          <span>Take </span>
-          {bestJourney.map((segment, index) => (
-            <Segment key={index} segment={segment} />
-          ))}
+          <span>Trip duration </span>
           {travelTime > 120
             ? <span className='decrease'>inaccessible within 120 minutes</span>
-            : <span>in
+            : <span>
               <strong> {travelTime}</strong> {message('Units.Mins')}
               <TripDiff
                 baseTravelTime={oldTravelTime}
@@ -31,15 +28,36 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
             </span>}
         </td>
       </tr>
+      <tr>
+        <td></td>
+        <td>
+          <span>Take </span>
+          {bestJourney.map((segment, index) => (
+            <span>
+              <Segment
+                key={index}
+                segment={segment}
+              />
+              {index !== bestJourney.length - 1 && 'to '}
+            </span>
+          ))}
+        </td>
+      </tr>
       {routeSegments.length > 1 &&
         <tr className='AlternateTrips'>
-          <td><span className='fa fa-map-signs' /></td>
+          <td></td>
           <td>
             <span>{message('Systems.AlternateTripsTitle')} </span>
             {alternateJourneys.map((segments, jindex) => (
               <span key={jindex}>
                 {segments.map((segment, index) => (
-                  <Segment key={index} segment={segment} />
+                  <span>
+                    <Segment
+                      key={index}
+                      segment={segment}
+                    />
+                    {index !== segments.length - 1 && 'to '}
+                  </span>
                 ))}
                 {jindex < alternateJourneys.length - 1 && <span>or </span>}
               </span>
