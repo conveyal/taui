@@ -6,6 +6,8 @@ const EmptyCollection = {type: 'FeatureCollection', features: []}
 const getId = i => `route-for-${i}`
 
 export default function useGeoJSONRoutes (map, allRoutes) {
+  useOnLoad(initializeGeoJSONRoutes, map, [allRoutes])
+
   React.useEffect(() => {
     if (!map) return
     allRoutes.forEach((routes, i) => {
@@ -13,8 +15,6 @@ export default function useGeoJSONRoutes (map, allRoutes) {
       if (source) source.setData(routes[0] || EmptyCollection)
     })
   }, [map, allRoutes])
-
-  useOnLoad(() => initializeGeoJSONRoutes(map, allRoutes), map)
 }
 
 function initializeGeoJSONRoutes (map, allRoutes) {

@@ -1,14 +1,14 @@
-import lonlat from '@conveyal/lonlat'
 import mapboxgl from 'mapbox-gl'
 import React from 'react'
+
+import {POI_ID as ID} from '../constants'
 
 import useOnLoad from './use-on-load'
 
 const EmptyCollection = {type: 'FeatureCollection', features: []}
-const ID = 'taui-points-of-interest'
 
-export default function usePointsOfInterest (map, poi, onClick) {
-  useOnLoad(() => initializePoi(map, poi), map)
+export default function usePointsOfInterest (map, poi) {
+  useOnLoad(initializePoi, map, [poi])
 
   React.useEffect(() => {
     if (!map) return

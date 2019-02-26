@@ -20,13 +20,9 @@ const containerStyle = {height: '100%', width: '100%'}
 const startMarkerProps = {color: darkBlue}
 const endMarkerProps = {color: colors[1].hex}
 
-const renderCount = 0
-
 export default function Map (p) {
   const [mapRef, map] = useMap(p, {
-    onClick: position => p.start
-      ? p.updateEnd({position})
-      : p.updateStart({position}),
+    onClick: d => p.start ? p.updateEnd(d) : p.updateStart(d),
     onMove: center => p.updateMap({center}),
     onZoom: zoom => p.updateMap({zoom})
   })
@@ -34,12 +30,12 @@ export default function Map (p) {
   useMarker(startMarkerProps, map, get(p, 'start.position'), {
     onDragEnd: position => p.updateStart({position})
   })
-  useMarker({...endMarkerProps, size: 0.5}, map, get(p, 'end.position'), {
+  useMarker(endMarkerProps, map, get(p, 'end.position'), {
     onDragEnd: position => p.updateEnd({position})
   })
   useIsochrones(map, p.isochrones)
   useGeoJSONRoutes(map, p.networkGeoJSONRoutes)
-  usePointsOfInterest(map, p.pointsOfInterest, p.updateStart)
+  usePointsOfInterest(map, p.pointsOfInterest)
 
   return <div ref={mapRef} style={containerStyle} />
 }

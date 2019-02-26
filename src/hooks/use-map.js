@@ -2,6 +2,8 @@ import lonlat from '@conveyal/lonlat'
 import mapboxgl from 'mapbox-gl'
 import React from 'react'
 
+import {POI_ID} from '../constants'
+
 // Default NavigationControl
 const navControl = new mapboxgl.NavigationControl({showCompass: false})
 
@@ -24,7 +26,19 @@ export default function useMap (mapProps, events) {
     })
 
     m.on('load', () => m.addControl(navControl, 'top-right'))
-    m.on('click', e => events.onClick(lonlat(e.lngLat)))
+    m.on('click', e => {
+      const bbox = [[e.point.x - 5, e.point.y - 5], [e.point.x + 5, e.point.y + 5]]
+      const pois = m.queryRenderedFeatures(bbox, {layers: [POI_ID]})
+      if (pois.length > 0) {
+        const poi = pois[0]
+        events.onClick({
+          label: poi.properties.label,
+          position: lonlat(poi.geometry.coordinates)
+        })
+      } else {
+        events.onClick({position: lonlat(e.lngLat)})
+      }
+    })
     m.on('moveend', () => events.onMove(lonlat(m.getCenter())))
     m.on('zoomend', () => events.onZoom(m.getZoom()))
 
