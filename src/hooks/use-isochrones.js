@@ -1,14 +1,11 @@
-import reverse from 'lodash/reverse'
 import React from 'react'
 
 import useOnLoad from './use-on-load'
 
 const EmptyCollection = {type: 'FeatureCollection', features: []}
-const getId = i => `isochrone-${i}`
 
 /**
- * Reverse to add the top layer first so that we can insert subsequent
- * layers beneath. Use consistently for ID purposes.
+ * Isochrones are in reverse order of the networks.
  */
 export default function useIsochrones (map, isochrones) {
   useOnLoad(initializeIsochrones, map, [isochrones])
@@ -16,23 +13,21 @@ export default function useIsochrones (map, isochrones) {
   React.useEffect(() => {
     if (!map) return
 
-    reverse(isochrones).forEach((isochrone, i) => {
-      const source = map.getSource(getId(i))
-      if (source) source.setData(isochrone || EmptyCollection)
+    isochrones.forEach((isochrone, i) => {
+      const source = map.getSource(isochrone.properties.id)
+      if (source) source.setData(isochrone)
     })
   }, [map, isochrones])
 }
 
 function initializeIsochrones (map, isochrones) {
-  reverse(isochrones).forEach((isochrone, i) => {
-    const id = `isochrone-${i}`
-    const data = isochrone || EmptyCollection
-
-    map.addSource(id, {type: 'geojson', data})
+  isochrones.forEach((isochrone, i) => {
+    const id = isochrone.properties.id
+    map.addSource(id, {type: 'geojson', data: isochrone})
 
     const beforeLayer = i === 0
       ? 'waterway'
-      : `isochrone-${i - 1}`
+      : isochrones[i - 1].properties.id
 
     // Fill the base layer
     map.addLayer({
