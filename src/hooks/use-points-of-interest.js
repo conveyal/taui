@@ -26,7 +26,7 @@ function initializePoi (map, poi) {
     type: 'symbol',
     layout: {
       'icon-image': 'stroked-circle',
-      'icon-size': 0.1
+      'icon-size': 0.11
     }
   })
 

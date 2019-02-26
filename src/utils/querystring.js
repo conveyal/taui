@@ -6,11 +6,10 @@ function set (opts) {
 
 function getAsObject () {
   if (typeof window === 'undefined') return {}
+  const search = window.location.search.split('?search=')[1]
+  if (!search) return {}
   try {
-    const v = JSON.parse(
-      decodeURIComponent(window.location.search.split('?search=')[1])
-    )
-    return v
+    return JSON.parse(decodeURIComponent(search))
   } catch (e) {
     console.error(e)
     return {}

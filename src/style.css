@@ -299,6 +299,10 @@ table.CardContent td:first-of-type {
   color: #fff;
 }
 
+.mapboxgl-popup {
+  font-size: 1.1rem;
+}
+
 .Popup button {
   display: block;
   font-size: 1rem;

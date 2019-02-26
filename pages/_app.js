@@ -8,6 +8,16 @@ import {Provider} from 'react-redux'
 import defaultStore from '../store.json'
 import {getOrCreateStore} from '../src/with-redux-store'
 
+function tryParse (v) {
+  try {
+    return JSON.parse(v)
+  } catch (e) {
+    console.error('Error parsing JSON.')
+    console.error(v)
+    return {}
+  }
+}
+
 const iconLink = 'https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png'
 
 export default class TauiApp extends App {
@@ -15,12 +25,12 @@ export default class TauiApp extends App {
     // Get the configuration from the cookies
     const {tauiConfig} = nextCookies(ctx)
     const cookieConfig = typeof tauiConfig === 'string'
-      ? JSON.parse(tauiConfig)
+      ? tryParse(tauiConfig)
       : (tauiConfig || {})
 
     // Get the query string parameters
     const queryConfig = typeof ctx.query.search === 'string'
-      ? JSON.parse(ctx.query.search)
+      ? tryParse(ctx.query.search)
       : {}
 
     // Create the store with the initial state prioritizing:
