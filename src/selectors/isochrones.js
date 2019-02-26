@@ -1,3 +1,4 @@
+import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
 import {colors, cutoffs, opacities} from '../constants'
@@ -6,26 +7,26 @@ import getIsochroneForNetwork from '../utils/get-isochrone-for-network'
 export default createSelector(
   state => state.start,
   state => state.networks,
-  (start, networks = []) =>
+  state => state.timeCutoff,
+  (start, networks = [], timeCutoff) =>
     networks.map((n, i) => {
-      if (start && n.travelTimeSurface && n.travelTimeSurface.data) {
+      const data = get(n, 'travelTimeSurface.data')
+      if (start && data) {
         return {
           type: 'FeatureCollection',
           properties: {
-            name: n.name,
-            type: i === 0 ? 'fill' : 'line'
+            name: n.name
           },
-          features: cutoffs.map((cutoff, cutoffIndex) => ({
-            ...getIsochroneForNetwork(n, start, cutoff),
+          features: [{
+            ...getIsochroneForNetwork(n, start, timeCutoff),
             properties: {
-              color: colors[i].hex,
-              opacity: opacities[cutoffIndex],
-              timeCutoff: cutoff,
-              width: 2
+              color: n.hexColor || colors[i].hex,
+              opacity: 1,
+              timeCutoff: timeCutoff,
+              width: 1
             }
-          }))
+          }]
         }
       }
     })
 )
-

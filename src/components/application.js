@@ -154,6 +154,7 @@ export default class Application extends Component {
         <Dock
           showSpinner={p.fetches > 0}
           componentError={this.state.componentError}
+          title={p.title}
         >
           <Form
             end={p.end}
@@ -171,7 +172,7 @@ export default class Application extends Component {
           {p.networks.map((network, index) => (
             <RouteCard
               active={p.activeNetworkIndex === index}
-              cardColor={colors[index]}
+              cardColor={network.hexColor || colors[index].hex}
               downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
               index={index}
               key={`${index}-route-card`}

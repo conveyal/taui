@@ -1,3 +1,4 @@
+import get from 'lodash/get'
 import {createSelector} from 'reselect'
 
 import {darkBlue} from '../constants'
@@ -9,7 +10,8 @@ export default createSelector(
   state => state.timeCutoff,
   (start, networks = [], timeCutoff) => {
     const n = networks[0]
-    if (start && n.travelTimeSurface && n.travelTimeSurface.data) {
+    const data = get(n, 'travelTimeSurface.data')
+    if (start && data) {
       return {
         type: 'FeatureCollection',
         properties: {
@@ -21,7 +23,7 @@ export default createSelector(
             color: darkBlue,
             opacity: 1,
             timeCutoff,
-            width: 2
+            width: 1
           }
         }]
       }

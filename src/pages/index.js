@@ -16,14 +16,14 @@ function mapStateToProps (state, ownProps) {
     ...state,
     accessibility: select.accessibility(state, ownProps),
     activeNetworkIndex: select.activeNetworkIndex(state, ownProps),
-    isochroneOutline: select.isochroneOutline(state, ownProps),
+    // isochroneOutline: select.isochroneOutline(state, ownProps),
     isochrones: select.isochrones(state, ownProps),
     isLoading: select.loading(state, ownProps),
     networkRoutes: select.networkRoutes(state, ownProps),
     networkGeoJSONRoutes: select.networkGeoJSONRoutes(state, ownProps),
     pointsOfInterestOptions: select.pointsOfInterestOptions(state, ownProps),
     showComparison: select.showComparison(state, ownProps),
-    travelTimes: select.travelTimes(state, ownProps),
+    travelTimes: select.travelTimes(state, ownProps)
   }
 }
 

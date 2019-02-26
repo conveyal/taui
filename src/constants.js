@@ -29,7 +29,7 @@ export const colors = [{
   rgb: {r: 201, g: 35, b: 54}
 }]
 
-export const cutoffs =   [ 10,  20,  30,  40,  50,  60]
+export const cutoffs = [ 10, 20, 30, 40, 50, 60]
 export const opacities = [1, 0.2, 0.2, 0.2, 0.2, 0.2]
 
 export const WALK_STYLE = {

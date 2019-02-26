@@ -14,21 +14,19 @@ export default function useMap (mapProps, events) {
 
   // Runs on mount
   React.useEffect(() => {
-    const newMap = window.map = new mapboxgl.Map({
+    const m = map.current = window.map = new mapboxgl.Map({
       center,
       container: ref.current,
+      maxBounds: mapProps.maxBounds,
+      minZoom: mapProps.minZoom,
       style,
       zoom
     })
 
-    newMap.on('load', () => {
-      newMap.addControl(navControl, 'top-right')
-      map.current = newMap
-    })
-
-    newMap.on('click', e => events.onClick(lonlat(e.lngLat)))
-    newMap.on('moveend', () => events.onMove(lonlat(newMap.getCenter())))
-    newMap.on('zoomend', () => events.onZoom(newMap.getZoom()))
+    m.on('load', () => m.addControl(navControl, 'top-right'))
+    m.on('click', e => events.onClick(lonlat(e.lngLat)))
+    m.on('moveend', () => events.onMove(lonlat(m.getCenter())))
+    m.on('zoomend', () => events.onZoom(m.getZoom()))
 
     return () => {
       if (map.current) map.current.remove()

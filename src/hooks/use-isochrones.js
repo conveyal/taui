@@ -1,56 +1,46 @@
-import toKebabCase from 'lodash/kebabCase'
 import reverse from 'lodash/reverse'
+import React from 'react'
 
-import useIfExists from './use-if-exists'
+import useOnLoad from './use-on-load'
 
 const EmptyCollection = {type: 'FeatureCollection', features: []}
+const getId = i => `isochrone-${i}`
 
 export default function useIsochrones (map, isochrones) {
-  useIfExists(() => {
-    // Reverse to add the top layer first so that we can insert subsequent
-    // layers beneath.
-    reverse(isochrones).forEach((isochrone, i) => {
-      const id = `isochrone-${i}`
-      const data = isochrone || EmptyCollection
-      const source = map.getSource(id)
+  // Reverse to add the top layer first so that we can insert subsequent
+  // layers beneath. Use consistently for ID purposes.
+  const forEachIso = fn => reverse(isochrones).forEach(fn)
 
-      if (source) {
-        source.setData(data)
-      } else {
-        map.addSource(id, {type: 'geojson', data})
+  React.useEffect(() => {
+    if (!map) return
 
-        const beforeLayer = i === 0
-          ? 'road-label'
-          : `isochrone-${i - 1}`
-
-        // Fill the base layer
-        if (i === isochrones.length - 1) {
-          map.addLayer({
-            id,
-            source: id,
-            type: 'fill',
-            paint: {
-              'fill-color': ['get', 'color'],
-              'fill-opacity': ['get', 'opacity']
-            }
-          }, 'waterway')
-        } else {
-          map.addLayer({
-            id,
-            source: id,
-            type: 'line',
-            layout: {
-              'line-cap': 'round',
-              'line-join': 'round'
-            },
-            paint: {
-              'line-color': ['get', 'color'],
-              'line-opacity': ['get', 'opacity'],
-              'line-width': ['get', 'width']
-            }
-          }, beforeLayer)
-        }
-      }
+    forEachIso((isochrone, i) => {
+      const source = map.getSource(getId(i))
+      if (source) source.setData(isochrone || EmptyCollection)
     })
   }, [map, isochrones])
+
+  useOnLoad(() => {
+    forEachIso((isochrone, i) => {
+      const id = `isochrone-${i}`
+      const data = isochrone || EmptyCollection
+
+      map.addSource(id, {type: 'geojson', data})
+
+      const beforeLayer = i === 0
+        ? 'waterway'
+        : `isochrone-${i - 1}`
+
+      // Fill the base layer
+      map.addLayer({
+        id,
+        source: id,
+        type: 'fill',
+        paint: {
+          'fill-color': ['get', 'color'],
+          'fill-opacity': ['get', 'opacity']
+        }
+      }, beforeLayer)
+    })
+  }, map)
 }

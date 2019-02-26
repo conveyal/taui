@@ -1,9 +1,6 @@
 import lonlat from '@conveyal/lonlat'
-import throttle from 'lodash/throttle'
 import mapboxgl from 'mapbox-gl'
 import React from 'react'
-
-import useIfExists from './use-if-exists'
 
 /**
  * Create a marker based on the marker props. Update the position on drag end.
@@ -15,21 +12,24 @@ export default function useMarker (markerProps, map, position, events) {
   }))
 
   const onDragEnd = React.useCallback(() =>
-    events.onDragEnd(lonlat(marker.getLngLat()))
-  , [marker])
+    events.onDragEnd(lonlat(marker.getLngLat())))
 
-  useIfExists(() => {
+  React.useEffect(() => {
+    marker.on('dragend', onDragEnd)
+    return () => marker.off('dragend', onDragEnd)
+  }, [marker])
+
+  React.useEffect(() => {
+    if (!map) return
+
     if (position) {
       marker
-        .on('dragend', onDragEnd)
         .setLngLat(position)
         .addTo(map)
     } else {
-      marker
-        .off('dragend', onDragEnd)
-        .remove()
+      marker.remove()
     }
-  }, [map], [position])
+  }, [map, position])
 
   return marker
 }
