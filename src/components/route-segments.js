@@ -17,13 +17,9 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
       <tr className='BestTrip'>
         <td><span className='fa fa-street-view' /></td>
         <td>
-          <span>Take </span>
-          {bestJourney.filter(s => s.mode !== 'WALK').map((segment, index) => (
-            <Segment key={index} segment={segment} />
-          ))}
           {travelTime > 120
-            ? <span className='decrease'>inaccessible within 120 minutes</span>
-            : <span>in
+            ? <span className='decrease'>Inaccessible within 120 minutes</span>
+            : <span>Trip duration
               <strong> {travelTime}</strong> {message('Units.Mins')}&nbsp;
               <TripDiff
                 baseTravelTime={oldTravelTime}
@@ -32,19 +28,21 @@ export default function RouteSegments ({routeSegments, oldTravelTime, travelTime
             </span>}
         </td>
       </tr>
+      <tr>
+        <td></td>
+        <td>Take <Segments segments={bestJourney} /></td>
+      </tr>
       {routeSegments.length > 1 &&
-        <tr className='AlternateTrips'>
-          <td><span className='fa fa-map-signs' /></td>
+        <tr>
+          <td></td>
           <td>
             <span>{message('Systems.AlternateTripsTitle')} </span>
-            {alternateJourneys.map((segments, jindex) => (
-              <span key={jindex}>
-                {segments.filter(s => s.mode !== 'WALK').map((segment, index) => (
-                  <Segment key={index} segment={segment} />
-                ))}
-                {jindex < alternateJourneys.length - 1 && <span>or </span>}
+            {alternateJourneys.map((segments, i) =>
+              <span key={i}>
+                <Segments segments={segments} />
+                {i < alternateJourneys.length - 1 && 'or '}
               </span>
-            ))}
+            )}
           </td>
         </tr>}
     </tbody>
@@ -56,6 +54,16 @@ const getFontColor = backgroundColor => {
   const color = il ? '#000' : '#fff'
   const textShadow = `0 0 1px ${il ? '#fff' : '#000'}`
   return {color, textShadow}
+}
+
+function Segments (p) {
+  return p.segments.filter(s => s.mode !== 'WALK')
+    .map((segment, i, segments) =>
+      <span key={i}>
+        <Segment segment={segment} />
+        {i !== (segments.length - 1) && 'to '}
+      </span>
+    )
 }
 
 const Segment = ({segment}) => (
