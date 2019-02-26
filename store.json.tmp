@@ -7,6 +7,7 @@
     "types": "country,region,postcode,district,place,locality,neighborhood,address,poi"
   },
   "map": {
+    "accessToken": "",
     "center": [-73.995193, 40.716867],
     "style": "mapbox://styles/conveyal/cjr7kztgv1ac22sp9h7ucqhgp",
     "zoom": 11

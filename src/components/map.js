@@ -1,18 +1,13 @@
 import get from 'lodash/get'
-import mapboxgl from 'mapbox-gl'
 import React from 'react'
 
 import {darkBlue, colors} from '../constants'
-import env from '../env'
 import useGeoJSONRoutes from '../hooks/use-geojson-routes'
 import useIfExists from '../hooks/use-if-exists'
 import useIsochrones from '../hooks/use-isochrones'
 import useMap from '../hooks/use-map'
 import useMarker from '../hooks/use-marker'
 import usePointsOfInterest from '../hooks/use-points-of-interest'
-
-// Set the token from `env`
-mapboxgl.accessToken = env.MAPBOX_ACCESS_TOKEN
 
 const containerStyle = {height: '100%', width: '100%'}
 

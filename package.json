@@ -4,7 +4,8 @@
   "main": "src/index.js",
   "scripts": {
     "build": "next build",
-    "dev": "node --require dotenv/config node_modules/.bin/next",
+    "dev": "next",
+    "now-build": "next build",
     "predev": "yarn",
     "semantic-release": "semantic-release",
     "start": "next start",
@@ -30,7 +31,6 @@
     "@conveyal/woonerf": "^4.1.0",
     "@mapbox/polyline": "^1.0.0",
     "@zeit/next-css": "^1.0.1",
-    "dotenv": "^6.2.0",
     "js-cookie": "^2.2.0",
     "jsolines": "^2.1.1",
     "lodash": "^4.17.10",
