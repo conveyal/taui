@@ -1,6 +1,5 @@
-import get from 'lodash/get'
-import getConfig from 'next/config'
-
-const configs = getConfig()
-
-export default get(configs, 'publicRuntimeConfig', {})
+// Options must be explicit
+export default {
+  CACHE_DATA: process.env.CACHE_DATA,
+  MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN
+}

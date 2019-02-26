@@ -7,7 +7,7 @@ const {PHASE_PRODUCTION_SERVER} =
       : require('next-server/constants')
 
 const config = {
-  publicRuntimeConfig: {
+  env: {
     CACHE_DATA: process.env.CACHE_DATA, // Only used in Development
     MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN
   }

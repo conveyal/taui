@@ -5,8 +5,8 @@ import nextCookies from 'next-cookies'
 import React from 'react'
 import {Provider} from 'react-redux'
 
-import defaultStore from '../../store.json'
-import {getOrCreateStore} from '../with-redux-store'
+import defaultStore from '../store.json'
+import {getOrCreateStore} from '../src/with-redux-store'
 
 const iconLink = 'https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png'
 

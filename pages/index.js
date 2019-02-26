@@ -1,12 +1,12 @@
 import {connect} from 'react-redux'
 
-import actions from '../actions'
-import Application from '../components/application'
-import message from '../message'
-import * as select from '../selectors'
-import configureTaui from '../services/config'
+import actions from '../src/actions'
+import Application from '../src/components/application'
+import message from '../src/message'
+import * as select from '../src/selectors'
+import configureTaui from '../src/services/config'
 
-import '../style.css'
+import '../src/style.css'
 
 // Set the title
 if (typeof document !== 'undefined') document.title = message('Title')

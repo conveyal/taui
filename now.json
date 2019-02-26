@@ -1,7 +1,7 @@
 {
   "version": 2,
   "builds": [
-    {"src": "src/next.config.js", "use": "@now/next"}
+    {"src": "next.config.js", "use": "@now/next"}
   ],
   "env": {
     "MAPBOX_ACCESS_TOKEN": "@mapbox-access-token"
