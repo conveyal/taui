@@ -10,12 +10,17 @@ const WALK = 'WALK'
  * stops.
  */
 export default createSelector(
+  state => state.activeNetwork,
   state => state.networks,
   state => state.start,
   state => state.end,
   selectNetworkRoutes, // if journeys exist, so does the network, start + end
-  (networks, start, end, networkRoutes) => networks.map((network, i) =>
+  (activeNetwork, networks, start, end, networkRoutes) => networks.map((network, i) =>
     networkRoutes[i].map(segments => {
+      if (typeof activeNetwork === 'string' && activeNetwork !== network.name) {
+        return {type: 'FeatureCollection', features: []}
+      }
+
       // Convert to [lon, lat] coordinates
       const startCoords = [start.position.lon, start.position.lat]
       const endCoords = [end.position.lon, end.position.lat]

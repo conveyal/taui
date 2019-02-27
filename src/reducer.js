@@ -14,7 +14,10 @@ export default function reducer (state = {}, action) {
         networks: []
       }
     case 'set active network':
-      return setActiveNetwork(state, action)
+      return {
+        ...state,
+        activeNetwork: action.payload
+      }
     case 'set end':
       return setLocation('end')(state, action)
     case 'set geocoder':
@@ -46,20 +49,6 @@ export default function reducer (state = {}, action) {
       }
 
       return state
-  }
-}
-
-function setActiveNetwork (state, action) {
-  const networks = [...state.networks]
-
-  return {
-    ...state,
-    networks: networks.map(
-      n =>
-        (n.name === action.payload
-          ? {...n, active: true}
-          : {...n, active: false})
-    )
   }
 }
 

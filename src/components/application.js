@@ -140,7 +140,6 @@ export default class Application extends Component {
               {...p.map}
               end={p.end}
               grids={p.grids}
-              isochroneOutline={p.isochroneOutline}
               isochrones={p.isochrones}
               networkGeoJSONRoutes={p.networkGeoJSONRoutes}
               pointsOfInterest={p.pointsOfInterest}
@@ -169,34 +168,36 @@ export default class Application extends Component {
             updateEnd={p.updateEnd}
             updateStart={p.updateStart}
           />
-          {p.networks.map((network, index) => (
-            <RouteCard
-              active={p.activeNetworkIndex === index}
-              cardColor={network.hexColor || colors[index].hex}
-              downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
-              index={index}
+          {p.networks.map((network, index) =>
+            <div
+              onMouseEnter={() => p.setActiveNetwork(network.name)}
+              onMouseLeave={() => p.setActiveNetwork(null)}
               key={`${index}-route-card`}
-              onMouseOver={() => p.setActiveNetwork(network.name)}
-              setShowOnMap={this._setShowOnMap(index)}
-              showOnMap={network.showOnMap}
-              title={network.name}
             >
-              {!p.isLoading &&
-                <RouteAccess
-                  accessibility={p.accessibility[index]}
-                  grids={p.grids}
-                  hasStart={!!p.start}
-                  oldAccessibility={p.accessibility[p.accessibility.length - 1]}
-                  showComparison={p.showComparison}
-                />}
-              {!p.isLoading && !!p.end && !!p.start &&
-                <RouteSegments
-                  oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
-                  routeSegments={p.networkRoutes[index]}
-                  travelTime={p.travelTimes[index]}
-                />}
-            </RouteCard>
-          ))}
+              <RouteCard
+                cardColor={network.hexColor || colors[index].hex}
+                downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
+                index={index}
+                title={network.name}
+              >
+                {!p.isLoading &&
+                  <RouteAccess
+                    accessibility={p.accessibility[index]}
+                    grids={p.grids}
+                    hasStart={!!p.start}
+                    oldAccessibility={p.accessibility[p.accessibility.length - 1]}
+                    showComparison={p.showComparison}
+                  />}
+                {!p.isLoading && !!p.end && !!p.start &&
+                  <RouteSegments
+                    active={network.name === p.activeNetwork}
+                    oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
+                    routeSegments={p.networkRoutes[index]}
+                    travelTime={p.travelTimes[index]}
+                  />}
+              </RouteCard>
+            </div>
+          )}
           {p.showLog && p.actionLog &&
             <div className='Card'>
               <div className='CardTitle'>

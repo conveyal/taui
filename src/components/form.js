@@ -82,9 +82,10 @@ export default class Form extends React.PureComponent {
               />}
             <div className='heading'>
               {message('Strings.HighlightAreaAccessibleWithin')}
-              <a className='pull-right' onClick={this._animateTimeCutoff}>
-                <Icon type='play' />
-              </a>
+              {this.state.animating ||
+                <a className='pull-right' onClick={this._animateTimeCutoff}>
+                  <Icon type='play' />
+                </a>}
             </div>
             <div className='TimeCutoff'>
               <div className='Time'>

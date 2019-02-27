@@ -170,7 +170,9 @@ html, body {
 .Card {
   background-color: #fff;
   border-radius: var(--rad);
+  cursor: pointer;
   margin-top: 1rem;
+  border: 1px solid #fff;
   box-shadow: 0 2px 4px var(--shadow);
 }
 

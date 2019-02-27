@@ -34,8 +34,13 @@ export default class TauiApp extends App {
       : {}
 
     // Create the store with the initial state prioritizing:
-    // query string > cookie config > store.json
-    const configs = [defaultStore, cookieConfig, queryConfig]
+    // query string > cookie config > store.json but ignore cookies if a
+    // custom configuation is not allowed
+    const configs = [
+      defaultStore,
+      defaultStore.allowChangeConfig ? cookieConfig : {},
+      queryConfig
+    ]
     const reduxStore = getOrCreateStore(merge(...configs))
 
     return {

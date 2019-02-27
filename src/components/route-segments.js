@@ -5,34 +5,34 @@ import {isLight} from '../utils/hex-color-contrast'
 
 import Alert from './tr-alert'
 
-export default function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
-  if (routeSegments.length === 0) {
+export default function RouteSegments (p) {
+  if (p.routeSegments.length === 0) {
     return <Alert>{message('Systems.TripsEmpty')}</Alert>
   }
 
-  const [bestJourney, ...alternateJourneys] = routeSegments
+  const [bestJourney, ...alternateJourneys] = p.routeSegments
 
   return (
     <tbody>
       <tr className='BestTrip'>
-        <td><span className='fa fa-street-view' /></td>
+        <td><span className='fa fa-clock-o' /></td>
         <td>
-          {travelTime > 120
+          {p.travelTime > 120
             ? <span className='decrease'>Inaccessible within 120 minutes</span>
             : <span>Trip duration
-              <strong> {travelTime}</strong> {message('Units.Mins')}&nbsp;
+              <strong> {p.travelTime}</strong> {message('Units.Mins')}&nbsp;
               <TripDiff
-                baseTravelTime={oldTravelTime}
-                travelTime={travelTime}
+                baseTravelTime={p.oldTravelTime}
+                travelTime={p.travelTime}
               />
             </span>}
         </td>
       </tr>
       <tr>
-        <td></td>
+        <td>{p.active && <span className='fa fa-street-view' />}</td>
         <td>Take <Segments segments={bestJourney} /></td>
       </tr>
-      {routeSegments.length > 1 &&
+      {p.routeSegments.length > 1 &&
         <tr>
           <td></td>
           <td>
