@@ -4,26 +4,26 @@ import Icon from '@conveyal/woonerf/components/icon'
 import get from 'lodash/get'
 import memoize from 'lodash/memoize'
 import dynamic from 'next/dynamic'
-import Cookies from 'js-cookie'
 import React, {Component} from 'react'
 
 import {colors} from '../constants'
 import message from '../message'
 import downloadJson from '../utils/download-json'
 
+import Dock from './dock'
 import Form from './form'
 import Log from './log'
 import RouteAccess from './route-access'
 import RouteCard from './route-card'
 import RouteSegments from './route-segments'
 
-// Example config
-const exampleConfigLink = 'https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp'
-
 const Loader = () =>
   <div className='Loader'>
-    <span className='fa fa-circle-o-notch fa-spin' />
+    <Icon type='circle-o-notch' className='fa-spin' />
   </div>
+
+// Config Card not always needed
+const ConfigCard = dynamic(() => import('./config-card'))
 
 // Cannot import map on the server
 const Map = dynamic(() => import('./map'), {
@@ -47,44 +47,11 @@ export default class Application extends Component {
     })
   }
 
-  _saveRefToConfig = (ref) => {
-    this._refToConfig = ref
-  }
-
-  _updateConfig = () => {
-    try {
-      const json = JSON.parse(this._refToConfig.value)
-      Cookies.set('tauiConfig', json)
-      window.location.reload(true)
-    } catch (e) {
-      console.error(e)
-      window.alert('Invalid JSON!')
-    }
-  }
-
-  _clearStartAndEnd = () => {
-    const {setEnd, setStart} = this.props
-    setStart(null)
-    setEnd(null)
-  }
-
-  _setStartWithEvent = (event) => {
-    this.props.updateStartPosition(lonlat(event.latlng || event.target._latlng))
-  }
-
   _setStartWithFeature = (feature) => {
-    if (!feature) {
-      this._clearStartAndEnd()
-    } else {
-      this.props.updateStart({
-        label: feature.place_name,
-        position: lonlat(feature.geometry.coordinates)
-      })
-    }
-  }
-
-  _setEndWithEvent = (event) => {
-    this.props.updateEndPosition(lonlat(event.latlng || event.target._latlng))
+    this.props.updateStart({
+      label: feature.place_name,
+      position: lonlat(feature.geometry.coordinates)
+    })
   }
 
   _setEndWithFeature = (feature) => {
@@ -101,17 +68,6 @@ export default class Application extends Component {
   _onTimeCutoffChange = (event) => {
     this.props.setTimeCutoff(parseInt(event.currentTarget.value, 10))
   }
-
-  _setShowOnMap = memoize(index => () => {
-    const p = this.props
-    const network = p.networks[index]
-    const showOnMap = !network.showOnMap
-    p.setNetwork({
-      ...network,
-      showOnMap
-    })
-    if (showOnMap) p.setActiveNetwork(network.name)
-  })
 
   _downloadIsochrone = memoize(index => () => {
     const p = this.props
@@ -136,13 +92,6 @@ export default class Application extends Component {
     return (
       <div className={p.isLoading ? 'isLoading' : ''}>
         <div className='Fullscreen'>
-          <svg width='0' height='0' style={{position: 'absolute'}}>
-            <defs>
-              <filter id='shadow'>
-                <feDropShadow dx='1' dy='1' stdDeviation='1' />
-              </filter>
-            </defs>
-          </svg>
           <div className='Taui-Map'>
             <Map
               {...p.map}
@@ -159,7 +108,6 @@ export default class Application extends Component {
           </div>
         </div>
         <Dock
-          showSpinner={p.fetches > 0}
           componentError={this.state.componentError}
           title={p.title}
         >
@@ -210,65 +158,23 @@ export default class Application extends Component {
               </RouteCard>
             </div>
           )}
-          {p.showLog && p.actionLog &&
-            <div className='Card'>
-              <div className='CardTitle'>
-                <span className='fa fa-terminal' /> {message('Log.Title')}
-              </div>
-              <Log items={p.actionLog} />
-            </div>}
-          {p.allowChangeConfig &&
-            <div className='Card'>
-              <div
-                className='CardTitle'
-              >
-                <span className='fa fa-cog' /> Configure
-                <div className='CardLinks'>
-                  <a
-                    onClick={this._updateConfig}
-                    title='Update config and reload the page'
-                  >save config</a>
-                </div>
-              </div>
-              <div className='CardContent'>
-                <br />
-                <a href={exampleConfigLink} target='_blank'>See example config</a>
-              </div>
-              <textarea
-                ref={this._saveRefToConfig}
-                defaultValue={JSON.stringify(p.cookieConfig || {}, null, '  ')}
-              />
-            </div>}
-          {p.showLink &&
-            <div className='Attribution'>
-              site made by
-              {' '}
-              <a href='https://www.conveyal.com' target='_blank'>
-                conveyal
-              </a>
-            </div>}
+
+          {p.showLog && p.actionLog && <Log items={p.actionLog} />}
+          {p.allowChangeConfig && <ConfigCard cookieConfig={p.cookieConfig} />}
+          {p.showLink && <Attribution />}
         </Dock>
       </div>
     )
   }
 }
 
-function Dock (props) {
-  return <div className='Taui-Dock'>
-    <div className='Taui-Dock-content'>
-      <div className='title'>
-        {props.showSpinner
-          ? <Icon type='spinner' className='fa-spin' />
-          : <Icon type='map' />}
-        {' '}
-        {props.title || message('Title')}
-      </div>
-      {props.componentError &&
-        <div>
-          <h1>Error</h1>
-          <p>{props.componentError.info}</p>
-        </div>}
-      {props.children}
-    </div>
+function Attribution () {
+  return <div className='Attribution'>
+    site made by
+    {' '}
+    <a href='https://www.conveyal.com' target='_blank'>
+      conveyal
+    </a>
   </div>
 }
+
