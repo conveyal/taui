@@ -43,10 +43,9 @@ export default class Form extends React.PureComponent {
     const p = this.props
     const poi = p.pointsOfInterest || []
     const filterPoi = cfo(poi) // memoized filtering function
-    const showPoiSelect = poi.length > 0
     return (
       <React.Fragment>
-        {showPoiSelect
+        {p.searchPoiOnly
           ? <Select
             clearable={false}
             filterOptions={filterPoi}
@@ -65,7 +64,7 @@ export default class Form extends React.PureComponent {
           />}
         {p.start &&
           <React.Fragment>
-            {showPoiSelect
+            {p.searchPoiOnly
               ? <Select
                 filterOptions={filterPoi}
                 options={poi}

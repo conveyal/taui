@@ -163,6 +163,7 @@ export default class Application extends Component {
             onChangeStart={this._setStartWithFeature}
             pointsOfInterest={p.pointsOfInterestOptions}
             reverseGeocode={p.reverseGeocode}
+            searchPoiOnly={p.searchPoiOnly}
             selectedTimeCutoff={p.timeCutoff}
             start={p.start}
             updateEnd={p.updateEnd}
