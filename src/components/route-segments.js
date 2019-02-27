@@ -1,7 +1,7 @@
 import Icon from '@conveyal/woonerf/components/icon'
+import uniqBy from 'lodash/uniqBy'
 
 import message from '../message'
-import {isLight} from '../utils/hex-color-contrast'
 
 import Alert from './tr-alert'
 
@@ -10,7 +10,10 @@ export default function RouteSegments (p) {
     return <Alert>{message('Systems.TripsEmpty')}</Alert>
   }
 
-  const [bestJourney, ...alternateJourneys] = p.routeSegments
+  const [bestJourney, ...alternateJourneys] = uniqBy(
+    p.routeSegments,
+    r => r.map(s => s.name).join('-')
+  )
 
   return (
     <tbody>
@@ -19,29 +22,29 @@ export default function RouteSegments (p) {
         <td>
           {p.travelTime > 120
             ? <span className='decrease'>Inaccessible within 120 minutes</span>
-            : <span>Trip duration
+            : <React.Fragment>Trip duration
               <strong> {p.travelTime}</strong> {message('Units.Mins')}&nbsp;
               <TripDiff
                 baseTravelTime={p.oldTravelTime}
                 travelTime={p.travelTime}
               />
-            </span>}
+            </React.Fragment>}
         </td>
       </tr>
       <tr>
         <td>{p.active && <span className='fa fa-street-view' />}</td>
         <td>Take <Segments segments={bestJourney} /></td>
       </tr>
-      {p.routeSegments.length > 1 &&
+      {alternateJourneys.length > 0 &&
         <tr>
           <td></td>
           <td>
-            <span>{message('Systems.AlternateTripsTitle')} </span>
+            {message('Systems.AlternateTripsTitle')}&nbsp;
             {alternateJourneys.map((segments, i) =>
-              <span key={i}>
+              <React.Fragment key={i}>
                 <Segments segments={segments} />
-                {i < alternateJourneys.length - 1 && 'or '}
-              </span>
+                {i < alternateJourneys.length - 1 && ' or '}
+              </React.Fragment>
             )}
           </td>
         </tr>}
@@ -49,35 +52,21 @@ export default function RouteSegments (p) {
   )
 }
 
-const getFontColor = backgroundColor => {
-  const il = isLight(backgroundColor.substr(1))
-  const color = il ? '#000' : '#fff'
-  const textShadow = `0 0 1px ${il ? '#fff' : '#000'}`
-  return {color, textShadow}
-}
-
 function Segments (p) {
   return p.segments.filter(s => s.mode !== 'WALK')
     .map((segment, i, segments) =>
-      <span key={i}>
-        <Segment segment={segment} />
-        {i !== (segments.length - 1) && 'to '}
-      </span>
+      <React.Fragment key={i}>
+        <span
+          className='CardSegment'
+          style={{borderColor: segment.routeColor}}
+          title={segment.name}
+        >
+          <i className={`fa fa-${segment.mode}`} /> {segment.name}
+        </span>
+        {i !== (segments.length - 1) && ' to '}
+      </React.Fragment>
     )
 }
-
-const Segment = ({segment}) => (
-  <span
-    className='CardSegment'
-    style={{
-      backgroundColor: segment.routeColor,
-      ...getFontColor(segment.routeColor)
-    }}
-    title={segment.name}
-  >
-    <i className={`fa fa-${segment.mode}`} /> {segment.name}
-  </span>
-)
 
 function TripDiff ({baseTravelTime, travelTime}) {
   if (baseTravelTime === 2147483647) {

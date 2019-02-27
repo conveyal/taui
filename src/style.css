@@ -273,12 +273,12 @@ table.CardContent td:first-of-type {
 }
 
 .CardSegment {
-  font-size: 0.75rem;
-  padding: 0 0.25rem;
+  border: 1px solid;
   border-radius: var(--rad);
-  margin-right: 0.25rem;
-  white-space: nowrap;
-  display: inline-block;
+  padding: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: bold;
 }
 
 .Card .increase {
