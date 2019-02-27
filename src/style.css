@@ -44,12 +44,14 @@ html, body {
   height: 100vh;
 }
 
-.SsrLoad {
-  height: 100%;
-  width: 100%;
-  font-size: 3rem;
-  text-align: center;
-  line-height: 100%;
+.Loader {
+  opacity: 0.4;
+  font-size: 2rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -1rem;
+  margin-top: -1rem;
 }
 
 .isLoading .Taui-Map {
@@ -226,6 +228,8 @@ html, body {
   padding: 0 1rem;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  min-height: 4rem;
 }
 
 .CardBands {

@@ -13,6 +13,16 @@ export default function reducer (state = {}, action) {
         grids: [],
         networks: []
       }
+    case 'decrement fetches':
+      return {
+        ...state,
+        activeFetches: state.activeFetches - 1
+      }
+    case 'increment fetches':
+      return {
+        ...state,
+        activeFetches: isNaN(state.activeFetches) ? 1 : state.activeFetches + 1
+      }
     case 'set active network':
       return {
         ...state,

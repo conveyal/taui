@@ -20,8 +20,16 @@ import RouteSegments from './route-segments'
 // Example config
 const exampleConfigLink = 'https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp'
 
+const Loader = () =>
+  <div className='Loader'>
+    <span className='fa fa-circle-o-notch fa-spin' />
+  </div>
+
 // Cannot import map on the server
-const Map = dynamic(() => import('./map'), {ssr: false})
+const Map = dynamic(() => import('./map'), {
+  loading: Loader,
+  ssr: false
+})
 
 export default class Application extends Component {
   state = {
@@ -181,21 +189,24 @@ export default class Application extends Component {
                 index={index}
                 title={network.name}
               >
-                {!p.isLoading &&
-                  <RouteAccess
-                    accessibility={p.accessibility[index]}
-                    grids={p.grids}
-                    hasStart={!!p.start}
-                    oldAccessibility={p.accessibility[p.accessibility.length - 1]}
-                    showComparison={p.showComparison}
-                  />}
-                {!p.isLoading && !!p.end && !!p.start &&
-                  <RouteSegments
-                    active={network.name === p.activeNetwork}
-                    oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
-                    routeSegments={p.networkRoutes[index]}
-                    travelTime={p.travelTimes[index]}
-                  />}
+                {p.isLoading
+                  ? <tbody><tr><td><Loader /></td></tr></tbody>
+                  : <React.Fragment>
+                    <RouteAccess
+                      accessibility={p.accessibility[index]}
+                      grids={p.grids}
+                      hasStart={!!p.start}
+                      oldAccessibility={p.accessibility[p.accessibility.length - 1]}
+                      showComparison={p.showComparison}
+                    />
+                    {!!p.end && !!p.start &&
+                      <RouteSegments
+                        active={network.name === p.activeNetwork}
+                        oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
+                        routeSegments={p.networkRoutes[index]}
+                        travelTime={p.travelTimes[index]}
+                      />}
+                  </React.Fragment>}
               </RouteCard>
             </div>
           )}

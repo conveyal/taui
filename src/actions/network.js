@@ -5,6 +5,14 @@ import * as NetworkAPI from '../services/network'
 
 import {logError} from './log'
 
+export const incrementFetches = () => ({
+  type: 'increment fetches'
+})
+
+export const decrementFetches = () => ({
+  type: 'decrement fetches'
+})
+
 export const setNetwork = (payload) => ({type: 'set network', payload})
 export const setActiveNetwork = (payload) => ({
   type: 'set active network',
@@ -38,6 +46,9 @@ export const fetchAllTimesAndPathsForCoordinate = (coordinate) => (
   const networks = state.networks
 
   return Promise.all(networks.map(network => {
+    // Increment fetches
+    dispatch(incrementFetches())
+
     // Reset the network
     dispatch(setNetwork({
       ...network,
@@ -61,5 +72,6 @@ export const fetchAllTimesAndPathsForCoordinate = (coordinate) => (
           ? 'Data not available for these coordinates.'
           : 'Error while retrieving data for these coordinates.'))
       })
+      .finally(() => dispatch(decrementFetches()))
   }))
 }

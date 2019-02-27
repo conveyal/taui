@@ -15,8 +15,6 @@ function mapStateToProps (state, ownProps) {
   return {
     ...state,
     accessibility: select.accessibility(state, ownProps),
-    activeNetworkIndex: select.activeNetworkIndex(state, ownProps),
-    // isochroneOutline: select.isochroneOutline(state, ownProps),
     isochrones: select.isochrones(state, ownProps),
     isLoading: select.loading(state, ownProps),
     networkRoutes: select.networkRoutes(state, ownProps),
@@ -31,6 +29,9 @@ Application.prototype.componentDidMount = async function componentDidMount () {
   const p = this.props
 
   try {
+    // Show the loader while setting up
+    p.incrementFetches()
+
     const data = await configureTaui(p.initialReduxState)
 
     if (data.networks) data.networks.forEach(n => p.setNetwork(n))
@@ -45,6 +46,9 @@ Application.prototype.componentDidMount = async function componentDidMount () {
     console.error('Error loading initial data.')
     console.error(e)
   }
+
+  // Hide the loader
+  p.decrementFetches()
 }
 
 export default connect(mapStateToProps, actions)(Application)
