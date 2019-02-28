@@ -5,7 +5,7 @@ import nextCookies from 'next-cookies'
 import React from 'react'
 import {Provider} from 'react-redux'
 
-import defaultStore from '../store.json'
+// import defaultStore from '../store.json'
 import {getOrCreateStore} from '../src/with-redux-store'
 
 function tryParse (v) {
@@ -18,10 +18,16 @@ function tryParse (v) {
   }
 }
 
+function loadStoreJSON () {
+  return import('../store.json').catch(() => import('../empty-store.json'))
+}
+
 const iconLink = 'https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png'
 
 export default class TauiApp extends App {
   static async getInitialProps ({ctx}) {
+    const defaultStore = await loadStoreJSON()
+
     // Get the configuration from the cookies
     const {tauiConfig} = nextCookies(ctx)
     const cookieConfig = typeof tauiConfig === 'string'

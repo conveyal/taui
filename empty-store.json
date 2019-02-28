@@ -1,10 +1,13 @@
 {
+  "allowChangeConfig": true,
   "actionLog": [],
   "grids": [],
   "networks": [],
   "poiUrl": null,
+  "start" null,
+  "end": null,
   "geocoder": {
-    "types": "country,region,postcode,district,place,locality,neighborhood,address,poi"
+    "types": "region,postcode,district,place,locality,neighborhood,address,poi"
   },
   "map": {
     "accessToken": "",
@@ -13,9 +16,9 @@
     "zoom": 11
   },
   "fetches": 0,
+  "searchPoiOnly": false,
   "showLink": true,
   "showLog": true,
-  "timeCutoff": 60,
-  "title": "Taui",
-  "allowChangeConfig": true
+  "timeCutoff": 30,
+  "title": "Taui"
 }
