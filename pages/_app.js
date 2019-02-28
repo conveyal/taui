@@ -18,15 +18,11 @@ function tryParse (v) {
   }
 }
 
-function loadStoreJSON () {
-  return import('../store.json').catch(() => import('../empty-store.json'))
-}
-
 const iconLink = 'https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png'
 
 export default class TauiApp extends App {
   static async getInitialProps ({ctx}) {
-    const defaultStore = await loadStoreJSON()
+    const defaultStore = tryParse(process.env.STORE)
 
     // Get the configuration from the cookies
     const {tauiConfig} = nextCookies(ctx)

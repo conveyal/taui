@@ -10,19 +10,21 @@ import message from '../message'
 import downloadJson from '../utils/download-json'
 
 import Dock from './dock'
-import Form from './form'
 import Log from './log'
 import RouteAccess from './route-access'
 import RouteCard from './route-card'
 import RouteSegments from './route-segments'
+import TimeCutoff from './time-cutoff'
 
 const Loader = () =>
   <div className='Loader'>
     <Icon type='circle-o-notch' className='fa-spin' />
   </div>
 
-// Config Card not always needed
+// Certain components depend on config options, so dynamically load them
 const ConfigCard = dynamic(() => import('./config-card'))
+const GeocodeSearch = dynamic(() => import('./geocode-search'))
+const PoiSearch = dynamic(() => import('./poi-search'))
 
 // Cannot import map on the server
 const Map = dynamic(() => import('./map'), {
@@ -31,39 +33,6 @@ const Map = dynamic(() => import('./map'), {
 })
 
 export default class Application extends Component {
-  state = {
-    componentError: null
-  }
-
-  /**
-   * Top level component error catch
-   */
-  componentDidCatch (error, info) {
-    this.setState({
-      componentError: {
-        error, info
-      }
-    })
-  }
-
-  _setStartWithFeature = (feature) => {
-    this.props.updateStart({
-      label: feature.place_name,
-      position: lonlat(feature.geometry.coordinates)
-    })
-  }
-
-  _setEndWithFeature = (feature) => {
-    if (!feature) {
-      this.props.setEnd(null)
-    } else {
-      this.props.updateEnd({
-        label: feature.place_name,
-        position: lonlat(feature.geometry.coordinates)
-      })
-    }
-  }
-
   _downloadIsochrone = memoize(index => () => {
     const p = this.props
     const isochrone = p.isochrones[index]
@@ -79,9 +48,6 @@ export default class Application extends Component {
     }
   })
 
-  /**
-   *
-   */
   render () {
     const p = this.props
     return (
@@ -102,23 +68,26 @@ export default class Application extends Component {
             />
           </div>
         </div>
-        <Dock
-          componentError={this.state.componentError}
-          title={p.title}
-        >
-          <Form
-            end={p.end}
-            geocode={p.geocode}
-            onTimeCutoffChange={p.setTimeCutoff}
-            onChangeEnd={this._setEndWithFeature}
-            onChangeStart={this._setStartWithFeature}
-            pointsOfInterest={p.pointsOfInterestOptions}
-            reverseGeocode={p.reverseGeocode}
-            searchPoiOnly={p.searchPoiOnly}
-            selectedTimeCutoff={p.timeCutoff}
-            start={p.start}
-            updateEnd={p.updateEnd}
-            updateStart={p.updateStart}
+        <Dock title={p.title}>
+          {p.searchPoiOnly
+            ? <PoiSearch
+                end={p.end}
+                poi={p.pointsOfInterestOptions}
+                start={p.start}
+                updateEnd={p.updateEnd}
+                updateStart={p.updateStart}
+              />
+            : <GeocodeSearch
+                end={p.end}
+                geocoer={p.geocode}
+                reverseGeocode={p.reverseGeocode}
+                start={p.start}
+                updateEnd={p.updateEnd}
+                updateStart={p.updateStart}
+              />}
+          <TimeCutoff
+            cutoff={p.timeCutoff}
+            setCutoff={p.setTimeCutoff}
           />
           {p.networks.map((network, index) =>
             <div

@@ -16,8 +16,14 @@ export default function useMap (mapProps, events) {
 
   // Runs on mount
   React.useEffect(() => {
-    // Set accessToken
-    mapboxgl.accessToken = mapProps.accessToken
+    if (!mapProps.accessToken) {
+      const accessToken = window.prompt('Enter a Mapbox access token')
+      mapProps.updateMap({accessToken})
+      mapboxgl.accessToken = accessToken
+    } else {
+      // Set accessToken
+      mapboxgl.accessToken = mapProps.accessToken
+    }
 
     // Create map
     const m = map.current = window.map = new mapboxgl.Map({

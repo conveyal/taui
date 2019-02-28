@@ -4,7 +4,7 @@
   "grids": [],
   "networks": [],
   "poiUrl": null,
-  "start" null,
+  "start": null,
   "end": null,
   "geocoder": {
     "types": "region,postcode,district,place,locality,neighborhood,address,poi"
