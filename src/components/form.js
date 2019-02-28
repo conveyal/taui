@@ -1,107 +1,53 @@
-import lonlat from '@conveyal/lonlat'
-import Icon from '@conveyal/woonerf/components/icon'
-import memoize from 'lodash/memoize'
+import dynamic from 'next/dynamic'
 import React from 'react'
-import Select from 'react-virtualized-select'
-import createFilterOptions from 'react-select-fast-filter-options'
 
 import message from '../message'
 
 import Geocoder from './geocoder'
+import TimeCutoff from './time-cutoff'
 
-const cfo = memoize(o => createFilterOptions({options: o}))
+// Not always used
+const PoiSelect = dynamic(() => import('./poi-select'))
 
-export default class Form extends React.PureComponent {
-  state = {
-    animating: false
-  }
-
-  _animateTimeCutoff = () => {
-    this.setState({animating: true})
-    this._animateTo(0)
-  }
-
-  _animateTo (cutoff) {
-    this.props.onTimeCutoffChange({currentTarget: {value: cutoff}})
-    if (cutoff < 120) setTimeout(() => this._animateTo(cutoff + 1), 50)
-    else this.setState({animating: false})
-  }
-
-  _selectPoiStart = (option) =>
-    this.props.updateStart(option ? {
-      label: option.label,
-      position: lonlat(option.coordinates)
-    } : null)
-
-  _selectPoiEnd = (option) =>
-    this.props.updateEnd(option ? {
-      label: option.label,
-      position: lonlat(option.coordinates)
-    } : null)
-
-  render () {
-    const p = this.props
-    const poi = p.pointsOfInterest || []
-    const filterPoi = cfo(poi) // memoized filtering function
-    return (
-      <React.Fragment>
+export default function Form (p) {
+  const poi = p.pointsOfInterest || []
+  return <>
+    {p.searchPoiOnly
+      ? <PoiSelect
+        clearable={false}
+        options={poi}
+        onChange={p.updateStart}
+        placeholder={message('Geocoding.StartPlaceholder')}
+        value={p.start}
+      />
+      : <Geocoder
+        clearable={false}
+        geocode={p.geocode}
+        onChange={p.onChangeStart}
+        placeholder={message('Geocoding.StartPlaceholder')}
+        reverseGeocode={p.reverseGeocode}
+        value={p.start}
+      />}
+    {p.start &&
+      <>
         {p.searchPoiOnly
-          ? <Select
-            clearable={false}
-            filterOptions={filterPoi}
+          ? <PoiSelect
             options={poi}
-            onChange={this._selectPoiStart}
-            placeholder={message('Geocoding.StartPlaceholder')}
-            value={p.start}
+            onChange={p.updateEnd}
+            placeholder={message('Geocoding.EndPlaceholder')}
+            value={p.end}
           />
           : <Geocoder
-            clearable={false}
             geocode={p.geocode}
-            onChange={p.onChangeStart}
+            onChange={p.onChangeEnd}
             placeholder={message('Geocoding.StartPlaceholder')}
             reverseGeocode={p.reverseGeocode}
-            value={p.start}
+            value={p.end}
           />}
-        {p.start &&
-          <React.Fragment>
-            {p.searchPoiOnly
-              ? <Select
-                filterOptions={filterPoi}
-                options={poi}
-                onChange={this._selectPoiEnd}
-                placeholder={message('Geocoding.EndPlaceholder')}
-                value={p.end}
-              />
-              : <Geocoder
-                geocode={p.geocode}
-                onChange={p.onChangeEnd}
-                placeholder={message('Geocoding.StartPlaceholder')}
-                reverseGeocode={p.reverseGeocode}
-                value={p.end}
-              />}
-            <div className='heading'>
-              {message('Strings.HighlightAreaAccessibleWithin')}
-              {this.state.animating ||
-                <a className='pull-right' onClick={this._animateTimeCutoff}>
-                  <Icon type='play' />
-                </a>}
-            </div>
-            <div className='TimeCutoff'>
-              <div className='Time'>
-                {p.selectedTimeCutoff} {message('Units.Minutes')}
-              </div>
-              <input
-                disabled={this.state.animating}
-                onChange={p.onTimeCutoffChange}
-                type='range'
-                min={10}
-                max={120}
-                step={1}
-                value={p.selectedTimeCutoff}
-              />
-            </div>
-          </React.Fragment>}
-      </React.Fragment>
-    )
-  }
+        <TimeCutoff
+          cutoff={p.selectedTimeCutoff}
+          setCutoff={p.onTimeCutoffChange}
+        />
+      </>}
+  </>
 }

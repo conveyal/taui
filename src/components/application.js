@@ -1,4 +1,3 @@
-// @flow
 import lonlat from '@conveyal/lonlat'
 import Icon from '@conveyal/woonerf/components/icon'
 import get from 'lodash/get'
@@ -65,10 +64,6 @@ export default class Application extends Component {
     }
   }
 
-  _onTimeCutoffChange = (event) => {
-    this.props.setTimeCutoff(parseInt(event.currentTarget.value, 10))
-  }
-
   _downloadIsochrone = memoize(index => () => {
     const p = this.props
     const isochrone = p.isochrones[index]
@@ -114,7 +109,7 @@ export default class Application extends Component {
           <Form
             end={p.end}
             geocode={p.geocode}
-            onTimeCutoffChange={this._onTimeCutoffChange}
+            onTimeCutoffChange={p.setTimeCutoff}
             onChangeEnd={this._setEndWithFeature}
             onChangeStart={this._setStartWithFeature}
             pointsOfInterest={p.pointsOfInterestOptions}

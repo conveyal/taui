@@ -6,6 +6,8 @@ import Select from 'react-select'
 
 import message from '../message'
 
+import 'react-select/dist/react-select.css'
+
 const USE_GEOLOCATE = true
 const GEOLOCATE_VALUE = 'geolocate'
 const RATE_LIMIT = 500

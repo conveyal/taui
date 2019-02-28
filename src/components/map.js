@@ -9,6 +9,8 @@ import useMap from '../hooks/use-map'
 import useMarker from '../hooks/use-marker'
 import usePointsOfInterest from '../hooks/use-points-of-interest'
 
+import 'mapbox-gl/dist/mapbox-gl.css'
+
 const containerStyle = {height: '100%', width: '100%'}
 
 // Always use the same markers

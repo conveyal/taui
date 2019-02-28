@@ -1,9 +1,4 @@
-@import url('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
-@import url(../node_modules/mapbox-gl/dist/mapbox-gl.css);
-@import url(../node_modules/react-select/dist/react-select.css);
-@import url(../node_modules/react-virtualized/styles.css);
-@import url(../node_modules/react-virtualized-select/styles.css);
 @import url(components/log/style.css);
 
 /** Colors from https://palx.jxnblk.com/2389c9 **/
@@ -298,38 +293,8 @@ table.CardContent td:first-of-type {
   display: inline-block;
 }
 
-.map-legends,
-.map-tooltip {
-  border-radius: var(--rad);
-  background-color: var(--dark-blue);
-  font-size: 1rem;
-  color: #fff;
-}
-
 .mapboxgl-popup {
   font-size: 1.1rem;
-}
-
-.Popup button {
-  display: block;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: var(--rad);
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  color: var(--dark-blue);
-  background-color: rgba(255, 255, 255, 0.95);
-  border: none;
-  width: 100%;
-  text-align: left;
-}
-
-.Popup button:last-of-type {
-  margin-bottom: 0;
-}
-
-.Popup button:hover {
-  background-color: #fff;
 }
 
 .Fullscreen {

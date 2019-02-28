@@ -6,6 +6,7 @@ import message from '../src/message'
 import * as select from '../src/selectors'
 import configureTaui from '../src/services/config'
 
+import 'normalize.css'
 import '../src/style.css'
 
 // Set the title

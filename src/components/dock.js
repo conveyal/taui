@@ -7,7 +7,7 @@ export default function Dock (props) {
   return <div className='Taui-Dock'>
     <div className='Taui-Dock-content'>
       <div className='title'>
-        <Icon type='map' />}
+        <Icon type='map' />
         {' '}
         {props.title || message('Title')}
       </div>
