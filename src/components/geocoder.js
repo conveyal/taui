@@ -100,6 +100,7 @@ export default class Geocoder extends Component {
         autoload={false}
         blurInputOnSelect
         cacheOptions={false}
+        classNamePrefix='-select'
         defaultOptions={s.options}
         filterOptions={false}
         ignoreAccents={false}
@@ -109,6 +110,17 @@ export default class Geocoder extends Component {
         onBlurResetsInput={false}
         onChange={this._onChange}
         searchPromptText={message('Geocoding.PromptText')}
+        theme={t => ({
+          ...t,
+          colors: {
+            ...t.colors,
+            primary: '#fff'
+          },
+          spacing: {
+            ...t.spacing,
+            baseUnit: 6
+          }
+        })}
       />
     )
   }

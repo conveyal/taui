@@ -21,6 +21,7 @@
 }
 
 .pull-right { float: right; }
+.-select__control { margin-bottom: 0.5rem; }
 
 html, body {
   font-size: 15px;
