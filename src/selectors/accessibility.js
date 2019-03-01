@@ -1,4 +1,4 @@
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
 import accessibilityForGrid from '../utils/accessibility-for-grid'
 
@@ -13,18 +13,18 @@ export default createSelector(
     surfaces.map((surface, index) =>
       grids.map(
         grid =>
-          (surface &&
-            surface.data &&
-            grid.data &&
-            networks[index] &&
-            networks[index].ready
+          surface &&
+          surface.data &&
+          grid.data &&
+          networks[index] &&
+          networks[index].ready
             ? accessibilityForGrid({
               surface: surface.data,
               grid,
               network: networks[index],
               cutoff
             })
-            : -1)
+            : -1
       )
     )
 )

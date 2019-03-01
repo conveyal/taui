@@ -31,7 +31,10 @@ export function parsePathsData (ab) {
     distinctPaths.push(legList)
   }
 
-  const targetPathIndexes = new Int32Array(ab, (2 + offset) * Int32Array.BYTES_PER_ELEMENT)
+  const targetPathIndexes = new Int32Array(
+    ab,
+    (2 + offset) * Int32Array.BYTES_PER_ELEMENT
+  )
   let previousValue = 0
   for (let i = 0, position = 0; i < nTargets; i++) {
     for (let j = 0; j < pathsPerTarget; j++, position++) {

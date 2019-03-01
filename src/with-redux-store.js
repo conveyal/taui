@@ -23,8 +23,7 @@ export function getOrCreateStore (initialState) {
   }
 
   Object.keys(actions).forEach(key => {
-    app.action[key] = (...args) =>
-      store.dispatch(actions[key](...args))
+    app.action[key] = (...args) => store.dispatch(actions[key](...args))
   })
 
   Object.keys(select).forEach(key => {

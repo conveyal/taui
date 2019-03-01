@@ -1,7 +1,7 @@
 import get from 'lodash/get'
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
-import {darkBlue} from '../constants'
+import { darkBlue } from '../constants'
 import getIsochroneForNetwork from '../utils/get-isochrone-for-network'
 
 export default createSelector(
@@ -17,15 +17,17 @@ export default createSelector(
         properties: {
           name: n.name
         },
-        features: [{
-          ...getIsochroneForNetwork(n, start, timeCutoff),
-          properties: {
-            color: darkBlue,
-            opacity: 1,
-            timeCutoff,
-            width: 1
+        features: [
+          {
+            ...getIsochroneForNetwork(n, start, timeCutoff),
+            properties: {
+              color: darkBlue,
+              opacity: 1,
+              timeCutoff,
+              width: 1
+            }
           }
-        }]
+        ]
       }
     }
   }

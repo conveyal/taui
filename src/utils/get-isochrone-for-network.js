@@ -12,10 +12,13 @@ function getIsochrone (network, start, timeCutoff) {
     surface: surface.data,
     cutoff: timeCutoff,
     project ([x, y]) {
-      const {lon, lat} = lonlat.fromPixel({
-        x: x + surface.west,
-        y: y + surface.north
-      }, surface.zoom)
+      const { lon, lat } = lonlat.fromPixel(
+        {
+          x: x + surface.west,
+          y: y + surface.north
+        },
+        surface.zoom
+      )
       return [lon, lat]
     }
   })

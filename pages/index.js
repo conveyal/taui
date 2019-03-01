@@ -1,4 +1,4 @@
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import actions from '../src/actions'
 import Application from '../src/components/application'
@@ -52,4 +52,7 @@ Application.prototype.componentDidMount = async function componentDidMount () {
   p.decrementFetches()
 }
 
-export default connect(mapStateToProps, actions)(Application)
+export default connect(
+  mapStateToProps,
+  actions
+)(Application)

@@ -1,10 +1,10 @@
 import lonlat from '@conveyal/lonlat'
 import memoize from 'lodash/memoize'
 import dynamic from 'next/dynamic'
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 
-import {colors} from '../constants'
-import {geocode, reverseGeocode} from '../services/geocode'
+import { colors } from '../constants'
+import { geocode, reverseGeocode } from '../services/geocode'
 import downloadJson from '../utils/download-json'
 
 import Dock from './dock'
@@ -14,10 +14,11 @@ import RouteCard from './route-card'
 import RouteSegments from './route-segments'
 import TimeCutoff from './time-cutoff'
 
-const Loader = () =>
+const Loader = () => (
   <div className='Loader'>
     <Icon icon='compass' spin />
   </div>
+)
 
 // Certain components depend on config options, so dynamically load them
 const ConfigCard = dynamic(() => import('./config-card'))
@@ -32,12 +33,12 @@ const Map = dynamic(() => import('./map'), {
 })
 
 export default class Application extends Component {
-  _geocode = (text) => {
+  _geocode = text => {
     const p = this.props
     return geocode(text, p.map.accessToken, p.geocoder)
   }
 
-  _reverseGeocode = (position) => {
+  _reverseGeocode = position => {
     const p = this.props
     return reverseGeocode(position, p.map.accessToken, p.geocoder)
   }
@@ -78,27 +79,26 @@ export default class Application extends Component {
           </div>
         </div>
         <Dock title={p.title}>
-          {p.searchPoiOnly
-            ? <PoiSearch
+          {p.searchPoiOnly ? (
+            <PoiSearch
               end={p.end}
               poi={p.pointsOfInterestOptions}
               start={p.start}
               updateEnd={p.updateEnd}
               updateStart={p.updateStart}
             />
-            : <GeocodeSearch
+          ) : (
+            <GeocodeSearch
               end={p.end}
               geocode={this._geocode}
               reverseGeocode={this._reverseGeocode}
               start={p.start}
               updateEnd={p.updateEnd}
               updateStart={p.updateStart}
-            />}
-          <TimeCutoff
-            cutoff={p.timeCutoff}
-            setCutoff={p.setTimeCutoff}
-          />
-          {p.networks.map((network, index) =>
+            />
+          )}
+          <TimeCutoff cutoff={p.timeCutoff} setCutoff={p.setTimeCutoff} />
+          {p.networks.map((network, index) => (
             <div
               onMouseEnter={() => p.setActiveNetwork(network.name)}
               onMouseLeave={() => p.setActiveNetwork(null)}
@@ -106,31 +106,47 @@ export default class Application extends Component {
             >
               <RouteCard
                 cardColor={network.hexColor || colors[index].hex}
-                downloadIsochrone={p.isochrones[index] && this._downloadIsochrone(index)}
+                downloadIsochrone={
+                  p.isochrones[index] && this._downloadIsochrone(index)
+                }
                 index={index}
                 title={network.name}
               >
-                {p.isLoading
-                  ? <tbody><tr><td><Loader /></td></tr></tbody>
-                  : <React.Fragment>
+                {p.isLoading ? (
+                  <tbody>
+                    <tr>
+                      <td>
+                        <Loader />
+                      </td>
+                    </tr>
+                  </tbody>
+                ) : (
+                  <React.Fragment>
                     <RouteAccess
                       accessibility={p.accessibility[index]}
                       grids={p.grids}
                       hasStart={!!p.start}
-                      oldAccessibility={p.accessibility[p.accessibility.length - 1]}
+                      oldAccessibility={
+                        p.accessibility[p.accessibility.length - 1]
+                      }
                       showComparison={p.showComparison}
                     />
-                    {!!p.end && !!p.start &&
+                    {!!p.end &&
+                      !!p.start && (
                       <RouteSegments
                         active={network.name === p.activeNetwork}
-                        oldTravelTime={p.travelTimes[p.accessibility.length - 1]}
+                        oldTravelTime={
+                          p.travelTimes[p.accessibility.length - 1]
+                        }
                         routeSegments={p.networkRoutes[index]}
                         travelTime={p.travelTimes[index]}
-                      />}
-                  </React.Fragment>}
+                      />
+                    )}
+                  </React.Fragment>
+                )}
               </RouteCard>
             </div>
-          )}
+          ))}
 
           {p.showLog && p.actionLog && <Log items={p.actionLog} />}
           {p.allowChangeConfig && <ConfigCard cookieConfig={p.cookieConfig} />}
@@ -142,11 +158,12 @@ export default class Application extends Component {
 }
 
 function Attribution () {
-  return <div className='Attribution'>
-    site made by
-    {' '}
-    <a href='https://www.conveyal.com' target='_blank'>
-      conveyal
-    </a>
-  </div>
+  return (
+    <div className='Attribution'>
+      site made by{' '}
+      <a href='https://www.conveyal.com' target='_blank'>
+        conveyal
+      </a>
+    </div>
+  )
 }

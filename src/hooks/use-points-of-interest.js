@@ -1,24 +1,27 @@
 import mapboxgl from 'mapbox-gl'
 import React from 'react'
 
-import {POI_ID as ID} from '../constants'
+import { POI_ID as ID } from '../constants'
 
 import useOnLoad from './use-on-load'
 
-const EmptyCollection = {type: 'FeatureCollection', features: []}
+const EmptyCollection = { type: 'FeatureCollection', features: [] }
 
 export default function usePointsOfInterest (map, poi) {
   useOnLoad(initializePoi, map, [poi])
 
-  React.useEffect(() => {
-    if (!map) return
-    const source = map.getSource(ID)
-    if (source) source.setData(poi || EmptyCollection)
-  }, [map, poi])
+  React.useEffect(
+    () => {
+      if (!map) return
+      const source = map.getSource(ID)
+      if (source) source.setData(poi || EmptyCollection)
+    },
+    [map, poi]
+  )
 }
 
 function initializePoi (map, poi) {
-  map.addSource(ID, {type: 'geojson', data: poi || EmptyCollection})
+  map.addSource(ID, { type: 'geojson', data: poi || EmptyCollection })
 
   map.addLayer({
     id: ID,
@@ -35,7 +38,7 @@ function initializePoi (map, poi) {
     closeOnClick: false
   })
 
-  map.on('mouseenter', ID, (e) => {
+  map.on('mouseenter', ID, e => {
     map.getCanvas().style.cursor = 'pointer'
 
     const coordinates = e.features[0].geometry.coordinates.slice()
@@ -46,7 +49,8 @@ function initializePoi (map, poi) {
       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
     }
 
-    popup.setLngLat(coordinates)
+    popup
+      .setLngLat(coordinates)
       .setHTML(description)
       .addTo(map)
   })

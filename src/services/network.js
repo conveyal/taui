@@ -1,8 +1,8 @@
 import cacheURL from '../utils/cache-url'
 import coordinateToPoint from '../utils/coordinate-to-point'
 import fetch from '../utils/fetch'
-import {parsePathsData} from '../utils/parse-paths-data'
-import {parseTimesData} from '../utils/parse-times-data'
+import { parsePathsData } from '../utils/parse-paths-data'
+import { parseTimesData } from '../utils/parse-times-data'
 
 export function fetchDataAtCoordinate (network, coordinate) {
   const index = coordinateToIndex(network, coordinate)

@@ -5,7 +5,7 @@ import slice from 'lodash/slice'
 import uniqBy from 'lodash/uniqBy'
 import toUpperCase from 'lodash/upperCase'
 
-import {coordinateToIndex} from './coordinate-to-point'
+import { coordinateToIndex } from './coordinate-to-point'
 
 const DEFAULT_ROUTE_COLOR = '0b2b40'
 const TYPE_TO_ICON = ['subway', 'subway', 'train', 'bus']
@@ -36,22 +36,20 @@ export default function createTransitiveRoutesForNetwork (network, coordinates) 
   const allPaths = targetPathIndexes.map(index => network.paths[index])
 
   // Filter out non-unique path combinations
-  const uniquePaths = uniqBy(
-    allPaths,
-    (p) => flatten(p).join('-')
-  )
+  const uniquePaths = uniqBy(allPaths, p => flatten(p).join('-'))
 
   // Populate each path leg with it's stops, pattern, and route
-  const populatePath = path => path.map(([fromStopId, patternId, toStopId]) => {
-    const pattern = find(td.patterns, ['pattern_id', patternId])
-    const route = find(td.routes, ['route_id', pattern.route_id])
-    return {
-      fromStop: findStop(fromStopId),
-      pattern,
-      route,
-      toStop: findStop(toStopId)
-    }
-  })
+  const populatePath = path =>
+    path.map(([fromStopId, patternId, toStopId]) => {
+      const pattern = find(td.patterns, ['pattern_id', patternId])
+      const route = find(td.routes, ['route_id', pattern.route_id])
+      return {
+        fromStop: findStop(fromStopId),
+        pattern,
+        route,
+        toStop: findStop(toStopId)
+      }
+    })
 
   return uniquePaths.map(populatePath).map(addDataToPath)
 }
@@ -83,9 +81,13 @@ function addDataToPath (path) {
       pattern.stops.findIndex(s => s.stop_id === stop.stop_id)
 
     const subSegments = pattern.stops.slice(
-      findStopIndex(boardStop), findStopIndex(alightStop))
-    const latLons = subSegments.reduce((lls, s) =>
-      [...lls, ...polyline.decode(s.geometry)], [])
+      findStopIndex(boardStop),
+      findStopIndex(alightStop)
+    )
+    const latLons = subSegments.reduce(
+      (lls, s) => [...lls, ...polyline.decode(s.geometry)],
+      []
+    )
 
     /** TODO Patterns with more than one rout
     if (leg[1].patterns && leg[1].patterns.length > 0) {

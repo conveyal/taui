@@ -67,7 +67,7 @@ function setGrid (state, action) {
   const gridIndex = grids.findIndex(g => g.name === action.payload.name)
 
   if (gridIndex > -1) {
-    grids[gridIndex] = {...grids[gridIndex], ...action.payload}
+    grids[gridIndex] = { ...grids[gridIndex], ...action.payload }
   } else {
     grids.push(action.payload)
   }
@@ -94,12 +94,10 @@ function setLocation (location) {
 
 function setNetwork (state, action) {
   const networks = [...state.networks]
-  const networkIndex = networks.findIndex(
-    n => n.name === action.payload.name
-  )
+  const networkIndex = networks.findIndex(n => n.name === action.payload.name)
 
   if (networkIndex > -1) {
-    networks[networkIndex] = {...networks[networkIndex], ...action.payload}
+    networks[networkIndex] = { ...networks[networkIndex], ...action.payload }
   } else {
     networks.push(action.payload)
   }

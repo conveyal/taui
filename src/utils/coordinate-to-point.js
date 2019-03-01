@@ -17,13 +17,12 @@ export default function coordinateToPoint (coordinate, zoom, west, north) {
  * Convert a point to a coordinate
  */
 export const pointToCoordinate = (x, y, zoom) =>
-  lonlat.fromPixel({x, y}, zoom)
+  lonlat.fromPixel({ x, y }, zoom)
 
 /**
  * Get the index of a point based off the query width
  */
-const pointToOriginIndex = (point, width) =>
-  point.x + point.y * width
+const pointToOriginIndex = (point, width) => point.x + point.y * width
 
 /**
  * Convert a coordinate to an index

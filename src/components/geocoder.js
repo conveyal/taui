@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import Select from 'react-select/lib/Async'
 
 import message from '../message'
@@ -38,31 +38,35 @@ export default class Geocoder extends Component {
 
   componentWillReceiveProps (nextProps) {
     if (!isEqual(nextProps.value, this.props.value)) {
-      this.setState({value: nextProps.value})
+      this.setState({ value: nextProps.value })
     }
   }
 
   defaultOptions () {
     const p = this.props
-    const geolocateOptions = p.geolocate && 'geolocation' in navigator
-      ? [{
-        label: message(
-          'Geocoding.UseCurrentLocation',
-          'Use Current Location'
-        ),
-        value: GEOLOCATE_VALUE
-      }]
-      : []
+    const geolocateOptions =
+      p.geolocate && 'geolocation' in navigator
+        ? [
+          {
+            label: message(
+              'Geocoding.UseCurrentLocation',
+              'Use Current Location'
+            ),
+            value: GEOLOCATE_VALUE
+          }
+        ]
+        : []
     return [...geolocateOptions, ...(p.options || [])]
   }
 
   loadOptions = (input, callback) => {
     if (input && input.length < 4) return Promise.resolve([])
-    return this.props.geocode(input)
+    return this.props
+      .geocode(input)
       .then(features => features.map(featureToOption))
   }
 
-  _onChange = (value) => {
+  _onChange = value => {
     const p = this.props
     if (get(value, 'value') === GEOLOCATE_VALUE) {
       this.setState({
@@ -73,7 +77,7 @@ export default class Geocoder extends Component {
       window.navigator.geolocation.getCurrentPosition(position => {
         p.reverseGeocode(position.coords).then(feature => {
           const value = this.featureToOption(feature)
-          this.setState({value})
+          this.setState({ value })
           p.onChange && p.onChange(value)
         })
       })
@@ -85,7 +89,7 @@ export default class Geocoder extends Component {
         })
         p.onChange(null)
       } else {
-        this.setState({value})
+        this.setState({ value })
         p.onChange(value.data)
       }
     }

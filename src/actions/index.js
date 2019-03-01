@@ -2,27 +2,27 @@ import * as location from './location'
 import * as log from './log'
 import * as network from './network'
 
-const setGeocoder = (payload) => ({
+const setGeocoder = payload => ({
   type: 'set geocoder',
   payload
 })
 
-const setGrid = (payload) => ({
+const setGrid = payload => ({
   type: 'set grid',
   payload
 })
 
-const setPointsOfInterest = (payload) => ({
+const setPointsOfInterest = payload => ({
   type: 'set points of interest',
   payload
 })
 
-const setTimeCutoff = (payload) => ({
+const setTimeCutoff = payload => ({
   type: 'set time cutoff',
   payload
 })
 
-const updateMap = (payload) => ({
+const updateMap = payload => ({
   type: 'update map',
   payload
 })

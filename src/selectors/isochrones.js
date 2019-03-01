@@ -1,8 +1,8 @@
 import get from 'lodash/get'
 import reduceRight from 'lodash/reduceRight'
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
-import {colors} from '../constants'
+import { colors } from '../constants'
 import getIsochroneForNetwork from '../utils/get-isochrone-for-network'
 
 export default createSelector(
@@ -10,29 +10,34 @@ export default createSelector(
   state => state.networks,
   state => state.timeCutoff,
   (start, networks = [], timeCutoff) =>
-    reduceRight(networks, (isochrones, n, i) => {
-      const data = get(n, 'travelTimeSurface.data')
-      const features = start && data
-        ? getIsochroneForNetwork(n, start, timeCutoff)
-        : {}
+    reduceRight(
+      networks,
+      (isochrones, n, i) => {
+        const data = get(n, 'travelTimeSurface.data')
+        const features =
+          start && data ? getIsochroneForNetwork(n, start, timeCutoff) : {}
 
-      const isochrone = {
-        type: 'FeatureCollection',
-        properties: {
-          name: n.name,
-          id: `isochrone-${i}`
-        },
-        features: [{
-          ...features,
+        const isochrone = {
+          type: 'FeatureCollection',
           properties: {
-            color: n.hexColor || colors[i].hex,
-            opacity: 1,
-            timeCutoff: timeCutoff,
-            width: 1
-          }
-        }]
-      }
+            name: n.name,
+            id: `isochrone-${i}`
+          },
+          features: [
+            {
+              ...features,
+              properties: {
+                color: n.hexColor || colors[i].hex,
+                opacity: 1,
+                timeCutoff: timeCutoff,
+                width: 1
+              }
+            }
+          ]
+        }
 
-      return [...isochrones, isochrone]
-    }, [])
+        return [...isochrones, isochrone]
+      },
+      []
+    )
 )

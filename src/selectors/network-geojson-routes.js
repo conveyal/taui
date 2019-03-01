@@ -1,4 +1,4 @@
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
 import selectNetworkRoutes from './network-routes'
 
@@ -14,38 +14,43 @@ export default createSelector(
   state => state.start,
   state => state.end,
   selectNetworkRoutes, // if journeys exist, so does the network, start + end
-  (activeNetwork, networks, start, end, networkRoutes) => networks.map((network, i) =>
-    networkRoutes[i].map(segments => {
-      if (typeof activeNetwork === 'string' && activeNetwork !== network.name) {
-        return {type: 'FeatureCollection', features: []}
-      }
+  (activeNetwork, networks, start, end, networkRoutes) =>
+    networks.map((network, i) =>
+      networkRoutes[i].map(segments => {
+        if (
+          typeof activeNetwork === 'string' &&
+          activeNetwork !== network.name
+        ) {
+          return { type: 'FeatureCollection', features: [] }
+        }
 
-      // Convert to [lon, lat] coordinates
-      const startCoords = [start.position.lon, start.position.lat]
-      const endCoords = [end.position.lon, end.position.lat]
+        // Convert to [lon, lat] coordinates
+        const startCoords = [start.position.lon, start.position.lat]
+        const endCoords = [end.position.lon, end.position.lat]
 
-      if (segments.length === 0) {
+        if (segments.length === 0) {
+          return {
+            type: 'FeatureCollection',
+            features: [createWalkFeature([startCoords, endCoords])]
+          }
+        }
+
+        const firstStop = segments[0].fromStop
+        const lastStop = segments[segments.length - 1].toStop
+
         return {
           type: 'FeatureCollection',
-          features: [createWalkFeature([startCoords, endCoords])]
+          features: [
+            createWalkFeature([startCoords, firstStop.coordinates]),
+            ...segments.reduce(
+              (features, s) => [...features, ...createSegmentFeatures(s)],
+              []
+            ),
+            createWalkFeature([lastStop.coordinates, endCoords])
+          ]
         }
-      }
-
-      const firstStop = segments[0].fromStop
-      const lastStop = segments[segments.length - 1].toStop
-
-      return {
-        type: 'FeatureCollection',
-        features: [
-          createWalkFeature([startCoords, firstStop.coordinates]),
-          ...segments.reduce((features, s) =>
-            [...features, ...createSegmentFeatures(s)]
-          , []),
-          createWalkFeature([lastStop.coordinates, endCoords])
-        ]
-      }
-    })
-  )
+      })
+    )
 )
 
 function createSegmentFeatures (segment) {
@@ -54,7 +59,8 @@ function createSegmentFeatures (segment) {
   }
 
   return [
-    createStopFeature(segment.fromStop), {
+    createStopFeature(segment.fromStop),
+    {
       type: 'Feature',
       properties: {
         mode: segment.mode,

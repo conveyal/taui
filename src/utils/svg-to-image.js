@@ -1,5 +1,5 @@
 // For usage with MapboxGL
-export default (svg) => {
+export default svg => {
   const blob = new Blob([svg], {
     type: 'image/svg+xml;charset=utf-8'
   })
@@ -12,7 +12,7 @@ export default (svg) => {
       URL.revokeObjectURL(url)
       resolve(el)
     }
-    el.onerror = (err) => {
+    el.onerror = err => {
       console.log('ERROR', el, err)
       reject(el)
     }

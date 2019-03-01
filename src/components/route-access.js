@@ -21,24 +21,29 @@ export default function RouteAccess (p) {
 
   return (
     <tbody className='Opportunities'>
-      {p.grids.map((grid, i) =>
+      {p.grids.map((grid, i) => (
         <Opportunity grid={grid} key={grid.name}>
           <strong> {(p.accessibility[i] | 0).toLocaleString()} </strong>
-          {toSpaceCase(grid.name)}&nbsp;
-          {p.showComparison &&
+          {toSpaceCase(grid.name)}
+          &nbsp;
+          {p.showComparison && (
             <DiffPercentage
               current={p.accessibility[i]}
               old={p.oldAccessibility[i]}
-            />}
-        </Opportunity>)}
+            />
+          )}
+        </Opportunity>
+      ))}
     </tbody>
   )
 }
 
-function Opportunity ({children, grid}) {
+function Opportunity ({ children, grid }) {
   return (
     <tr className='Opportunity' key={grid.name}>
-      <td><Icon icon={grid.icon} /></td>
+      <td>
+        <Icon icon={grid.icon} />
+      </td>
       <td>
         <span>Access to</span> {children}
       </td>
@@ -46,8 +51,8 @@ function Opportunity ({children, grid}) {
   )
 }
 
-function DiffPercentage ({current, old}) {
-  const diff = (current - old) / old * 100
+function DiffPercentage ({ current, old }) {
+  const diff = ((current - old) / old) * 100
 
   // only show if the diff is >= 0.1%
   if (Math.abs(diff) < 0.1 || isNaN(diff)) return null
@@ -62,7 +67,8 @@ function DiffPercentage ({current, old}) {
 
   return (
     <span className='decrease'>
-      (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' rotation={180} />)
+      (<strong>{diff.toFixed(1)}</strong>%{' '}
+      <Icon icon='level-up-alt' rotation={180} />)
     </span>
   )
 }

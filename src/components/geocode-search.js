@@ -14,23 +14,26 @@ function featureToLocation (f) {
 }
 
 export default function GeocodeSearch (p) {
-  return <>
-    <Geocoder
-      isClearable={false}
-      geocode={p.geocode}
-      onChange={f => p.updateStart(featureToLocation(f))}
-      placeholder={message('Geocoding.StartPlaceholder')}
-      reverseGeocode={p.reverseGeocode}
-      value={p.start}
-    />
-    {p.start &&
+  return (
+    <>
       <Geocoder
-        isClearable
+        isClearable={false}
         geocode={p.geocode}
-        onChange={f => p.updateEnd(featureToLocation(f))}
+        onChange={f => p.updateStart(featureToLocation(f))}
         placeholder={message('Geocoding.StartPlaceholder')}
         reverseGeocode={p.reverseGeocode}
-        value={p.end}
-      />}
-  </>
+        value={p.start}
+      />
+      {p.start && (
+        <Geocoder
+          isClearable
+          geocode={p.geocode}
+          onChange={f => p.updateEnd(featureToLocation(f))}
+          placeholder={message('Geocoding.StartPlaceholder')}
+          reverseGeocode={p.reverseGeocode}
+          value={p.end}
+        />
+      )}
+    </>
+  )
 }
