@@ -1,7 +1,8 @@
-import Icon from '@conveyal/woonerf/components/icon'
+import {faTerminal} from '@fortawesome/free-solid-svg-icons'
 import React from 'react'
 
 import message from '../../message'
+import Icon from '../icon'
 
 import LogItem from './item'
 
@@ -11,7 +12,7 @@ export default function Log (props) {
   return (
     <div className='Card'>
       <div className='CardTitle'>
-        <Icon type='terminal' /> {message('Log.Title')}
+        <Icon icon={faTerminal} /> {message('Log.Title')}
       </div>
       <div className={`Log ${hasError}`}>
         {items.map((item, index) => (

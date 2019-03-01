@@ -1,7 +1,8 @@
-import Icon from '@conveyal/woonerf/components/icon'
 import React from 'react'
 
 import message from '../message'
+
+import Icon from './icon'
 
 // Delay in animating the time cutoff
 const DELAY = 50
@@ -12,7 +13,7 @@ export default function TimeCutoff (p) {
   React.useEffect(() => {
     if (!animating) return
     if (p.cutoff < 120) {
-      setTimeout(() => p.setCutoff(p.cutoff + 1), 50)
+      setTimeout(() => p.setCutoff(p.cutoff + 1), DELAY)
     } else {
       setAnimating(false)
     }
@@ -26,7 +27,7 @@ export default function TimeCutoff (p) {
           setAnimating(true)
           p.setCutoff(10)
         }}>
-          <Icon type='play' />
+          <Icon icon='play' />
         </a>}
     </div>
     <div className='TimeCutoff'>

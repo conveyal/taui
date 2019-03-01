@@ -3,7 +3,6 @@ import React from 'react'
 
 import {darkBlue, colors} from '../constants'
 import useGeoJSONRoutes from '../hooks/use-geojson-routes'
-import useIfExists from '../hooks/use-if-exists'
 import useIsochrones from '../hooks/use-isochrones'
 import useMap from '../hooks/use-map'
 import useMarker from '../hooks/use-marker'

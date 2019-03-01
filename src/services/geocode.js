@@ -1,4 +1,3 @@
-// @flow
 import lonlat from '@conveyal/lonlat'
 
 import {MAPBOX_GEOCODING_URL} from '../constants'
@@ -19,14 +18,10 @@ function formatURL (text, accessToken, opts) {
  *
  * NB Content-Type is application/vnd.geo+json
  */
-export const geocode = (text, nextAction) => (dispatch, getState) => {
-  const state = getState()
-  const {geocoder, map} = state
-
-  dispatch(fetch(formatURL(text, map.accessToken, geocoder))
+export const geocode = (text, accessToken, opts) =>
+  fetch(formatURL(text, accessToken, opts))
     .then(response => response.json())
-    .then(geojson => nextAction(geojson.features)))
-}
+    .then(geojson => geojson.features)
 
-export const reverseGeocode = (position, nextAction) =>
-  geocode(lonlat.toString(position), nextAction)
+export const reverseGeocode = (position, at, opts) =>
+  geocode(lonlat.toString(position), at, opts)

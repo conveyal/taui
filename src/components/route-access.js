@@ -4,6 +4,7 @@ import get from 'lodash/get'
 import message from '../message'
 
 import Alert from './tr-alert'
+import Icon from './icon'
 
 export default function RouteAccess (p) {
   if (p.grids.length === 0) {
@@ -37,7 +38,7 @@ export default function RouteAccess (p) {
 function Opportunity ({children, grid}) {
   return (
     <tr className='Opportunity' key={grid.name}>
-      <td><span className={`fa fa-${grid.icon}`} /></td>
+      <td><Icon icon={grid.icon} /></td>
       <td>
         <span>Access to</span> {children}
       </td>
@@ -54,14 +55,14 @@ function DiffPercentage ({current, old}) {
   if (diff > 0) {
     return (
       <span className='increase'>
-        (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up' />)
+        (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' />)
       </span>
     )
   }
 
   return (
     <span className='decrease'>
-      (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up fa-rotate-180' />)
+      (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' rotation={180} />)
     </span>
   )
 }

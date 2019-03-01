@@ -1,9 +1,10 @@
-import Icon from '@conveyal/woonerf/components/icon'
 import uniqBy from 'lodash/uniqBy'
+import React from 'react'
 
 import message from '../message'
 
 import Alert from './tr-alert'
+import Icon from './icon'
 
 export default function RouteSegments (p) {
   if (p.routeSegments.length === 0) {
@@ -18,26 +19,26 @@ export default function RouteSegments (p) {
   return (
     <tbody>
       <tr className='BestTrip'>
-        <td><span className='fa fa-clock-o' /></td>
+        <td><Icon icon='clock' /></td>
         <td>
           {p.travelTime > 120
             ? <span className='decrease'>Inaccessible within 120 minutes</span>
-            : <React.Fragment>Trip duration
+            : <>Trip duration
               <strong> {p.travelTime}</strong> {message('Units.Mins')}&nbsp;
               <TripDiff
                 baseTravelTime={p.oldTravelTime}
                 travelTime={p.travelTime}
               />
-            </React.Fragment>}
+            </>}
         </td>
       </tr>
       <tr>
-        <td>{p.active && <span className='fa fa-street-view' />}</td>
+        <td>{p.active && <Icon icon='street-view' />}</td>
         <td>Take <Segments segments={bestJourney} /></td>
       </tr>
       {alternateJourneys.length > 0 &&
         <tr>
-          <td></td>
+          <td />
           <td>
             {message('Systems.AlternateTripsTitle')}&nbsp;
             {alternateJourneys.map((segments, i) =>
@@ -61,7 +62,7 @@ function Segments (p) {
           style={{borderColor: segment.routeColor}}
           title={segment.name}
         >
-          <i className={`fa fa-${segment.mode}`} /> {segment.name}
+          <Icon icon={segment.mode} /> {segment.name}
         </span>
         {i !== (segments.length - 1) && ' to '}
       </React.Fragment>
@@ -71,11 +72,15 @@ function Segments (p) {
 function TripDiff ({baseTravelTime, travelTime}) {
   if (baseTravelTime === 2147483647) {
     return (
-      <span className='increase'>({message('NewTrip')} <Icon type='star' />)</span>
+      <span className='increase'>
+        ({message('NewTrip')} <Icon icon='star' />)
+      </span>
     )
   } else if (travelTime === 2147483647) {
     return (
-      <span className='decrease'>(<strong>> {120 - baseTravelTime}</strong>% <span className='fa fa-level-up' />)</span>
+      <span className='decrease'>
+        (<strong> {120 - baseTravelTime}</strong>% <Icon icon='level-up-alt' />)
+      </span>
     )
   }
 
@@ -85,14 +90,14 @@ function TripDiff ({baseTravelTime, travelTime}) {
   if (diff > 0) {
     return (
       <span className='decrease'>
-        (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up' />)
+        (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' />)
       </span>
     )
   }
 
   return (
     <span className='increase'>
-      (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up fa-rotate-180' />)
+      (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' rotation={180} />)
     </span>
   )
 }

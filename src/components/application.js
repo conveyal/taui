@@ -1,16 +1,14 @@
 import lonlat from '@conveyal/lonlat'
-import Icon from '@conveyal/woonerf/components/icon'
-import get from 'lodash/get'
 import memoize from 'lodash/memoize'
 import dynamic from 'next/dynamic'
 import React, {Component} from 'react'
 
 import {colors} from '../constants'
-import message from '../message'
+import {geocode, reverseGeocode} from '../services/geocode'
 import downloadJson from '../utils/download-json'
 
 import Dock from './dock'
-import Log from './log'
+import Icon from './icon'
 import RouteAccess from './route-access'
 import RouteCard from './route-card'
 import RouteSegments from './route-segments'
@@ -18,11 +16,12 @@ import TimeCutoff from './time-cutoff'
 
 const Loader = () =>
   <div className='Loader'>
-    <Icon type='circle-o-notch' className='fa-spin' />
+    <Icon icon='compass' spin />
   </div>
 
 // Certain components depend on config options, so dynamically load them
 const ConfigCard = dynamic(() => import('./config-card'))
+const Log = dynamic(() => import('./log'))
 const GeocodeSearch = dynamic(() => import('./geocode-search'))
 const PoiSearch = dynamic(() => import('./poi-search'))
 
@@ -33,6 +32,16 @@ const Map = dynamic(() => import('./map'), {
 })
 
 export default class Application extends Component {
+  _geocode = (text) => {
+    const p = this.props
+    return geocode(text, p.map.accessToken, p.geocoder)
+  }
+
+  _reverseGeocode = (position) => {
+    const p = this.props
+    return reverseGeocode(position, p.map.accessToken, p.geocoder)
+  }
+
   _downloadIsochrone = memoize(index => () => {
     const p = this.props
     const isochrone = p.isochrones[index]
@@ -71,20 +80,20 @@ export default class Application extends Component {
         <Dock title={p.title}>
           {p.searchPoiOnly
             ? <PoiSearch
-                end={p.end}
-                poi={p.pointsOfInterestOptions}
-                start={p.start}
-                updateEnd={p.updateEnd}
-                updateStart={p.updateStart}
-              />
+              end={p.end}
+              poi={p.pointsOfInterestOptions}
+              start={p.start}
+              updateEnd={p.updateEnd}
+              updateStart={p.updateStart}
+            />
             : <GeocodeSearch
-                end={p.end}
-                geocoer={p.geocode}
-                reverseGeocode={p.reverseGeocode}
-                start={p.start}
-                updateEnd={p.updateEnd}
-                updateStart={p.updateStart}
-              />}
+              end={p.end}
+              geocode={this._geocode}
+              reverseGeocode={this._reverseGeocode}
+              start={p.start}
+              updateEnd={p.updateEnd}
+              updateStart={p.updateStart}
+            />}
           <TimeCutoff
             cutoff={p.timeCutoff}
             setCutoff={p.setTimeCutoff}
@@ -141,4 +150,3 @@ function Attribution () {
     </a>
   </div>
 }
-

@@ -8,9 +8,6 @@ import {POI_ID} from '../constants'
 const navControl = new mapboxgl.NavigationControl({showCompass: false})
 
 export default function useMap (mapProps, events) {
-  const [center, setCenter] = React.useState(mapProps.center)
-  const [style, setStyle] = React.useState(mapProps.style)
-  const [zoom, setZoom] = React.useState(mapProps.zoom)
   const ref = React.useRef(null)
   const map = React.useRef(null)
 
@@ -27,12 +24,12 @@ export default function useMap (mapProps, events) {
 
     // Create map
     const m = map.current = window.map = new mapboxgl.Map({
-      center,
+      center: mapProps.center,
       container: ref.current,
       maxBounds: mapProps.maxBounds,
       minZoom: mapProps.minZoom,
-      style,
-      zoom
+      style: mapProps.style,
+      zoom: mapProps.zoom
     })
 
     m.on('load', () => m.addControl(navControl, 'top-right'))

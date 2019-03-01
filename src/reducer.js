@@ -118,6 +118,7 @@ function updateMap (state, action) {
 
   // Set the map in the query string
   qs.setKeyTo('map', {
+    accessToken: map.accessToken,
     center: map.center,
     zoom: map.zoom
   })

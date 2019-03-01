@@ -2,8 +2,6 @@ import React from 'react'
 
 import useOnLoad from './use-on-load'
 
-const EmptyCollection = {type: 'FeatureCollection', features: []}
-
 /**
  * Isochrones are in reverse order of the networks.
  */

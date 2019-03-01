@@ -1,11 +1,10 @@
-import get from 'lodash/get'
+import {reverseGeocode} from '../services/geocode'
 
 import {addActionLogItem} from './log'
 import {
   fetchAllTimesAndPathsForCoordinate,
   setNetworksToLoading
 } from './network'
-import {geocode, reverseGeocode} from './geocode'
 
 export const setEnd = (end) => ({
   type: 'set end',
@@ -31,26 +30,23 @@ export function updateStart (value) {
       ]
     } else if (value.position) {
       return updateStartPosition(value.position)
-    } else {
-      return geocode(value.label, features =>
-        updateStart({
-          label: value.label,
-          position: get(features, [0, 'center'])
-        })
-      )
     }
   } else {
     return [addActionLogItem('Clearing start'), setStart()]
   }
 }
 
-export const updateStartPosition = (position) => [
-  fetchAllTimesAndPathsForCoordinate(position),
-  setStart({position}), // so the marker updates quickly
-  reverseGeocode(position, features =>
-    setStart({position, label: features[0].place_name})
-  )
-]
+export const updateStartPosition = (position) => (dispatch, getState) => {
+  dispatch([
+    fetchAllTimesAndPathsForCoordinate(position),
+    setStart({position}) // so the marker updates quickly
+  ])
+
+  const {geocoder, map} = getState()
+  reverseGeocode(position, map.accessToken, geocoder).then(features => {
+    dispatch(setStart({position, label: features[0].place_name}))
+  })
+}
 
 /**
  * Update the end point
@@ -70,9 +66,11 @@ export const updateEnd = (value) => {
   }
 }
 
-export const updateEndPosition = (position) => [
-  setEnd({position}),
-  reverseGeocode(position, features =>
-    setEnd({position, label: features[0].place_name})
-  )
-]
+export const updateEndPosition = (position) => (dispatch, getState) => {
+  dispatch(setEnd({position}))
+
+  const {geocoder, map} = getState()
+  reverseGeocode(position, map.accessToken, geocoder).then(features => {
+    dispatch(setEnd({position, label: features[0].place_name}))
+  })
+}

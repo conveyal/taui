@@ -1,13 +1,14 @@
-import Icon from '@conveyal/woonerf/components/icon'
 import React from 'react'
 
 import message from '../message'
+
+import Icon from './icon'
 
 export default function Dock (props) {
   return <div className='Taui-Dock'>
     <div className='Taui-Dock-content'>
       <div className='title'>
-        <Icon type='map' />
+        <Icon icon='map' />
         {' '}
         {props.title || message('Title')}
       </div>

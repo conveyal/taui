@@ -1,5 +1,6 @@
-import Icon from '@conveyal/woonerf/components/icon'
 import React from 'react'
+
+import Icon from './icon'
 
 export default function RouteCard (p) {
   return (
@@ -12,7 +13,7 @@ export default function RouteCard (p) {
               onClick={p.downloadIsochrone}
               title='Download GeoJSON isochrone for network'
             >
-              <Icon type='download' />
+              <Icon icon='download' />
             </a>}
         </div>
       </div>

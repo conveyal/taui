@@ -1,5 +1,3 @@
-import get from 'lodash/get'
-
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
 import * as NetworkAPI from '../services/network'
 

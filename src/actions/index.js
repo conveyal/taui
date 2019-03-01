@@ -1,4 +1,3 @@
-import * as geocode from './geocode'
 import * as location from './location'
 import * as log from './log'
 import * as network from './network'
@@ -29,7 +28,6 @@ const updateMap = (payload) => ({
 })
 
 export default {
-  ...geocode,
   ...location,
   ...log,
   ...network,

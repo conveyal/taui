@@ -6,7 +6,7 @@ import React from 'react'
  * Create a marker based on the marker props. Update the position on drag end.
  */
 export default function useMarker (markerProps, map, position, events) {
-  const [marker, setMarker] = React.useState(() => new mapboxgl.Marker({
+  const [marker] = React.useState(() => new mapboxgl.Marker({
     draggable: true,
     ...markerProps
   }))

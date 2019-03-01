@@ -1,6 +1,8 @@
-import Icon from '@conveyal/woonerf/components/icon'
+import {faCog} from '@fortawesome/free-solid-svg-icons'
 import Cookies from 'js-cookie'
 import React from 'react'
+
+import Icon from './icon'
 
 // Example config
 const exampleConfigLink = 'https://github.com/conveyal/taui/blob/aa9e6285002d59b4b6ae38890229569311cc4b6d/config.json.tmp'
@@ -21,7 +23,7 @@ export default function ConfigCard (p) {
 
   return <div className='Card'>
     <div className='CardTitle'>
-      <Icon type='cog' /> Configure
+      <Icon icon={faCog} /> Configure
       <div className='CardLinks'>
         <a
           onClick={onClick}

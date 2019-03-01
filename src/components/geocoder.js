@@ -1,22 +1,21 @@
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
-import throttle from 'lodash/throttle'
 import React, {Component} from 'react'
-import Select from 'react-select'
+import Select from 'react-select/lib/Async'
 
 import message from '../message'
 
-import 'react-select/dist/react-select.css'
-
-const USE_GEOLOCATE = true
 const GEOLOCATE_VALUE = 'geolocate'
-const RATE_LIMIT = 500
 
-/**
- *
- */
+function featureToOption (feature) {
+  return {
+    data: feature,
+    label: feature.place_name,
+    value: feature.id
+  }
+}
+
 export default class Geocoder extends Component {
-  autocompleteCache = {}
   options = {}
 
   state = {
@@ -57,38 +56,11 @@ export default class Geocoder extends Component {
     return [...geolocateOptions, ...(p.options || [])]
   }
 
-  featureToOption = (feature) => {
-    return {
-      feature,
-      label: feature.place_name,
-      value: feature.id
-    }
+  loadOptions = (input, callback) => {
+    if (input && input.length < 4) return Promise.resolve([])
+    return this.props.geocode(input)
+      .then(features => features.map(featureToOption))
   }
-
-  loadOptions = throttle((input, callback) => {
-    if (!input) {
-      if (USE_GEOLOCATE && 'geolocation' in navigator) {
-        callback(null, {
-          options: this.defaultOptions()
-        })
-      } else {
-        callback(null)
-      }
-    } else {
-      // check if autocomplete query has been made before
-      const cachedOptions = this.autocompleteCache[input]
-      if (cachedOptions) {
-        return callback(null, {options: cachedOptions})
-      }
-
-      this.props.geocode(input, features => {
-        const options = features.map(this.featureToOption)
-        this.cacheOptions(options)
-        this.autocompleteCache[input] = options
-        callback(null, {options})
-      })
-    }
-  }, RATE_LIMIT)
 
   _onChange = (value) => {
     const p = this.props
@@ -99,7 +71,7 @@ export default class Geocoder extends Component {
         }
       })
       window.navigator.geolocation.getCurrentPosition(position => {
-        p.reverseGeocode(position.coords, feature => {
+        p.reverseGeocode(position.coords).then(feature => {
           const value = this.featureToOption(feature)
           this.setState({value})
           p.onChange && p.onChange(value)
@@ -111,21 +83,24 @@ export default class Geocoder extends Component {
           options: this.defaultOptions(),
           value
         })
+        p.onChange(null)
       } else {
         this.setState({value})
+        p.onChange(value.data)
       }
-      p.onChange && p.onChange(value && this.options[value.value])
     }
   }
 
   render () {
+    const s = this.state
     return (
-      <Select.Async
-        {...this.props} // clearable, placeholder
+      <Select
+        {...this.props} // isClearable, placeholder
         {...this.state} // options, value
-        autoBlur
         autoload={false}
-        cache={false}
+        blurInputOnSelect
+        cacheOptions={false}
+        defaultOptions={s.options}
         filterOptions={false}
         ignoreAccents={false}
         ignoreCase={false}

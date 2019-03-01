@@ -8,15 +8,15 @@ import Geocoder from './geocoder'
 function featureToLocation (f) {
   if (!f) return null
   return {
-    label: feature.place_name,
-    position: lonlat(feature.geometry.coordinates)
+    label: f.place_name,
+    position: lonlat(f.geometry.coordinates)
   }
 }
 
 export default function GeocodeSearch (p) {
   return <>
     <Geocoder
-      clearable={false}
+      isClearable={false}
       geocode={p.geocode}
       onChange={f => p.updateStart(featureToLocation(f))}
       placeholder={message('Geocoding.StartPlaceholder')}
@@ -25,6 +25,7 @@ export default function GeocodeSearch (p) {
     />
     {p.start &&
       <Geocoder
+        isClearable
         geocode={p.geocode}
         onChange={f => p.updateEnd(featureToLocation(f))}
         placeholder={message('Geocoding.StartPlaceholder')}

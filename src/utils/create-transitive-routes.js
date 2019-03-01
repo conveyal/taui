@@ -6,7 +6,6 @@ import uniqBy from 'lodash/uniqBy'
 import toUpperCase from 'lodash/upperCase'
 
 import {coordinateToIndex} from './coordinate-to-point'
-import {isLight} from './hex-color-contrast'
 
 const DEFAULT_ROUTE_COLOR = '0b2b40'
 const TYPE_TO_ICON = ['subway', 'subway', 'train', 'bus']
