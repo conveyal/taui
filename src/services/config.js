@@ -13,7 +13,7 @@ import {loadPointsOfInterest} from './points-of-interest'
  * and parse the query parameters. If there is a `start`, set the networks to
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
-export default async function config (initialState) {
+export default async function config (initialState = {}) {
   const data = {}
 
   // Create all of the fetches to run in parallel

@@ -6,7 +6,7 @@ describe('Services > Config', () => {
   })
 
   it('should correctly load all data', async () => {
-    const data = await configure({}, {}, {
+    const data = await configure({
     /*  networks: [{
         url: '' // add test data
       }],
