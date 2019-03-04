@@ -5,6 +5,7 @@ import fetch, {fetchMultiple} from '@conveyal/woonerf/fetch'
 import {retrieveConfig, storeConfig} from '../config'
 import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
 import type {LonLat} from '../types'
+import cacheURL from '../utils/cache-url'
 import coordinateToPoint, {pointToCoordinate} from '../utils/coordinate-to-point'
 import {parsePathsData, warnForInvalidPaths} from '../utils/parse-paths-data'
 import {parseTimesData} from '../utils/parse-times-data'
@@ -84,7 +85,7 @@ export const initialize = (startCoordinate?: LonLat) => (dispatch, getState) => 
     }
 
     dispatch(fetch({
-      url: 'config.json',
+      url: cacheURL('config.json'),
       next: response => {
         const c = response.value
         storeConfig(c)
@@ -131,7 +132,8 @@ export const loadDataset = (
   dispatch(fetchMultiple({
     fetches: networks.reduce((urls, n) => [
       ...urls,
-      {url: `${n.url}/request.json`}, {url: `${n.url}/transitive.json`}
+      {url: cacheURL(`${n.url}/request.json`)},
+      {url: cacheURL(`${n.url}/transitive.json`)}
     ], []),
     next: responses => {
       let offset = 0
@@ -214,41 +216,60 @@ const fetchTimesAndPathsForNetworkAtCoordinate = (network, coordinate, currentZo
   ]
 }
 
-const fetchTimesAndPathsForNetworkAtIndex = (network, originPoint, index) =>
-  fetchMultiple({
-    fetches: [
-      {
-        url: `${network.url}/${index}_times.dat`
-      },
-      {
-        url: `${network.url}/${index}_paths.dat`
-      }
-    ],
-    next: (error, responses) => {
+const fetchTimesAndPathsForNetworkAtIndex = (network, originPoint, index) => [
+  setNetwork({
+    ...network,
+    originPoint,
+    paths: null,
+    pathsPerTarget: null,
+    targets: null,
+    travelTimeSurface: null
+  }),
+  fetch({
+    url: cacheURL(`${network.url}/${index}_paths.dat`),
+    next: (error, response) => {
       if (error) {
         console.error(error)
-        if (error.status === 404) return logError('Data not available for these coordinates.')
-        return logError('Error while retrieving data for these coordinates.')
+        return logError(error.status === 400
+          ? 'Paths data not available for these coordinates.'
+          : 'Error while retrieving paths for these coordinates.')
       }
 
-      const [timesResponse, pathsResponse] = responses
-      const travelTimeSurface = parseTimesData(timesResponse.value)
-      const {paths, pathsPerTarget, targets} = parsePathsData(pathsResponse.value)
+      const {paths, pathsPerTarget, targets} = parsePathsData(response.value)
 
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'test') {
         warnForInvalidPaths(paths, network.transitive)
       }
 
       return [
-        logItem(`Found times and paths for ${index}...`),
+        logItem(`Found paths for ${index}...`),
         setNetwork({
-          ...network,
-          originPoint,
+          name: network.name,
           paths,
           pathsPerTarget,
-          targets,
+          targets
+        })
+      ]
+    }
+  }),
+  fetch({
+    url: cacheURL(`${network.url}/${index}_times.dat`),
+    next: (error, timesResponse) => {
+      if (error) {
+        console.error(error)
+        return logError(error.status === 400
+          ? 'Data not available for these coordinates.'
+          : 'Error while retrieving data for these coordinates.')
+      }
+
+      const travelTimeSurface = parseTimesData(timesResponse.value)
+      return [
+        logItem(`Found times for ${index}...`),
+        setNetwork({
+          name: network.name,
           travelTimeSurface
         })
       ]
     }
   })
+]

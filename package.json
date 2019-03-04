@@ -10,7 +10,7 @@
     "pretest": "yarn",
     "semantic-release": "semantic-release",
     "start": "mastarm build --serve",
-    "test": "mastarm lint src"
+    "test": "mastarm lint src && mastarm build"
   },
   "repository": {
     "type": "git",
@@ -28,27 +28,30 @@
   "homepage": "https://github.com/conveyal/taui",
   "dependencies": {
     "@conveyal/gridualizer": "^2.1.0",
-    "@conveyal/lonlat": "^1.3.0",
-    "@conveyal/woonerf": "^4.0.0",
+    "@conveyal/lonlat": "^1.4.0",
+    "@conveyal/woonerf": "^4.1.0",
     "@mapbox/polyline": "^1.0.0",
     "d3-scale": "^2.1.0",
     "date-fns": "^1.29.0",
-    "debug": "^3.1.0",
+    "debug": "^4.1.0",
     "isomorphic-fetch": "^2.2.1",
-    "jsolines": "^1.0.2",
+    "jsolines": "^2.1.0",
     "leaflet": "^1.3.4",
     "lodash": "^4.17.10",
-    "mastarm": "^4.3.1",
-    "react": "^16.5.1",
-    "react-dom": "^16.5.1",
+    "mastarm": "^4.4.2",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
     "react-leaflet": "^1.9.1",
+    "react-leaflet-vectorgrid": "^2.1.3",
     "react-redux": "^5.0.7",
     "react-select": "^1.2.1",
-    "redux": "^4.0.0",
-    "redux-actions": "^2.6.1",
+    "react-select-fast-filter-options": "^0.2.3",
+    "react-virtualized-select": "^3.1.3",
+    "redux": "^4.0.1",
+    "redux-actions": "^2.6.4",
     "redux-mock-store": "1.5.3",
-    "reselect": "^3.0.1",
-    "semantic-release": "^15.9.9"
+    "reselect": "^4.0.0",
+    "semantic-release": "^15.12.4"
   },
   "standard": {
     "parser": "babel-eslint"
