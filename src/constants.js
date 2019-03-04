@@ -23,11 +23,11 @@ export const darkBlue = '#103f5c'
 export const colors = [
   {
     hex: '#2389c9', // conveyal blue
-    rgb: { r: 31, g: 137, b: 201 }
+    rgb: {r: 31, g: 137, b: 201}
   },
   {
     hex: '#c92336', // red
-    rgb: { r: 201, g: 35, b: 54 }
+    rgb: {r: 201, g: 35, b: 54}
   }
 ]
 

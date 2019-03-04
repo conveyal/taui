@@ -6,7 +6,7 @@
     "build": "next build",
     "check-format": "prettier -l \"src/**/*.js\" \"pages/**/*.js\"",
     "dev": "next",
-    "format": "prettier \"src/**/*.js\" \"pages/**/*.js\"",
+    "format": "prettier --write \"src/**/*.js\" \"pages/**/*.js\"",
     "now-build": "next build",
     "predev": "yarn",
     "semantic-release": "semantic-release",
@@ -76,6 +76,7 @@
   },
   "prettier": {
     "bracketSpacing": false,
+    "singleQuote": true,
     "semi": false
   }
 }

@@ -5,6 +5,7 @@ notifications:
 node_js:
   - '10'
 scripts:
+  - yarn run check-format
   - yarn test
   - yarn run build
 after_success:

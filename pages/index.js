@@ -1,4 +1,4 @@
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
 import actions from '../src/actions'
 import Application from '../src/components/application'
@@ -12,7 +12,7 @@ import '../src/style.css'
 // Set the title
 if (typeof document !== 'undefined') document.title = message('Title')
 
-function mapStateToProps (state, ownProps) {
+function mapStateToProps(state, ownProps) {
   return {
     ...state,
     accessibility: select.accessibility(state, ownProps),
@@ -26,7 +26,7 @@ function mapStateToProps (state, ownProps) {
   }
 }
 
-Application.prototype.componentDidMount = async function componentDidMount () {
+Application.prototype.componentDidMount = async function componentDidMount() {
   const p = this.props
 
   try {

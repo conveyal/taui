@@ -1,5 +1,5 @@
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {
   faBus,
   faCompass,
@@ -32,6 +32,6 @@ library.add(
   faWrench
 )
 
-export default function Icon (p) {
+export default function Icon(p) {
   return <FontAwesomeIcon {...p} />
 }

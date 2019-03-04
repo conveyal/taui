@@ -1,6 +1,6 @@
 import * as qs from './utils/querystring'
 
-export default function reducer (state = {}, action) {
+export default function reducer(state = {}, action) {
   switch (action.type) {
     case 'add action log item':
       return {
@@ -62,12 +62,12 @@ export default function reducer (state = {}, action) {
   }
 }
 
-function setGrid (state, action) {
+function setGrid(state, action) {
   const grids = [...state.grids]
   const gridIndex = grids.findIndex(g => g.name === action.payload.name)
 
   if (gridIndex > -1) {
-    grids[gridIndex] = { ...grids[gridIndex], ...action.payload }
+    grids[gridIndex] = {...grids[gridIndex], ...action.payload}
   } else {
     grids.push(action.payload)
   }
@@ -81,8 +81,8 @@ function setGrid (state, action) {
 /**
  * Set start/end and save to querystring at the same time.
  */
-function setLocation (location) {
-  return function set (state, action) {
+function setLocation(location) {
+  return function set(state, action) {
     qs.setKeyTo(location, action.payload)
 
     return {
@@ -92,12 +92,12 @@ function setLocation (location) {
   }
 }
 
-function setNetwork (state, action) {
+function setNetwork(state, action) {
   const networks = [...state.networks]
   const networkIndex = networks.findIndex(n => n.name === action.payload.name)
 
   if (networkIndex > -1) {
-    networks[networkIndex] = { ...networks[networkIndex], ...action.payload }
+    networks[networkIndex] = {...networks[networkIndex], ...action.payload}
   } else {
     networks.push(action.payload)
   }
@@ -108,7 +108,7 @@ function setNetwork (state, action) {
   }
 }
 
-function updateMap (state, action) {
+function updateMap(state, action) {
   const map = {
     ...state.map,
     ...action.payload

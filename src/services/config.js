@@ -2,18 +2,18 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 
 import cacheURL from '../utils/cache-url'
-import { pointToCoordinate } from '../utils/coordinate-to-point'
+import {pointToCoordinate} from '../utils/coordinate-to-point'
 import fetch from '../utils/fetch'
 
-import { loadGrid } from './grid'
-import { loadPointsOfInterest } from './points-of-interest'
+import {loadGrid} from './grid'
+import {loadPointsOfInterest} from './points-of-interest'
 
 /**
  * Download the initial set of data and set the state accordingly. First, check
  * and parse the query parameters. If there is a `start`, set the networks to
  * loading. Second, load the grids. Third, gecode the starting parameters
  */
-export default async function config (initialState = {}) {
+export default async function config(initialState = {}) {
   const data = {}
 
   // Create all of the fetches to run in parallel
@@ -75,17 +75,17 @@ export default async function config (initialState = {}) {
   return data
 }
 
-function fetchTransitive (network) {
+function fetchTransitive(network) {
   return fetch(cacheURL(`${network.url}/transitive.json`)).then(res =>
     res.json()
   )
 }
 
-function fetchRequest (network) {
+function fetchRequest(network) {
   return fetch(cacheURL(`${network.url}/request.json`)).then(res => res.json())
 }
 
-function getCenterFromNetwork (network) {
+function getCenterFromNetwork(network) {
   const x = network.west + network.width / 2
   const y = network.north + network.height / 2
   const c = pointToCoordinate(x, y, network.zoom)

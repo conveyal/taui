@@ -6,7 +6,7 @@ const isServer = typeof window === 'undefined'
 const __APP__ = 'Taui'
 const __NRS__ = '__NEXT_REDUX_STORE__'
 
-export function getOrCreateStore (initialState) {
+export function getOrCreateStore(initialState) {
   // Always make a new store if server, otherwise state is shared between requests
   if (isServer) return createStore(initialState)
 

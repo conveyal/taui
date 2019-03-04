@@ -6,7 +6,7 @@ const warn = once(() =>
   )
 )
 
-export default function cacheifyUrl (url) {
+export default function cacheifyUrl(url) {
   if (process.env.CACHE_DATA === true) {
     warn()
     return `http://localhost:9966/tile?url=${url}`

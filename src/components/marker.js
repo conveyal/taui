@@ -1,8 +1,8 @@
 import React from 'react'
-import { Feature, Layer } from 'react-mapbox-gl'
+import {Feature, Layer} from 'react-mapbox-gl'
 
-export function createMarker (c) {
-  const { iconImage, iconAnchor, iconSize, ...rest } = c
+export function createMarker(c) {
+  const {iconImage, iconAnchor, iconSize, ...rest} = c
   const layout = {
     'icon-image': iconImage,
     'icon-anchor': iconAnchor || 'bottom',
@@ -12,9 +12,9 @@ export function createMarker (c) {
   return p => <Marker {...rest} {...p} layout={layout} />
 }
 
-export default function Marker (p) {
+export default function Marker(p) {
   return (
-    <Layer id={p.id} images={p.images} layout={p.layout} type='symbol'>
+    <Layer id={p.id} images={p.images} layout={p.layout} type="symbol">
       <Feature coordinates={[p.position.lon, p.position.lat]} draggable />
     </Layer>
   )

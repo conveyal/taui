@@ -5,13 +5,13 @@ import slice from 'lodash/slice'
 import uniqBy from 'lodash/uniqBy'
 import toUpperCase from 'lodash/upperCase'
 
-import { coordinateToIndex } from './coordinate-to-point'
+import {coordinateToIndex} from './coordinate-to-point'
 
 const DEFAULT_ROUTE_COLOR = '0b2b40'
 const TYPE_TO_ICON = ['subway', 'subway', 'train', 'bus']
 const WALK = 'WALK'
 
-export default function createTransitiveRoutesForNetwork (network, coordinates) {
+export default function createTransitiveRoutesForNetwork(network, coordinates) {
   const td = network.transitive
 
   // Get the targetPathIndexes
@@ -57,7 +57,7 @@ export default function createTransitiveRoutesForNetwork (network, coordinates) 
 /**
  * Used to show a transitive route
  */
-function addDataToPath (path) {
+function addDataToPath(path) {
   const segments = []
   let previousStop = path[0].fromStop
   for (let i = 0; i < path.length; i++) {

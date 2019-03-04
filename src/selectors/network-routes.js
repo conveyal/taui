@@ -1,7 +1,7 @@
 import lonlat from '@conveyal/lonlat'
 import get from 'lodash/get'
 import memoize from 'lodash/memoize'
-import { createSelector } from 'reselect'
+import {createSelector} from 'reselect'
 
 import createTransitiveRoutes from '../utils/create-transitive-routes'
 

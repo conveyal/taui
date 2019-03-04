@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect'
+import {createSelector} from 'reselect'
 
 import selectNetworkRoutes from './network-routes'
 
@@ -21,7 +21,7 @@ export default createSelector(
           typeof activeNetwork === 'string' &&
           activeNetwork !== network.name
         ) {
-          return { type: 'FeatureCollection', features: [] }
+          return {type: 'FeatureCollection', features: []}
         }
 
         // Convert to [lon, lat] coordinates
@@ -53,7 +53,7 @@ export default createSelector(
     )
 )
 
-function createSegmentFeatures (segment) {
+function createSegmentFeatures(segment) {
   if (segment.mode === WALK) {
     return [createWalkFeature(segment.coordinates)]
   }
@@ -78,7 +78,7 @@ function createSegmentFeatures (segment) {
   ]
 }
 
-function createStopFeature (stop) {
+function createStopFeature(stop) {
   return {
     type: 'Feature',
     properties: {
@@ -92,7 +92,7 @@ function createStopFeature (stop) {
   }
 }
 
-function createWalkFeature (coordinates) {
+function createWalkFeature(coordinates) {
   return {
     type: 'Feature',
     properties: {

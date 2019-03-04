@@ -1,7 +1,7 @@
 /**
  * Create a file and open a download dialog for a given POJO.
  */
-export default function downloadObjectAsJson ({ data, filename }) {
+export default function downloadObjectAsJson({data, filename}) {
   try {
     const out = JSON.stringify(data, null, '\t')
     const uri = `data:application/json;base64,${window.btoa(out)}`

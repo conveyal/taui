@@ -1,10 +1,10 @@
 import lonlat from '@conveyal/lonlat'
 import memoize from 'lodash/memoize'
 import dynamic from 'next/dynamic'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 
-import { colors } from '../constants'
-import { geocode, reverseGeocode } from '../services/geocode'
+import {colors} from '../constants'
+import {geocode, reverseGeocode} from '../services/geocode'
 import downloadJson from '../utils/download-json'
 
 import Dock from './dock'
@@ -15,8 +15,8 @@ import RouteSegments from './route-segments'
 import TimeCutoff from './time-cutoff'
 
 const Loader = () => (
-  <div className='Loader'>
-    <Icon icon='compass' spin />
+  <div className="Loader">
+    <Icon icon="compass" spin />
   </div>
 )
 
@@ -58,12 +58,12 @@ export default class Application extends Component {
     }
   })
 
-  render () {
+  render() {
     const p = this.props
     return (
       <div className={p.isLoading ? 'isLoading' : ''}>
-        <div className='Fullscreen'>
-          <div className='Taui-Map'>
+        <div className="Fullscreen">
+          <div className="Taui-Map">
             <Map
               {...p.map}
               end={p.end}
@@ -131,8 +131,7 @@ export default class Application extends Component {
                       }
                       showComparison={p.showComparison}
                     />
-                    {!!p.end &&
-                      !!p.start && (
+                    {!!p.end && !!p.start && (
                       <RouteSegments
                         active={network.name === p.activeNetwork}
                         oldTravelTime={
@@ -157,11 +156,11 @@ export default class Application extends Component {
   }
 }
 
-function Attribution () {
+function Attribution() {
   return (
-    <div className='Attribution'>
+    <div className="Attribution">
       site made by{' '}
-      <a href='https://www.conveyal.com' target='_blank'>
+      <a href="https://www.conveyal.com" target="_blank">
         conveyal
       </a>
     </div>

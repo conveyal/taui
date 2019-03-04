@@ -1,8 +1,8 @@
 import get from 'lodash/get'
 import reduceRight from 'lodash/reduceRight'
-import { createSelector } from 'reselect'
+import {createSelector} from 'reselect'
 
-import { colors } from '../constants'
+import {colors} from '../constants'
 import getIsochroneForNetwork from '../utils/get-isochrone-for-network'
 
 export default createSelector(

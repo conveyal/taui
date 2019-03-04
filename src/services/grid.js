@@ -2,7 +2,7 @@ import cacheURL from '../utils/cache-url'
 import createGrid from '../utils/create-grid'
 import fetch from '../utils/fetch'
 
-export function loadGrid (grid) {
+export function loadGrid(grid) {
   return fetch(cacheURL(grid.url))
     .then(res => res.arrayBuffer())
     .then(arrayBuffer => ({

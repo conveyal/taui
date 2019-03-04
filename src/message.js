@@ -1,4 +1,4 @@
-import message, { setMessages } from '@conveyal/woonerf/message'
+import message, {setMessages} from '@conveyal/woonerf/message'
 
 import Messages from '../i18n/en.json'
 

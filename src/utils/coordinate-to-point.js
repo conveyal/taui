@@ -4,7 +4,7 @@ import lonlat from '@conveyal/lonlat'
  * Project a coordinate to it's pixel coordinate and find the appropriate point
  * associated with it.
  */
-export default function coordinateToPoint (coordinate, zoom, west, north) {
+export default function coordinateToPoint(coordinate, zoom, west, north) {
   const pixel = lonlat.toPixel(coordinate, zoom)
 
   return {
@@ -16,8 +16,7 @@ export default function coordinateToPoint (coordinate, zoom, west, north) {
 /**
  * Convert a point to a coordinate
  */
-export const pointToCoordinate = (x, y, zoom) =>
-  lonlat.fromPixel({ x, y }, zoom)
+export const pointToCoordinate = (x, y, zoom) => lonlat.fromPixel({x, y}, zoom)
 
 /**
  * Get the index of a point based off the query width

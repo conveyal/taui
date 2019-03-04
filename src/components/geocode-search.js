@@ -5,7 +5,7 @@ import message from '../message'
 
 import Geocoder from './geocoder'
 
-function featureToLocation (f) {
+function featureToLocation(f) {
   if (!f) return null
   return {
     label: f.place_name,
@@ -13,7 +13,7 @@ function featureToLocation (f) {
   }
 }
 
-export default function GeocodeSearch (p) {
+export default function GeocodeSearch(p) {
   return (
     <>
       <Geocoder

@@ -5,7 +5,7 @@ const PATHS_GRID_TYPE = 'PATHGRID'
 /**
  * Parse the ArrayBuffer of a `*_paths.dat` file for a point in a network.
  */
-export function parsePathsData (ab) {
+export function parsePathsData(ab) {
   const headerData = new Int8Array(ab, 0, PATHS_GRID_TYPE.length)
   const headerType = String.fromCharCode(...headerData)
   if (headerType !== PATHS_GRID_TYPE) {
@@ -54,7 +54,7 @@ export function parsePathsData (ab) {
  * Checks each leg of a path ensuring that the pattern exists and the
  * stops in the leg are in the pattern.
  */
-export function warnForInvalidPaths (paths, td) {
+export function warnForInvalidPaths(paths, td) {
   const stopInAllData = id => hasStop(id, td.stops)
   paths.forEach(path => {
     path.forEach(leg => {

@@ -1,27 +1,24 @@
 import mapboxgl from 'mapbox-gl'
 import React from 'react'
 
-import { POI_ID as ID } from '../constants'
+import {POI_ID as ID} from '../constants'
 
 import useOnLoad from './use-on-load'
 
-const EmptyCollection = { type: 'FeatureCollection', features: [] }
+const EmptyCollection = {type: 'FeatureCollection', features: []}
 
-export default function usePointsOfInterest (map, poi) {
+export default function usePointsOfInterest(map, poi) {
   useOnLoad(initializePoi, map, [poi])
 
-  React.useEffect(
-    () => {
-      if (!map) return
-      const source = map.getSource(ID)
-      if (source) source.setData(poi || EmptyCollection)
-    },
-    [map, poi]
-  )
+  React.useEffect(() => {
+    if (!map) return
+    const source = map.getSource(ID)
+    if (source) source.setData(poi || EmptyCollection)
+  }, [map, poi])
 }
 
-function initializePoi (map, poi) {
-  map.addSource(ID, { type: 'geojson', data: poi || EmptyCollection })
+function initializePoi(map, poi) {
+  map.addSource(ID, {type: 'geojson', data: poi || EmptyCollection})
 
   map.addLayer({
     id: ID,

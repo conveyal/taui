@@ -4,7 +4,7 @@ import message from '../message'
 
 import PoiSelect from './poi-select'
 
-export default function PoiSearch (p) {
+export default function PoiSearch(p) {
   return (
     <>
       <PoiSelect

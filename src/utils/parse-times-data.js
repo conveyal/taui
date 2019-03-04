@@ -18,7 +18,7 @@ type TimesData = {
 /**
  * Parse the ArrayBuffer from a `*_times.dat` file for a point in a network.
  */
-export function parseTimesData (ab) {
+export function parseTimesData(ab) {
   const headerType = String.fromCharCode(
     ...new Int8Array(ab, 0, TIMES_GRID_TYPE.length)
   )

@@ -1,13 +1,13 @@
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import Select from 'react-select/lib/Async'
 
 import message from '../message'
 
 const GEOLOCATE_VALUE = 'geolocate'
 
-function featureToOption (feature) {
+function featureToOption(feature) {
   return {
     data: feature,
     label: feature.place_name,
@@ -23,38 +23,38 @@ export default class Geocoder extends Component {
     value: this.props.value || null
   }
 
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     if (props.options) {
       this.cacheOptions(props.options)
     }
   }
 
-  cacheOptions (options) {
+  cacheOptions(options) {
     options.forEach(o => {
       this.options[o.value] = o.feature
     })
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (!isEqual(nextProps.value, this.props.value)) {
-      this.setState({ value: nextProps.value })
+      this.setState({value: nextProps.value})
     }
   }
 
-  defaultOptions () {
+  defaultOptions() {
     const p = this.props
     const geolocateOptions =
       p.geolocate && 'geolocation' in navigator
         ? [
-          {
-            label: message(
-              'Geocoding.UseCurrentLocation',
-              'Use Current Location'
-            ),
-            value: GEOLOCATE_VALUE
-          }
-        ]
+            {
+              label: message(
+                'Geocoding.UseCurrentLocation',
+                'Use Current Location'
+              ),
+              value: GEOLOCATE_VALUE
+            }
+          ]
         : []
     return [...geolocateOptions, ...(p.options || [])]
   }
@@ -77,7 +77,7 @@ export default class Geocoder extends Component {
       window.navigator.geolocation.getCurrentPosition(position => {
         p.reverseGeocode(position.coords).then(feature => {
           const value = this.featureToOption(feature)
-          this.setState({ value })
+          this.setState({value})
           p.onChange && p.onChange(value)
         })
       })
@@ -89,13 +89,13 @@ export default class Geocoder extends Component {
         })
         p.onChange(null)
       } else {
-        this.setState({ value })
+        this.setState({value})
         p.onChange(value.data)
       }
     }
   }
 
-  render () {
+  render() {
     const s = this.state
     return (
       <Select
@@ -104,7 +104,7 @@ export default class Geocoder extends Component {
         autoload={false}
         blurInputOnSelect
         cacheOptions={false}
-        classNamePrefix='-select'
+        classNamePrefix="-select"
         defaultOptions={s.options}
         filterOptions={false}
         ignoreAccents={false}

@@ -1,6 +1,6 @@
-import { reverseGeocode } from '../services/geocode'
+import {reverseGeocode} from '../services/geocode'
 
-import { addActionLogItem } from './log'
+import {addActionLogItem} from './log'
 import {
   fetchAllTimesAndPathsForCoordinate,
   setNetworksToLoading
@@ -19,7 +19,7 @@ export const setStart = start => ({
 /**
  * Update the start
  */
-export function updateStart (value) {
+export function updateStart(value) {
   if (value) {
     if (value.label && value.position) {
       return [
@@ -39,12 +39,12 @@ export function updateStart (value) {
 export const updateStartPosition = position => (dispatch, getState) => {
   dispatch([
     fetchAllTimesAndPathsForCoordinate(position),
-    setStart({ position }) // so the marker updates quickly
+    setStart({position}) // so the marker updates quickly
   ])
 
-  const { geocoder, map } = getState()
+  const {geocoder, map} = getState()
   reverseGeocode(position, map.accessToken, geocoder).then(features => {
-    dispatch(setStart({ position, label: features[0].place_name }))
+    dispatch(setStart({position, label: features[0].place_name}))
   })
 }
 
@@ -64,10 +64,10 @@ export const updateEnd = value => {
 }
 
 export const updateEndPosition = position => (dispatch, getState) => {
-  dispatch(setEnd({ position }))
+  dispatch(setEnd({position}))
 
-  const { geocoder, map } = getState()
+  const {geocoder, map} = getState()
   reverseGeocode(position, map.accessToken, geocoder).then(features => {
-    dispatch(setEnd({ position, label: features[0].place_name }))
+    dispatch(setEnd({position, label: features[0].place_name}))
   })
 }

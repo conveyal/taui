@@ -1,10 +1,10 @@
-function set (opts) {
+function set(opts) {
   if (typeof window === 'undefined') return
   const queryString = encodeURIComponent(JSON.stringify(opts))
   window.history.pushState(null, document.title, `?search=${queryString}`)
 }
 
-function getAsObject () {
+function getAsObject() {
   if (typeof window === 'undefined') return {}
   const search = window.location.search.split('?search=')[1]
   if (!search) return {}
@@ -16,7 +16,7 @@ function getAsObject () {
   }
 }
 
-export function setKeyTo (key, value) {
+export function setKeyTo(key, value) {
   set({
     ...getAsObject(),
     [`${key}`]: value

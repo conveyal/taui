@@ -30,7 +30,7 @@
  * @param {Uint8Array} surface
  * @returns {Number} accessibility
  */
-export default function accessibilityForGrid ({
+export default function accessibilityForGrid({
   cutoff = 60,
   grid,
   network,
@@ -56,13 +56,13 @@ export default function accessibilityForGrid ({
 /**
  * Removed from the grid object itself.
  */
-function valueAtPoint (grid, x, y) {
+function valueAtPoint(grid, x, y) {
   if (!contains(grid, x, y)) {
     return 0
   }
   return grid.data[y * grid.width + x]
 }
 
-function contains (grid, x, y) {
+function contains(grid, x, y) {
   return x >= 0 && x < grid.width && y >= 0 && y < grid.height
 }

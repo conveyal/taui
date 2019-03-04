@@ -1,7 +1,7 @@
-import { ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY } from '../constants'
+import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
 import * as NetworkAPI from '../services/network'
 
-import { logError } from './log'
+import {logError} from './log'
 
 export const incrementFetches = () => ({
   type: 'increment fetches'
@@ -11,7 +11,7 @@ export const decrementFetches = () => ({
   type: 'decrement fetches'
 })
 
-export const setNetwork = payload => ({ type: 'set network', payload })
+export const setNetwork = payload => ({type: 'set network', payload})
 export const setActiveNetwork = payload => ({
   type: 'set active network',
   payload

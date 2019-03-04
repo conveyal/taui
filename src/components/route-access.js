@@ -6,7 +6,7 @@ import message from '../message'
 import Alert from './tr-alert'
 import Icon from './icon'
 
-export default function RouteAccess (p) {
+export default function RouteAccess(p) {
   if (p.grids.length === 0) {
     return <Alert>{message('Systems.NoGrids')}</Alert>
   }
@@ -20,7 +20,7 @@ export default function RouteAccess (p) {
   }
 
   return (
-    <tbody className='Opportunities'>
+    <tbody className="Opportunities">
       {p.grids.map((grid, i) => (
         <Opportunity grid={grid} key={grid.name}>
           <strong> {(p.accessibility[i] | 0).toLocaleString()} </strong>
@@ -38,9 +38,9 @@ export default function RouteAccess (p) {
   )
 }
 
-function Opportunity ({ children, grid }) {
+function Opportunity({children, grid}) {
   return (
-    <tr className='Opportunity' key={grid.name}>
+    <tr className="Opportunity" key={grid.name}>
       <td>
         <Icon icon={grid.icon} />
       </td>
@@ -51,7 +51,7 @@ function Opportunity ({ children, grid }) {
   )
 }
 
-function DiffPercentage ({ current, old }) {
+function DiffPercentage({current, old}) {
   const diff = ((current - old) / old) * 100
 
   // only show if the diff is >= 0.1%
@@ -59,16 +59,16 @@ function DiffPercentage ({ current, old }) {
 
   if (diff > 0) {
     return (
-      <span className='increase'>
-        (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' />)
+      <span className="increase">
+        (<strong>{diff.toFixed(1)}</strong>% <Icon icon="level-up-alt" />)
       </span>
     )
   }
 
   return (
-    <span className='decrease'>
+    <span className="decrease">
       (<strong>{diff.toFixed(1)}</strong>%{' '}
-      <Icon icon='level-up-alt' rotation={180} />)
+      <Icon icon="level-up-alt" rotation={180} />)
     </span>
   )
 }
