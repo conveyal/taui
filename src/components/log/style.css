@@ -23,4 +23,5 @@
   line-height: 15px;
   margin-right: 0.5rem;
   vertical-align: middle;
+  white-space: nowrap;
 }

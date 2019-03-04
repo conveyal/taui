@@ -6,16 +6,15 @@ import Icon from '../icon'
 
 import LogItem from './item'
 
-export default function Log(props) {
-  const {items} = props
-  const hasError = items[0] && items[0].level === 'error' ? 'hasError' : ''
+export default function Log(p) {
+  const hasError = p.items[0] && p.items[0].level === 'error' ? 'hasError' : ''
   return (
     <div className="Card">
       <div className="CardTitle">
         <Icon icon={faTerminal} /> {message('Log.Title')}
       </div>
       <div className={`Log ${hasError}`}>
-        {items.map((item, index) => (
+        {p.items.map((item, index) => (
           <LogItem {...item} key={index} />
         ))}
       </div>
