@@ -4,7 +4,9 @@
   "main": "src/index.js",
   "scripts": {
     "build": "next build",
+    "check-format": "prettier -l \"src/**/*.js\" \"pages/**/*.js\"",
     "dev": "next",
+    "format": "prettier \"src/**/*.js\" \"pages/**/*.js\"",
     "now-build": "next build",
     "predev": "yarn",
     "semantic-release": "semantic-release",
@@ -58,7 +60,22 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^24.1.0",
     "jest": "^24.1.0",
+    "prettier": "^1.16.4",
     "regenerator-runtime": "^0.13.1",
     "semantic-release": "^15.13.3"
+  },
+
+  "babel": {
+    "presets": ["next/babel"]
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "<rootDir>/.next/",
+      "<rootDir>/node_modules/"
+    ]
+  },
+  "prettier": {
+    "bracketSpacing": false,
+    "semi": false
   }
 }
