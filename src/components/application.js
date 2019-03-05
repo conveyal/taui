@@ -23,7 +23,7 @@ const Loader = () => (
 // Certain components depend on config options, so dynamically load them
 const ConfigCard = dynamic(() => import('./config-card'))
 const Log = dynamic(() => import('./log'))
-const GeocodeSearch = dynamic(() => import('./geocode-search'))
+const GeocodeSearch = dynamic(() => import('./geocode-search'), {ssr: false})
 const PoiSearch = dynamic(() => import('./poi-search'))
 
 // Cannot import map on the server

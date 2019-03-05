@@ -5,7 +5,7 @@ import nextCookies from 'next-cookies'
 import React from 'react'
 import {Provider} from 'react-redux'
 
-// import defaultStore from '../store.json'
+import emptyStore from '../empty-store.json'
 import {getOrCreateStore} from '../src/with-redux-store'
 
 function tryParse(v) {
@@ -14,7 +14,7 @@ function tryParse(v) {
   } catch (e) {
     console.error('Error parsing JSON.')
     console.error(v)
-    return {}
+    return emptyStore
   }
 }
 
