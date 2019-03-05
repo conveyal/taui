@@ -1,80 +1,73 @@
-// @flow
-import lonlat from '@conveyal/lonlat'
-
-import type {Location, LonLat} from '../types'
-import {setValues} from '../utils/hash'
+import {reverseGeocode} from '../services/geocode'
 
 import {addActionLogItem} from './log'
 import {
   fetchAllTimesAndPathsForCoordinate,
   setNetworksToLoading
 } from './network'
-import {reverseGeocode} from './geocode'
 
-const setLocation = (which: 'end' | 'start', location?: Location) => {
-  if (location) {
-    setValues({
-      [`${which}`]: location.label,
-      [`${which}Coordinate`]: location.position
-        ? lonlat.toString(location.position)
-        : null
-    })
-  } else {
-    setValues({
-      [`${which}`]: null,
-      [`${which}Coordinate`]: null
-    })
-  }
-}
+export const setEnd = end => ({
+  type: 'set end',
+  payload: end
+})
 
-export const setEnd = (end: any) => {
-  setLocation('end', end)
-  return {
-    type: 'set end',
-    payload: end
-  }
-}
-
-export const setStart = (start: any) => {
-  setLocation('start', start)
-  return {
-    type: 'set start',
-    payload: start
-  }
-}
+export const setStart = start => ({
+  type: 'set start',
+  payload: start
+})
 
 /**
  * Update the start
  */
-export const updateStart = (value?: Location) =>
-  value && value.label && value.position
-    ? [
-      setNetworksToLoading(),
-      addActionLogItem(`Updating start to ${value.label}`),
-      setStart(value),
-      fetchAllTimesAndPathsForCoordinate(value.position)
-    ]
-    : [
-      addActionLogItem('Clearing start'),
-      setStart()
-    ]
+export function updateStart(value) {
+  if (value) {
+    if (value.label && value.position) {
+      return [
+        setNetworksToLoading(),
+        addActionLogItem(`Updating start to ${value.label}`),
+        setStart(value),
+        fetchAllTimesAndPathsForCoordinate(value.position)
+      ]
+    } else if (value.position) {
+      return updateStartPosition(value.position)
+    }
+  } else {
+    return [addActionLogItem('Clearing start'), setStart()]
+  }
+}
 
-export const updateStartPosition = (position: LonLat) => [
-  reverseGeocode(position, features =>
-    setStart({position, label: features[0].place_name})
-  ),
-  fetchAllTimesAndPathsForCoordinate(position)
-]
+export const updateStartPosition = position => (dispatch, getState) => {
+  dispatch([
+    fetchAllTimesAndPathsForCoordinate(position),
+    setStart({position}) // so the marker updates quickly
+  ])
+
+  const {geocoder, map} = getState()
+  reverseGeocode(position, map.accessToken, geocoder).then(features => {
+    dispatch(setStart({position, label: features[0].place_name}))
+  })
+}
 
 /**
  * Update the end point
  */
-export const updateEnd = (value?: Location) => [
-  addActionLogItem(value ? `Updating end to ${value.label}` : 'Clearing end'),
-  setEnd(value)
-]
+export const updateEnd = value => {
+  if (value) {
+    if (value.label && value.position) {
+      return [addActionLogItem(`Updating end to ${value.label}`), setEnd(value)]
+    } else if (value.position) {
+      return updateEndPosition(value.position)
+    }
+  } else {
+    return [addActionLogItem('Clearing end'), setEnd()]
+  }
+}
 
-export const updateEndPosition = (position: LonLat) =>
-  reverseGeocode(position, features =>
-    setEnd({position, label: features[0].place_name})
-  )
+export const updateEndPosition = position => (dispatch, getState) => {
+  dispatch(setEnd({position}))
+
+  const {geocoder, map} = getState()
+  reverseGeocode(position, map.accessToken, geocoder).then(features => {
+    dispatch(setEnd({position, label: features[0].place_name}))
+  })
+}

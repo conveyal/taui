@@ -1,26 +1,23 @@
-// @flow
+import {faTerminal} from '@fortawesome/free-solid-svg-icons'
 import React from 'react'
 
-import type {LogItems} from '../../types'
+import message from '../../message'
+import Icon from '../icon'
 
 import LogItem from './item'
 
-type Props = {
-  items: LogItems
-}
-
-export default class Log extends React.PureComponent {
-  props: Props
-
-  render () {
-    const {items} = this.props
-    const hasError = items[0] && items[0].level === 'error' ? 'hasError' : ''
-    return (
+export default function Log(p) {
+  const hasError = p.items[0] && p.items[0].level === 'error' ? 'hasError' : ''
+  return (
+    <div className="Card">
+      <div className="CardTitle">
+        <Icon icon={faTerminal} /> {message('Log.Title')}
+      </div>
       <div className={`Log ${hasError}`}>
-        {this.props.items.map((item, index) => (
+        {p.items.map((item, index) => (
           <LogItem {...item} key={index} />
         ))}
       </div>
-    )
-  }
+    </div>
+  )
 }

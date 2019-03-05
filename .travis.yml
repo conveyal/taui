@@ -1,16 +1,12 @@
 sudo: false
 language: node_js
-cache:
-  yarn: true
 notifications:
   email: false
 node_js:
-  - '8'
-before_install:
-  - yarn global add codecov
+  - '10'
 scripts:
-  - yarn test -- --coverage --coverage-paths src/**/*.js
-  - codecov
+  - yarn run check-format
+  - yarn test
   - yarn run build
 after_success:
   - yarn run semantic-release
