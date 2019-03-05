@@ -1,59 +1,24 @@
-// @flow
-import Icon from '@conveyal/woonerf/components/icon'
 import React from 'react'
 
-type Props = {
-  cardColor: string,
-  children?: any,
-  downloadIsochrone?: Function,
-  setShowOnMap: Function,
-  showOnMap: boolean,
-  title: string
-}
+import Icon from './icon'
 
-export default class RouteCard extends React.PureComponent<Props> {
-  render () {
-    const p = this.props
-    const {
-      cardColor,
-      children,
-      downloadIsochrone,
-      setShowOnMap,
-      showOnMap,
-      title
-    } = this.props
-    return (
-      <div
-        className={'Card'}
-      >
-        <div
-          className='CardTitle'
-          onClick={p.setShowOnMap}
-          onMouseOver={p.onMouseOver}
-          style={{
-            backgroundColor: cardColor,
-            cursor: 'pointer'
-          }}
-        >
-          {title}
-          <div className='CardLinks'>
+export default function RouteCard(p) {
+  return (
+    <div className={'Card'}>
+      <div className="CardTitle" style={{backgroundColor: p.cardColor}}>
+        {p.title}
+        <div className="CardLinks">
+          {p.downloadIsochrone && (
             <a
-              onClick={setShowOnMap}
-              title='Show/hide isochrone for network'
+              onClick={p.downloadIsochrone}
+              title="Download GeoJSON isochrone for network"
             >
-              {showOnMap ? <Icon type='eye-slash' /> : <Icon type='eye' />}
+              <Icon icon="download" />
             </a>
-            {downloadIsochrone &&
-              <a
-                onClick={downloadIsochrone}
-                title='Download GeoJSON isochrone for network'
-              >
-                <Icon type='download' />
-              </a>}
-          </div>
+          )}
         </div>
-        <table className='CardContent'>{children}</table>
       </div>
-    )
-  }
+      <table className="CardContent">{p.children}</table>
+    </div>
+  )
 }

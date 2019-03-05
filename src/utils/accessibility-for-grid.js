@@ -1,6 +1,3 @@
-// @flow
-import type {Grid, Query} from '../types'
-
 /**
  * Get the cumulative accessibility number for a cutoff from a travel time
  * surface. This function always calculates _average_ accessibility. Calculating
@@ -33,17 +30,12 @@ import type {Grid, Query} from '../types'
  * @param {Uint8Array} surface
  * @returns {Number} accessibility
  */
-export default function accessibilityForGrid ({
+export default function accessibilityForGrid({
   cutoff = 60,
   grid,
   network,
   surface
-}: {
-  cutoff: number,
-  grid: Grid,
-  network: Query,
-  surface: Uint8Array
-}): number {
+}) {
   let accessibility = 0
   for (let pixel = 0, y = 0; y < network.height; y++) {
     for (let x = 0; x < network.width; x++, pixel++) {
@@ -53,10 +45,24 @@ export default function accessibilityForGrid ({
       if (travelTime <= cutoff) {
         const gridx = x + network.west - grid.west
         const gridy = y + network.north - grid.north
-        accessibility += grid.valueAtPoint(gridx, gridy)
+        accessibility += valueAtPoint(grid, gridx, gridy)
       }
     }
   }
 
   return accessibility
+}
+
+/**
+ * Removed from the grid object itself.
+ */
+function valueAtPoint(grid, x, y) {
+  if (!contains(grid, x, y)) {
+    return 0
+  }
+  return grid.data[y * grid.width + x]
+}
+
+function contains(grid, x, y) {
+  return x >= 0 && x < grid.width && y >= 0 && y < grid.height
 }
