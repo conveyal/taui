@@ -1,4 +1,3 @@
-import {ACCESSIBILITY_IS_LOADING, ACCESSIBILITY_IS_EMPTY} from '../constants'
 import * as NetworkAPI from '../services/network'
 
 import {logError} from './log'
@@ -16,25 +15,6 @@ export const setActiveNetwork = payload => ({
   type: 'set active network',
   payload
 })
-
-export const setNetworksAccessibilityTo = value => (dispatch, getState) => {
-  const state = getState()
-  dispatch(
-    state.networks.map(network =>
-      setNetwork({
-        ...network,
-        accessibility: value,
-        paths: null,
-        targets: null,
-        travelTimeSurface: null
-      })
-    )
-  )
-}
-export const setNetworksToLoading = () =>
-  setNetworksAccessibilityTo(ACCESSIBILITY_IS_LOADING)
-export const setNetworksToEmpty = () =>
-  setNetworksAccessibilityTo(ACCESSIBILITY_IS_EMPTY)
 
 export const fetchAllTimesAndPathsForCoordinate = coordinate => (
   dispatch,

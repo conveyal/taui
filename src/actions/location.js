@@ -1,10 +1,7 @@
 import {reverseGeocode} from '../services/geocode'
 
 import {addActionLogItem} from './log'
-import {
-  fetchAllTimesAndPathsForCoordinate,
-  setNetworksToLoading
-} from './network'
+import {fetchAllTimesAndPathsForCoordinate} from './network'
 
 export const setEnd = end => ({
   type: 'set end',
@@ -23,7 +20,6 @@ export function updateStart(value) {
   if (value) {
     if (value.label && value.position) {
       return [
-        setNetworksToLoading(),
         addActionLogItem(`Updating start to ${value.label}`),
         setStart(value),
         fetchAllTimesAndPathsForCoordinate(value.position)

@@ -1,6 +1,3 @@
-export const ACCESSIBILITY_IS_EMPTY = 'accessibility-is-empty'
-export const ACCESSIBILITY_IS_LOADING = 'accessibility-is-loading'
-
 export const POI_ID = 'taui-points-of-interest-layer'
 
 // URLS
@@ -32,25 +29,3 @@ export const colors = [
 
 export const cutoffs = [10, 20, 30, 40, 50, 60]
 export const opacities = [1, 0.2, 0.2, 0.2, 0.2, 0.2]
-
-export const WALK_STYLE = {
-  color: '#333',
-  dashArray: '5, 5',
-  lineCap: 'butt',
-  lineMeter: 'miter',
-  weight: 5
-}
-
-export const TRANSIT_STYLE = {
-  color: 'green',
-  weight: 5
-}
-
-export const STOP_STYLE = {
-  color: '#333',
-  fill: true,
-  fillColor: '#fff',
-  fillOpacity: 1,
-  radius: 3,
-  weight: 2
-}
