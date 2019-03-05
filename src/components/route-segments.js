@@ -1,112 +1,114 @@
-// @flow
-import Icon from '@conveyal/woonerf/components/icon'
-import message from '@conveyal/woonerf/message'
+import uniqBy from 'lodash/uniqBy'
+import React from 'react'
+
+import message from '../message'
 
 import Alert from './tr-alert'
+import Icon from './icon'
 
-export default function RouteSegments ({routeSegments, oldTravelTime, travelTime}) {
-  if (routeSegments.length === 0) {
+export default function RouteSegments(p) {
+  if (p.routeSegments.length === 0) {
     return <Alert>{message('Systems.TripsEmpty')}</Alert>
   }
 
-  const [bestJourney, ...alternateJourneys] = routeSegments
+  const [bestJourney, ...alternateJourneys] = uniqBy(p.routeSegments, r =>
+    r.map(s => s.name).join('-')
+  )
 
   return (
     <tbody>
-      <tr className='BestTrip'>
-        <td><span className='fa fa-street-view' /></td>
+      <tr className="BestTrip">
         <td>
-          <span>Trip duration </span>
-          {travelTime > 120
-            ? <span className='decrease'>inaccessible within 120 minutes</span>
-            : <span>
-              <strong> {travelTime}</strong> {message('Units.Mins')}
+          <Icon icon="clock" />
+        </td>
+        <td>
+          {p.travelTime > 120 ? (
+            <span className="decrease">Inaccessible within 120 minutes</span>
+          ) : (
+            <>
+              Trip duration
+              <strong> {p.travelTime}</strong> {message('Units.Mins')}
+              &nbsp;
               <TripDiff
-                baseTravelTime={oldTravelTime}
-                travelTime={travelTime}
+                baseTravelTime={p.oldTravelTime}
+                travelTime={p.travelTime}
               />
-            </span>}
+            </>
+          )}
         </td>
       </tr>
       <tr>
-        <td></td>
+        <td>{p.active && <Icon icon="street-view" />}</td>
         <td>
-          <span>Take </span>
-          {bestJourney.map((segment, index) => (
-            <span>
-              <Segment
-                key={index}
-                segment={segment}
-              />
-              {index !== bestJourney.length - 1 && 'to '}
-            </span>
-          ))}
+          Take <Segments segments={bestJourney} />
         </td>
       </tr>
-      {routeSegments.length > 1 &&
-        <tr className='AlternateTrips'>
-          <td></td>
+      {alternateJourneys.length > 0 && (
+        <tr>
+          <td />
           <td>
-            <span>{message('Systems.AlternateTripsTitle')} </span>
-            {alternateJourneys.map((segments, jindex) => (
-              <span key={jindex}>
-                {segments.map((segment, index) => (
-                  <span>
-                    <Segment
-                      key={index}
-                      segment={segment}
-                    />
-                    {index !== segments.length - 1 && 'to '}
-                  </span>
-                ))}
-                {jindex < alternateJourneys.length - 1 && <span>or </span>}
-              </span>
+            {message('Systems.AlternateTripsTitle')}
+            &nbsp;
+            {alternateJourneys.map((segments, i) => (
+              <React.Fragment key={i}>
+                <Segments segments={segments} />
+                {i < alternateJourneys.length - 1 && ' or '}
+              </React.Fragment>
             ))}
           </td>
-        </tr>}
+        </tr>
+      )}
     </tbody>
   )
 }
 
-const Segment = ({segment}) => (
-  <span
-    className='CardSegment'
-    style={{
-      backgroundColor: segment.backgroundColor || 'inherit',
-      color: segment.color || 'inherit',
-      textShadow: `0 0 1px ${segment.color === '#fff' ? '#333' : '#fff'}`
-    }}
-    title={segment.name}
-  >
-    <i className={`fa fa-${segment.type}`} /> {segment.name}
-  </span>
-)
+function Segments(p) {
+  return p.segments
+    .filter(s => s.mode !== 'WALK')
+    .map((segment, i, segments) => (
+      <React.Fragment key={i}>
+        <span
+          className="CardSegment"
+          style={{borderColor: segment.routeColor}}
+          title={segment.name}
+        >
+          <Icon icon={segment.mode} /> {segment.name}
+        </span>
+        {i !== segments.length - 1 && ' to '}
+      </React.Fragment>
+    ))
+}
 
-function TripDiff ({baseTravelTime, travelTime}) {
+function TripDiff({baseTravelTime, travelTime}) {
   if (baseTravelTime === 2147483647) {
     return (
-      <span className='increase'>&nbsp;({message('NewTrip')} <Icon type='star' />)</span>
+      <span className="increase">
+        ({message('NewTrip')} <Icon icon="star" />)
+      </span>
     )
   } else if (travelTime === 2147483647) {
     return (
-      <span className='decrease'>&nbsp;(<strong>> {120 - baseTravelTime}</strong>% <span className='fa fa-level-up' />)</span>
+      <span className="decrease">
+        (<strong> {120 - baseTravelTime}</strong>% <Icon icon="level-up-alt" />)
+      </span>
     )
   }
 
-  const diff = (travelTime - baseTravelTime) / baseTravelTime * 100
+  const diff = ((travelTime - baseTravelTime) / baseTravelTime) * 100
   if (isNaN(diff) || Math.abs(diff) < 0.1) return null
 
   if (diff > 0) {
     return (
-      <span className='decrease'>
-        (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up' />)
+      <span className="decrease">
+        (<strong>{diff.toFixed(1)}</strong>% <Icon icon="level-up-alt" />)
       </span>
     )
   }
 
   return (
-    <span className='increase'>
-      (<strong>{diff.toFixed(1)}</strong>% <span className='fa fa-level-up fa-rotate-180' />)
+    <span className="increase">
+      (<strong>{diff.toFixed(1)}</strong>%{' '}
+      <Icon icon="level-up-alt" rotation={180} />)
     </span>
   )
 }

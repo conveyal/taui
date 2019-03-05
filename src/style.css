@@ -1,0 +1,260 @@
+@import url(components/log/style.css);
+
+/** Colors from https://palx.jxnblk.com/2389c9 **/
+
+:root {
+  --bold: 500;
+  --rad: 4px;
+
+  --dark-blue: #103f5c;
+  --blue: #2389c9;
+  --orange: #c96323;
+  --red: #c92336;
+  --green: #36c923;
+
+  --anchor-hover-color: #333;
+  --shadow: #333;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+.pull-right {
+  float: right;
+}
+.-select__control {
+  margin-bottom: 0.5rem;
+}
+
+html,
+body {
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  color: var(--dark-blue);
+}
+
+.Taui-Map {
+  height: 100vh;
+}
+
+.Loader {
+  opacity: 0.4;
+  font-size: 2rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -1rem;
+  margin-top: -1rem;
+}
+
+.isLoading .Taui-Map {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.Taui-Dock {
+  background-color: var(--dark-blue);
+  position: absolute;
+  width: 414px;
+  top: 0;
+  left: 0;
+  height: 100%;
+  box-shadow: 0 0 25px 0 var(--shadow);
+}
+
+.Taui-Dock-content {
+  position: relative;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.Taui-Dock-content .heading {
+  color: rgba(255, 255, 255, 1);
+  text-shadow: 0 0 1px var(--shadow);
+  margin: 1rem 0 0.5rem;
+  font-weight: var(--bold);
+}
+
+.Taui-Dock-content .heading a {
+  color: rgba(255, 255, 255, 1);
+  text-shadow: 0 0 1px var(--shadow);
+  cursor: pointer;
+}
+
+.Taui-Dock-content .title {
+  color: rgba(255, 255, 255, 1);
+  text-shadow: 0 0 1px var(--shadow);
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  font-weight: var(--bold);
+}
+
+.Taui-ActionLog {
+  display: block;
+  bottom: 0;
+  height: 5rem;
+  background-color: #fff;
+  padding: 0.5rem 1rem;
+}
+
+.TimeCutoff {
+  display: flex;
+  margin: 0.5rem 0 1rem;
+}
+
+.TimeCutoff .Time {
+  font-weight: var(--bold);
+  color: rgba(255, 255, 255, 1);
+  text-shadow: 0 0 1px var(--shadow);
+}
+
+.TimeCutoff input[type='range'] {
+  margin-left: 1rem;
+  flex: auto;
+}
+
+.Card {
+  background-color: #fff;
+  border-radius: var(--rad);
+  cursor: pointer;
+  margin-top: 1rem;
+  border: 1px solid #fff;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.Card pre {
+  overflow-x: scroll;
+  font-size: 0.8rem;
+}
+
+.Card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  min-height: 200px;
+  border: none;
+  border-radius: var(--rad);
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.CardTitle {
+  color: rgba(255, 255, 255, 1);
+  text-shadow: 0 0 1px var(--shadow);
+  background-color: var(--blue);
+  padding: 1rem 4rem 1rem 1rem;
+  font-weight: var(--bold);
+  position: relative;
+}
+
+.CardLinks {
+  position: absolute;
+  top: 1rem;
+  right: 0;
+}
+
+.CardLinks > a {
+  cursor: pointer;
+  padding: 0 1rem;
+}
+
+.CardLinks > a:hover {
+  color: var(--anchor-hover-color);
+  text-shadow: 0 0 1px #fff;
+}
+
+.Card > .CardTitle {
+  border-radius: var(--rad) var(--rad) 0 0;
+}
+
+.CardContent {
+  color: var(--dark-blue);
+  padding: 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  min-height: 4rem;
+}
+
+.CardBands {
+  border-spacing: 0;
+  width: 100%;
+}
+
+.CardBands td {
+  padding: 0.5rem 1rem;
+}
+
+table.CardContent {
+  padding: 0.25rem 0;
+  border-spacing: 1rem 0.5rem;
+  line-height: 1.5rem;
+}
+
+table.CardContent td {
+  vertical-align: top;
+}
+
+table.CardContent td:first-of-type {
+  text-align: center;
+}
+
+.CardContent .alert {
+  color: var(--red);
+}
+
+.Attribution {
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 1px var(--shadow);
+}
+
+.Attribution a {
+  color: #fff;
+  background: url(https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png)
+    no-repeat;
+  padding: 2.2rem 0 2.2rem 2.2rem;
+  display: inline-block;
+  background-size: 2rem;
+  background-position: left;
+  background-position-x: left;
+  background-position-y: center;
+}
+
+.CardSegment {
+  border: 1px solid;
+  border-radius: var(--rad);
+  padding: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.Card .increase {
+  color: var(--green);
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.Card .decrease {
+  color: var(--red);
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.mapboxgl-popup {
+  font-size: 1.1rem;
+}
+
+.Fullscreen {
+  position: absolute;
+  height: 100%;
+  right: 0;
+  left: 414px;
+  overflow: hidden;
+}

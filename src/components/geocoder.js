@@ -1,36 +1,21 @@
-// @flow
-import message from '@conveyal/woonerf/message'
+import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
-import throttle from 'lodash/throttle'
 import React, {Component} from 'react'
-import Select from 'react-select'
+import Select from 'react-select/lib/Async'
 
-import type {Location, MapboxFeature} from '../types'
+import message from '../message'
 
-const USE_GEOLOCATE = true
 const GEOLOCATE_VALUE = 'geolocate'
-const RATE_LIMIT = 500
 
-type ReactSelectOption = {
-  feature: MapboxFeature,
-  label: string,
-  value: string
+function featureToOption(feature) {
+  return {
+    data: feature,
+    label: feature.place_name,
+    value: feature.id
+  }
 }
 
-type Props = {
-  geocode: (string, Function) => void,
-  onChange: any => void,
-  options: ReactSelectOption[],
-  placeholder: string,
-  reverseGeocode: (string, Function) => void,
-  value: null | Location
-}
-
-/**
- *
- */
-export default class Geocoder extends Component<Props> {
-  autocompleteCache = {}
+export default class Geocoder extends Component {
   options = {}
 
   state = {
@@ -38,88 +23,62 @@ export default class Geocoder extends Component<Props> {
     value: this.props.value || null
   }
 
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     if (props.options) {
       this.cacheOptions(props.options)
     }
   }
 
-  cacheOptions (options: ReactSelectOption[]) {
+  cacheOptions(options) {
     options.forEach(o => {
       this.options[o.value] = o.feature
     })
   }
 
-  componentWillReceiveProps (nextProps: Props) {
+  componentWillReceiveProps(nextProps) {
     if (!isEqual(nextProps.value, this.props.value)) {
       this.setState({value: nextProps.value})
     }
   }
 
-  defaultOptions () {
+  defaultOptions() {
     const p = this.props
-    const geolocateOptions = p.geolocate && 'geolocation' in navigator
-      ? [{
-        label: message(
-          'Geocoding.UseCurrentLocation',
-          'Use Current Location'
-        ),
-        value: GEOLOCATE_VALUE
-      }]
-      : []
+    const geolocateOptions =
+      p.geolocate && 'geolocation' in navigator
+        ? [
+            {
+              label: message(
+                'Geocoding.UseCurrentLocation',
+                'Use Current Location'
+              ),
+              value: GEOLOCATE_VALUE
+            }
+          ]
+        : []
     return [...geolocateOptions, ...(p.options || [])]
   }
 
-  featureToOption = (feature: MapboxFeature) => {
-    return {
-      feature,
-      label: feature.place_name,
-      value: feature.id
-    }
+  loadOptions = (input, callback) => {
+    if (input && input.length < 4) return Promise.resolve([])
+    return this.props
+      .geocode(input)
+      .then(features => features.map(featureToOption))
   }
 
-  loadOptions = throttle((input: string, callback: Function) => {
-    const {geocode} = this.props
-    if (!input) {
-      if (USE_GEOLOCATE && 'geolocation' in navigator) {
-        callback(null, {
-          options: this.defaultOptions()
-        })
-      } else {
-        callback(null)
-      }
-    } else {
-      // check if autocomplete query has been made before
-      const cachedOptions = this.autocompleteCache[input]
-      if (cachedOptions) {
-        return callback(null, {options: cachedOptions})
-      }
-
-      geocode(input, features => {
-        const options = features.map(this.featureToOption)
-        this.cacheOptions(options)
-        this.autocompleteCache[input] = options
-        callback(null, {options})
-      })
-    }
-  }, RATE_LIMIT)
-
-  _onChange = (value?: ReactSelectOption) => {
-    const {onChange, reverseGeocode} = this.props
-    if (value && value.value === GEOLOCATE_VALUE) {
+  _onChange = value => {
+    const p = this.props
+    if (get(value, 'value') === GEOLOCATE_VALUE) {
       this.setState({
         value: {
           label: message('Geocoding.FindingLocation', 'Locating you...')
         }
       })
       window.navigator.geolocation.getCurrentPosition(position => {
-        reverseGeocode(position.coords, feature => {
+        p.reverseGeocode(position.coords).then(feature => {
           const value = this.featureToOption(feature)
-          this.setState({
-            value
-          })
-          onChange && onChange(value)
+          this.setState({value})
+          p.onChange && p.onChange(value)
         })
       })
     } else {
@@ -128,20 +87,25 @@ export default class Geocoder extends Component<Props> {
           options: this.defaultOptions(),
           value
         })
+        p.onChange(null)
       } else {
         this.setState({value})
+        p.onChange(value.data)
       }
-      this.props.onChange &&
-        this.props.onChange(value && this.options[value.value])
     }
   }
 
-  render () {
+  render() {
+    const s = this.state
     return (
-      <Select.Async
-        autoBlur
+      <Select
+        {...this.props} // isClearable, placeholder
+        {...this.state} // options, value
         autoload={false}
-        cache={false}
+        blurInputOnSelect
+        cacheOptions={false}
+        classNamePrefix="-select"
+        defaultOptions={s.options}
         filterOptions={false}
         ignoreAccents={false}
         ignoreCase={false}
@@ -149,10 +113,18 @@ export default class Geocoder extends Component<Props> {
         minimumInput={3}
         onBlurResetsInput={false}
         onChange={this._onChange}
-        options={this.state.options}
-        placeholder={this.props.placeholder}
         searchPromptText={message('Geocoding.PromptText')}
-        value={this.state.value}
+        theme={t => ({
+          ...t,
+          colors: {
+            ...t.colors,
+            primary: '#fff'
+          },
+          spacing: {
+            ...t.spacing,
+            baseUnit: 6
+          }
+        })}
       />
     )
   }

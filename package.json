@@ -3,14 +3,16 @@
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
   "scripts": {
-    "build": "mastarm build",
-    "deploy": "mastarm deploy",
-    "predeploy": "yarn",
-    "prestart": "yarn",
-    "pretest": "yarn",
+    "build": "next build",
+    "check-format": "prettier -l \"src/**/*.js\" \"pages/**/*.js\"",
+    "dev": "next",
+    "format": "prettier --write \"src/**/*.js\" \"pages/**/*.js\"",
+    "now-build": "next build",
+    "predev": "yarn",
     "semantic-release": "semantic-release",
-    "start": "mastarm build --serve",
-    "test": "mastarm lint src && mastarm build"
+    "start": "next start",
+    "test": "jest",
+    "test-debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "repository": {
     "type": "git",
@@ -27,33 +29,54 @@
   },
   "homepage": "https://github.com/conveyal/taui",
   "dependencies": {
-    "@conveyal/gridualizer": "^2.1.0",
     "@conveyal/lonlat": "^1.4.0",
     "@conveyal/woonerf": "^4.1.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.15",
+    "@fortawesome/free-solid-svg-icons": "^5.7.2",
+    "@fortawesome/react-fontawesome": "^0.1.4",
     "@mapbox/polyline": "^1.0.0",
-    "d3-scale": "^2.1.0",
-    "date-fns": "^1.29.0",
-    "debug": "^4.1.0",
-    "isomorphic-fetch": "^2.2.1",
-    "jsolines": "^2.1.0",
-    "leaflet": "^1.3.4",
+    "@zeit/next-css": "^1.0.1",
+    "js-cookie": "^2.2.0",
+    "jsolines": "^2.1.1",
     "lodash": "^4.17.10",
-    "mastarm": "^4.4.2",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
-    "react-leaflet": "^1.9.1",
-    "react-leaflet-vectorgrid": "^2.1.3",
-    "react-redux": "^5.0.7",
-    "react-select": "^1.2.1",
+    "mapbox-gl": "^0.53.1",
+    "next": "v8.0.3",
+    "next-cookies": "^1.1.2",
+    "node-fetch": "^2.3.0",
+    "normalize.css": "^8.0.1",
+    "react": "v16.8.3",
+    "react-dom": "v16.8.3",
+    "react-modal": "^3.8.1",
+    "react-redux": "^6.0.1",
+    "react-select": "^2.4.1",
     "react-select-fast-filter-options": "^0.2.3",
     "react-virtualized-select": "^3.1.3",
     "redux": "^4.0.1",
-    "redux-actions": "^2.6.4",
-    "redux-mock-store": "1.5.3",
     "reselect": "^4.0.0",
-    "semantic-release": "^15.12.4"
+    "whatwg-fetch": "^3.0.0"
   },
-  "standard": {
-    "parser": "babel-eslint"
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^24.1.0",
+    "jest": "^24.1.0",
+    "prettier": "^1.16.4",
+    "regenerator-runtime": "^0.13.1",
+    "semantic-release": "^15.13.3"
+  },
+
+  "babel": {
+    "presets": ["next/babel"]
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "<rootDir>/.next/",
+      "<rootDir>/node_modules/"
+    ]
+  },
+  "prettier": {
+    "bracketSpacing": false,
+    "singleQuote": true,
+    "semi": false
   }
 }

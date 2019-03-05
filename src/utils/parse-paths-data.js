@@ -1,14 +1,11 @@
-// @flow
 import find from 'lodash/find'
-
-import type {Leg, PathsData, TransitiveData} from '../types'
 
 const PATHS_GRID_TYPE = 'PATHGRID'
 
 /**
  * Parse the ArrayBuffer of a `*_paths.dat` file for a point in a network.
  */
-export function parsePathsData (ab: ArrayBuffer): PathsData {
+export function parsePathsData(ab) {
   const headerData = new Int8Array(ab, 0, PATHS_GRID_TYPE.length)
   const headerType = String.fromCharCode(...headerData)
   if (headerType !== PATHS_GRID_TYPE) {
@@ -34,7 +31,10 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
     distinctPaths.push(legList)
   }
 
-  const targetPathIndexes = new Int32Array(ab, (2 + offset) * Int32Array.BYTES_PER_ELEMENT)
+  const targetPathIndexes = new Int32Array(
+    ab,
+    (2 + offset) * Int32Array.BYTES_PER_ELEMENT
+  )
   let previousValue = 0
   for (let i = 0, position = 0; i < nTargets; i++) {
     for (let j = 0; j < pathsPerTarget; j++, position++) {
@@ -54,7 +54,7 @@ export function parsePathsData (ab: ArrayBuffer): PathsData {
  * Checks each leg of a path ensuring that the pattern exists and the
  * stops in the leg are in the pattern.
  */
-export function warnForInvalidPaths (paths: Leg[][], td: TransitiveData) {
+export function warnForInvalidPaths(paths, td) {
   const stopInAllData = id => hasStop(id, td.stops)
   paths.forEach(path => {
     path.forEach(leg => {
