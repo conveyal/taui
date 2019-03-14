@@ -13,6 +13,13 @@ export const setStart = start => ({
   payload: start
 })
 
+export const onMapClick = v => (dispatch, getState) => {
+  const state = getState()
+  const {clickAction} = state.map
+  if (clickAction === 'end') dispatch(updateEnd(v))
+  else if (clickAction === 'start') dispatch(updateStart(v))
+}
+
 /**
  * Update the start
  */

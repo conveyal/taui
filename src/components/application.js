@@ -73,7 +73,9 @@ export default class Application extends Component {
               grids={p.grids}
               isochrones={p.isochrones}
               networkGeoJSONRoutes={p.networkGeoJSONRoutes}
+              onMapClick={p.onMapClick}
               pointsOfInterest={p.pointsOfInterest}
+              setMapClickAction={p.setMapClickAction}
               start={p.start}
               updateEnd={p.updateEnd}
               updateMap={p.updateMap}
