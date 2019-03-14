@@ -58,6 +58,9 @@ export default class Application extends Component {
     }
   })
 
+  _onMouseEnterCard = memoize(name => () => this.props.setActiveNetwork(name))
+  _onMouseLeaveCard = () => this.props.setActiveNetwork(null)
+
   render() {
     const p = this.props
     return (
@@ -100,8 +103,8 @@ export default class Application extends Component {
           <TimeCutoff cutoff={p.timeCutoff} setCutoff={p.setTimeCutoff} />
           {p.networks.map((network, index) => (
             <div
-              onMouseEnter={() => p.setActiveNetwork(network.name)}
-              onMouseLeave={() => p.setActiveNetwork(null)}
+              onMouseEnter={this._onMouseEnterCard(network.name)}
+              onMouseLeave={this._onMouseLeaveCard}
               key={`${index}-route-card`}
             >
               <RouteCard

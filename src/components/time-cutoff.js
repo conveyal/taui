@@ -19,6 +19,11 @@ export default function TimeCutoff(p) {
     }
   }, [animating, p.cutoff])
 
+  const onClickAnimate = React.useCallback(() => {
+    setAnimating(true)
+    p.setCutoff(10)
+  }, [p.setCutoff, setAnimating])
+
   return (
     <>
       <div className="heading">
@@ -26,10 +31,7 @@ export default function TimeCutoff(p) {
         {animating || (
           <a
             className="pull-right"
-            onClick={() => {
-              setAnimating(true)
-              p.setCutoff(10)
-            }}
+            onClick={onClickAnimate}
           >
             <Icon icon="play" />
           </a>

@@ -14,12 +14,21 @@ function featureToLocation(f) {
 }
 
 export default function GeocodeSearch(p) {
+  const onChangeStart = React.useCallback(
+    f => p.updateStart(featureToLocation(f)),
+    [p.updateStart]
+  )
+  const onChangeEnd = React.useCallback(
+    f => p.updateEnd(featureToLocation(f)),
+    [p.updateEnd]
+  )
+
   return (
     <>
       <Geocoder
         isClearable={false}
         geocode={p.geocode}
-        onChange={f => p.updateStart(featureToLocation(f))}
+        onChange={onChangeStart}
         placeholder={message('Geocoding.StartPlaceholder')}
         reverseGeocode={p.reverseGeocode}
         value={p.start}
@@ -28,7 +37,7 @@ export default function GeocodeSearch(p) {
         <Geocoder
           isClearable
           geocode={p.geocode}
-          onChange={f => p.updateEnd(featureToLocation(f))}
+          onChange={onChangeEnd}
           placeholder={message('Geocoding.StartPlaceholder')}
           reverseGeocode={p.reverseGeocode}
           value={p.end}

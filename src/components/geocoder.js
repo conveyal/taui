@@ -1,11 +1,46 @@
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
-import React, {Component} from 'react'
+import React from 'react'
 import Select from 'react-select/lib/Async'
 
 import message from '../message'
 
 const GEOLOCATE_VALUE = 'geolocate'
+
+const noOptionsMessage = ({inputValue}) => inputValue && inputValue.length > 3
+  ? 'No options found'
+  : message('Geocoding.PromptText')
+
+const reactSelectStyles = {
+  control (provided, state) {
+    const style = {...provided, borderWidth: 0, boxShadow: 'none'}
+    if (state.menuIsOpen) {
+      return {
+        ...style,
+        borderRadius: '4px 4px 0 0'
+      }
+    } else {
+      return style
+    }
+  },
+  menuList: p => ({...p, padding: 0}),
+  menu: p => ({...p, borderRadius: '0 0 4px 4px'})
+}
+
+function reactSelectTheme (t, state) {
+  return {
+    ...t,
+    colors: {
+      ...t.colors,
+      primary: '#fff'
+    },
+    spacing: {
+      ...t.spacing,
+      baseUnit: 6,
+      menuGutter: 0
+    }
+  }
+}
 
 function featureToOption(feature) {
   return {
@@ -15,30 +50,16 @@ function featureToOption(feature) {
   }
 }
 
-export default class Geocoder extends Component {
+export default class Geocoder extends React.PureComponent {
   options = {}
 
   state = {
-    options: this.defaultOptions(),
-    value: this.props.value || null
+    options: this.defaultOptions()
   }
 
-  constructor(props, context) {
-    super(props, context)
-    if (props.options) {
-      this.cacheOptions(props.options)
-    }
-  }
-
-  cacheOptions(options) {
-    options.forEach(o => {
-      this.options[o.value] = o.feature
-    })
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!isEqual(nextProps.value, this.props.value)) {
-      this.setState({value: nextProps.value})
+  static getDerivedStateFromProps (props) {
+    return {
+      value: props.value
     }
   }
 
@@ -111,20 +132,12 @@ export default class Geocoder extends Component {
         ignoreCase={false}
         loadOptions={this.loadOptions}
         minimumInput={3}
+        noOptionsMessage={noOptionsMessage}
         onBlurResetsInput={false}
         onChange={this._onChange}
         searchPromptText={message('Geocoding.PromptText')}
-        theme={t => ({
-          ...t,
-          colors: {
-            ...t.colors,
-            primary: '#fff'
-          },
-          spacing: {
-            ...t.spacing,
-            baseUnit: 6
-          }
-        })}
+        styles={reactSelectStyles}
+        theme={reactSelectTheme}
       />
     )
   }
