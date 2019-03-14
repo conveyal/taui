@@ -14,6 +14,8 @@ export default function ConfigCard(p) {
     try {
       const json = JSON.parse(ref.current.value)
       Cookies.set('tauiConfig', json)
+      // Clear the search string before reloading
+      window.history.pushState(null, document.title, '')
       window.location.reload(true)
     } catch (e) {
       console.error(e)
