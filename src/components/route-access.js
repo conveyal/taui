@@ -20,7 +20,7 @@ export default function RouteAccess(p) {
   }
 
   return (
-    <tbody className="Opportunities">
+    <tbody className='Opportunities'>
       {p.grids.map((grid, i) => (
         <Opportunity grid={grid} key={grid.name}>
           <strong> {(p.accessibility[i] | 0).toLocaleString()} </strong>
@@ -40,7 +40,7 @@ export default function RouteAccess(p) {
 
 function Opportunity({children, grid}) {
   return (
-    <tr className="Opportunity" key={grid.name}>
+    <tr className='Opportunity' key={grid.name}>
       <td>
         <Icon icon={grid.icon} />
       </td>
@@ -59,16 +59,16 @@ function DiffPercentage({current, old}) {
 
   if (diff > 0) {
     return (
-      <span className="increase">
-        (<strong>{diff.toFixed(1)}</strong>% <Icon icon="level-up-alt" />)
+      <span className='increase'>
+        (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' />)
       </span>
     )
   }
 
   return (
-    <span className="decrease">
+    <span className='decrease'>
       (<strong>{diff.toFixed(1)}</strong>%{' '}
-      <Icon icon="level-up-alt" rotation={180} />)
+      <Icon icon='level-up-alt' rotation={180} />)
     </span>
   )
 }

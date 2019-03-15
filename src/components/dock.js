@@ -6,10 +6,10 @@ import Icon from './icon'
 
 export default function Dock(props) {
   return (
-    <div className="Taui-Dock">
-      <div className="Taui-Dock-content">
-        <div className="title">
-          <Icon icon="map" /> {props.title || message('Title')}
+    <div className='Taui-Dock'>
+      <div className='Taui-Dock-content'>
+        <div className='title'>
+          <Icon icon='map' /> {props.title || message('Title')}
         </div>
         {props.componentError && (
           <div>

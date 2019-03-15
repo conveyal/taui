@@ -14,7 +14,7 @@ export function createMarker(c) {
 
 export default function Marker(p) {
   return (
-    <Layer id={p.id} images={p.images} layout={p.layout} type="symbol">
+    <Layer id={p.id} images={p.images} layout={p.layout} type='symbol'>
       <Feature coordinates={[p.position.lon, p.position.lat]} draggable />
     </Layer>
   )

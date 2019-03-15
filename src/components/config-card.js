@@ -25,18 +25,18 @@ export default function ConfigCard(p) {
   const defaultValue = JSON.stringify(p.cookieConfig || {}, null, '  ')
 
   return (
-    <div className="Card">
-      <div className="CardTitle">
+    <div className='Card'>
+      <div className='CardTitle'>
         <Icon icon={faCog} /> Configure
-        <div className="CardLinks">
-          <a onClick={onClick} title="Update config and reload the page">
+        <div className='CardLinks'>
+          <a onClick={onClick} title='Update config and reload the page'>
             save config
           </a>
         </div>
       </div>
-      <div className="CardContent">
+      <div className='CardContent'>
         <br />
-        <a href={exampleConfigLink} target="_blank">
+        <a href={exampleConfigLink} target='_blank'>
           See example config
         </a>
       </div>

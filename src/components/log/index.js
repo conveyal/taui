@@ -9,8 +9,8 @@ import LogItem from './item'
 export default function Log(p) {
   const hasError = p.items[0] && p.items[0].level === 'error' ? 'hasError' : ''
   return (
-    <div className="Card">
-      <div className="CardTitle">
+    <div className='Card'>
+      <div className='CardTitle'>
         <Icon icon={faTerminal} /> {message('Log.Title')}
       </div>
       <div className={`Log ${hasError}`}>

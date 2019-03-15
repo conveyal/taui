@@ -76,6 +76,7 @@
   },
   "prettier": {
     "bracketSpacing": false,
+    "jsxSingleQuote": true,
     "singleQuote": true,
     "semi": false
   }

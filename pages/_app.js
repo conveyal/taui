@@ -21,13 +21,11 @@ function tryParse(v, backup) {
 
 const iconLink = 'https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png'
 
-function parseCookie (ctx) {
+function parseCookie(ctx) {
   // Get the configuration from the cookies
   const {tauiConfig} = nextCookies(ctx)
   const cookieConfig =
-    typeof tauiConfig === 'string'
-      ? tryParse(tauiConfig, {})
-      : tauiConfig || {}
+    typeof tauiConfig === 'string' ? tryParse(tauiConfig, {}) : tauiConfig || {}
 
   return omit(cookieConfig, ['allowChangeConfig'])
 }
@@ -37,9 +35,7 @@ export default class TauiApp extends App {
     const defaultStore = tryParse(process.env.STORE, emptyStore)
 
     // Ignore cookie config if customization is not allowed
-    const cookieConfig = defaultStore.allowChangeConfig
-      ? parseCookie(ctx)
-      : {}
+    const cookieConfig = defaultStore.allowChangeConfig ? parseCookie(ctx) : {}
 
     // Get the query string parameters
     const queryConfig =
@@ -47,11 +43,7 @@ export default class TauiApp extends App {
 
     // Create the store with the initial state prioritizing:
     // query string > cookie config > store.json
-    const configs = [
-      defaultStore,
-      cookieConfig,
-      queryConfig
-    ]
+    const configs = [defaultStore, cookieConfig, queryConfig]
     const reduxStore = getOrCreateStore(merge(...configs))
 
     return {
@@ -71,7 +63,7 @@ export default class TauiApp extends App {
       <>
         <Head>
           <title>{appProps.initialReduxState.title}</title>
-          <link rel="shortcut icon" href={iconLink} type="image/x-icon" />
+          <link rel='shortcut icon' href={iconLink} type='image/x-icon' />
         </Head>
         <Container>
           <Provider store={this.reduxStore}>

@@ -15,8 +15,8 @@ import RouteSegments from './route-segments'
 import TimeCutoff from './time-cutoff'
 
 const Loader = () => (
-  <div className="Loader">
-    <Icon icon="compass" spin />
+  <div className='Loader'>
+    <Icon icon='compass' spin />
   </div>
 )
 
@@ -65,8 +65,8 @@ export default class Application extends Component {
     const p = this.props
     return (
       <div className={p.isLoading ? 'isLoading' : ''}>
-        <div className="Fullscreen">
-          <div className="Taui-Map">
+        <div className='Fullscreen'>
+          <div className='Taui-Map'>
             <Map
               {...p.map}
               end={p.end}
@@ -163,9 +163,9 @@ export default class Application extends Component {
 
 function Attribution() {
   return (
-    <div className="Attribution">
+    <div className='Attribution'>
       site made by{' '}
-      <a href="https://www.conveyal.com" target="_blank">
+      <a href='https://www.conveyal.com' target='_blank'>
         conveyal
       </a>
     </div>

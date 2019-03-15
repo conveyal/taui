@@ -17,13 +17,13 @@ export default function RouteSegments(p) {
 
   return (
     <tbody>
-      <tr className="BestTrip">
+      <tr className='BestTrip'>
         <td>
-          <Icon icon="clock" />
+          <Icon icon='clock' />
         </td>
         <td>
           {p.travelTime > 120 ? (
-            <span className="decrease">Inaccessible within 120 minutes</span>
+            <span className='decrease'>Inaccessible within 120 minutes</span>
           ) : (
             <>
               Trip duration
@@ -38,7 +38,7 @@ export default function RouteSegments(p) {
         </td>
       </tr>
       <tr>
-        <td>{p.active && <Icon icon="street-view" />}</td>
+        <td>{p.active && <Icon icon='street-view' />}</td>
         <td>
           Take <Segments segments={bestJourney} />
         </td>
@@ -68,7 +68,7 @@ function Segments(p) {
     .map((segment, i, segments) => (
       <React.Fragment key={i}>
         <span
-          className="CardSegment"
+          className='CardSegment'
           style={{borderColor: segment.routeColor}}
           title={segment.name}
         >
@@ -82,14 +82,14 @@ function Segments(p) {
 function TripDiff({baseTravelTime, travelTime}) {
   if (baseTravelTime === 2147483647) {
     return (
-      <span className="increase">
-        ({message('NewTrip')} <Icon icon="star" />)
+      <span className='increase'>
+        ({message('NewTrip')} <Icon icon='star' />)
       </span>
     )
   } else if (travelTime === 2147483647) {
     return (
-      <span className="decrease">
-        (<strong> {120 - baseTravelTime}</strong>% <Icon icon="level-up-alt" />)
+      <span className='decrease'>
+        (<strong> {120 - baseTravelTime}</strong>% <Icon icon='level-up-alt' />)
       </span>
     )
   }
@@ -99,16 +99,16 @@ function TripDiff({baseTravelTime, travelTime}) {
 
   if (diff > 0) {
     return (
-      <span className="decrease">
-        (<strong>{diff.toFixed(1)}</strong>% <Icon icon="level-up-alt" />)
+      <span className='decrease'>
+        (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' />)
       </span>
     )
   }
 
   return (
-    <span className="increase">
+    <span className='increase'>
       (<strong>{diff.toFixed(1)}</strong>%{' '}
-      <Icon icon="level-up-alt" rotation={180} />)
+      <Icon icon='level-up-alt' rotation={180} />)
     </span>
   )
 }

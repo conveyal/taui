@@ -14,8 +14,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 
 const containerStyle = {height: '100%', width: '100%'}
 
-const legendStyle = {
-}
+const legendStyle = {}
 
 // Always use the same markers
 const startMarkerProps = {color: darkBlue}

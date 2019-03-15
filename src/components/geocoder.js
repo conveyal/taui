@@ -7,12 +7,13 @@ import message from '../message'
 
 const GEOLOCATE_VALUE = 'geolocate'
 
-const noOptionsMessage = ({inputValue}) => inputValue && inputValue.length > 3
-  ? 'No options found'
-  : message('Geocoding.PromptText')
+const noOptionsMessage = ({inputValue}) =>
+  inputValue && inputValue.length > 3
+    ? 'No options found'
+    : message('Geocoding.PromptText')
 
 const reactSelectStyles = {
-  control (provided, state) {
+  control(provided, state) {
     const style = {...provided, borderWidth: 0, boxShadow: 'none'}
     if (state.menuIsOpen) {
       return {
@@ -27,7 +28,7 @@ const reactSelectStyles = {
   menu: p => ({...p, borderRadius: '0 0 4px 4px'})
 }
 
-function reactSelectTheme (t, state) {
+function reactSelectTheme(t, state) {
   return {
     ...t,
     colors: {
@@ -57,7 +58,7 @@ export default class Geocoder extends React.PureComponent {
     options: this.defaultOptions()
   }
 
-  static getDerivedStateFromProps (props) {
+  static getDerivedStateFromProps(props) {
     return {
       value: props.value
     }
@@ -125,7 +126,7 @@ export default class Geocoder extends React.PureComponent {
         autoload={false}
         blurInputOnSelect
         cacheOptions={false}
-        classNamePrefix="-select"
+        classNamePrefix='-select'
         defaultOptions={s.options}
         filterOptions={false}
         ignoreAccents={false}

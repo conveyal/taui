@@ -26,25 +26,22 @@ export default function TimeCutoff(p) {
 
   return (
     <>
-      <div className="heading">
+      <div className='heading'>
         {message('Strings.HighlightAreaAccessibleWithin')}
         {animating || (
-          <a
-            className="pull-right"
-            onClick={onClickAnimate}
-          >
-            <Icon icon="play" />
+          <a className='pull-right' onClick={onClickAnimate}>
+            <Icon icon='play' />
           </a>
         )}
       </div>
-      <div className="TimeCutoff">
-        <div className="Time">
+      <div className='TimeCutoff'>
+        <div className='Time'>
           {p.cutoff} {message('Units.Minutes')}
         </div>
         <input
           disabled={animating}
           onChange={e => p.setCutoff(parseInt(e.currentTarget.value, 10))}
-          type="range"
+          type='range'
           min={10}
           max={120}
           step={1}
