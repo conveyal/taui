@@ -15,14 +15,6 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 const containerStyle = {height: '100%', width: '100%'}
 
 const legendStyle = {
-  backgroundColor: '#fff',
-  borderRadius: '4px',
-  boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.1)',
-  cursor: 'pointer'
-}
-
-const legendButtonStyle = {
-  padding: '10px'
 }
 
 // Always use the same markers
@@ -50,38 +42,66 @@ export default function Map(p) {
     <>
       <div ref={mapRef} style={containerStyle} />
       <div className='mapboxgl-ctrl-bottom-right'>
-        <div className='mapboxgl-ctrl' style={legendStyle}>
+        <div className={`mapboxgl-ctrl ${p.clickAction}`}>
+          <div>click map to:</div>
           <div
-            className={p.clickAction === 'start' ? 'active' : ''}
-            style={legendButtonStyle}
+            className='startButton'
             onClick={() => p.updateMap({clickAction: 'start'})}
           >
-            <Icon icon='map-marker-alt' />&nbsp;&nbsp;set start
+            <Icon
+              icon='map-marker-alt'
+              color={p.clickAction === 'start' ? 'white' : darkBlue}
+              transform='shrink-4'
+            />
+            &nbsp;set start
           </div>
           <div
-            className={p.clickAction === 'end' ? 'active' : ''}
-            style={legendButtonStyle}
+            className='endButton'
             onClick={() => p.updateMap({clickAction: 'end'})}
           >
-            <Icon icon='map-marker-alt' color={colors[1].hex} />&nbsp;&nbsp;set end
+            <Icon
+              icon='map-marker-alt'
+              color={p.clickAction === 'end' ? 'white' : colors[1].hex}
+              transform='shrink-4'
+            />
+            &nbsp;set end
           </div>
         </div>
         <style jsx>{`
+          .mapboxgl-ctrl {
+            padding: 0 4px 4px 4px;
+            margin-bottom: 25px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+            text-align: center;
+          }
+
           .mapboxgl-ctrl > div {
-            opacity: 0.5;
+            padding: 5px 13px;
+            margin-top: 4px;
+            border-radius: 100px;
           }
 
-          .mapboxgl-ctrl > div:hover {
+          .mapbox-ctrl > div > .svg-inline--fa {
+            display: inline-block;
+            margin-bottom: -1.5px;
+          }
+
+          .end > .startButton:hover,
+          .start > .endButton:hover {
             background-color: rgba(0, 0, 0, 0.05);
-            opacity: 1;
+            cursor: pointer;
           }
 
-          .mapboxgl-ctrl > div.active {
-            opacity: 1;
+          .end > .endButton {
+            background-color: ${colors[1].hex};
+            color: white;
           }
 
-          .mapboxgl-ctrl > div + div {
-            border-top: 1px solid #ddd;
+          .start > .startButton {
+            background-color: ${darkBlue};
+            color: white;
           }
         `}</style>
       </div>
