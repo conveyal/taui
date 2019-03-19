@@ -20,11 +20,11 @@ const iconStyle = {
   marginRight: '5px'
 }
 
-const MapControl = p =>
+const MapControl = p => (
   <div className='mapboxgl-ctrl-bottom-right'>
     <div
       className='mapboxgl-ctrl mapboxgl-ctrl-group'
-      style={{'pointerEvents': 'auto'}}
+      style={{pointerEvents: 'auto'}}
     >
       {p.children}
     </div>
@@ -39,6 +39,7 @@ const MapControl = p =>
       }
     `}</style>
   </div>
+)
 
 const Button = React.memo(p => {
   const style = {
@@ -46,21 +47,17 @@ const Button = React.memo(p => {
     color: p.color
   }
   if (p.active) {
-     style.borderColor = p.color
+    style.borderColor = p.color
   }
 
   return (
-    <div
-      onClick={p.onClick}
-      style={style}
-    >
+    <div onClick={p.onClick} style={style}>
       {p.children}
     </div>
   )
 })
 
-
-export default function MapClickControl (p) {
+export default function MapClickControl(p) {
   const startActive = p.clickAction === 'start'
 
   return (
