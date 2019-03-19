@@ -32,7 +32,8 @@ function parseCookie(ctx) {
 
 export default class TauiApp extends App {
   static async getInitialProps({ctx}) {
-    const defaultStore = tryParse(process.env.STORE, emptyStore)
+    const store = tryParse(process.env.STORE, {})
+    const defaultStore = merge({}, emptyStore, store)
 
     // Ignore cookie config if customization is not allowed
     const cookieConfig = defaultStore.allowChangeConfig ? parseCookie(ctx) : {}
@@ -43,7 +44,7 @@ export default class TauiApp extends App {
 
     // Create the store with the initial state prioritizing:
     // query string > cookie config > store.json
-    const configs = [defaultStore, cookieConfig, queryConfig]
+    const configs = [{}, defaultStore, cookieConfig, queryConfig]
     const reduxStore = getOrCreateStore(merge(...configs))
 
     return {

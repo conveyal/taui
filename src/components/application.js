@@ -24,6 +24,7 @@ const Loader = () => (
 const ConfigCard = dynamic(() => import('./config-card'))
 const Log = dynamic(() => import('./log'))
 const GeocodeSearch = dynamic(() => import('./geocode-search'), {ssr: false})
+const Info = dynamic(() => import('./info'))
 const PoiSearch = dynamic(() => import('./poi-search'))
 
 // Cannot import map on the server
@@ -33,6 +34,8 @@ const Map = dynamic(() => import('./map'), {
 })
 
 export default class Application extends Component {
+  state = {}
+
   _geocode = text => {
     const p = this.props
     return geocode(text, p.map.accessToken, p.geocoder)
@@ -60,11 +63,15 @@ export default class Application extends Component {
 
   _onMouseEnterCard = memoize(name => () => this.props.setActiveNetwork(name))
   _onMouseLeaveCard = () => this.props.setActiveNetwork(null)
+  _showInfo = () => this.setState({showInfo: true})
+  _hideInfo = () => this.setState({showInfo: false})
 
   render() {
     const p = this.props
+    const s = this.state
     return (
       <div className={p.isLoading ? 'isLoading' : ''}>
+        {s.showInfo && <Info {...p.info} onRequestClose={this._hideInfo} />}
         <div className='Fullscreen'>
           <div className='Taui-Map'>
             <Map
@@ -83,7 +90,12 @@ export default class Application extends Component {
             />
           </div>
         </div>
-        <Dock title={p.title}>
+        <Dock>
+          <div className='TauiTitle'>
+            <Icon icon='map' />
+            <span>{p.title || message('Title')}</span>
+            {p.info && <Icon icon='info-circle' onClick={this._showInfo} />}
+          </div>
           {p.searchPoiOnly ? (
             <PoiSearch
               end={p.end}

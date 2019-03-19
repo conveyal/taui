@@ -7,6 +7,7 @@ import {
   faDownload,
   faExclamationCircle,
   faHome,
+  faInfoCircle,
   faLevelUpAlt,
   faMap,
   faMapMarkerAlt,
@@ -14,6 +15,7 @@ import {
   faStar,
   faStreetView,
   faSubway,
+  faTimes,
   faWrench
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -24,6 +26,7 @@ library.add(
   faDownload,
   faExclamationCircle,
   faHome,
+  faInfoCircle,
   faLevelUpAlt,
   faMap,
   faMapMarkerAlt,
@@ -31,6 +34,7 @@ library.add(
   faStar,
   faStreetView,
   faSubway,
+  faTimes,
   faWrench
 )
 
