@@ -1,5 +1,6 @@
 import lonlat from '@conveyal/lonlat'
 import memoize from 'lodash/memoize'
+import Cookies from 'js-cookie'
 import dynamic from 'next/dynamic'
 import React, {Component} from 'react'
 
@@ -34,7 +35,9 @@ const Map = dynamic(() => import('./map'), {
 })
 
 export default class Application extends Component {
-  state = {}
+  state = {
+    showInfo: this.props.info && !this.props.user // first visit to the site
+  }
 
   _geocode = text => {
     const p = this.props
@@ -64,7 +67,11 @@ export default class Application extends Component {
   _onMouseEnterCard = memoize(name => () => this.props.setActiveNetwork(name))
   _onMouseLeaveCard = () => this.props.setActiveNetwork(null)
   _showInfo = () => this.setState({showInfo: true})
-  _hideInfo = () => this.setState({showInfo: false})
+  _hideInfo = () => {
+    // Create a user object if one does not exist
+    Cookies.set('user', {...this.props.user})
+    this.setState({showInfo: false})
+  }
 
   render() {
     const p = this.props
