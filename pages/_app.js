@@ -35,7 +35,9 @@ export default class TauiApp extends App {
     const defaultStore = merge({}, emptyStore, store)
     const {tauiConfig, user} = nextCookies(ctx)
     // Ignore cookie config if customization is not allowed
-    const cookieConfig = defaultStore.allowChangeConfig ? parseTauiCookie(tauiConfig) : {}
+    const cookieConfig = defaultStore.allowChangeConfig
+      ? parseTauiCookie(tauiConfig)
+      : {}
 
     // Get the query string parameters
     const queryConfig =
