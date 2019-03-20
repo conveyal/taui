@@ -7,7 +7,7 @@ import useMap from '../hooks/use-map'
 
 import renderGeoJSONRoutes from '../map/geojson-routes'
 import renderIsochrones from '../map/isochrones'
-import renderMarker from '../map/marker'
+import createRenderMarker from '../map/marker'
 import renderPointsOfInterest from '../map/points-of-interest'
 
 import Icon from './icon'
@@ -22,6 +22,8 @@ const legendStyle = {}
 // Always use the same markers
 const startMarker = new mapboxgl.Marker({color: darkBlue, draggable: true})
 const endMarker = new mapboxgl.Marker({color: colors[1].hex, draggable: true})
+const renderStartMarker = createRenderMarker(startMarker)
+const renderEndMarker = createRenderMarker(endMarker)
 
 export default function Map(p) {
   const [map, setMap] = React.useState(null)
@@ -37,8 +39,8 @@ export default function Map(p) {
 
   // Use memoized functions. Map only exists once it is loaded.
   if (map) {
-    renderMarker(map, startMarker, get(p, 'start.position'), p.updateStart)
-    renderMarker(map, endMarker, get(p, 'end.position'), p.updateEnd)
+    renderStartMarker(map, get(p, 'start.position'), p.updateStart)
+    renderEndMarker(map, get(p, 'end.position'), p.updateEnd)
     renderIsochrones(map, p.isochrones)
     renderGeoJSONRoutes(map, p.networkGeoJSONRoutes)
     renderPointsOfInterest(map, p.pointsOfInterest)
