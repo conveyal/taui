@@ -28,8 +28,8 @@ export function updateStart(value) {
     if (value.label && value.position) {
       return [
         addActionLogItem(`Updating start to ${value.label}`),
-        setStart(value),
-        fetchAllTimesAndPathsForCoordinate(value.position)
+        fetchAllTimesAndPathsForCoordinate(value.position),
+        setStart(value)
       ]
     } else if (value.position) {
       return updateStartPosition(value.position)

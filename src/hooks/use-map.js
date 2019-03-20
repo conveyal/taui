@@ -7,9 +7,8 @@ import {POI_ID} from '../constants'
 // Default NavigationControl
 const navControl = new mapboxgl.NavigationControl({showCompass: false})
 
-export default function useMap(mapProps, events) {
+export default function useMap(mapProps, events, setMap) {
   const ref = React.useRef(null)
-  const map = React.useRef(null)
 
   // Runs on mount
   React.useEffect(() => {
@@ -21,7 +20,7 @@ export default function useMap(mapProps, events) {
     mapboxgl.accessToken = accessToken
 
     // Create map
-    const m = (map.current = window.map = new mapboxgl.Map({
+    const m = (window.map = new mapboxgl.Map({
       center: mapProps.center,
       container: ref.current,
       maxBounds: mapProps.maxBounds,
@@ -30,7 +29,10 @@ export default function useMap(mapProps, events) {
       zoom: mapProps.zoom
     }))
 
-    m.on('load', () => m.addControl(navControl, 'top-right'))
+    m.on('load', () => {
+      setMap(m)
+      m.addControl(navControl, 'top-right')
+    })
     m.on('click', e => {
       const bbox = [
         [e.point.x - 5, e.point.y - 5],
@@ -51,10 +53,9 @@ export default function useMap(mapProps, events) {
     m.on('zoomend', () => events.onZoom(m.getZoom()))
 
     return () => {
-      if (map.current) map.current.remove()
-      map.current = null
+      if (m) m.remove()
     }
   }, [ref])
 
-  return [ref, map.current]
+  return ref
 }
