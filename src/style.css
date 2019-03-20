@@ -95,7 +95,7 @@ body {
 
 .TauiTitle > span {
   display: inline-block;
-  margin: 0 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .Taui-ActionLog {

@@ -101,7 +101,16 @@ export default class Application extends Component {
           <div className='TauiTitle'>
             <Icon icon='map' />
             <span>{p.title || message('Title')}</span>
-            {p.info && <Icon icon='info-circle' onClick={this._showInfo} />}
+            {p.info && (
+              <span
+                style={{
+                  cursor: 'pointer',
+                  float: 'right'
+                }}
+              >
+                <Icon icon='info-circle' onClick={this._showInfo} />
+              </span>
+            )}
           </div>
           {p.searchPoiOnly ? (
             <PoiSearch
