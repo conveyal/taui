@@ -1,6 +1,7 @@
 {
   "allowChangeConfig": true,
   "actionLog": [],
+  "geocoder": {},
   "grids": [],
   "networks": [],
   "poiUrl": null,

@@ -85,12 +85,17 @@ body {
   cursor: pointer;
 }
 
-.Taui-Dock-content .title {
+.TauiTitle {
   color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
   font-size: 1.5rem;
   margin: 1rem 0;
   font-weight: var(--bold);
+}
+
+.TauiTitle > span {
+  display: inline-block;
+  margin-left: 0.5rem;
 }
 
 .Taui-ActionLog {

@@ -1,21 +1,19 @@
+import once from 'lodash/once'
 import mapboxgl from 'mapbox-gl'
-import React from 'react'
+import memoize from 'memoize-one'
 
 import {POI_ID as ID} from '../constants'
 
-import useOnLoad from './use-on-load'
-
 const EmptyCollection = {type: 'FeatureCollection', features: []}
 
-export default function usePointsOfInterest(map, poi) {
-  useOnLoad(initializePoi, map, [poi])
+const initializeOnce = once(initializePoi)
 
-  React.useEffect(() => {
-    if (!map) return
-    const source = map.getSource(ID)
-    if (source) source.setData(poi || EmptyCollection)
-  }, [map, poi])
-}
+export default memoize(function usePointsOfInterest(map, poi) {
+  initializeOnce(map, poi)
+
+  const source = map.getSource(ID)
+  if (source) source.setData(poi || EmptyCollection)
+})
 
 function initializePoi(map, poi) {
   map.addSource(ID, {type: 'geojson', data: poi || EmptyCollection})

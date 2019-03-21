@@ -21,9 +21,8 @@ function tryParse(v, backup) {
 
 const iconLink = 'https://d2f1n6ed3ipuic.cloudfront.net/conveyal-128x128.png'
 
-function parseCookie(ctx) {
+function parseTauiCookie(tauiConfig) {
   // Get the configuration from the cookies
-  const {tauiConfig} = nextCookies(ctx)
   const cookieConfig =
     typeof tauiConfig === 'string' ? tryParse(tauiConfig, {}) : tauiConfig || {}
 
@@ -32,10 +31,13 @@ function parseCookie(ctx) {
 
 export default class TauiApp extends App {
   static async getInitialProps({ctx}) {
-    const defaultStore = tryParse(process.env.STORE, emptyStore)
-
+    const store = tryParse(process.env.STORE, {})
+    const defaultStore = merge({}, emptyStore, store)
+    const {tauiConfig, user} = nextCookies(ctx)
     // Ignore cookie config if customization is not allowed
-    const cookieConfig = defaultStore.allowChangeConfig ? parseCookie(ctx) : {}
+    const cookieConfig = defaultStore.allowChangeConfig
+      ? parseTauiCookie(tauiConfig)
+      : {}
 
     // Get the query string parameters
     const queryConfig =
@@ -43,7 +45,7 @@ export default class TauiApp extends App {
 
     // Create the store with the initial state prioritizing:
     // query string > cookie config > store.json
-    const configs = [defaultStore, cookieConfig, queryConfig]
+    const configs = [{}, defaultStore, cookieConfig, queryConfig, {user}]
     const reduxStore = getOrCreateStore(merge(...configs))
 
     return {

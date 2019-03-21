@@ -1,24 +1,21 @@
-import React from 'react'
-
-import useOnLoad from './use-on-load'
+import once from 'lodash/once'
+import memoize from 'memoize-one'
 
 /**
  * Isochrones are in reverse order of the networks.
  */
-export default function useIsochrones(map, isochrones) {
-  useOnLoad(initializeIsochrones, map, [isochrones])
+export default memoize(function renderIsochrones(map, isochrones) {
+  initializeOnce(map, isochrones)
+  console.log('renderiso', map, isochrones)
 
-  React.useEffect(() => {
-    if (!map) return
+  // Set the data for each isochrone if it hasn't been done
+  isochrones.forEach((isochrone, i) => {
+    const source = map.getSource(isochrone.properties.id)
+    if (source) source.setData(isochrone)
+  })
+})
 
-    isochrones.forEach((isochrone, i) => {
-      const source = map.getSource(isochrone.properties.id)
-      if (source) source.setData(isochrone)
-    })
-  }, [map, isochrones])
-}
-
-function initializeIsochrones(map, isochrones) {
+const initializeOnce = once(function initializeIsochrones(map, isochrones) {
   isochrones.forEach((isochrone, i) => {
     const id = isochrone.properties.id
     map.addSource(id, {type: 'geojson', data: isochrone})
@@ -39,4 +36,4 @@ function initializeIsochrones(map, isochrones) {
       beforeLayer
     )
   })
-}
+})
