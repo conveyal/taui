@@ -34,6 +34,9 @@ const Map = dynamic(() => import('./map'), {
   ssr: false
 })
 
+// Default access token
+const MBAT = process.env.MAPBOX_ACCESS_TOKEN
+
 export default class Application extends Component {
   state = {
     showInfo: this.props.info && !this.props.user // first visit to the site
@@ -41,12 +44,12 @@ export default class Application extends Component {
 
   _geocode = text => {
     const p = this.props
-    return geocode(text, p.map.accessToken, p.geocoder)
+    return geocode(text, p.map.accessToken || MBAT, p.geocoder)
   }
 
   _reverseGeocode = position => {
     const p = this.props
-    return reverseGeocode(position, p.map.accessToken, p.geocoder)
+    return reverseGeocode(position, p.map.accessToken || MBAT, p.geocoder)
   }
 
   _downloadIsochrone = memoize(index => () => {
