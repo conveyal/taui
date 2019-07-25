@@ -3,7 +3,7 @@
   "scope": "conveyal",
   "regions": ["all"],
   "version": 2,
-  "alias": ["taui.conveyal.com", "taui.now.sh"],
+  "alias": ["taui.now.sh"],
   "build": {
     "env": {
       "MAPBOX_ACCESS_TOKEN": "@mapbox-access-token"

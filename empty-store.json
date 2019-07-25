@@ -11,7 +11,7 @@
     "types": "region,postcode,district,place,locality,neighborhood,address,poi"
   },
   "map": {
-    "accessToken": "",
+    "accessToken": null,
     "center": [-73.995193, 40.716867],
     "clickAction": "end",
     "style": "mapbox://styles/conveyal/cjr7kztgv1ac22sp9h7ucqhgp",
