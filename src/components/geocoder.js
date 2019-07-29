@@ -1,7 +1,7 @@
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
 import React from 'react'
-import Select from 'react-select/lib/Async'
+import Select from 'react-select/async'
 
 import message from '../message'
 

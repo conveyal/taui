@@ -133,6 +133,41 @@ export default class Application extends Component {
               updateStart={p.updateStart}
             />
           )}
+          <div className='heading'>Travel time</div>
+          <div style={{display: 'flex', boxShadow: '0 0 1px #333'}}>
+            <button>Good</button>
+            <button className='active'>Typical</button>
+            <button>Bad</button>
+            <style jsx>{`
+              button {
+                background-color: transparent;
+                border-color: #fff;
+                cursor: pointer;
+                color: #fff;
+                flex-grow: 1;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+              }
+
+              button.active,
+              button:hover {
+                background-color: #fff;
+                color: #103f5c;
+              }
+
+              button:first-of-type {
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+                border-right: none;
+              }
+
+              button:last-of-type {
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+                border-left: none;
+              }
+            `}</style>
+          </div>
           <TimeCutoff cutoff={p.timeCutoff} setCutoff={p.setTimeCutoff} />
           {p.networks.map((network, index) => (
             <div

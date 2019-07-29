@@ -8,6 +8,7 @@ import configureTaui from '../src/services/config'
 
 import 'normalize.css'
 import '../src/style.css'
+import '../src/fontawesome.css'
 
 // Set the title
 if (typeof document !== 'undefined') document.title = message('Title')
