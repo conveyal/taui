@@ -5,7 +5,7 @@ import jsolines from 'jsolines'
 /**
  * Create an isochrone. Save results based on the network and timecutoff.
  */
-function getIsochrone(network, start, timeCutoff) {
+function getIsochrone(network, timeCutoff) {
   const surface = network.travelTimeSurface
   const isochrone = jsolines({
     ...surface, // height, width, surface
@@ -27,5 +27,5 @@ function getIsochrone(network, start, timeCutoff) {
 
 export default memoize(
   getIsochrone,
-  (n, s, c) => `${n.name}-${lonlat.toString(s.position)}-${c}`
+  (n, c, s, pi) => `${n.name}-${lonlat.toString(s.position)}-${c}-${pi}`
 )

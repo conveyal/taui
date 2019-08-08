@@ -55,20 +55,20 @@ function Opportunity({children, grid}) {
 function DiffPercentage({current, old}) {
   const diff = ((current - old) / old) * 100
 
-  // only show if the diff is >= 0.1%
-  if (Math.abs(diff) < 0.1 || isNaN(diff)) return null
+  // only show if the diff is >= 1%
+  if (Math.abs(diff) < 1 || isNaN(diff)) return null
 
   if (diff > 0) {
     return (
       <span className='increase'>
-        (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' />)
+        (<strong>{Math.floor(diff)}</strong>% <Icon icon='level-up-alt' />)
       </span>
     )
   }
 
   return (
     <span className='decrease'>
-      (<strong>{diff.toFixed(1)}</strong>%{' '}
+      (<strong>{Math.floor(diff)}</strong>%{' '}
       <Icon icon='level-up-alt' rotation={180} />)
     </span>
   )

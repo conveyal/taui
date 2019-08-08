@@ -9,13 +9,16 @@ export default createSelector(
   state => state.start,
   state => state.networks,
   state => state.timeCutoff,
-  (start, networks = [], timeCutoff) =>
+  state => state.percentileIndex,
+  (start, networks = [], timeCutoff, percentileIndex) =>
     reduceRight(
       networks,
       (isochrones, n, i) => {
         const data = get(n, 'travelTimeSurface.data')
         const features =
-          start && data ? getIsochroneForNetwork(n, start, timeCutoff) : {}
+          start && data
+            ? getIsochroneForNetwork(n, timeCutoff, start, percentileIndex)
+            : {}
 
         const isochrone = {
           type: 'FeatureCollection',

@@ -26,13 +26,8 @@ export default function RouteSegments(p) {
             <span className='decrease'>Inaccessible within 120 minutes</span>
           ) : (
             <>
-              Trip duration
+              Door-to-door about
               <strong> {p.travelTime}</strong> {message('Units.Mins')}
-              &nbsp;
-              <TripDiff
-                baseTravelTime={p.oldTravelTime}
-                travelTime={p.travelTime}
-              />
             </>
           )}
         </td>
