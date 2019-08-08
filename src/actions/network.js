@@ -39,7 +39,16 @@ export const fetchAllTimesAndPathsForCoordinate = coordinate => (
         })
       )
 
-      return NetworkAPI.fetchDataAtCoordinate(network, coordinate)
+      // Based off the network params and coordinate
+      const index = NetworkAPI.coordinateToIndex(network, coordinate)
+
+      // Use the URL correlating to the selected percentile index
+      const url = network.urls[state.percentileIndex]
+
+      return Promise.all([
+        NetworkAPI.fetchTimesAtIndex(url, index),
+        NetworkAPI.fetchPathsAtIndex(url, index)
+      ])
         .then(([travelTimeSurface, pathsData]) => {
           dispatch(
             setNetwork({

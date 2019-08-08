@@ -14,14 +14,8 @@ function featureToLocation(f) {
 }
 
 export default function GeocodeSearch(p) {
-  const onChangeStart = React.useCallback(
-    f => p.updateStart(featureToLocation(f)),
-    [p.updateStart]
-  )
-  const onChangeEnd = React.useCallback(
-    f => p.updateEnd(featureToLocation(f)),
-    [p.updateEnd]
-  )
+  const onChangeStart = f => p.updateStart(featureToLocation(f))
+  const onChangeEnd = f => p.updateEnd(featureToLocation(f))
 
   return (
     <>

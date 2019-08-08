@@ -1,5 +1,4 @@
 import get from 'lodash/get'
-import isEqual from 'lodash/isEqual'
 import React from 'react'
 import Select from 'react-select/async'
 
@@ -28,7 +27,7 @@ const reactSelectStyles = {
   menu: p => ({...p, borderRadius: '0 0 4px 4px'})
 }
 
-function reactSelectTheme(t, state) {
+function reactSelectTheme(t) {
   return {
     ...t,
     colors: {
@@ -81,7 +80,7 @@ export default class Geocoder extends React.PureComponent {
     return [...geolocateOptions, ...(p.options || [])]
   }
 
-  loadOptions = (input, callback) => {
+  loadOptions = input => {
     if (input && input.length < 4) return Promise.resolve([])
     return this.props
       .geocode(input)

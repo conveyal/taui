@@ -2,6 +2,9 @@
   "name": "@conveyal/taui",
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
+  "engines": {
+    "node": "10.x"
+  },
   "scripts": {
     "build": "next build",
     "check-format": "prettier -l \"src/**/*.js\" \"pages/**/*.js\"",
@@ -36,6 +39,11 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@mapbox/polyline": "^1.1.0",
     "@zeit/next-css": "^1.0.1",
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.1.0",
+    "eslint-loader": "^2.2.1",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^1.6.1",
     "js-cookie": "^2.2.0",
     "jsolines": "^2.1.1",
     "lodash": "^4.17.15",

@@ -18,6 +18,7 @@ import {
   faTimes,
   faWrench
 } from '@fortawesome/free-solid-svg-icons'
+import React from 'react'
 
 library.add(
   faBus,

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import React, {Component} from 'react'
 
 import {colors} from '../constants'
+import message from '../message'
 import {geocode, reverseGeocode} from '../services/geocode'
 import downloadJson from '../utils/download-json'
 
@@ -76,6 +77,12 @@ export default class Application extends Component {
     this.setState({showInfo: false})
   }
 
+  _setPercentileIndex(newIndex) {
+    const p = this.props
+    p.setPercentileIndex(newIndex)
+    p.fetchAllTimesAndPathsForCoordinate(p.start.position)
+  }
+
   render() {
     const p = this.props
     const s = this.state
@@ -135,9 +142,24 @@ export default class Application extends Component {
           )}
           <div className='heading'>Travel time</div>
           <div style={{display: 'flex', boxShadow: '0 0 1px #333'}}>
-            <button>Good</button>
-            <button className='active'>Typical</button>
-            <button>Bad</button>
+            <button
+              onClick={() => this._setPercentileIndex(0)}
+              className={p.percentileIndex === 0 && 'active'}
+            >
+              {p.percentileLabels[0]}
+            </button>
+            <button
+              onClick={() => this._setPercentileIndex(1)}
+              className={p.percentileIndex === 1 && 'active'}
+            >
+              {p.percentileLabels[1]}
+            </button>
+            <button
+              onClick={() => this._setPercentileIndex(2)}
+              className={p.percentileIndex === 2 && 'active'}
+            >
+              {p.percentileLabels[2]}
+            </button>
             <style jsx>{`
               button {
                 background-color: transparent;
@@ -147,6 +169,10 @@ export default class Application extends Component {
                 flex-grow: 1;
                 padding-top: 0.5rem;
                 padding-bottom: 0.5rem;
+              }
+
+              button:focus {
+                outline: none;
               }
 
               button.active,
@@ -231,7 +257,11 @@ function Attribution() {
   return (
     <div className='Attribution'>
       site made by{' '}
-      <a href='https://www.conveyal.com' target='_blank'>
+      <a
+        href='https://www.conveyal.com'
+        target='_blank'
+        rel='noopener noreferrer'
+      >
         conveyal
       </a>
     </div>

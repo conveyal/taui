@@ -1,5 +1,6 @@
 import toSpaceCase from 'lodash/lowerCase'
 import get from 'lodash/get'
+import React from 'react'
 
 import message from '../message'
 

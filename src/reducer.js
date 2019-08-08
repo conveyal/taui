@@ -39,6 +39,11 @@ export default function reducer(state = {}, action) {
       return setGrid(state, action)
     case 'set network':
       return setNetwork(state, action)
+    case 'set percentile index':
+      return {
+        ...state,
+        percentileIndex: action.payload
+      }
     case 'set points of interest':
       return {
         ...state,

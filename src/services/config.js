@@ -76,13 +76,15 @@ export default async function config(initialState = {}) {
 }
 
 function fetchTransitive(network) {
-  return fetch(cacheURL(`${network.url}/transitive.json`)).then(res =>
+  return fetch(cacheURL(`${network.urls[0]}/transitive.json`)).then(res =>
     res.json()
   )
 }
 
 function fetchRequest(network) {
-  return fetch(cacheURL(`${network.url}/request.json`)).then(res => res.json())
+  return fetch(cacheURL(`${network.urls[0]}/request.json`)).then(res =>
+    res.json()
+  )
 }
 
 function getCenterFromNetwork(network) {

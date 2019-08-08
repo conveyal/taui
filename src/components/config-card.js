@@ -10,7 +10,7 @@ const exampleConfigLink =
 
 export default function ConfigCard(p) {
   const ref = React.useRef(null)
-  const onClick = React.useCallback(() => {
+  function onClick() {
     try {
       const json = JSON.parse(ref.current.value)
       Cookies.set('tauiConfig', json)
@@ -21,7 +21,7 @@ export default function ConfigCard(p) {
       console.error(e)
       window.alert('Invalid JSON!')
     }
-  })
+  }
   const defaultValue = JSON.stringify(p.cookieConfig || {}, null, '  ')
 
   return (
@@ -36,7 +36,7 @@ export default function ConfigCard(p) {
       </div>
       <div className='CardContent'>
         <br />
-        <a href={exampleConfigLink} target='_blank'>
+        <a href={exampleConfigLink} target='_blank' rel='noopener noreferrer'>
           See example config
         </a>
       </div>
