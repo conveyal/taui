@@ -1,6 +1,6 @@
-import uniqBy from 'lodash/uniqBy'
 import React from 'react'
 
+import {colors} from '../constants'
 import message from '../message'
 
 import Alert from './tr-alert'
@@ -11,48 +11,49 @@ export default function RouteSegments(p) {
     return <Alert>{message('Systems.TripsEmpty')}</Alert>
   }
 
-  const [bestJourney, ...alternateJourneys] = uniqBy(p.routeSegments, r =>
-    r.map(s => s.name).join('-')
-  )
+  const rid = i => `route-${p.networkIndex}-${i}`
+  const isActive = i => rid(i) === p.activeNetwork
 
   return (
     <tbody>
-      <tr className='BestTrip'>
+      <tr />
+      <tr>
         <td>
-          <Icon icon='clock' />
+          <Icon icon='map-marker-alt' style={{color: colors[1].hex}} />
         </td>
-        <td>
-          {p.travelTime > 120 ? (
-            <span className='decrease'>Inaccessible within 120 minutes</span>
-          ) : (
-            <>
-              Door-to-door about
-              <strong> {p.travelTime}</strong> {message('Units.Mins')}
-            </>
-          )}
-        </td>
+        <td>To end</td>
       </tr>
       <tr>
-        <td>{p.active && <Icon icon='street-view' />}</td>
-        <td>
-          Take <Segments segments={bestJourney} />
-        </td>
+        {p.travelTime > 120 ? (
+          <td colSpan='2' className='decrease'>
+            Inaccessible within 120 minutes
+          </td>
+        ) : (
+          <>
+            <td>Door-to-door</td>
+            <td>
+              <strong> {p.travelTime}</strong> {message('Units.Minutes')}
+            </td>
+          </>
+        )}
       </tr>
-      {alternateJourneys.length > 0 && (
-        <tr>
-          <td />
+      {p.routeSegments.map((segments, i) => (
+        <tr key={`journey-${i}`} onMouseOver={() => p.setActive(rid(i))}>
           <td>
-            {message('Systems.AlternateTripsTitle')}
-            &nbsp;
-            {alternateJourneys.map((segments, i) => (
-              <React.Fragment key={i}>
-                <Segments segments={segments} />
-                {i < alternateJourneys.length - 1 && ' or '}
-              </React.Fragment>
-            ))}
+            <Icon
+              icon='dot-circle'
+              style={{
+                opacity: isActive(i) ? 1 : 0.2,
+                verticalAlign: 'middle'
+              }}
+            />{' '}
+            Option {i + 1}
+          </td>
+          <td>
+            <Segments segments={segments} />
           </td>
         </tr>
-      )}
+      ))}
     </tbody>
   )
 }
@@ -72,38 +73,4 @@ function Segments(p) {
         {i !== segments.length - 1 && ' to '}
       </React.Fragment>
     ))
-}
-
-function TripDiff({baseTravelTime, travelTime}) {
-  if (baseTravelTime === 2147483647) {
-    return (
-      <span className='increase'>
-        ({message('NewTrip')} <Icon icon='star' />)
-      </span>
-    )
-  } else if (travelTime === 2147483647) {
-    return (
-      <span className='decrease'>
-        (<strong> {120 - baseTravelTime}</strong>% <Icon icon='level-up-alt' />)
-      </span>
-    )
-  }
-
-  const diff = ((travelTime - baseTravelTime) / baseTravelTime) * 100
-  if (isNaN(diff) || Math.abs(diff) < 0.1) return null
-
-  if (diff > 0) {
-    return (
-      <span className='decrease'>
-        (<strong>{diff.toFixed(1)}</strong>% <Icon icon='level-up-alt' />)
-      </span>
-    )
-  }
-
-  return (
-    <span className='increase'>
-      (<strong>{diff.toFixed(1)}</strong>%{' '}
-      <Icon icon='level-up-alt' rotation={180} />)
-    </span>
-  )
 }

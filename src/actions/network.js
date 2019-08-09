@@ -52,6 +52,7 @@ export const fetchAllTimesAndPathsForCoordinate = coordinate => (
         .then(([travelTimeSurface, pathsData]) => {
           dispatch(
             setNetwork({
+              fetchId: `${url}-${index}`,
               name: network.name,
               travelTimeSurface,
               ...pathsData

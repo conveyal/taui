@@ -6,18 +6,9 @@ import Icon from './icon'
 
 const buttonStyle = {
   padding: '5px 13px',
-  marginTop: '6px',
-  borderRadius: '100px',
   cursor: 'pointer',
-  borderWidth: '1px',
-  borderStyle: 'solid',
-  borderColor: 'white'
-}
-
-const iconStyle = {
-  display: 'inline-block',
-  marginBottom: '-1.5px',
-  marginRight: '5px'
+  borderWidth: '2px',
+  borderStyle: 'solid'
 }
 
 const MapControl = p => (
@@ -30,55 +21,57 @@ const MapControl = p => (
     </div>
     <style jsx>{`
       .mapboxgl-ctrl-bottom-right {
-        margin-bottom: 25px;
+        margin-bottom: 20px;
       }
 
       .mapboxgl-ctrl {
-        padding: 8px;
-        text-align: center;
+        box-shadow: none;
       }
     `}</style>
   </div>
 )
-
-const Button = React.memo(p => {
-  const style = {
-    ...buttonStyle,
-    color: p.color
-  }
-  if (p.active) {
-    style.borderColor = p.color
-  }
-
-  return (
-    <div onClick={p.onClick} style={style}>
-      {p.children}
-    </div>
-  )
-})
 
 export default function MapClickControl(p) {
   const startActive = p.clickAction === 'start'
 
   return (
     <MapControl>
-      <div>click map to:</div>
-      <Button
-        active={startActive}
-        color={darkBlue}
-        onClick={() => p.setClickAction('start')}
-      >
-        <Icon icon='map-marker-alt' style={iconStyle} />
-        <span>set start</span>
-      </Button>
-      <Button
-        active={!startActive}
-        color={colors[1].hex}
-        onClick={() => p.setClickAction('end')}
-      >
-        <Icon icon='map-marker-alt' style={iconStyle} />
-        <span>set end</span>
-      </Button>
+      <style jsx>{`
+        div {
+          padding: 5px 13px;
+          cursor: pointer;
+          border-width: 2px;
+          border-style: solid;
+        }
+
+        .start {
+          border-radius: 4px 4px 0 0;
+          border-color: ${startActive ? darkBlue : 'rgba(0, 0, 0, 0.1)'};
+          color: ${darkBlue};
+          opacity: ${startActive ? 1 : 0.5};
+        }
+
+        .end {
+          border-radius: 0 0 4px 4px;
+          border-color: ${startActive ? 'rgba(0, 0, 0, 0.1)' : colors[1].hex};
+          color: ${colors[1].hex};
+          opacity: ${startActive ? 0.5 : 1};
+        }
+
+        .start:hover,
+        .end:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+          opacity: 1;
+        }
+      `}</style>
+      <div className='start' onClick={() => p.setClickAction('start')}>
+        <Icon icon='hand-pointer' />
+        <span> set start</span>
+      </div>
+      <div className='end' onClick={() => p.setClickAction('end')}>
+        <Icon icon='hand-pointer' />
+        <span> set end</span>
+      </div>
     </MapControl>
   )
 }

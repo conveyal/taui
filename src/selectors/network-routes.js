@@ -9,8 +9,8 @@ import createTransitiveRoutes from '../utils/create-transitive-routes'
  * This assumes loaded query, paths, and targets.
  */
 const memoizedTransitiveRoutes = memoize(
-  (n, i, s, e) => createTransitiveRoutes(n, e),
-  (n, i, s, e) => `${n.name}-${i}-${lonlat.toString(s)}-${lonlat.toString(e)}`
+  createTransitiveRoutes,
+  (n, e, i, s) => `${n.name}-${i}-${lonlat.toString(s)}-${lonlat.toString(e)}`
 )
 
 export default createSelector(
@@ -23,7 +23,7 @@ export default createSelector(
       const startPosition = get(start, 'position')
       const endPosition = get(end, 'position')
       if (startPosition && endPosition && n.paths && n.targets && td.patterns) {
-        return memoizedTransitiveRoutes(n, nIndex, startPosition, endPosition)
+        return memoizedTransitiveRoutes(n, endPosition, nIndex, startPosition)
       } else {
         return []
       }

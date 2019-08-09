@@ -37,7 +37,7 @@ export default function TimeCutoff(p) {
       </div>
       <div className='TimeCutoff'>
         <div className='Time'>
-          {p.cutoff} {message('Units.Minutes')}
+          <span>{p.cutoff}</span> {message('Units.Minutes')}
         </div>
         <input
           disabled={animating}

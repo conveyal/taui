@@ -25,7 +25,4 @@ function getIsochrone(network, timeCutoff) {
   return isochrone
 }
 
-export default memoize(
-  getIsochrone,
-  (n, c, s, pi) => `${n.name}-${lonlat.toString(s.position)}-${c}-${pi}`
-)
+export default memoize(getIsochrone, (n, c) => `${n.fetchId}-${c}`)

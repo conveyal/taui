@@ -68,8 +68,6 @@ export default class Application extends Component {
     }
   })
 
-  _onMouseEnterCard = memoize(name => () => this.props.setActiveNetwork(name))
-  _onMouseLeaveCard = () => this.props.setActiveNetwork(null)
   _showInfo = () => this.setState({showInfo: true})
   _hideInfo = () => {
     // Create a user object if one does not exist
@@ -93,6 +91,7 @@ export default class Application extends Component {
           <div className='Taui-Map'>
             <Map
               {...p.map}
+              activeNetwork={p.activeNetwork}
               end={p.end}
               grids={p.grids}
               isochrones={p.isochrones}
@@ -197,8 +196,7 @@ export default class Application extends Component {
           <TimeCutoff cutoff={p.timeCutoff} setCutoff={p.setTimeCutoff} />
           {p.networks.map((network, index) => (
             <div
-              onMouseEnter={this._onMouseEnterCard(network.name)}
-              onMouseLeave={this._onMouseLeaveCard}
+              onMouseLeave={() => p.setActiveNetwork()}
               key={`${index}-route-card`}
             >
               <RouteCard
@@ -218,7 +216,7 @@ export default class Application extends Component {
                     </tr>
                   </tbody>
                 ) : (
-                  <React.Fragment>
+                  <>
                     <RouteAccess
                       accessibility={p.accessibility[index]}
                       grids={p.grids}
@@ -230,15 +228,14 @@ export default class Application extends Component {
                     />
                     {!!p.end && !!p.start && (
                       <RouteSegments
-                        active={network.name === p.activeNetwork}
-                        oldTravelTime={
-                          p.travelTimes[p.accessibility.length - 1]
-                        }
+                        activeNetwork={p.activeNetwork}
+                        networkIndex={index}
                         routeSegments={p.networkRoutes[index]}
+                        setActive={p.setActiveNetwork}
                         travelTime={p.travelTimes[index]}
                       />
                     )}
-                  </React.Fragment>
+                  </>
                 )}
               </RouteCard>
             </div>
