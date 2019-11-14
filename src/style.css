@@ -57,7 +57,7 @@ body {
 .Taui-Dock {
   background-color: var(--dark-blue);
   position: absolute;
-  width: 414px;
+  width: 400px;
   top: 0;
   left: 0;
   height: 100%;
@@ -111,13 +111,14 @@ body {
   margin: 0.5rem 0 1rem;
 }
 
-.TimeCutoff .Time {
+.TimeCutoff > .Time {
   font-weight: var(--bold);
   color: rgba(255, 255, 255, 1);
   text-shadow: 0 0 1px var(--shadow);
+  width: 90px;
 }
 
-.TimeCutoff input[type='range'] {
+.TimeCutoff > input[type='range'] {
   margin-left: 1rem;
   flex: auto;
 }
@@ -195,17 +196,14 @@ body {
 }
 
 table.CardContent {
-  padding: 0.25rem 0;
-  border-spacing: 1rem 0.5rem;
+  padding: 0.5rem 0;
+  border-spacing: 1rem 0.25rem;
   line-height: 1.5rem;
 }
 
-table.CardContent td {
-  vertical-align: top;
-}
-
 table.CardContent td:first-of-type {
-  text-align: center;
+  text-align: right;
+  width: 40%;
 }
 
 .CardContent .alert {
@@ -260,6 +258,6 @@ table.CardContent td:first-of-type {
   position: absolute;
   height: 100%;
   right: 0;
-  left: 414px;
+  left: 400px;
   overflow: hidden;
 }

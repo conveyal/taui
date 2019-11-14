@@ -1,6 +1,5 @@
 import polyline from '@mapbox/polyline'
 import find from 'lodash/find'
-import flatten from 'lodash/flatten'
 import slice from 'lodash/slice'
 import uniqBy from 'lodash/uniqBy'
 import toUpperCase from 'lodash/upperCase'
@@ -35,9 +34,6 @@ export default function createTransitiveRoutesForNetwork(network, coordinates) {
   // Convert to [stop, pattern, stop] arrays
   const allPaths = targetPathIndexes.map(index => network.paths[index])
 
-  // Filter out non-unique path combinations
-  const uniquePaths = uniqBy(allPaths, p => flatten(p).join('-'))
-
   // Populate each path leg with it's stops, pattern, and route
   const populatePath = path =>
     path.map(([fromStopId, patternId, toStopId]) => {
@@ -51,13 +47,17 @@ export default function createTransitiveRoutesForNetwork(network, coordinates) {
       }
     })
 
-  return uniquePaths.map(populatePath).map(addDataToPath)
+  // Collect pattern and route information
+  const populatedPaths = allPaths.map(populatePath).map(addDataToPaths)
+
+  // Filter non-unique route combinations
+  return uniqBy(populatedPaths, r => r.map(s => s.name).join('-'))
 }
 
 /**
  * Used to show a transitive route
  */
-function addDataToPath(path) {
+function addDataToPaths(path) {
   const segments = []
   let previousStop = path[0].fromStop
   for (let i = 0; i < path.length; i++) {

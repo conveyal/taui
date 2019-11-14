@@ -12,6 +12,11 @@ const setGrid = payload => ({
   payload
 })
 
+const setPercentileIndex = payload => ({
+  type: 'set percentile index',
+  payload
+})
+
 const setPointsOfInterest = payload => ({
   type: 'set points of interest',
   payload
@@ -33,6 +38,7 @@ export default {
   ...network,
   setGeocoder,
   setGrid,
+  setPercentileIndex,
   setPointsOfInterest,
   setTimeCutoff,
   updateMap

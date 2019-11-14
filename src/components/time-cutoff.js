@@ -9,20 +9,21 @@ const DELAY = 50
 
 export default function TimeCutoff(p) {
   const [animating, setAnimating] = React.useState(false)
+  const {cutoff, setCutoff} = p
 
   React.useEffect(() => {
     if (!animating) return
-    if (p.cutoff < 120) {
-      setTimeout(() => p.setCutoff(p.cutoff + 1), DELAY)
+    if (cutoff < 120) {
+      setTimeout(() => setCutoff(cutoff + 1), DELAY)
     } else {
       setAnimating(false)
     }
-  }, [animating, p.cutoff])
+  }, [animating, cutoff, setCutoff])
 
-  const onClickAnimate = React.useCallback(() => {
+  const onClickAnimate = () => {
     setAnimating(true)
-    p.setCutoff(10)
-  }, [p.setCutoff, setAnimating])
+    setCutoff(10)
+  }
 
   return (
     <>
@@ -36,16 +37,16 @@ export default function TimeCutoff(p) {
       </div>
       <div className='TimeCutoff'>
         <div className='Time'>
-          {p.cutoff} {message('Units.Minutes')}
+          <span>{p.cutoff}</span> {message('Units.Minutes')}
         </div>
         <input
           disabled={animating}
-          onChange={e => p.setCutoff(parseInt(e.currentTarget.value, 10))}
+          onChange={e => setCutoff(parseInt(e.currentTarget.value, 10))}
           type='range'
           min={10}
           max={120}
           step={1}
-          value={p.cutoff}
+          value={cutoff}
         />
       </div>
     </>

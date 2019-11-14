@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import React, {Component} from 'react'
 
 import {colors} from '../constants'
+import message from '../message'
 import {geocode, reverseGeocode} from '../services/geocode'
 import downloadJson from '../utils/download-json'
 
@@ -67,13 +68,17 @@ export default class Application extends Component {
     }
   })
 
-  _onMouseEnterCard = memoize(name => () => this.props.setActiveNetwork(name))
-  _onMouseLeaveCard = () => this.props.setActiveNetwork(null)
   _showInfo = () => this.setState({showInfo: true})
   _hideInfo = () => {
     // Create a user object if one does not exist
     Cookies.set('user', {...this.props.user})
     this.setState({showInfo: false})
+  }
+
+  _setPercentileIndex(newIndex) {
+    const p = this.props
+    p.setPercentileIndex(newIndex)
+    p.fetchAllTimesAndPathsForCoordinate(p.start.position)
   }
 
   render() {
@@ -86,6 +91,7 @@ export default class Application extends Component {
           <div className='Taui-Map'>
             <Map
               {...p.map}
+              activeNetwork={p.activeNetwork}
               end={p.end}
               grids={p.grids}
               isochrones={p.isochrones}
@@ -133,11 +139,64 @@ export default class Application extends Component {
               updateStart={p.updateStart}
             />
           )}
+          <div className='heading'>Travel time</div>
+          <div style={{display: 'flex', boxShadow: '0 0 1px #333'}}>
+            <button
+              onClick={() => this._setPercentileIndex(0)}
+              className={p.percentileIndex === 0 && 'active'}
+            >
+              {p.percentileLabels[0]}
+            </button>
+            <button
+              onClick={() => this._setPercentileIndex(1)}
+              className={p.percentileIndex === 1 && 'active'}
+            >
+              {p.percentileLabels[1]}
+            </button>
+            <button
+              onClick={() => this._setPercentileIndex(2)}
+              className={p.percentileIndex === 2 && 'active'}
+            >
+              {p.percentileLabels[2]}
+            </button>
+            <style jsx>{`
+              button {
+                background-color: transparent;
+                border-color: #fff;
+                cursor: pointer;
+                color: #fff;
+                flex-grow: 1;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+              }
+
+              button:focus {
+                outline: none;
+              }
+
+              button.active,
+              button:hover {
+                background-color: #fff;
+                color: #103f5c;
+              }
+
+              button:first-of-type {
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+                border-right: none;
+              }
+
+              button:last-of-type {
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+                border-left: none;
+              }
+            `}</style>
+          </div>
           <TimeCutoff cutoff={p.timeCutoff} setCutoff={p.setTimeCutoff} />
           {p.networks.map((network, index) => (
             <div
-              onMouseEnter={this._onMouseEnterCard(network.name)}
-              onMouseLeave={this._onMouseLeaveCard}
+              onMouseLeave={() => p.setActiveNetwork()}
               key={`${index}-route-card`}
             >
               <RouteCard
@@ -157,7 +216,7 @@ export default class Application extends Component {
                     </tr>
                   </tbody>
                 ) : (
-                  <React.Fragment>
+                  <>
                     <RouteAccess
                       accessibility={p.accessibility[index]}
                       grids={p.grids}
@@ -169,15 +228,14 @@ export default class Application extends Component {
                     />
                     {!!p.end && !!p.start && (
                       <RouteSegments
-                        active={network.name === p.activeNetwork}
-                        oldTravelTime={
-                          p.travelTimes[p.accessibility.length - 1]
-                        }
+                        activeNetwork={p.activeNetwork}
+                        networkIndex={index}
                         routeSegments={p.networkRoutes[index]}
+                        setActive={p.setActiveNetwork}
                         travelTime={p.travelTimes[index]}
                       />
                     )}
-                  </React.Fragment>
+                  </>
                 )}
               </RouteCard>
             </div>
@@ -196,7 +254,11 @@ function Attribution() {
   return (
     <div className='Attribution'>
       site made by{' '}
-      <a href='https://www.conveyal.com' target='_blank'>
+      <a
+        href='https://www.conveyal.com'
+        target='_blank'
+        rel='noopener noreferrer'
+      >
         conveyal
       </a>
     </div>

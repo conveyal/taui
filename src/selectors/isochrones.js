@@ -15,7 +15,7 @@ export default createSelector(
       (isochrones, n, i) => {
         const data = get(n, 'travelTimeSurface.data')
         const features =
-          start && data ? getIsochroneForNetwork(n, start, timeCutoff) : {}
+          start && data ? getIsochroneForNetwork(n, timeCutoff) : {}
 
         const isochrone = {
           type: 'FeatureCollection',
