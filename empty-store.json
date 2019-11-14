@@ -23,6 +23,7 @@
   "searchPoiOnly": false,
   "showLink": true,
   "showLog": true,
+  "showPercentileSelector": true,
   "timeCutoff": 30,
   "title": "Taui"
 }

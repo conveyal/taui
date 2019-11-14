@@ -1,6 +1,6 @@
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import App, {Container} from 'next/app'
+import App from 'next/app'
 import Head from 'next/head'
 import nextCookies from 'next-cookies'
 import React from 'react'
@@ -67,11 +67,9 @@ export default class TauiApp extends App {
           <title>{appProps.initialReduxState.title}</title>
           <link rel='shortcut icon' href={iconLink} type='image/x-icon' />
         </Head>
-        <Container>
-          <Provider store={this.reduxStore}>
-            <Component {...appProps} />
-          </Provider>
-        </Container>
+        <Provider store={this.reduxStore}>
+          <Component {...appProps} />
+        </Provider>
       </>
     )
   }

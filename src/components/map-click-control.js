@@ -4,13 +4,6 @@ import {darkBlue, colors} from '../constants'
 
 import Icon from './icon'
 
-const buttonStyle = {
-  padding: '5px 13px',
-  cursor: 'pointer',
-  borderWidth: '2px',
-  borderStyle: 'solid'
-}
-
 const MapControl = p => (
   <div className='mapboxgl-ctrl-bottom-right'>
     <div
