@@ -1,3 +1,4 @@
+import {ThemeProvider} from '@chakra-ui/core'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import App from 'next/app'
@@ -67,9 +68,11 @@ export default class TauiApp extends App {
           <title>{appProps.initialReduxState.title}</title>
           <link rel='shortcut icon' href={iconLink} type='image/x-icon' />
         </Head>
-        <Provider store={this.reduxStore}>
-          <Component {...appProps} />
-        </Provider>
+        <ThemeProvider>
+          <Provider store={this.reduxStore}>
+            <Component {...appProps} />
+          </Provider>
+        </ThemeProvider>
       </>
     )
   }

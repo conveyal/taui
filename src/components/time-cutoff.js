@@ -1,3 +1,11 @@
+import {
+  Box,
+  Flex,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb
+} from '@chakra-ui/core'
 import React from 'react'
 
 import message from '../message'
@@ -35,20 +43,23 @@ export default function TimeCutoff(p) {
           </a>
         )}
       </div>
-      <div className='TimeCutoff'>
-        <div className='Time'>
-          <span>{p.cutoff}</span> {message('Units.Minutes')}
-        </div>
-        <input
+      <Flex>
+        <Box color='white' fontWeight={500} mr={4} whiteSpace='nowrap'>
+          {`${p.cutoff} ${message('Units.Minutes')}`}
+        </Box>
+        <Slider
           disabled={animating}
-          onChange={e => setCutoff(parseInt(e.currentTarget.value, 10))}
-          type='range'
-          min={10}
           max={120}
+          min={10}
+          onChange={setCutoff}
           step={1}
           value={cutoff}
-        />
-      </div>
+        >
+          <SliderTrack />
+          <SliderFilledTrack />
+          <SliderThumb />
+        </Slider>
+      </Flex>
     </>
   )
 }
