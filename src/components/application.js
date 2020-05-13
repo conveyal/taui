@@ -43,17 +43,17 @@ export default class Application extends Component {
     showInfo: this.props.info && !this.props.user // first visit to the site
   }
 
-  _geocode = text => {
+  _geocode = (text) => {
     const p = this.props
     return geocode(text, p.map.accessToken || MBAT, p.geocoder)
   }
 
-  _reverseGeocode = position => {
+  _reverseGeocode = (position) => {
     const p = this.props
     return reverseGeocode(position, p.map.accessToken || MBAT, p.geocoder)
   }
 
-  _downloadIsochrone = memoize(index => () => {
+  _downloadIsochrone = memoize((index) => () => {
     const p = this.props
     const isochrone = p.isochrones[index]
     if (isochrone) {
@@ -208,6 +208,7 @@ export default class Application extends Component {
                 downloadIsochrone={
                   p.isochrones[index] && this._downloadIsochrone(index)
                 }
+                network={network}
                 index={index}
                 title={network.name}
               >

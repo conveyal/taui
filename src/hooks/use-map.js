@@ -33,7 +33,7 @@ export default function useMap(mapProps, events, setMap) {
       setMap(m)
       m.addControl(navControl, 'top-right')
     })
-    m.on('click', e => {
+    m.on('click', (e) => {
       const bbox = [
         [e.point.x - 5, e.point.y - 5],
         [e.point.x + 5, e.point.y + 5]
@@ -55,7 +55,7 @@ export default function useMap(mapProps, events, setMap) {
     return () => {
       if (m) m.remove()
     }
-  }, [ref])
+  }, [ref]) // eslint-disable-line
 
   return ref
 }

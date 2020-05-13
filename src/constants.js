@@ -12,7 +12,10 @@ export const NETWORK_COLORS = [
   '#6323c9' // violet
 ]
 
-export const COLORS_RGB = [[31, 137, 201], [201, 99, 35]]
+export const COLORS_RGB = [
+  [31, 137, 201],
+  [201, 99, 35]
+]
 
 export const darkBlue = '#103f5c'
 
@@ -24,6 +27,10 @@ export const colors = [
   {
     hex: '#c92336', // red
     rgb: {r: 201, g: 35, b: 54}
+  },
+  {
+    hex: '#36c923', // green
+    rgb: {r: 54, g: 201, b: 35}
   }
 ]
 

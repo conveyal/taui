@@ -37,9 +37,13 @@ export default function TimeCutoff(p) {
     <>
       <div className='heading'>
         {message('Strings.HighlightAreaAccessibleWithin')}
-        {animating || (
+        {!animating ? (
           <a className='pull-right' onClick={onClickAnimate}>
             <Icon icon='play' />
+          </a>
+        ) : (
+          <a className='pull-right' onClick={() => setAnimating(false)}>
+            <Icon icon='stop' />
           </a>
         )}
       </div>

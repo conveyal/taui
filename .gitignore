@@ -8,3 +8,5 @@ assets
 tmp
 yarn-error.log
 store.json
+
+.vercel

@@ -6,11 +6,11 @@ import {colors} from '../constants'
 import getIsochroneForNetwork from '../utils/get-isochrone-for-network'
 
 export default createSelector(
-  state => state.start,
-  state => state.networks,
-  state => state.timeCutoff,
-  (start, networks = [], timeCutoff) =>
-    reduceRight(
+  (state) => state.start,
+  (state) => state.networks,
+  (state) => state.timeCutoff,
+  (start, networks = [], timeCutoff) => {
+    return reduceRight(
       networks,
       (isochrones, n, i) => {
         const data = get(n, 'travelTimeSurface.data')
@@ -28,7 +28,7 @@ export default createSelector(
               ...features,
               properties: {
                 color: n.hexColor || colors[i].hex,
-                opacity: 0.5,
+                opacity: n.showOnMap ? 0.5 : 0,
                 timeCutoff: timeCutoff,
                 width: 1
               }
@@ -40,4 +40,5 @@ export default createSelector(
       },
       []
     )
+  }
 )
