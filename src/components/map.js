@@ -1,11 +1,10 @@
+import lonlat from '@conveyal/lonlat'
 import get from 'lodash/get'
 import mapboxgl from 'mapbox-gl'
 import React from 'react'
 
 import {darkBlue, colors, POI_ID} from '../constants'
 import useMap from '../hooks/use-map'
-
-import createRenderMarker from '../map/marker'
 
 import MapClickControl from './map-click-control'
 
@@ -18,8 +17,6 @@ const containerStyle = {height: '100%', width: '100%'}
 // Always use the same markers
 const startMarker = new mapboxgl.Marker({color: darkBlue, draggable: true})
 const endMarker = new mapboxgl.Marker({color: colors[1].hex, draggable: true})
-const renderStartMarker = createRenderMarker(startMarker)
-const renderEndMarker = createRenderMarker(endMarker)
 
 export default function Map(p) {
   const [map, setMap] = React.useState(null)
@@ -44,9 +41,20 @@ export default function Map(p) {
   // Render GeoJSON routes
   React.useEffect(() => {
     if (!map) return
+
     networkGeoJSONRoutes.forEach((routes, i) =>
       renderRoutesOnMap(routes, i, activeNetwork, map)
     )
+
+    return () => {
+      networkGeoJSONRoutes.forEach((routes, networkIndex) =>
+        routes.forEach((r, i) => {
+          const id = `route-${networkIndex}-${i}`
+          const source = map.getSource(id)
+          if (source) return source.setData(EmptyCollection)
+        })
+      )
+    }
   }, [map, networkGeoJSONRoutes, activeNetwork])
 
   // Render POI Data
@@ -58,9 +66,48 @@ export default function Map(p) {
 
   // Use memoized functions. Map only exists once it is loaded.
   if (map) {
-    renderStartMarker(map, get(p, 'start.position'), p.updateStart)
-    renderEndMarker(map, get(p, 'end.position'), p.updateEnd)
+    // renderStartMarker(map, get(p, 'start.position'), p.updateStart)
+    // renderEndMarker(map, get(p, 'end.position'), p.updateEnd)
   }
+
+  // Initialize markers
+  const {updateEnd, updateStart} = p
+  React.useEffect(() => {
+    if (!map) return
+    startMarker.on('dragend', () => {
+      updateStart({
+        position: lonlat(startMarker.getLngLat())
+      })
+    })
+
+    endMarker.on('dragend', () => {
+      updateEnd({
+        position: lonlat(endMarker.getLngLat())
+      })
+    })
+  }, [map, updateEnd, updateStart])
+
+  // Update positions
+  const startPosition = get(p, 'start.position')
+  const endPosition = get(p, 'end.position')
+  React.useEffect(() => {
+    if (!map) return
+
+    if (startPosition) {
+      startMarker.setLngLat(startPosition).addTo(map)
+    } else {
+      startMarker.remove()
+    }
+  }, [map, startPosition])
+  React.useEffect(() => {
+    if (!map) return
+
+    if (endPosition) {
+      endMarker.setLngLat(endPosition).addTo(map)
+    } else {
+      endMarker.remove()
+    }
+  }, [map, endPosition])
 
   return (
     <>

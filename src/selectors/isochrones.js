@@ -28,7 +28,7 @@ export default createSelector(
               ...features,
               properties: {
                 color: n.hexColor || colors[i].hex,
-                opacity: 1,
+                opacity: 0.5,
                 timeCutoff: timeCutoff,
                 width: 1
               }
