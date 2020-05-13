@@ -6,10 +6,6 @@ import message from '../src/message'
 import * as select from '../src/selectors'
 import configureTaui from '../src/services/config'
 
-import 'normalize.css'
-import '../src/style.css'
-import '../src/fontawesome.css'
-
 // Set the title
 if (typeof document !== 'undefined') document.title = message('Title')
 
@@ -23,7 +19,7 @@ function mapStateToProps(state, ownProps) {
     networkGeoJSONRoutes: select.networkGeoJSONRoutes(state, ownProps),
     pointsOfInterestOptions: select.pointsOfInterestOptions(state, ownProps),
     showComparison: select.showComparison(state, ownProps),
-    travelTimes: select.travelTimes(state, ownProps)
+    travelTimes: select.travelTimes(state, ownProps),
   }
 }
 
@@ -36,8 +32,8 @@ Application.prototype.componentDidMount = async function componentDidMount() {
 
     const data = await configureTaui(p.initialReduxState)
 
-    if (data.networks) data.networks.forEach(n => p.setNetwork(n))
-    if (data.grids) data.grids.forEach(g => p.setGrid(g))
+    if (data.networks) data.networks.forEach((n) => p.setNetwork(n))
+    if (data.grids) data.grids.forEach((g) => p.setGrid(g))
     if (data.poi) p.setPointsOfInterest(data.poi)
     if (data.map) p.updateMap(data.map)
     if (data.geocoder) p.setGeocoder(data.geocoder)
@@ -53,7 +49,4 @@ Application.prototype.componentDidMount = async function componentDidMount() {
   p.decrementFetches()
 }
 
-export default connect(
-  mapStateToProps,
-  actions
-)(Application)
+export default connect(mapStateToProps, actions)(Application)

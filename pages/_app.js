@@ -10,6 +10,13 @@ import {Provider} from 'react-redux'
 import emptyStore from '../empty-store.json'
 import {getOrCreateStore} from '../src/with-redux-store'
 
+import 'normalize.css'
+import '../src/style.css'
+import '../src/fontawesome.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
+import 'react-virtualized/styles.css'
+import 'react-virtualized-select/styles.css'
+
 function tryParse(v, backup) {
   try {
     return JSON.parse(v)
@@ -51,7 +58,7 @@ export default class TauiApp extends App {
 
     return {
       cookieConfig,
-      initialReduxState: reduxStore.getState()
+      initialReduxState: reduxStore.getState(),
     }
   }
 

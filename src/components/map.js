@@ -8,8 +8,6 @@ import useMap from '../hooks/use-map'
 
 import MapClickControl from './map-click-control'
 
-import 'mapbox-gl/dist/mapbox-gl.css'
-
 const EmptyCollection = {type: 'FeatureCollection', features: []}
 
 const containerStyle = {height: '100%', width: '100%'}
@@ -24,8 +22,8 @@ export default function Map(p) {
     p,
     {
       onClick: p.onMapClick,
-      onMove: center => p.updateMap({center}),
-      onZoom: zoom => p.updateMap({zoom})
+      onMove: (center) => p.updateMap({center}),
+      onZoom: (zoom) => p.updateMap({zoom}),
     },
     setMap
   )
@@ -76,13 +74,13 @@ export default function Map(p) {
     if (!map) return
     startMarker.on('dragend', () => {
       updateStart({
-        position: lonlat(startMarker.getLngLat())
+        position: lonlat(startMarker.getLngLat()),
       })
     })
 
     endMarker.on('dragend', () => {
       updateEnd({
-        position: lonlat(endMarker.getLngLat())
+        position: lonlat(endMarker.getLngLat()),
       })
     })
   }, [map, updateEnd, updateStart])
@@ -114,7 +112,7 @@ export default function Map(p) {
       <div ref={mapRef} style={containerStyle} />
       <MapClickControl
         clickAction={p.clickAction}
-        setClickAction={a => p.updateMap({clickAction: a})}
+        setClickAction={(a) => p.updateMap({clickAction: a})}
       />
     </>
   )
@@ -138,8 +136,8 @@ function renderIsochronesOnMap(isochrones, map) {
         type: 'fill',
         paint: {
           'fill-color': ['get', 'color'],
-          'fill-opacity': ['get', 'opacity']
-        }
+          'fill-opacity': ['get', 'opacity'],
+        },
       },
       beforeLayer
     )
@@ -164,7 +162,7 @@ function renderRoutesOnMap(routes, networkIndex, activeNetwork, map) {
 
     map.addSource(id, {
       type: 'geojson',
-      data: featureCollection
+      data: featureCollection,
     })
 
     map.addLayer(
@@ -175,9 +173,9 @@ function renderRoutesOnMap(routes, networkIndex, activeNetwork, map) {
         paint: {
           'line-color': '#000',
           'line-dasharray': [1, 1],
-          'line-width': 5
+          'line-width': 5,
         },
-        filter: ['==', 'mode', 'WALK']
+        filter: ['==', 'mode', 'WALK'],
       },
       'road-label'
     )
@@ -190,9 +188,9 @@ function renderRoutesOnMap(routes, networkIndex, activeNetwork, map) {
         paint: {
           'line-color': '#000',
           'line-width': 1,
-          'line-gap-width': 3
+          'line-gap-width': 3,
         },
-        filter: ['all', ['!=', 'mode', 'WALK'], ['==', '$type', 'LineString']]
+        filter: ['all', ['!=', 'mode', 'WALK'], ['==', '$type', 'LineString']],
       },
       'road-label'
     )
@@ -204,9 +202,9 @@ function renderRoutesOnMap(routes, networkIndex, activeNetwork, map) {
         type: 'line',
         paint: {
           'line-color': ['get', 'routeColor'],
-          'line-width': 3
+          'line-width': 3,
         },
-        filter: ['all', ['!=', 'mode', 'WALK'], ['==', '$type', 'LineString']]
+        filter: ['all', ['!=', 'mode', 'WALK'], ['==', '$type', 'LineString']],
       },
       'road-label'
     )
@@ -234,16 +232,16 @@ function renderPointsOfInterestOnMap(poi, map) {
     type: 'symbol',
     layout: {
       'icon-image': 'stroked-circle',
-      'icon-size': 0.11
-    }
+      'icon-size': 0.11,
+    },
   })
 
   const popup = new mapboxgl.Popup({
     closeButton: false,
-    closeOnClick: false
+    closeOnClick: false,
   })
 
-  map.on('mouseenter', POI_ID, e => {
+  map.on('mouseenter', POI_ID, (e) => {
     map.getCanvas().style.cursor = 'pointer'
 
     const coordinates = e.features[0].geometry.coordinates.slice()
@@ -254,10 +252,7 @@ function renderPointsOfInterestOnMap(poi, map) {
       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
     }
 
-    popup
-      .setLngLat(coordinates)
-      .setHTML(description)
-      .addTo(map)
+    popup.setLngLat(coordinates).setHTML(description).addTo(map)
   })
 
   map.on('mouseleave', POI_ID, () => {
