@@ -5,7 +5,7 @@ import React from 'react'
 import {POI_ID} from '../constants'
 
 // Default NavigationControl
-const navControl = new mapboxgl.NavigationControl({showCompass: false})
+const navControl = new mapboxgl.NavigationControl({visualizePitch: true})
 
 export default function useMap(mapProps, events, setMap) {
   const ref = React.useRef(null)
