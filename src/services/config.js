@@ -3,7 +3,6 @@ import set from 'lodash/set'
 
 import cacheURL from '../utils/cache-url'
 import {pointToCoordinate} from '../utils/coordinate-to-point'
-import fetch from '../utils/fetch'
 
 import {loadGrid} from './grid'
 import {loadPointsOfInterest} from './points-of-interest'
@@ -22,7 +21,7 @@ export default async function config(initialState = {}) {
   // Try to load points of interest
   if (initialState.poiUrl) {
     fetches.push(
-      loadPointsOfInterest(initialState.poiUrl).then(poi => {
+      loadPointsOfInterest(initialState.poiUrl).then((poi) => {
         data.poi = poi
       })
     )
@@ -31,7 +30,7 @@ export default async function config(initialState = {}) {
   // Load all opportunity grids
   get(initialState, 'grids', []).forEach((grid, i) => {
     fetches.push(
-      loadGrid(grid).then(fullGrid => {
+      loadGrid(grid).then((fullGrid) => {
         set(data, ['grids', i], fullGrid)
       })
     )
@@ -39,13 +38,13 @@ export default async function config(initialState = {}) {
 
   get(initialState, 'networks', []).forEach((network, i) => {
     fetches.push(
-      fetchTransitive(network).then(transitive =>
+      fetchTransitive(network).then((transitive) =>
         set(data, ['networks', i, 'transitive'], transitive)
       )
     )
 
     fetches.push(
-      fetchRequest(network).then(r => {
+      fetchRequest(network).then((r) => {
         // TODO remove when request data is moved to the top level.
         const request = get(r, 'request', r)
         const transitive = get(data, ['networks', i, 'transitive'])
@@ -76,13 +75,13 @@ export default async function config(initialState = {}) {
 }
 
 function fetchTransitive(network) {
-  return fetch(cacheURL(`${network.urls[0]}/transitive.json`)).then(res =>
+  return fetch(cacheURL(`${network.urls[0]}/transitive.json`)).then((res) =>
     res.json()
   )
 }
 
 function fetchRequest(network) {
-  return fetch(cacheURL(`${network.urls[0]}/request.json`)).then(res =>
+  return fetch(cacheURL(`${network.urls[0]}/request.json`)).then((res) =>
     res.json()
   )
 }

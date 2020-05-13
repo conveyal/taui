@@ -1,7 +1,6 @@
 import lonlat from '@conveyal/lonlat'
 
 import {MAPBOX_GEOCODING_URL} from '../constants'
-import fetch from '../utils/fetch'
 import cacheURL from '../utils/cache-url'
 
 /**
@@ -10,7 +9,7 @@ import cacheURL from '../utils/cache-url'
 function formatURL(text, accessToken, opts) {
   opts.access_token = accessToken
   const queryParams = Object.keys(opts)
-    .map(k => `${k}=${opts[k]}`)
+    .map((k) => `${k}=${opts[k]}`)
     .join('&')
   return cacheURL(`${MAPBOX_GEOCODING_URL}/${text}.json?${queryParams}`)
 }
@@ -22,8 +21,8 @@ function formatURL(text, accessToken, opts) {
  */
 export const geocode = (text, accessToken, opts) =>
   fetch(formatURL(text, accessToken, opts))
-    .then(response => response.json())
-    .then(geojson => geojson.features)
+    .then((response) => response.json())
+    .then((geojson) => geojson.features)
 
 export const reverseGeocode = (position, at, opts) =>
   geocode(lonlat.toString(position), at, opts)
