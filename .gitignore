@@ -1,5 +1,5 @@
 *.swp
-.env
+.env.local
 .env.build
 .next
 node_modules
