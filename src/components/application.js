@@ -143,24 +143,15 @@ export default class Application extends Component {
             <>
               <div className='heading'>Travel time</div>
               <div style={{display: 'flex', boxShadow: '0 0 1px #333'}}>
-                <button
-                  onClick={() => this._setPercentileIndex(0)}
-                  className={p.percentileIndex === 0 && 'active'}
-                >
-                  {p.percentileLabels[0]}
-                </button>
-                <button
-                  onClick={() => this._setPercentileIndex(1)}
-                  className={p.percentileIndex === 1 && 'active'}
-                >
-                  {p.percentileLabels[1]}
-                </button>
-                <button
-                  onClick={() => this._setPercentileIndex(2)}
-                  className={p.percentileIndex === 2 && 'active'}
-                >
-                  {p.percentileLabels[2]}
-                </button>
+                {p.percentileLabels.map((label, i) => (
+                  <button
+                    key={i}
+                    onClick={() => this._setPercentileIndex(i)}
+                    className={p.percentileIndex === i && 'active'}
+                  >
+                    {label}
+                  </button>
+                ))}
                 <style jsx>{`
                   button {
                     background-color: transparent;

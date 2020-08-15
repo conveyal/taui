@@ -17,7 +17,7 @@
     "style": "mapbox://styles/conveyal/cjr7kztgv1ac22sp9h7ucqhgp",
     "zoom": 11
   },
-  "percentileLabels": ["Good day", "Typical day", "Bad day"],
+  "percentileLabels": [],
   "percentileIndex": 0,
   "fetches": 0,
   "searchPoiOnly": false,
