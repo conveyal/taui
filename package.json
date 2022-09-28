@@ -3,7 +3,7 @@
   "description": "Isochrone & accessibility analysis",
   "main": "src/index.js",
   "engines": {
-    "node": "12.x"
+    "node": "16.x"
   },
   "scripts": {
     "build": "next build",
